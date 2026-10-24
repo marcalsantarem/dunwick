@@ -138,3 +138,11 @@ Respostas do usuário às perguntas n, o, p, q, r, s do 02:
 - **r) Sino no fim do slice:** o sino fica **"limpo"** (resposta própria; sem vínculo com a Coroa; mistério sobre o mal mantido).
 - **s) Classe da Grace:** **curandeira** por ora (aceita por padrão; "maga branca" pode vir depois).
 - **Pendente:** (j) nomes de NPCs menores, aldeia queimada, capital, instituição, sino e chefe; mal gigante. O 02 ainda não foi avisado desta rodada (será junto com a rodada de nomes).
+
+## D-018 — Secundárias, urso e quantidade (2026-10-24)
+Respostas do usuário às perguntas t, u, v do 02:
+- **t) Epílogo livre na vila acordada:** após a cura, o jogador pode terminar as secundárias da vila que faltarem. **Exige** uma cena a mais e um estado "vila acordada" (06/03 confirmam o custo).
+- **u) O urso-musgo morre** depois da luta; as armaduras de quem tentou antes ficam como memento. Mais sombrio. **Atenção:** a fala da Cuidadora "É só um sino" perde contraste com morte; o 02 ajusta o tom.
+- **v) 4 secundárias (total 5 missões, no limite da Bíblia):** 2 na vila, 1 na estrada e **1 nova na feira** (a escrever pelo 02).
+- Pendentes: nomes menores (j), mal gigante, nome do jogo.
+- O 02 ainda não foi avisado desta rodada (será junto com a rodada de nomes).
