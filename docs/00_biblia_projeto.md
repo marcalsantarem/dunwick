@@ -19,7 +19,7 @@
 
 - **Herói:** jovem aprendiz de guerreiro, órfão, de passado trágico. Quer se tornar cavaleiro e, no fundo, **vingar o passado contra um rei/tirano do país**. A vingança é o **pano de fundo**, não o centro. Nome **[A DEFINIR]**.
 - **Estrutura de abertura** (inspirada só na estrutura da primeira missão de FFVIII, nada copiado): uma **missão final de graduação** numa caverna, com um chefe.
-- **Gancho:** o chefe deixa um **espólio misterioso**. Depois da formatura, o objeto se revela **maldito/enfeitiçado** e atinge alguém da vila. O herói **adia a vingança e a ida para ser cavaleiro** e sai atrás de **uma feiticeira** capaz de desfazer a maldição.
+- **Gancho (revisado, D-015):** o **sino antigo** da vila se perdeu quando a aldeia do herói foi saqueada, há 10 anos (a mesma noite em que os pais dele morreram). Um monstro o achou e o trata como tesouro, no covil ao fim da dungeon inicial. Recuperá-lo é a **última tarefa do treinamento**, difícil, que outros guerreiros já tentaram. Ao ser usado na vila, o sino, **corrompido** enquanto esteve fora (ou protetor de um mal antigo), faz **todos adormecerem**. O herói **não é afetado** (uma **marca** misteriosa, que muito mais tarde se revelará como ser "o escolhido"/"diferente"). Ele adia a vingança e a ida para ser cavaleiro e sai atrás de **uma curandeira/feiticeira**.
 - **Primeira companheira (NPC):** ele a encontra na busca. A ideia de longo prazo é um **grupo de 3** (jogador + 2 NPCs que lutam sozinhos, com habilidades que o jogador pode usar) e **mais NPCs recrutáveis do que vagas**, para variar o gameplay.
 - **Arco geral:** pequeno e pessoal no começo; depois o rei e a maldição se ligam a um **mal gigante**; o final é **salvar o mundo**.
 - **Tom:** humor leve e ácido, mais adulto, com tensão real. Classificação-alvo **16 anos** (D-011).
@@ -47,11 +47,11 @@
 | Plataforma | navegador de computador, teclado + mouse, gamepad |
 | Idioma | português do Brasil |
 
-### O que o slice conta da história (proposta, 02 confirma)
-Vila (treino e vida cotidiana) → caverna da graduação (**masmorra** + **chefe**) → volta à vila com o espólio, que desencadeia a maldição → **região aberta** rumo à feiticeira → fim do slice com a **primeira companheira** se juntando em cena. O encontro com a feiticeira e o resto do mundo ficam depois do slice.
+### O que o slice conta da história (revisado, D-015; 02 detalha)
+Vila (treino com um sargento aposentado) → dungeon da graduação (**masmorra** + **chefe**: o monstro dono do covil) → volta à vila com o sino, que dorme a vila inteira → **região aberta** até a feira de **Ysolt Brum**, que confessa não ter poder real → **Grace**, aprendiz de curandeira, se prontifica a ajudar → **volta à vila e a cura**: fim do slice. O mal por trás do sino, a marca do herói e o resto do mundo ficam depois do slice.
 
 ### FORA (até depois do slice)
-Grupo de combate (a companheira entra **só como cena e diálogo** no fim do slice, sem lutar; D-012), multiplayer, árvore de talentos extensa, crafting, celular, idioma inglês (entra no M4), dublagem, editor de níveis para jogadores, conquistas, monetização ativa.
+Grupo de combate (a companheira Grace entra **só como cena e diálogo** a partir da feira, sem lutar; D-012), multiplayer, árvore de talentos extensa, crafting, celular, idioma inglês (entra no M4), dublagem, editor de níveis para jogadores, conquistas, monetização ativa.
 
 ## Referências (estilo e técnica, **nunca para copiar**)
 

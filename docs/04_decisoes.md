@@ -113,3 +113,18 @@ Efeitos a tratar pelo 02: o sino substitui o chefe-cavaleiro-do-selo (quem o rou
 | Companheira (aprendiz) | **Grace** (nome do próprio usuário; 02 checa originalidade) |
 | Mal gigante | **a definir**, depois de desenvolver mais atos da história |
 - Os nomes foram checados só de memória pelo 02. **Pendente:** busca na web de originalidade antes de fixar (nomes do roteirista) e nome do jogo ("Dunwick" segue provisório; é lugar real e lembra "Dunwich").
+
+## D-015 — Rodada final da história (2026-10-24)
+**Revisão do usuário sobre as opções do 02** (as respostas dele substituem D-013 onde conflitam):
+- **Sino (origem):** perdido quando a **aldeia do Edric foi saqueada**, há 10 anos (quando os pais morreram). Um **monstro** o achou e o guarda como tesouro no **covil ao fim da dungeon inicial** (caverna ou bosque, a critério do Produtor: **caverna**, coerente com a graduação). O **chefe é o monstro**. Obter o sino é a **última tarefa do treinamento**, tida como muito difícil (outros guerreiros já tentaram).
+- **Sino sem vínculo com o chanceler.** É só o "start" da jornada do herói. Ao ser usado, o sino pode ter sido **corrompido** no tempo fora da vila, **ou** protegia a vila de um mal que, corrompido, ele passa a potencializar (a decidir mais adiante).
+- **Maldição:** faz **todos na vila adormecerem** (a cuidadora é uma delas; a pergunta "por que ela" fica sem resposta específica). O herói **não é afetado** por causa de uma **marca**, que muito no futuro se revela como ser "o escolhido"/"diferente".
+- **Cadeia do slice:** Edric procura uma curandeira → **Ysolt Brum** (a feiticeira da feira) **confessa que não tem poder real** → **Grace**, aprendiz de curandeira (classe: "curandeira" por ora; talvez "maga branca"), se prontifica a ajudar → **voltam à vila e curam quem adormeceu**: **fim do slice**.
+- **Ficam como recomendado:** (b) treinador = **sargento aposentado da Guarda**; (c) aldeia queimada por **ordem do chanceler com o selo do rei**, Edric crê que foi o rei; (h) **18 anos hoje, saque há 10**; (i) **sem Luz/Sombra** por ora (Fogo, Gelo, Raio, Natureza); (k) **rei lúcido e arrependido**.
+- **Nome do rei:** **Ondric** (substitui Ulfrec, por semelhança com Ulfric Stormcloak). Em D-014, onde está "Ulfrec" leia "Ondric".
+- **Pontas ainda abertas:** a marca do herói (aparência e pista), o poder de Grace (cura; mecânica de cura da vila no slice), nomes de NPCs menores (j), o mal gigante e sua natureza.
+- **Efeito na Bíblia v1:** o fim do slice mudou (agora termina com a cura na vila, em vez de Grace se juntando); a seção foi atualizada.
+
+## D-016 — Tecnologia (ADR-001, 2026-10-24)
+- **Decisão (usuário):** **Three.js + câmera ortográfica + resolução interna 640×360** (escala inteira ×3). Medido: Alto 176 fps (pior 1 % 120), Baixo 478, 1ª tela ≈ 2 s, download inicial 1,75 MB. Ferramentas gratuitas/abertas; **geradores de assets em JavaScript/Node** (sem Python/Pillow); normal map OpenGL (verde para cima); animar sprites por shader/instância.
+- **Efeito:** ADR-001 sai de "proposto" para aceito. Falta o usuário informar a máquina dele (remedir) e se há Mac/Safari. Próximo: briefing do esqueleto M1 (só quando o usuário pedir).
