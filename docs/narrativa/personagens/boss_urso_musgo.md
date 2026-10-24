@@ -16,10 +16,10 @@
 |---|---|---|
 | 1 Controle | Defende o território. | Golpes grandes e legíveis (pancada, varrida, investida). Poucos ataques, telegraph longo. |
 | 2 Perda de controle | Agarra o sino e a aura sombria do sino o domina. | Cristais lançam estilhaços em arco; ataques mais rápidos, mas telegraph mantido. |
-| 3 Verdade | A aura se desprende do urso e o sino o solta. | Ataques frenéticos e imprevisíveis em padrão, mas **o aviso nunca some**; janela de dano maior. |
+| 3 Verdade | A aura se desprende do urso e o sino o solta. | Ataques frenéticos e imprevisíveis em padrão, mas **o aviso nunca some**; janela de dano maior. Termina na morte do urso (cena). |
 
 ## Falas
-Não fala. Sons: rugido (entrada), tilintar do sino a cada golpe de fase 2, gemido (fase 3), queda (derrota). O texto aparece só nas placas do cenário e nas falas de Edric (ver `textos.csv`, `txt_boss_*`).
+Não fala. Sons: rugido (entrada), tilintar do sino a cada golpe de fase 2, gemido (fase 3), queda e silêncio (morte). O texto aparece só nas placas do cenário e nas falas de Edric (ver `textos.csv`, `txt_boss_*`).
 
 ## Ponto fraco explicado pela história e visível no design
 O **sino** pendurado/preso à pata atrapalha a pata dianteira esquerda: o urso a protege e a usa pouco. A região do **ombro esquerdo** (musgo ralo, cristais quebrados por tentativas anteriores) é o ponto vulnerável e brilha após a fase 2.
@@ -29,11 +29,11 @@ O **sino** pendurado/preso à pata atrapalha a pata dianteira esquerda: o urso a
 
 ## Recompensa narrativa
 - O **sino** (`item_sino_antigo`, item-chave, não equipável).
-- **Lista de nomes** de quem tentou antes, pendurada no covil (lore).
+- **Lista de nomes** de quem tentou antes, pendurada no covil (lore), e o **círculo de armaduras** como memento.
 - Pista: o sino é o da aldeia de Edric (ele reconhece o formato, sem entender).
 
-## Destino do urso [ABERTO u]
-Recomendado: ao se livrar da aura, **foge** para as galerias do fundo; Edric não escolhe. Ver pergunta u.
+## Destino do urso [FIXO D-018]
+O urso **morre** depois da luta. Cena sóbria e curta, sem gore: ao perder a aura, ele olha para Edric, tenta alcançar o sino, tomba e fica quieto. **Memento:** as armaduras de quem tentou antes cercam o corpo; Edric pode (ação opcional) **pôr as armaduras em círculo** em volta dele (`txt_amb_covil_armaduras*`). Sem humor nessa cena; a Cuidadora e o sargento tratam disso no epílogo.
 
 ---
 
@@ -51,21 +51,21 @@ Recomendado: ao se livrar da aura, **foge** para as galerias do fundo; Edric nã
 
 **6. Presente.** Dorme sobre o sino. Quando alguém chega, acorda como um bicho acuado, não como um monstro. O musgo está mais fundo do que nunca, e o sino, mais quente.
 
-**7. Gancho.** A aura sombria do sino pode dominar o urso na luta (fase 2); quando Edric a quebra, o urso volta a ser um bicho. A mentira "é meu" se desfaz quando o sino é tirado dele, e o que sobra é um animal assustado.
+**7. Gancho.** A aura sombria do sino domina o urso na luta (fase 2); quando Edric a quebra, o urso volta a ser um bicho e, sem o sino, não sobrevive: a aura era o que o mantinha. A mentira "é meu" se desfaz com ele; o que sobra é um animal que morreu guardando uma coisa bonita e o peso disso para Edric (a vitória não tem festa).
 
 ### Notas para arte (10/04/07)
 1. Silhueta: ombros largos com cristais em fileira; musgo como textura de pelo.
 2. Cores: verde-musgo e pedra cinza, cristais azul-esverdeados (o mesmo azul do sino), olhos sem brilho, **sem magenta** (reservado a perigo).
 3. Escala: ocupa ≈ 3×3 tiles no mundo; sprite maior que a célula 64×64 do herói (04 define).
 4. Cenário: monte de brilhantes com objetos reconhecíveis (armaduras, talheres, bandeirolas), fio de luz do teto, estalactite quebrada com o sino.
-5. Fase 3: a aura se desfaz em fumaça escura que sobe, deixando o urso mais claro.
+5. Fase 3: a aura se desfaz em fumaça escura que sobe, deixando o urso mais claro. Morte: sem sangue, luz azul-esverdeada se apagando devagar; as armaduras ao redor entram em foco (circulo).
 
 ### Notas de combate (03/06)
 1. **Telegraph obrigatório** em todos os golpes (D-007); efeitos de cristal e HUD nunca cobrem o aviso.
 2. Golpes propostos: **pancada** vertical (círculo no chão), **varrida** de garra (cone), **investida** (retângulo), **estouro de cristais** (arco, fase 2+). Valores no 06.
 3. **Postura** (QUEBRADO) conforme D-009; o ponto fraco do ombro esquerdo dá bônus.
 4. Sem invocações; arena sem obstáculos grandes (pilares só para cobertura).
-5. Chefe de **3 fases**; dica visual de troca (flash ≤ 3/s).
+5. Chefe de **3 fases**; dica visual de troca (flash ≤ 3/s). A morte é **cena** (sem controle do jogador), curta; o 03 define o corte entre fim de luta e cena.
 
 ### Notas de som (05)
 1. Tema do chefe: grave e percussivo, com o timbre do sino como **eco** (não como melodia).

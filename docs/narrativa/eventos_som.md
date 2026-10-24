@@ -25,9 +25,12 @@
 | `mus_feira` | Feira | Ver `mus_motivo_ysolt` |
 | `mus_cura` | A cura | O tema de Grace + o sino limpo em coro |
 | `mus_fim` | Encerramento | Retoma o tema da vila, mais lento |
+| `mus_morte_urso` | Morte do urso | Quase só o sino, uma nota longa e abafada; sem percussão; luto, não vitória |
+| `mus_epilogo` | Epílogo na vila acordada | Tema da vila em tom menor, que clareia aos poucos; entra o tema de Grace |
+| `mus_feira_confissao` | Confissão de Ysolt | O tema alegre da feira se desmonta, sobra só a sineta |
 
 ## Ambientes
-`amb_vila_dia` (galinhas, martelo, passos de pedra) · `amb_vila_sono` (silêncio com ronco leve e vento) · `amb_caverna` (pingos, eco) · `amb_covil` (tilintar do monte brilhante) · `amb_estrada` (vento, passarinhos, cancela rangendo) · `amb_feira` (burburinho, sinetas, pano batendo).
+`amb_vila_dia` (galinhas, martelo, passos de pedra) · `amb_vila_sono` (silêncio com ronco leve e vento) · `amb_vila_acordada` (vida normal, mais baixa que de dia) · `amb_caverna` (pingos, eco) · `amb_covil` (tilintar do monte brilhante) · `amb_estrada` (vento, passarinhos, cancela rangendo) · `amb_feira` (burburinho, sinetas, pano batendo).
 
 ## Eventos de efeito sonoro (SFX)
 | ID | Quando | Tom/nota |
@@ -52,7 +55,11 @@
 | `sfx_urso_passo` | Passos do urso | Peso + metal tilintando |
 | `sfx_urso_cristais` | Estouro de cristais | Vidro grosso em pedra |
 | `sfx_urso_gemido` | Fase 3 | Gemido curto, vulnerável |
-| `sfx_urso_queda` | Derrota | Queda de peso e silêncio rápido |
+| `sfx_urso_queda` | Morte do urso | Queda de peso, um último tilintar do monte, silêncio longo |
+| `sfx_armaduras_circulo` | Edric põe as armaduras em círculo | Metal pousando devagar, sem batida; respeitoso |
+| `sfx_vila_acordada_amb` | Epílogo | Vozes, panelas, passos: a vila volta aos poucos |
+| `sfx_contrato_papel` | Contrato da Ysolt | Papel grosso, páginas virando |
+| `sfx_letreiro_troca` | Grace troca o letreiro | Tinta, madeira raspando, risada curta |
 | `sfx_cancela_rangido` | Cancela da estrada | Ferro enferrujado |
 | `sfx_pedagio_moeda` | Pagamento do pedágio | Moedas e carimbo |
 | `sfx_ui_diario` | Diário abre/atualiza | Folha virando |
@@ -69,5 +76,5 @@
 
 ## Para o 05: três regras de narrativa
 1. O **sino** é sempre a mesma nota. Antes da limpeza tem sombra; depois, não. O jogador deve **ouvir** a diferença.
-2. A vila adormecida é o momento mais quieto do jogo; o silêncio deve ser **desconfortável**, não relaxante.
+2. A vila adormecida é o momento mais quieto do jogo; o silêncio deve ser **desconfortável**, não relaxante. A **morte do urso** é o momento mais **solene**: sem comemoração musical; o sino é a única voz.
 3. A sineta de Ysolt e o sino antigo **não podem ser confundidos**.

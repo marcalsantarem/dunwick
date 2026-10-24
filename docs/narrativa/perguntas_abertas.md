@@ -1,4 +1,4 @@
-# Perguntas abertas — pontas soltas da história (v3, após D-017)
+# Perguntas abertas — pontas soltas da história (v4, após D-018)
 
 > Autor: 02 Roteirista · Para o Produtor levar ao usuário. Cada pergunta tem 2–3 opções e uma **recomendada**.
 > Nada aqui é fato até o usuário escolher. As letras são citadas em `biblia_do_mundo.md`, `missao_principal_slice.md` e nas fichas.
@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Já respondido pelo usuário (D-015 a D-017; não reabrir)
+## 1. Já respondido pelo usuário (D-015 a D-018; não reabrir)
 
 | Antiga | Tema | Resposta |
 |---|---|---|
@@ -24,6 +24,9 @@
 | p | Chefe | **Urso-musgo gigante** |
 | q | Urgência | **Sono sem prazo** |
 | r | Sino no fim | **Limpo**, sem vínculo com a Coroa |
+| t | Secundárias da vila | **Epílogo livre na vila acordada** (D-018); não expiram |
+| u | Destino do urso | **Morre**; armaduras de quem tentou antes como memento (D-018) |
+| v | Nº de secundárias | **4** (total 5); a nova é `quest_sec_letras_miudas`, na feira (D-018) |
 
 ### Originalidade (busca web)
 **Ondric**, **Edric Moss**, **Baixo Orvalho**, **Mor-Allen**, **Ysolt Brum** e **Oswin Cathe** (completo): sem conflito encontrado. "Oswin" sozinho existe em Fire Emblem. Busca de texto, sem checagem de marca (fica para o M6).
@@ -48,33 +51,24 @@ Nos textos, esses nomes aparecem como **variáveis** (`{nome_cuidadora}`, `{nome
 | **Taverneira** | **Zefa Caneca** · Tia Marta · Dona Ivete |
 | **Escrivão** | **Escrivão Plínio Selo** · Escrivão Arlindo Pena · Escrivão Teófilo Tinta |
 | **Viajante da estrada** | **Tomé Carga** · Beto Mala · Zé Cancela |
+| **Vendedor da feira** | **Seu Tadeu Doce** · Seu Anselmo · Dona Lídia |
 | **Nome do feitiço branco** | **A Bênção Branca** · O Rito da Água Limpa · A Limpeza |
 
 ---
 
-## t) Vila adormecida e prazo das secundárias da vila
+## w) O memento do urso: ação opcional ou automática?
 
-D-017 diz "cena, sem estado adormecido jogável". Como as duas secundárias da vila (`quest_sec_formulario_27b`, `quest_sec_receita_zefa`) só podem ser feitas com todos acordados:
-- **A — Secundárias da vila só antes da caverna, com aviso no diário (recomendada):** `txt_ui_aviso_expira`; a vila adormecida é cenário, só a casa da Cuidadora é interativa. Simples, sem estado novo. − o jogador pode perdê-las sem querer.
-- **B — Epílogo livre na vila acordada após a cura:** o jogador pode terminar as secundárias antes do encerramento. + não perde nada; − exige uma cena a mais e pede ao 06 estado "vila acordada".
-- **C — Mover as secundárias para a estrada e a feira:** a vila só tem a principal. + sem expiração; − perde a ligação entre NPCs da vila (regra do 02: secundárias conectam NPCs).
+D-018 fixa que o urso morre e as armaduras ficam como memento. Falta definir como o jogador participa.
+- **A — Ação opcional (recomendada):** o jogador escolhe pôr as armaduras em círculo (`txt_amb_covil_armaduras_acao`); quem não faz vê o círculo já formado, só que menos arrumado. Pouco custo, peso emocional, sem obrigar.
+- **B — Cena automática:** Edric arruma sozinho numa cena curta. Mais controlado; − tira a escolha.
+- **C — Só cenário:** as armaduras ficam como estão. Mais barato; − perde o gesto.
 
----
+## x) Custo dos três estados do mapa (06/03 confirmam)
 
-## u) Destino do urso-musgo depois da luta
-
-- **A — Foge para as galerias do fundo (recomendada):** ao se livrar da aura, vira bicho assustado e sai; o jogador não escolhe. Mantém o tom (não é mau) e evita morte gratuita (D-011).
-- **B — Morre:** cai e fica; as armaduras ficam como memento. Mais sombrio; − tira empatia.
-- **C — Escolha rápida (poupar ou não):** pequena escolha, efeito só de fala. + dá peso; − exige cena e flag extras.
-
----
-
-## v) Quantidade de missões secundárias
-
-O Produtor pediu "3–5 missões secundárias"; a Bíblia do Projeto diz "3–5 missões no total (1 principal + 2–4 secundárias)". O 02 entregou **3 secundárias** (total 4).
-- **A — Manter 3 (recomendada):** dentro dos dois limites.
-- **B — Subir para 4 (total 5):** no limite da Bíblia; uma secundária a mais na feira.
-- **C — Reduzir para 2:** mais barato para o 06/07.
+Para cumprir D-017/D-018, `map_baixo_orvalho` precisa de **dia**, **adormecida** (cenário) e **acordada** (epílogo).
+- **A — Três estados com o mesmo mapa e props trocados (recomendada):** reaproveita o mapa; NPCs mudam de pose (em pé, deitados, em pé); luz muda. O 06/03 decide se é por estado do mapa ou por flags.
+- **B — Duas cenas separadas para dormir e acordar:** só o dia e o epílogo são jogáveis; o sono é cutscene. Mais simples; − o jogador não anda pela vila adormecida (hoje a casa da Cuidadora é interativa).
+- **C — Cortar a adormecida jogável:** a casa da Cuidadora vira cutscene e o jogador só controla Edric de novo na estrada. Corte maior.
 
 ---
 
@@ -84,6 +78,6 @@ Nome e natureza continuam **em aberto**; o slice não os usa. Quando o usuário 
 ---
 
 ## Resumo das recomendações (para o Produtor levar em bloco)
-t A · u A · v A · j (usuário escolhe um a um; os recomendados já estão nos textos como variáveis).
+w A · x A · j (usuário escolhe um a um; os recomendados já estão nos textos como variáveis).
 
-**Combinações a evitar:** t=B com v=C (epílogo sem secundárias na vila); u=B com o tom da Cuidadora (fala "É só um sino" perde contraste se há morte gratuita).
+**Combinações a evitar:** x=C com a Parte 2 atual (a casa da Cuidadora deixa de ser interativa, o livro precisaria virar cena); w=B com u de D-018 (morte do urso fica ainda mais "de cena", pouco de jogador).

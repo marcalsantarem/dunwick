@@ -1,4 +1,4 @@
-# Bíblia do Mundo — v3 (BRF-008, atualizada com D-015 a D-017)
+# Bíblia do Mundo — v4 (BRF-008, atualizada com D-015 a D-018)
 
 > Autor: 02 Roteirista · Base: Bíblia do Projeto v1, D-011 a D-016, `perguntas_abertas.md`.
 > **Legenda de status:**
@@ -6,7 +6,7 @@
 > - **[PROPOSTA]** preenchimento mínimo do 02 para o slice ser produzível; o usuário pode trocar.
 > - **[ABERTO]** depende de uma pergunta em `perguntas_abertas.md` (cita a letra).
 > Regra: nada em [PROPOSTA] ou [ABERTO] vira dado, arte final ou texto de jogo antes de aprovado.
-> **v3:** além de D-015 (sino, maldição, fim do slice, rei **Ondric**), entram D-017: marca de sino no antebraço, chefe **urso-musgo gigante**, cura por **feitiço branco** (Grace abençoa e limpa o sino), sono sem prazo, sino limpo no fim. Fichas completas em `personagens/`, textos em `textos.csv`.
+> **v4:** D-018 adiciona epílogo livre na vila acordada, **morte do urso** (armaduras como memento) e 4ª secundária na feira. **v3:** além de D-015 (sino, maldição, fim do slice, rei **Ondric**), entram D-017: marca de sino no antebraço, chefe **urso-musgo gigante**, cura por **feitiço branco** (Grace abençoa e limpa o sino), sono sem prazo, sino limpo no fim. Fichas completas em `personagens/`, textos em `textos.csv`.
 
 ---
 
@@ -39,9 +39,9 @@
 | 10 aj | Um **monstro** acha o sino e o leva para um covil, como tesouro. | [FIXO] |
 | 10 aj | Edric é acolhido e criado pela **Cuidadora** em Baixo Orvalho. | [FIXO] que foi criado por ela · como o encontrou [PROPOSTA] |
 | Anos seguintes | O rei **Ondric** envelhece e adoece; o chanceler **Oswin Cathe** passa a governar de fato. Edric treina com um sargento aposentado da Guarda. Vários guerreiros tentam pegar o sino e falham. | [FIXO] |
-| Hoje, dia 1 | **Última tarefa do treinamento:** pegar o sino no covil, tida como muito difícil. Edric vence o monstro e traz o sino. | [FIXO] |
+| Hoje, dia 1 | **Última tarefa do treinamento:** pegar o sino no covil, tida como muito difícil. Edric vence o monstro, que **morre**, e traz o sino. | [FIXO] |
 | Hoje, dia 1 à noite | O sino toca na vila e **todos adormecem**, menos Edric. | [FIXO] |
-| Hoje, dias seguintes | Edric acha o **feitiço branco** nos livros da Cuidadora e adia a vingança e a ida para cavaleiro. Na feira, Ysolt **confessa que não pode** executá-lo e **Grace abençoa e limpa o sino**. Voltam à vila, o **sino limpo** soa, a **aura sombria sai** e todos acordam (cena). Fim do slice. | [FIXO, D-017] |
+| Hoje, dias seguintes | Edric acha o **feitiço branco** nos livros da Cuidadora e adia a vingança e a ida para cavaleiro. Na feira, Ysolt **confessa que não pode** executá-lo e **Grace abençoa e limpa o sino**. Voltam à vila, o **sino limpo** soa, a **aura sombria sai** e todos acordam (cena). Epílogo livre na vila acordada e fim do slice. | [FIXO, D-017/D-018] |
 
 **Edric crê que o rei mandou queimar a aldeia [FIXO]**; a verdade (foi Oswin, com o selo do rei) fica para depois do slice.
 
@@ -54,7 +54,7 @@ Mínima, só o que o slice precisa. Cada lugar tem função de jogo e uma imagem
 - **Imagem forte (Lanterna e Musgo):** vila no fundo de um vale onde o orvalho nunca seca; telhados de musgo, lanternas que acendem ao entardecer, **poço no centro**.
 - **Imagem forte, depois do sino:** a mesma vila **toda adormecida**: gente deitada onde estava, de lado na praça, na porta da taberna, com a lanterna acesa e o silêncio no lugar do barulho. É o contraste visual do slice.
 - **Lugares-chave:** praça com poço; a **casa da Cuidadora** (ervas pendendo, luz de vela, **estante de livros** com o feitiço branco [FIXO D-017]); o **campo de treino** da Guarda; a **taverna**; a **forja**; o **quadro de avisos** com editais, taxas e (depois) o cartaz de Ysolt.
-- **Vila adormecida [FIXO D-017]:** o sono é **cena e cenário**, sem estado adormecido jogável; os habitantes ficam deitados como props e só a casa da Cuidadora é interativa (pergunta t).
+- **Três estados do mapa [FIXO D-017/D-018]:** (1) **dia** (Parte 1); (2) **adormecida** (cenário, habitantes deitados como props; só a casa da Cuidadora é interativa); (3) **acordada** (epílogo livre, secundárias da vila podem ser terminadas).
 
 ### 4.2 A caverna da graduação — `map_caverna_graduacao` [PROPOSTA nome genérico]
 - **Função de jogo:** masmorra + chefe. Atmosfera B · Cinza e Brasa.
@@ -99,7 +99,7 @@ Mínima, só o que o slice precisa. Cada lugar tem função de jogo e uma imagem
 5 inimigos comuns e 1 chefe. Aqui só o motivo narrativo; combate é do 06/03.
 - **Fauna da caverna (2–3 tipos):** bichos do escuro e da umidade. Motivo: território e fome. Quais exatamente fica para o 04/10 com o 06.
 - **Gente da estrada (2–3 tipos):** saqueadores famintos, arruinados por taxas; **não são monstros**, são vítimas da burocracia. Moral cinzenta.
-- **Chefe [FIXO D-017]:** **urso-musgo gigante** (musgo e cristais, acumula objetos brilhantes), `boss_urso_musgo`. Nome provisório **Musgoso** [PROPOSTA j]. Ficha completa em `personagens/boss_urso_musgo.md`.
+- **Chefe [FIXO D-017]:** **urso-musgo gigante** (musgo e cristais, acumula objetos brilhantes), `boss_urso_musgo`. Nome provisório **Musgoso** [PROPOSTA j]. **Morre** depois da luta [FIXO D-018]. Ficha completa em `personagens/boss_urso_musgo.md`.
 - Sons característicos e aparência de cada inimigo: o 02 detalha quando o 06 fechar a lista.
 
 ## 8. Glossário (grafia oficial)
@@ -115,7 +115,7 @@ Mínima, só o que o slice precisa. Cada lugar tem função de jogo e uma imagem
 | **Grace** | Aprendiz de curandeira, primeira companheira | [FIXO] |
 | **o sino** | Sino antigo de cobre, perdido no saque. Fica **limpo** no fim do slice. Nome próprio [ABERTO j]. | [FIXO] |
 | **a Bênção** | Feitiço branco antigo que limpa a sombra do sino. Nome do rito [ABERTO j]. | [FIXO que existe] |
-| **o urso-musgo** | Chefe da caverna. Nome provisório Musgoso. | [FIXO · nome PROPOSTA] |
+| **o urso-musgo** | Chefe da caverna; morre depois da luta. Nome provisório Musgoso. | [FIXO · nome PROPOSTA] |
 | **a Cuidadora** | Nome provisório da mulher que criou Edric | [ABERTO j] |
 | **a Guarda** | Nome provisório da instituição que forma cavaleiros | [ABERTO j] |
 | **o saque** | A queima e pilhagem da aldeia de Edric, há 10 anos | [FIXO] |
@@ -150,4 +150,4 @@ Textos de jogo: `textos.csv` (IDs por área). Missões secundárias em `missoes/
 
 ## 10. Revisão de consistência (checklist do 02)
 1. Linha do tempo sem contradição com D-015: ok. 2. Grafia igual ao glossário (Ondric no lugar de Ulfrec): ok. 3. Magia respeitada: ok. 4. Personagens agem conforme desejo e medo: ok. 5. Vozes distintas: ok. 6. Tom 16+ e D-011: ok. 7. Notas para arte, combate e som: parciais. 8. Originalidade: ver `perguntas_abertas.md`. 9. Pontas soltas: todas em `perguntas_abertas.md`. 10. Textos dentro do limite: sim.
-**Pontas conhecidas:** a aldeia queimada de Edric não tem nome (proposta **Vale Seco**, pergunta j); o destino do urso depois da luta (pergunta u); o grau de exploração da vila adormecida (pergunta t).
+**Pontas conhecidas:** a aldeia queimada de Edric não tem nome (proposta **Vale Seco**, pergunta j); o custo dos três estados do mapa (06/03 confirmam).
