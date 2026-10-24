@@ -146,3 +146,10 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **v) 4 secundárias (total 5 missões, no limite da Bíblia):** 2 na vila, 1 na estrada e **1 nova na feira** (a escrever pelo 02).
 - Pendentes: nomes menores (j), mal gigante, nome do jogo.
 - O 02 ainda não foi avisado desta rodada (será junto com a rodada de nomes).
+
+## D-019 — Custo dos estados da vila e extras do urso (BRF-010, 2026-10-24)
+- **Vila em 3 estados: versão COMPLETA** (usuário): sprites novos de aldeões deitados (adormecida) e poses próprias na vila acordada, além da luz. Custo de arte **médio** (04 Sprites e 07 Cenário). Simulação: mapa único com 3 variantes escolhidas ao carregar pelas flags, precedência acordada > adormecida > dia; aldeões dormindo são props sem IA, sem hurtbox e sem colisão que bloqueie rota; o save guarda só flags.
+- **Memento das armaduras: SIMPLIFICADO** (usuário): só visual, sem interação (substitui a ação opcional de 3 s e `flag_armaduras_circulo`).
+- **Ponto fraco do urso: SIMPLIFICADO** (usuário): apenas bônus quando a postura quebra, sem hurtbox por zona (o ×1,25 de ponto fraco em formulas §4.4 vira só o bônus de postura quebrada; 06 ajusta).
+- **Aceito das respostas do 03/06:** estado CENA do herói (invencível, trava na morte do chefe, pausa de 30 quadros); roteiro de cena em dados (passos temporizados) compartilhado pelas cenas 1.4, 2.2, 3.3 e 3.4, com formato do 08; flag `flag_urso_derrotado` (o urso não renasce); manter uma só flag entre `flag_vila_curada` e `flag_vila_acordada`; não salvar em CENA ou DIÁLOGO; ponto da cura checa flags, não inventário; Grace seguidora sem colisão com o herói; itens com valores iniciais (doce 25, sopa 30, poção 50, carimbo sem efeito).
+- **O M1 não muda** (tudo isso é M3).

@@ -187,7 +187,54 @@ A distância é contada por passos em 4 direções, então é o limite de cima. 
 
 ---
 
+## 9. Respostas ao Produtor (BRF-010: 3 estados da vila e o urso-musgo)
+
+> Base: `missao_principal_slice.md` v4, `boss_urso_musgo.md`, D-017/D-018. Custos: baixo / médio / alto. A resposta (e) do 03 ainda não existe; assumi **estado resolvido no carregamento do mapa + cenas que trocam objeto por objeto** e o 03 confirma.
+
+**(a) Três estados de `map_baixo_orvalho`: por flags, num único mapa. Custo médio.**
+O mapa (layout, colisão, portais, luzes-base) é um só. O estado é uma tabela `estados_mapa` com `condição` (flags) e, por objeto, `visivel`, `pose`, `interativo`, `luz` e `musica`:
+`adormecida` = `flag_vila_dorme` e não `flag_vila_curada`; `acordada` = `flag_vila_acordada`; senão `dia`.
+Dados: baixo (6–8 NPCs × 3 linhas). Implementação: médio (o 03 resolve o estado ao carregar). Arte: **alto se cada NPC ganhar pose de dormir** (6–8 sprites extras do 04).
+**Alternativa barata (recomendada):** adormecida = pose parada atual + luz fria + partículas "zz" do 10, sem sprite novo; poses dedicadas só se sobrar orçamento. `acordada` não custa arte: usa as poses normais, luz de manhã e os `txt_epi_*`.
+
+**(b) Flags: cabem no esquema de missões sem mudança. Custo baixo.**
+São 11 flags principais + 11 das secundárias (booleanas ou inteiros 0–3, padrão 0), e gatilhos com E de flags (ex.: cura = `flag_sino_limpo` E `flag_grace_no_grupo` dentro da vila). `flag_epilogo_partir` só liga a tela de encerramento.
+**Pedido ao 02:** `flag_vila_curada` e `flag_vila_acordada` se sobrepõem (cena 3.4 e corte para a 3.5). Sugiro manter só uma, ou dizer qual liga cada coisa; senão há dois estados possíveis para o mesmo instante.
+
+**(c) Itens e recompensas só em item: confirmado. Custo baixo.** Valores iniciais (provisórios, sem economia ainda; vida do herói nv. 1 = 140):
+
+| ID | Tipo | Efeito / valor | Venda |
+|---|---|---|---|
+| `item_doce_limao` | consumível, empilha 9 | cura **25** (H-fórmula §9 do formulas) | 6 |
+| `item_sopa_ervas` | consumível, empilha 9 | cura **30** | 8 |
+| `item_pocao_ervas` | consumível, empilha 9 | cura **50** ("cura pequena" da 27-B = 2 desta) | 12 |
+| `item_carimbo_honorario` | lore, não empilha | sem efeito, valor 0 | não vende |
+| `item_sino_antigo`, `item_sino_limpo`, `item_livro_cuidadora`, `item_contrato_ysolt` | chave/lore | sem efeito; não vende nem descarta | não vende |
+
+Sem moedas como recompensa (só trocam de mão na secundária do viajante). **Alternativa barata:** doce, sopa e poção partilham o ícone de cura com cor diferente (menos arte para o 07/04).
+
+**(d) Urso-musgo (`boss_urso_musgo`). Custo médio na lógica; alto só no sprite do 04.**
+- **Arquétipo:** Pesado, com Atirador na fase 2 (estilhaços). Pergunta: "tenho paciência?". Contra-jogo: esquivar e punir a recuperação, quebrar a postura, atacar o ombro esquerdo.
+- **Fases por vida:** 100–66 % território · 66–33 % posse (cristais) · 33–0 % verdade. Transição: invencível ~2 s, flash ≤ 3/s.
+- **Golpes (resumo, em quadros; telegraph ≥ 60 e forma exata no chão, convenção do 10):**
+
+| Golpe | Forma | Aviso | Ativo | Recup. | Dano base | Fases |
+|---|---|---|---|---|---|---|
+| pancada | círculo r 2,0 | 90 | 8 | 55 | 28 `impacto` | 1–3 |
+| varrida | cone 120°, alcance 3,0 | 72 | 6 | 45 | 20 `corte` | 1–3 |
+| investida | retângulo 6 × 1,6 | 100 | 12 | 70 | 24 `impacto` | 1–3 |
+| estouro de cristais | arco 180°, alcance 4,5 | 66 | 6 | 50 | 18 `perfuracao` | 2–3 |
+
+  Fase 2: avisos −20 %, mas nunca abaixo de 60 (o aviso não encurta além disso, para o 02 "telegraph mantido"). Fase 3: combina 2 golpes em sequência, recuperação +20 q (janela de dano maior), sem tirar o aviso.
+- **Números de referência (a calibrar em simulação):** vida ~2800 (faixa 2400–3200), duração-alvo 3–6 min, vitória 20–40 % na 1ª tentativa. Postura 200, `resist_recuo` 1,0 (o combo leve não o trava), QUEBRADO 90 q com ×1,5 de dano e **10 s sem acumular postura depois de quebrar** (regra nova para chefes, para não encadear). Meta: 1 quebra por fase.
+- **Ponto fraco (ombro esquerdo):** segunda hurtbox com `ponto_fraco` ×1,25 (nova linha em `formulas.md` §4.4); brilha na fase 2+. **Alternativa barata:** sem ponto fraco, só quebra de postura.
+- **Arena:** câmara circular de ~18 tiles de diâmetro (entre as arenas média e grande). O chefe ocupa ≈ 3 × 3 tiles (hurtbox r ≈ 1,2). Pilares só como cobertura, sem obstáculo grande.
+- **Morte e memento:** vida 0 → cena sem controle (o 03 define o corte). Sem mecânica de dano nela; o memento é interação opcional, sem recompensa em número.
+
+---
+
 ## Histórico de mudanças
 | Data | Mudança | Antes → depois | Motivo |
 |---|---|---|---|
 | 2026-10-24 | Criação (BRF-004) | — | Onda 0; alinhado ao `gameplay.md` v0.1 |
+| 2026-10-24 | §9 Respostas ao Produtor (BRF-010) | — | D-017/D-018; `formulas.md` §4.4 ganha `ponto_fraco` ×1,25 |

@@ -250,6 +250,7 @@ Regra do 10 (`docs/arte/guia_visual.md` A1.2), decidida pelo Produtor (D-007):
 | DANO | golpe passou pelo pipeline e não foi ignorado | PARADO, MORTE | nenhuma (ver §4.4) |
 | MORTE | vida ≤ 0 | — (game over / reinício, tela do 07) | nenhuma |
 | INTERAGIR / DIÁLOGO | `interagir` com alvo válido | PARADO ao fim | controle travado até o fim |
+| CENA | gatilho de cena (flag ou fim de chefe, §15) | PARADO ao fim da cena | nenhuma; controle travado, herói invencível, buffer esvaziado; só `pular_dialogo` age. Não se salva durante a CENA (§15, g) |
 
 "Livre" = PARADO, ANDAR, CORRER. Cada estado implementa entrar, atualizar, sair e lista de transições permitidas; transição não declarada é ignorada e registrada no log de debug.
 
@@ -460,6 +461,8 @@ Convenção do 10 (`docs/arte/guia_visual.md` §9) — **em revisão com 03/06/0
 - **Transição de área:** portal com destino; fade curto; carregamento da próxima área pelo 08.
 - **O que salvar:** posição e área, vida e mana, inventário, flags, missões, objetos abertos, habilidades equipadas. Formato, versão e migração: 08.
 
+- **Variantes de mapa por flags** (§15, e): o mesmo mapa pode ter variantes (ex.: dia, adormecida, acordada), escolhidas **ao carregar** a partir das flags; nada de estado "adormecido" jogável.
+
 Tudo nesta seção está **fora do M1**.
 
 ---
@@ -621,12 +624,64 @@ As 8 perguntas da v0.1 foram respondidas em `formulas.md` §13 e aplicadas nesta
 | Inimigos e IA (inclui postura/QUEBRADO) | pendente |
 | Chefe | pendente |
 | Interação, diálogo, missões | pendente |
+| Cenas (estado CENA, roteiro de cena em dados) e variantes de mapa | pendente |
 | Transição de área e save | pendente |
 | HUD ligado ao estado | pendente |
 | Debug | pendente |
 
 ---
 
+## 15. Respostas ao Produtor (BRF-010, itens e–h)
+
+Premissa de leitura: `docs/narrativa/missao_principal_slice.md` v4, `boss_urso_musgo.md`, D-017 e D-018. **Nada disso entra no M1** (ver h). Valores abaixo são propostas do 03, ajustáveis em playtest; o 06 responde (a)–(d) em paralelo e as duas respostas precisam casar no ponto marcado ⇄.
+
+### (e) Como a simulação lê os 3 estados do mapa — custo **baixo** (simulação) e **médio** (arte, de outros agentes)
+- **Recomendação: variantes escolhidas ao carregar, por flags; sem troca em tempo de execução.** Um único `map_baixo_orvalho` (geometria, colisores e portais iguais) com uma lista de variantes: `dia`, `adormecida`, `acordada`. Cada variante só declara o que muda: pose dos NPCs, preset de luz (10) e quais objetos/NPCs são interativos. A escolha é uma função das flags no carregamento: `flag_vila_acordada` → acordada; senão `flag_vila_dorme` → adormecida; senão dia ⇄ (o 06 confirma esta precedência e o que cabe no esquema de missões).
+- As trocas dentro de uma cena (2.2 sono, 3.4 cura, corte para 3.5) acontecem **sob fade**, reaproveitando a transição de área (portal para o mesmo mapa com a variante nova). Evita um mecanismo de troca ao vivo, que seria custo **médio** e sem ganho.
+- Aldeões dormindo são **props**: sem IA, sem sensores, sem hurtbox, sem pushbox bloqueando rota. A simulação não os vê como inimigos.
+- O save guarda **só flags**; a variante nunca é gravada, é recalculada.
+- **Alternativa mais barata:** `acordada` reaproveita o layout e as poses de `dia`, com um preset de luz e os textos `txt_epi_*` (2 variantes visuais em vez de 3). O custo é de arte, não meu; o usuário decide com o 07/10.
+
+### (f) Cena de morte do chefe e memento — custo **médio** (cena) e **baixo** (memento)
+- **Fim da luta:** quando a vida do `boss_urso_musgo` chega a 0 (passo 8 do pipeline), a simulação **não** mata de imediato: cancela avisos e projéteis, entra o herói em CENA (invencível, sem controle), faz a pausa de impacto longa de `chefe_morte_corte_quadros` e roda a cena (urso olha, alcança o sino, tomba; luz se apaga; sem gore). Se o herói morrer **no mesmo quadro**, a morte do chefe prevalece e o herói fica com 1 de vida: não se perde depois de vencer.
+- **Depois da cena:** controle livre na arena. `item_sino_antigo` (flag `flag_sino_recolhido`) e o **memento** são duas interações independentes, em qualquer ordem. O memento é um objeto interativo (`interagir`, raio 1,0): o herói entra em INTERAGIR por `memento_duracao_quadros`, as armaduras entram em círculo e liga `flag_armaduras_circulo` (sem recompensa; o 02 pode usar a flag no epílogo). Opcional, nunca bloqueia nada.
+- **Flag nova que sugiro ao 02:** `flag_urso_derrotado`, para o chefe não renascer se o jogador sair da caverna antes de pegar o sino. Sem ela há soft-lock lógico (sino pegável, urso de volta).
+- **Alternativa mais barata:** o memento é só visual (armaduras já em círculo na cena, sem interação). Custo ~zero; perde a escolha do jogador.
+- **Peça compartilhada de custo médio:** nenhuma cena existe sem um **roteiro de cena em dados** (lista de passos temporizados: mover câmera, animação, som, diálogo, esperar, ligar flag, trocar variante). É a mesma peça das cenas 1.4, 2.2, 3.3 e 3.4; o formato é do 08. Um por todos, não um por cena.
+
+### (g) Risco de soft-lock — vila adormecida e epílogo
+| Risco | Regra de prevenção (custo baixo) |
+|---|---|
+| Aldeão adormecido bloqueia caminho até a casa ou o portão | Adormecidos sem pushbox bloqueante e fora das rotas de ≥ 2 tiles; o script de caminho do 06 (§8.5 das métricas) roda **por variante**: início → casa da Cuidadora → praça → portão |
+| Save no meio de uma cena (flags pela metade) | Não se salva em CENA nem em DIÁLOGO; as flags de cada cena gravam **em bloco no fim** (transação); autosave ao terminar 2.2, 2.3, 3.4 e antes de "Partir" |
+| Cura depende do item `item_sino_limpo` e o jogador o perdeu | Item-chave não vendável, não descartável; o ponto do poço checa **flags** (`flag_sino_limpo` e `flag_grace_no_grupo`), não o inventário |
+| Jogador não sabe o que fazer na vila adormecida | Objetivo no diário e marcador na casa da Cuidadora; portão fechado até `flag_rumo_ysolt_aceito`, com texto (`ui_`) dizendo por quê |
+| Secundária da vila exige NPC acordado e o jogador está na adormecida | Diário mostra "disponível depois da cura"; nenhum item dessas missões é consumido durante o sono (06/02 confirmam) |
+| Grace (seguidora, sem lutar) fica presa ou longe | Sem colisão com o herói; se passar de `seguidor_teleporta_dist_tiles` ou ficar presa, reaparece atrás do herói, fora da câmera |
+| "Partir" encerra e o jogador queria ficar | Aviso com confirmação, repetível; `flag_epilogo_partir` só liga na confirmação; autosave antes da tela de encerramento, então "Continuar" volta à vila acordada |
+| Saídas da vila no epílogo levam a áreas já "fechadas" | No epílogo o portão só abre o aviso partir/ficar; o resto das saídas fica fechado, com texto |
+| Perigo na vila | A vila não tem inimigos nem dano em nenhuma variante, então não há morte nela |
+| `flag_vila_curada` e `flag_vila_acordada` fora de sincronia | Ligar as duas na mesma transação, no corte da cena 3.4 para 3.5 |
+
+Parâmetros novos (dados; propostas):
+
+| Chave | Valor | Observação |
+|---|---|---|
+| `chefe_morte_corte_quadros` | 30 | Pausa entre o último golpe e o começo da cena (0,5 s) |
+| `memento_duracao_quadros` | 180 | Interação do memento (3 s) |
+| `seguidor_dist_alvo_tiles` | 1,5 | Distância que Grace mantém atrás do herói |
+| `seguidor_teleporta_dist_tiles` | 8 | Acima disso, ou presa por 3 s, reaparece fora da câmera |
+
+### (h) O que muda no "M1 precisa ter"
+**Nada.** O M1 continua só com `map_sala_teste`, o herói e os dois bonecos. O que aparece aqui (variantes por flags, estado CENA, roteiro de cena, morte de chefe, memento, seguidor) é trabalho do M3, e fica em §14 como pendente. Duas coisas baratas valem se alguém tiver folga no M1, sem virarem critério: o estado CENA do herói (travar controle e invencibilidade) e o carregamento de mapa já aceitar a lista `variantes`.
+
+### Extras que afetam custo (fora do pedido)
+- **Ponto fraco do urso (ombro esquerdo):** exige **hurtbox por zona** com multiplicador, em vez de uma hurtbox só. Custo **baixo-médio**, e o 06 já tem o multiplicador situacional. **Alternativa:** sem zonas, o bônus vem só da postura quebrada.
+- **Grace seguidora:** é um NPC com comportamento de seguir, sem combate. Custo **baixo**, regras acima.
+
+---
+
 ## Histórico
 - v0.1 (2026-10-24) — rascunho inicial (BRF-003). Sem stack, sem premissa. Inclui a convenção de aviso do 10 e o alinhamento com os critérios M1 do 09.
 - v0.2 (2026-10-24) — alinhamento com 06 (formulas.md, metricas.md, D-009), 07 (controles, D1–D5), 10 (diagonais, tingimento, IDs fx_, câmera) e D-007: fôlego e `esquiva_custo` 25, `mana_max`/`folego_max`, colunas de dano nos ataques, `travamento_quadros`, estado QUEBRADO, colisores e linha de visão (§5.9), `map_sala_teste` no M1, novos itens 14b/14c.
+- v0.2.1 (2026-10-24) — §15 Respostas ao Produtor (BRF-010, e–h): variantes de mapa por flags, cena de morte do chefe e memento, regras de soft-lock, M1 inalterado; estado CENA no §5.1.

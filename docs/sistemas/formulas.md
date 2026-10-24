@@ -169,6 +169,7 @@ Combo leve completo no nível 1: 13 + 13 + 20 = **46** em 57 quadros (≈ 0,95 s
 | `costas` | atacante no setor traseiro de 120° do alvo | ×1,25 |
 | `postura_quebrada` | alvo em QUEBRADO (§7) | ×1,5 |
 | `exposto` | alvo com `est_exposto` (§5.3) | ×1,2 |
+| `ponto_fraco` | golpe acerta a hurtbox de ponto fraco do alvo (só chefes; ex.: ombro do `boss_urso_musgo`) | ×1,25 |
 
 Contra o herói, só `exposto` vale (ele não tem postura, e o inimigo não "procura" as costas no slice).
 
