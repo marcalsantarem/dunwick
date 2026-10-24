@@ -128,3 +128,13 @@ Efeitos a tratar pelo 02: o sino substitui o chefe-cavaleiro-do-selo (quem o rou
 ## D-016 — Tecnologia (ADR-001, 2026-10-24)
 - **Decisão (usuário):** **Three.js + câmera ortográfica + resolução interna 640×360** (escala inteira ×3). Medido: Alto 176 fps (pior 1 % 120), Baixo 478, 1ª tela ≈ 2 s, download inicial 1,75 MB. Ferramentas gratuitas/abertas; **geradores de assets em JavaScript/Node** (sem Python/Pillow); normal map OpenGL (verde para cima); animar sprites por shader/instância.
 - **Efeito:** ADR-001 sai de "proposto" para aceito. Falta o usuário informar a máquina dele (remedir) e se há Mac/Safari. Próximo: briefing do esqueleto M1 (só quando o usuário pedir).
+
+## D-017 — Marca, chefe, cura e sino (2026-10-24)
+Respostas do usuário às perguntas n, o, p, q, r, s do 02:
+- **n) Marca do Edric:** **desenho de sino no antebraço**; esquenta e brilha quando o sino toca (pista no slice).
+- **o) A cura (resposta própria):** a **Grace "abençoa" o sino** (feitiço branco antigo) e o **limpa**; ao usá-lo, a **aura sombria da vila some e as pessoas acordam**. O Edric encontra o feitiço nos **livros da cuidadora/curandeira** e vai atrás de uma feiticeira (Ysolt) para executá-lo; Ysolt confessa que não pode, e a Grace o faz. Mecânica no slice: cena/uso do sino limpo, sem estado "adormecido" jogável (06/03 confirmam).
+- **p) Chefe da caverna:** **urso-musgo gigante** (musgo e cristais, acumula objetos brilhantes). Nome ainda a escolher.
+- **q) Urgência:** **sono sem prazo** (recomendada, aceita por padrão; a urgência é emocional).
+- **r) Sino no fim do slice:** o sino fica **"limpo"** (resposta própria; sem vínculo com a Coroa; mistério sobre o mal mantido).
+- **s) Classe da Grace:** **curandeira** por ora (aceita por padrão; "maga branca" pode vir depois).
+- **Pendente:** (j) nomes de NPCs menores, aldeia queimada, capital, instituição, sino e chefe; mal gigante. O 02 ainda não foi avisado desta rodada (será junto com a rodada de nomes).
