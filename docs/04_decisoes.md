@@ -88,3 +88,28 @@ Aceitas as respostas do 03: alcance medido da origem do golpe até a **borda** d
 
 ## D-012 — Companheira no slice (2026-10-24)
 - **Decisão (usuário, opção A):** a primeira companheira aparece no **fim do slice só como cena e diálogo** (anda com o herói, sem lutar nem habilidades compartilhadas). O **grupo de 3** (jogador + 2 NPCs de IA, habilidades usáveis pelo jogador, mais NPCs recrutáveis do que vagas) entra **depois do slice**. Os dados já ficam preparados (habilidades por ID, D-004).
+
+## D-013 — Escolhas do usuário sobre a história (2026-10-24)
+Fonte: `docs/narrativa/opcoes_v1.md` (02). Escolhas:
+1. **Espólio:** **ideia própria do usuário**: um **sino antigo, que havia sido roubado**; ao ser usado na vila, causa a maldição. (Substitui as opções A/B/C do 02; selo real/relicário **descartados** como espólio. Como o sino liga ao rei e ao mal gigante fica a definir com o 02.)
+2. **Atingida:** **a cuidadora que criou o herói** (idosa curandeira da vila).
+3. **Passado do herói:** **a aldeia queimada** (soldados do rei queimaram a aldeia dele por tributo atrasado; ele sobreviveu escondido).
+4. **Rei:** **rei fantoche e chanceler tirano** (rei velho e doente; quem manda é um chanceler burocrata cruel; humor de burocracia e taxas).
+5. **Feiticeira:** **charlatã de feira** (famosa por "curas" que são truques; o poder verdadeiro é de outra pessoa; empurra o herói a quem ajuda).
+6. **Companheira:** **aprendiz da feiticeira** (jovem maga, nervosa e tagarela; compatível com a feiticeira charlatã: é dela o poder verdadeiro).
+7. **Humor:** **Tom 2, autoironia + burocracia absurda** (pitadas dos outros tons só se o usuário pedir).
+8. **Nomes:** usuário quer **escolher um a um** (pendente).
+Efeitos a tratar pelo 02: o sino substitui o chefe-cavaleiro-do-selo (quem o roubou, quem o guardava na caverna?); sem "mestre instrutor" atingido, o treino precisa de outro NPC; a cuidadora é a única que saberia curar, então a vila fica sem saída; o rei fantoche + chanceler muda a figura do vilão da vingança (o herói se vinga do rei ou do chanceler?).
+
+## D-014 — Nomes escolhidos pelo usuário (2026-10-24)
+| Item | Nome |
+|---|---|
+| Herói | **Edric Moss** |
+| Vila inicial | **Baixo Orvalho** |
+| Reino | **Mor-Allen** |
+| Chanceler tirano | **Oswin Cathe** |
+| Rei fantoche | **Ulfrec** |
+| Feiticeira charlatã | **Ysolt Brum** |
+| Companheira (aprendiz) | **Grace** (nome do próprio usuário; 02 checa originalidade) |
+| Mal gigante | **a definir**, depois de desenvolver mais atos da história |
+- Os nomes foram checados só de memória pelo 02. **Pendente:** busca na web de originalidade antes de fixar (nomes do roteirista) e nome do jogo ("Dunwick" segue provisório; é lugar real e lembra "Dunwich").
