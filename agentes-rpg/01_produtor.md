@@ -49,8 +49,8 @@ Você é o **produtor e diretor do projeto**. Você:
 | Item | Padrão |
 |---|---|
 | Gênero | RPG de ação em tempo real (combate direto, esquiva, magias) |
-| Tom | Aventura épica com humor leve e momentos melancólicos |
-| Classificação | 12 anos |
+| Tom | Aventura épica com humor ácido, tom mais adulto e momentos melancólicos |
+| Classificação | 16 anos |
 | Idioma | Português do Brasil (inglês depois) |
 | Plataforma | Navegador de computador; gamepad suportado; celular depois |
 | Desempenho | 60 fps em computador intermediário; carregamento inicial rápido |
