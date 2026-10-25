@@ -1,12 +1,13 @@
 # Gameplay
 
-> **Status:** RASCUNHO v0.2 (BRF-003, onda 0) · **Dono:** 03 Jogabilidade · **Data:** 2026-10-24
+> **Status:** RASCUNHO v0.3 (BRF-003; D-025: câmera isométrica e controles à Diablo) · **Dono:** 03 Jogabilidade · **Data:** 2026-10-24
 > Sem stack: nada aqui nomeia ferramenta. Formato final dos dados = ADR-001 do 08.
 > **Todos os valores são iniciais e devem ser ajustados em playtest.** As tabelas são a especificação do que vai para `data/`; o texto só referencia chaves das tabelas.
 > Alinhado (v0.2): fórmulas e métricas do 06 (`docs/sistemas/formulas.md`, `docs/niveis/metricas.md`, D-009), controles do 07 (`docs/ui/controles_acessibilidade.md`), arte/VFX do 10 (`docs/arte/guia_visual.md` §9 e A1), critérios M1 do 09 (`docs/qa/criterios_marcos.md`), decisões D-007.
-> Pendente: laço/entrada/formatos com o 08 (BRF-001) e a premissa/mundo do 02. Ver §12.
+> **v0.3 (D-025): só mudaram câmera isométrica, movimento/mira no plano isométrico, entrada à Diablo (mouse) e ordem de desenho/oclusão** (§0, §3, §4.1, §4.2, §4.6, §5.2, §8, §10, §11, §12, §13). Combate, fórmulas, fôlego/mana, golpe forte, telegraph, sem crítico e o resto da v0.2 ficam como estavam.
+> Pendente: laço/entrada/formatos e câmera com o 08 (ADR-002), sprites/visual com 04/10, premissa/mundo do 02. Ver §12.
 
-Unidades: distância em **tiles** (1 tile = 1 unidade do mundo = 32 px de arte), tempo em **segundos** ou em **quadros a 60 Hz**. Ângulos em graus, medidos no plano do chão (x, z).
+Unidades: distância em **tiles** (1 tile = 1 unidade do mundo = 32 px de arte), tempo em **segundos** ou em **quadros a 60 Hz**. Ângulos em graus, medidos no plano do chão (x, z). **A lógica não muda com a câmera:** o jogo acontece no plano do chão; a tela é uma projeção isométrica fixa dele (08/10). Densidade de pixels por tile em revisão (08/10); em lógica, 1 tile = 1 unidade do mundo.
 
 ---
 
@@ -15,8 +16,9 @@ Unidades: distância em **tiles** (1 tile = 1 unidade do mundo = 32 px de arte),
 | Chave | Valor | Observação |
 |---|---|---|
 | `passo_logico_hz` | 60 | Lógica em passo fixo; desenho interpolado (08) |
-| `direcoes_movimento` | 8 | Teclado gera 8; analógico é quantizado em 8 (ver §3.4) |
-| `direcoes_sprite` | 4 | S, N, L desenhadas; O espelhada (04) |
+| `direcoes_movimento` | 8 (teclado) · livre, 360° (mouse e analógico) | Velocidade igual em todas as direções (ver §3.4 e §4.1) |
+| `esquema_controle` | mouse | Opções: `mouse` (padrão, à Diablo), `teclado` (v0.2), gamepad automático ao detectar (§3.2) |
+| `direcoes_sprite` | 4 | S, N, L desenhadas; O espelhada (04). **Em revisão 04/10:** a isometria pede 8 (5 + espelho); ver §4.6 |
 | `buffer_entrada_quadros` | 7 | Faixa permitida 6–8 |
 | `zona_morta_analogico` | 0,20 | Fração do curso do analógico; opção 0,05–0,40 (07) |
 | `correr_modo` | segurar | Opções: `segurar`, `alternar`, `sempre` (§3.4) |
@@ -61,9 +63,12 @@ O código só conhece ações; teclas e botões vêm de dados e são remapeávei
 
 | Ação | Contexto | Tipo | Buffer | Descrição |
 |---|---|---|---|---|
-| `mover` | jogo | eixo 2D | — | Direção no chão |
+| `mover` | jogo | eixo 2D | — | Direção no chão (teclas/analógico). Mouse: ver `mover_para` |
+| `mover_para` | jogo | clique (segurar) | — | **Esquema mouse:** anda até o ponto do chão sob o cursor; segurar acompanha o cursor (§3.5) |
+| `acao_principal` | jogo | clique (segurar) | sim | **Esquema mouse (clique esquerdo), contextual:** sobre inimigo = atacar (anda até o alcance e bate; segurar mantém o combo); sobre NPC/objeto = interagir; no chão = `mover_para` |
+| `parar_no_lugar` | jogo | segurar | — | Com `acao_principal`: ataca na direção do cursor **sem andar** |
 | `correr` | jogo | segurar / alternar | — | Usa `vel_correr`; comportamento conforme `correr_modo` (§3.4) |
-| `mirar` | jogo | eixo 2D | — | Opcional: mira por mouse/analógico direito (§3.3) |
+| `mirar` | jogo | eixo 2D | — | Direção dos golpes e habilidades: cursor (esquema mouse), analógico direito ou movimento (§3.3) |
 | `atacar` | jogo | apertar | sim | Ataque leve / avança o combo |
 | `forte` | jogo | apertar | sim | Ataque forte |
 | `esquivar` | jogo | apertar | sim | Rolamento com invencibilidade |
@@ -82,10 +87,25 @@ O código só conhece ações; teclas e botões vêm de dados e são remapeávei
 Em telas, diálogo e Pausa a simulação não recebe ações de jogo; buffer de jogo é esvaziado ao abrir uma tela.
 
 ### 3.2 Mapeamento padrão por dispositivo
-Gamepad descrito por **posição** (genérico, sem marca).
+Gamepad descrito por **posição** (genérico, sem marca). Dois esquemas (`esquema_controle`): **`mouse`** (padrão, D-025: "ação com mouse", à Diablo) e **`teclado`** (o da v0.2, que também serve ao gamepad). Teclado e gamepad continuam completos.
 
-**Jogo**
-| Ação | Teclado + mouse | Teclado só (alternativo) | Gamepad |
+**Jogo — esquema `mouse` (padrão)**
+| Ação | Teclado + mouse |
+|---|---|
+| `acao_principal` / `mover_para` | **Clique esquerdo** (segurar repete): chão = anda; inimigo = ataca; NPC/objeto = interage |
+| `mover` | W A S D / setas (continuam valendo junto com o clique; cancelam o destino do clique) |
+| `parar_no_lugar` | Shift (segurar) |
+| `forte` | **Clique direito**: golpe forte na direção do cursor (não repete ao segurar) |
+| `esquivar` | **Espaço**: rolamento na direção do cursor (sem cursor válido, na direção do movimento) |
+| `habilidade_1..3` | **1 · 2 · 3**: habilidades, usadas na direção/alvo do cursor |
+| `item` | Q |
+| `interagir` | E (ou `acao_principal` sobre o objeto) |
+| `menu` · `inventario` · `missoes` | Esc / P · B · N |
+| `mirar` | Cursor (sempre ativo; sem tecla) |
+| `correr` | Não há: no esquema `mouse` o herói **corre** ao seguir o clique (`correr_modo` = `sempre`) |
+
+**Jogo — esquema `teclado` (v0.2; também o do gamepad)**
+| Ação | Teclado + mouse (esquema `teclado`: o clique esquerdo ataca, não anda) | Teclado só (alternativo) | Gamepad |
 |---|---|---|---|
 | `mover` | W A S D / setas | setas | Analógico esquerdo (direcional só com a opção `direcional_move`) |
 | `correr` | Shift esquerdo | Shift esquerdo | Gatilho esquerdo |
@@ -113,29 +133,49 @@ Gamepad descrito por **posição** (genérico, sem marca).
 | `pular_dialogo` | Segurar Esc ou Backspace | idem | Segurar Start |
 
 Regras:
-- Nenhuma ação essencial depende só do mouse; mudar de dispositivo no meio do jogo funciona sem menu (troca os ícones de dica — 07).
+- Nenhuma ação essencial depende só do mouse: o esquema `teclado`/gamepad cobre tudo (mover, mirar, atacar, forte, esquivar, habilidades, interagir). Mudar de dispositivo no meio do jogo funciona sem menu (troca os ícones de dica e o esquema ativo — 07).
+- Clique que cai em UI (HUD, menu, diálogo) **não** age no mundo. Menu de contexto do navegador bloqueado só sobre o jogo.
+- Opção `clique_mover_ativo` (sim): desligar mantém a mira por cursor e `acao_principal` só ataca/interage, sem andar (acessibilidade e quem prefere WASD).
 - **Direcional do gamepad = atalhos** (D3, aprovado): ↑ `item`, ↓ `missoes`; movimento só no analógico. Motivo: o herói anda em 8 direções com velocidade contínua, o que o analógico cobre, e atalhos no direcional não exigem soltar o analógico. **Acessibilidade:** com a opção `direcional_move` ligada, o direcional move e os atalhos saem dele (ficam só no remapeamento).
 - Esc em tela cheia, no navegador, só sai da tela cheia; por isso `menu` também tem P e `cancelar` também tem Backspace (D5). Sair da tela cheia abre a Pausa (07).
 - Gamepad desconectado durante o jogo: todas as ações dele são soltas no mesmo tick (herói para) e o jogo abre a Pausa com aviso (07); reconectar volta sem menu; teclado funciona o tempo todo (M1-09).
 - O jogo não captura atalhos do navegador (F5, F11, Ctrl+W) (M1-07). Teclas F são bloqueadas no remapeamento do jogador (07 §3.3); as teclas de debug (§10) só existem em build de desenvolvimento.
 
-**Ações exigidas no M1** (lista para o M1-07/M1-08): `mover` (8 direções), `correr`, `atacar`, `forte`, `esquivar` e as ações de debug da §10. As demais existem nos dados, mas sem efeito no M1.
+**Ações exigidas no M1** (lista para o M1-07/M1-08): `mover` (8 direções), `mover_para`, `acao_principal`, `parar_no_lugar`, `mirar` (cursor), `correr`, `atacar`, `forte`, `esquivar` e as ações de debug da §10. As demais existem nos dados, mas sem efeito no M1.
 
 ### 3.3 Mira e alvo assistido
 | Chave | Valor | Observação |
 |---|---|---|
-| `mira_modo` | movimento | Opções: `movimento` (padrão), `mouse_analogico` |
-| `assistencia_alcance_tiles` | 2,0 | Procura alvos até esta distância |
+| `mira_modo` | por esquema | `cursor` (esquema mouse, padrão), `movimento` (teclado), `analogico` (gamepad, analógico direito). Troca sozinho com o último dispositivo usado |
+| `mira_cursor_zona_morta_tiles` | 0,4 | Cursor mais perto que isto do herói mantém a direção anterior |
+| `assistencia_alcance_tiles` | 2,0 | Só em `movimento` e `analogico`: procura alvos até esta distância |
 | `assistencia_correcao_max_graus` | 15 | Gira o golpe corpo a corpo no máximo isto em direção ao alvo |
 
-Sem alvo dentro do alcance e do ângulo, o golpe sai na direção atual, sem correção.
+- **Cursor → mundo:** o ponto do cursor é projetado no plano do chão (x, z); a direção da mira é do herói a esse ponto. O ângulo é **contínuo** (qualquer ângulo, não 8): o setor, a linha e a investida giram junto, e o sprite usa a direção desenhada mais próxima (§4.6). Sem assistência de ângulo com o cursor (o jogador já mira).
+- Em `movimento`/`analogico`, sem alvo dentro do alcance e do ângulo, o golpe sai na direção atual, sem correção.
+- Habilidades: `skill_giro` ignora a mira (círculo); `skill_disparo` e `skill_investida` seguem o cursor.
 
 ### 3.4 Buffer e leitura de entrada
 - `correr_modo` (opção, D4): `segurar` (padrão) — corre enquanto segura; `alternar` — um aperto liga/desliga, e parar de mover desliga; `sempre` — corre sempre e segurar `correr` faz andar.
 - Entradas lidas **no início de cada passo lógico**; apertos que ocorrem entre passos não se perdem (fila — pergunta ao 08, §12.2).
 - Ação com buffer = guardada por `buffer_entrada_quadros`; executa no primeiro quadro em que o estado permite. Expira depois disso.
 - Se houver mais de uma no buffer, vale a **mais recente**; empate no mesmo quadro: `esquivar` > `habilidade_n` > `forte` > `atacar`.
-- Analógico: abaixo de `zona_morta_analogico` = parado; acima, a direção é quantizada em `direcoes_movimento` (consistência com os testes de alcance; revisar em playtest).
+- Analógico: abaixo de `zona_morta_analogico` = parado; acima, a direção é **livre** (360°). Só o teclado gera 8 direções. Os testes de alcance continuam nas 8 direções mais 3 ângulos arbitrários.
+
+### 3.5 Clicar para mover e atacar (esquema `mouse`)
+| Chave | Valor | Observação |
+|---|---|---|
+| `clique_chegada_tiles` | 0,15 | Chega ao destino quando a distância fica menor que isto |
+| `clique_fila_quadros` | 12 | Clique feito durante golpe, esquiva ou dano fica guardado (destino ou ataque) por este tempo e depois é descartado |
+| `clique_alvo_margem_px` | 12 | Margem de clique em volta do inimigo na tela (hurtbox projetada) |
+| `caminho_modo` | `reta_deslizando` | Opções: `reta_deslizando`, `a_estrela` (grade de 0,5 tile, replaneja a cada 30 q) |
+
+- **Alvo sob o cursor, por prioridade:** UI > inimigo (hurtbox projetada) > objeto/NPC interativo > chão. Objetos decorativos **nunca** capturam clique (um inimigo atrás de uma casa continua clicável, §8.4).
+- **Clique no chão:** o herói anda (corre) até o ponto em linha reta com deslizamento; segurar o botão faz o destino acompanhar o cursor. W A S D, analógico, esquiva e dano cancelam o destino.
+- **Clique em inimigo:** anda até `alcance − 0,1` e bate; segurar mantém o combo (a fila é realimentada); se o alvo morre ou some, para. Com `parar_no_lugar` (Shift) bate na direção do cursor sem andar, mesmo sem alvo.
+- **Clique em NPC/objeto:** anda até `raio_interacao_tiles` e interage; se algo bloqueia ou o alvo some, para.
+- **Custo de caminho:** `reta_deslizando` é de custo **baixo** (sem busca; o herói pode ficar preso em concavidades, e o mapa evita becos côncavos entre os pontos de interesse). `a_estrela` é custo **médio** e entra só se o playtest mostrar herói preso. **M1 usa `reta_deslizando`.**
+- Feedback: marcador de destino no chão (10; nunca magenta, que é perigo), contorno e barra de vida do inimigo sob o cursor, e cursor de espada/mão (07).
 
 ---
 
@@ -153,11 +193,12 @@ ID provisório do herói: `hero_principal` **[aguarda 02]**. Arquétipo provisó
 | `giro_instantaneo` | sim | Virar não tem custo de tempo | Sensação |
 
 Regras de movimento:
-- **Diagonal normalizada:** módulo da velocidade igual em todas as `direcoes_movimento`.
+- **Diagonal normalizada:** módulo da velocidade igual em todas as direções (as 8 do teclado e as livres do mouse/analógico).
+- **W A S D seguem a tela, não os eixos do mundo:** W vai para o topo da tela, que na isometria é uma diagonal do mundo; as 8 direções do teclado são as 8 da tela. A velocidade é no **mundo**, então na tela o deslocamento vertical parece cerca de metade do horizontal (2:1). Se incomodar, ajusta-se `vel_andar`/`vel_correr`, nunca a projeção.
 - **Deslizar em paredes:** componente de velocidade paralela à parede é mantida; só a normal é removida.
 - **Sem pulo livre** no slice; desníveis só por rampas e escadas (métricas do 06).
 - **Pés não deslizam:** velocidade e ciclo de caminhada do sprite precisam casar (§4.5).
-- Direção do sprite = direção do movimento; durante ataque, direção do ataque. Mapeamento 8 → 4 direções na §4.6.
+- Direção do sprite = direção do movimento; durante ataque, direção da mira. Mapeamento na §4.6.
 
 ### 4.2 Esquiva
 | Chave | Valor | Equivalente | Origem |
@@ -168,7 +209,7 @@ Regras de movimento:
 | `esquiva_invencivel_base_quadros` | 9 | tamanho da janela em Normal | §6.1 |
 | `esquiva_invencivel_fim` | derivado = 10 | `inicio + arred(base × mult_janela_esquiva) − 1`; piso de janela 4 q, teto `esquiva_duracao_quadros` | 06 `formulas.md` §6.2 (J1–J4) |
 | `esquiva_recarga_quadros` | 24 | 0,4 s, conta após o fim da esquiva | §6.1 |
-| `esquiva_direcao` | entrada atual; sem entrada = direção do sprite | — | Padrão |
+| `esquiva_direcao` | esquema `mouse`: direção do cursor (sem cursor válido, a do movimento); `teclado`/gamepad: entrada atual, e sem entrada a direção do sprite | — | D-025 |
 | `esquiva_custo` | 25 | **fôlego**, debitado no 1º quadro da esquiva | D-009 / `formulas.md` §3.3 |
 
 A esquiva atravessa a hurtbox de inimigos (pushbox entre personagens desligada durante a esquiva), mas não atravessa paredes.
@@ -231,7 +272,9 @@ Regra do 10 (`docs/arte/guia_visual.md` A1.2), decidida pelo Produtor (D-007):
 | Movimento reto (S, N, L, O) | a própria direção (O = L espelhado) |
 | Diagonal, e a direção atual é uma das duas componentes | mantém a atual (ex.: vindo de S, virando para SE → continua S); evita piscar entre poses |
 | Diagonal partindo de PARADO (ou a direção atual não é componente) | o **lado** (L ou O) da diagonal |
-| Ataque / habilidade | vira no 1º quadro para a direção mais próxima da mira (após o alvo assistido, §3.3) e não troca durante o golpe |
+| Ataque / habilidade | vira no 1º quadro para a direção mais próxima da mira (cursor ou alvo assistido, §3.3) e não troca durante o golpe |
+
+**Em revisão 04/10 (D-025):** com mira livre pelo cursor e câmera isométrica, o sprite precisa de mais direções. Proposta do 03: **8 direções** (5 desenhadas + espelho), a mais próxima do ângulo de mira, com **histerese de 10°** para não piscar entre poses. Se o 04 desenhar 8, a regra das diagonais acima (A1.2) deixa de ser necessária. A hitbox usa o ângulo real, não o do sprite.
 
 ---
 
@@ -269,6 +312,7 @@ Regras:
 5. **Parede bloqueia golpe** (decisão do 03, pedido do 06): ver §5.9. Atacante e alvo precisam ter linha livre no plano e estar no mesmo andar.
 6. **Como se mede o alcance:** `alcance_tiles` vai da **origem do golpe** (centro da pushbox do atacante, na posição do 1º quadro ativo, já com o avanço) até a **borda da hurtbox do alvo**, e não até o centro dele. Há acerto se o círculo da hurtbox intersecta o setor (ou a forma) do golpe; em distância: `distância_centros − hurtbox_raio_alvo ≤ alcance_tiles`. Assim o alcance não depende do tamanho do inimigo.
    Para o teste de alcance (M1-15b), "alvo a X % do alcance" = distância origem → **borda** da hurtbox igual a X % do `alcance_tiles` (90 % acerta, 110 % erra). Alvo de treino: `enemy_boneco_alvo` com `hurtbox_raio_tiles` 0,40 e `hurtbox_altura_tiles` 0,0–1,4 **[proposta do 03; o 06 confirma nas métricas]**.
+7. **Direção do golpe = a mira** (§3.3): contínua com o cursor, quantizada em 8 com o teclado. O setor gira com o ângulo; o aviso do inimigo também (a forma exata da hitbox no chão, §6.2).
 
 ### 5.3 Ataques do herói (dados)
 Prefixo `atk_` aprovado para ataques básicos (D-007; o 08 confirma o formato). Quadros contados a partir do quadro 1 do ataque.
@@ -311,7 +355,7 @@ Habilidades por ID, desacopladas do herói (D-004). Custos, recargas e multiplic
 | `skill_disparo` | Projétil em linha reta | projétil (§5.5) | 12 | 1 (dispara) | 16 | 8 | 90 q (1,5 s) | 1,2 | mente | `elem_1` **[aguarda 02]** | 5 |
 | `skill_investida` (opcional) | Avanço com golpe | retângulo 3,0 × 0,8 | 8 | 10 | 18 | 12 | 480 q (8 s) | 2,0 | forca | `impacto` | 25 |
 
-`skill_disparo` acumula 35 de `est_queimando` por acerto; as demais não acumulam estado.
+`skill_disparo` acumula 35 de `est_queimando` por acerto; as demais não acumulam estado. No esquema `mouse`, `skill_disparo` e `skill_investida` seguem o **cursor** e `skill_giro` ignora a mira (§3.3).
 
 ### 5.5 Projéteis
 | Chave | Valor | Observação |
@@ -454,7 +498,7 @@ Convenção do 10 (`docs/arte/guia_visual.md` §9) — **em revisão com 03/06/0
 | `interacao_cone_graus` | 90 | Alvo precisa estar à frente do herói |
 | `interacao_prioridade` | menor `distância × (1 + ângulo/90)` | Desempate: o mais recente a ficar disponível |
 
-- Ícone acima do alvo escolhido (evento `interacao_disponivel` → 07).
+- Ícone acima do alvo escolhido (evento `interacao_disponivel` → 07). No esquema `mouse`, clicar no NPC/objeto anda até ele e interage (§3.5); a prioridade por distância e ângulo vale para `interagir` por tecla.
 - **Diálogos:** tocam os dados do 02 (falas, escolhas, flags); travam o controle; podem mover a câmera (§8.3).
 - **Missões:** `não iniciada → ativa → passos → concluída / falhou`, guiadas por flags; nada travado por ordem de ações. Conteúdo do 02.
 - **Objetos com estado salvo:** baús, portas, alavancas, pontos de salvamento.
@@ -469,18 +513,20 @@ Tudo nesta seção está **fora do M1**.
 
 ## 8. Câmera
 
-### 8.1 Em jogo (dados)
+### 8.1 Em jogo (dados) — câmera isométrica (D-025)
 | Chave | Valor | Observação |
 |---|---|---|
-| `camera_angulo_graus` | 35 | Faixa 30–45; confirmado pelo 10 (A1.1), provisório até o spike do 08 |
-| `camera_area_visivel_tiles` | 20 × 11,25 | Confirmado pelo 10 (= 640×360 px ÷ 32); distância/campo de visão calculados pelo 08 |
+| `camera_projecao` | isométrica fixa | Ortográfica ou perspectiva estreita: **ADR-002 do 08** (ponto aberto da D-016) |
+| `camera_giro_graus` | 45 | Fixo; sem rotação pelo jogador |
+| `camera_inclinacao_graus` | 30 | Proposta do 03. Faixa 26,6° (losango 2:1 em pixels) a 35,3° (isométrica verdadeira); **08/10 confirmam**. Substitui `camera_angulo_graus` 35 da câmera 3/4 |
+| `camera_area_visivel_tiles` | **a recalcular** | Depende da resolução e da densidade em px por tile (08/10); era 20 × 11,25 na câmera 3/4 |
 | `camera_suavizacao_s` | 0,15 | Tempo de resposta do seguimento |
-| `camera_antecipacao_tiles` | 1,0 | Na direção do movimento, proporcional à velocidade (0 parado, máximo ao correr) |
+| `camera_antecipacao_tiles` | 1,0 | Na direção do movimento, proporcional à velocidade (0 parado, máximo ao correr). Com o mouse, também puxa um pouco para o cursor (`camera_cursor_peso` 0,15) |
 | `camera_zona_morta_tiles` | 0,25 | Movimentos menores não mexem a câmera |
-| `camera_oclusao_alpha` | 0,35 | Objeto entre câmera e herói fica recortado em pontilhado de pixel (10, A1.1; o 08 decide o custo) |
+| `camera_oclusao_alpha` | 0,35 | Objeto entre câmera e herói fica recortado em pontilhado de pixel (10, A1.1; o 08 decide o custo); ver §8.4 |
 
-- Ângulo e distância **fixos** em jogo; sem rotação pelo jogador.
-- **Limites por área:** a câmera nunca mostra fora do cenário (limites vêm do mapa — 06/07).
+- Ângulo e distância **fixos** em jogo; sem rotação nem zoom pelo jogador. A câmera **segue o herói** (não o destino do clique).
+- **Limites por área:** a câmera nunca mostra fora do cenário (limites vêm do mapa — 06/07), agora num losango/retângulo em coordenadas de tela.
 - Câmera não treme o mundo lógico: tremor é só apresentação.
 
 ### 8.2 Tremor (dados; desligável)
@@ -494,6 +540,24 @@ Opção de acessibilidade: tremor desligado ou reduzido (multiplicador de amplit
 
 ### 8.3 Cenas e golpes especiais
 Aproximar, girar pouco e mudar foco só em cenas, entrada/transição de chefe e golpes especiais; sempre volta ao padrão da §8.1. Valores definidos com o 07/10 quando houver cenas (fora do M1).
+
+### 8.4 Ordem de desenho e oclusão (câmera isométrica)
+Na isometria os objetos ao norte e a oeste da tela (casas, árvores, torre) **cobrem** quem está atrás. As regras abaixo garantem que a lógica não dependa do que se vê.
+
+| Camada, de baixo para cima | Regra |
+|---|---|
+| 1. Chão e decalques | — |
+| 2. Marcadores de **aviso** e de **destino do clique** | Emissivos (não recebem luz de impacto); acima do chão, abaixo dos personagens (10 §9) |
+| 3. Sombras | Projetadas no chão |
+| 4. Entidades e objetos | Ordenados por profundidade: `ordem = x + z` do ponto de apoio nos pés; empate: o herói fica na frente |
+| 5. Efeitos | Partículas, faíscas, luz de impacto |
+| 6. Números de dano e barras de vida | Sempre à frente, em tela |
+| 7. UI | — |
+
+- **O herói nunca fica ilegível:** objetos que o cobrem ficam recortados em pontilhado dentro de `oclusao_raio_tiles` (1,5) em volta dele (`camera_oclusao_alpha`), e há contorno de silhueta atrás deles (`silhueta_oclusao` ligado).
+- **O aviso nunca é coberto:** se um objeto cobrir um aviso ativo (ou o inimigo que o emite), o objeto é recortado nessa área ou o inimigo ganha silhueta. Vale a regra "efeitos e HUD nunca cobrem o aviso".
+- **Clique e acerto não dependem da imagem:** o alvo do clique usa a hurtbox projetada (§3.5), e colisões, golpes e linha de visão usam só os colisores (§5.9), nunca o desenho.
+- **Para 06/07 (nível e cenário):** construções com mais de 2 tiles de altura a menos de `oclusao_raio_tiles` das rotas de combate pedem recorte; prefira arenas abertas para o lado da câmera (sul/leste da tela) e evite posicionar inimigos que atacam atrás de paredes altas ao norte.
 
 ---
 
@@ -512,7 +576,7 @@ Aproximar, girar pouco e mudar foco só em cenas, entrada/transição de chefe e
 | Tecla (debug) | Função |
 |---|---|
 | F1 | Mostrar caixas (cores da §5.2) |
-| F2 | Estado de cada entidade e quadro atual do estado; posição do herói em tiles (x, z, altura) |
+| F2 | Estado de cada entidade e quadro atual do estado; posição do herói em tiles (x, z, altura); posição do cursor no mundo, destino do clique e alvo sob o cursor |
 | F3 | FPS (média e pior 1 %), tempo de quadro e contador de ticks da simulação |
 | F4 | Entradas e conteúdo do buffer |
 | F6 | Pausar simulação |
@@ -532,7 +596,7 @@ F5 e F11 ficam livres para o navegador (M1-07). F1, F3, F7 e F10 têm função n
 
 ## 11. Escopo do M1 — protótipo cinza
 
-Objetivo do M1 (roadmap): herói se move e ataca numa sala 3D cinza com luz e câmera; **sensação aprovada em playtest**. Critério do 09: movimento, ataque e esquiva estáveis; sala de teste; 60 fps no intermediário.
+Objetivo do M1 (roadmap): herói se move e ataca numa sala de teste com **câmera isométrica**, luz e acabamento de teste (o 08/10 definem o nível de polimento do esqueleto, D-025); **sensação aprovada em playtest**. Critério do 09: movimento, ataque e esquiva estáveis; sala de teste; 60 fps no intermediário.
 
 ### 11.1 M1 precisa ter (verificável)
 | # | Item | Como verificar |
@@ -540,7 +604,7 @@ Objetivo do M1 (roadmap): herói se move e ataca numa sala 3D cinza com luz e c�
 | 1 | **`map_sala_teste`** (48 × 32, `metricas.md` §8) carregada de dados, com as zonas marcadas "M1: sim": campo, parede solta, rampa, plataforma, escada, pátio (o laço campo → plataforma → pátio), corredor (sem armadilha) e arena vazia com a porta aberta | Abrir; percorrer o laço; subir a rampa e descer a escada; o script do 06 (§8.5) confirma que não há tile andável sem volta |
 | 2 | Herói-placeholder com sombra sempre no chão | Visual; sombra acompanha em rampa |
 | 3 | Andar e correr com `vel_andar` / `vel_correr` | Teste automático mede deslocamento por segundo (tolerância ±1 %) |
-| 4 | 8 direções com diagonal normalizada | Teste: módulo igual nas 8 direções |
+| 4 | 8 direções do teclado (e direção livre do mouse/analógico) com velocidade igual no mundo; W A S D seguem a tela | Teste: módulo igual nas 8 direções e em 3 ângulos livres |
 | 5 | Aceleração e freada conforme §4.1 | Teste: quadros até velocidade máxima e até parar |
 | 6 | Deslizar em paredes (sem travar em quinas) | Teste: andar a 45° contra parede mantém componente paralela |
 | 7 | Esquiva: distância, duração, invencibilidade (J1–J4 do 06), recarga e custo de fôlego da §4.2 | Teste automático + debug F1/F2 mostra janela |
@@ -553,9 +617,12 @@ Objetivo do M1 (roadmap): herói se move e ataca numa sala 3D cinza com luz e c�
 | 14 | Pipeline de dano na ordem da §5.7 com a fórmula do 06 | Exemplos D1–D11, J1–J4, K1–K3 do `formulas.md` passam como testes unitários |
 | 14b | **Fôlego (decisão do 03: entra no M1; vale o M1-15i do 09):** `folego_max` 100; esquiva gasta 25 e forte 20; recarga e atrasos da §4.4; ação sem fôlego não sai, fica no buffer e gera `sem_folego`; vida e fôlego visíveis no debug; opção `folego_custo_ativo` | Testes F1–F4 do 06; 5ª esquiva seguida negada; debug F2 mostra o recurso |
 | 14c | **Parede bloqueia golpe** (§5.9): alvo a 90 % do alcance atrás de parede ou meia-parede não é atingido; sem parede, é | Teste de alcance com e sem colisor na sala |
-| 15 | Câmera 3/4 com suavização, antecipação, zona morta, limites da sala e tremor desligável | Visual; câmera nunca mostra fora da sala |
+| 15 | Câmera isométrica fixa (§8.1) com suavização, antecipação, zona morta, limites da sala e tremor desligável | Visual; câmera nunca mostra fora da sala; ângulo fixo |
+| 15b | Ordem de desenho e oclusão (§8.4): herói legível atrás de parede (recorte + silhueta); aviso do `enemy_boneco_golpe` nunca coberto; clique atravessa objeto decorativo | Visual com o boneco atrás da parede solta; teste de clique |
 | 16 | Luz básica da cena e sombra (08/10) | Visual |
-| 17 | Teclado + mouse e gamepad, por ações lógicas; remapeamento por dados | Trocar uma tecla nos dados sem tocar no código |
+| 17 | Teclado + mouse e gamepad, por ações lógicas; dois esquemas (`mouse` padrão, `teclado`); remapeamento por dados | Trocar uma tecla nos dados sem tocar no código; trocar o esquema sem reiniciar |
+| 17b | **Clicar para mover e atacar** (§3.5): clique no chão anda/corre; segurar acompanha; clique em inimigo anda até o alcance e ataca; Shift ataca parado; WASD cancela o destino; clique na UI não age no mundo | Teste de entrada simulada; debug F2 mostra destino e alvo |
+| 17c | **Mira no cursor**: direção do golpe, da esquiva e da investida segue o ângulo contínuo do cursor | Teste de alcance nas 8 direções e em 3 ângulos arbitrários; sprite com histerese de 10° |
 | 18 | Passo fixo 60 Hz com desenho interpolado; aba em segundo plano pausa | Teste do laço; trocar de aba e voltar |
 | 19 | Debug completo da §10: fps (média e pior 1 %), contador de ticks, estado, caixas, entradas, posição em tiles, câmera lenta, avanço quadro a quadro, exportar tempos de quadro | M1-19; cada função funciona |
 | 20 | Nenhum número de gameplay no código | Revisão: todo valor das §0–§8 vem de dados (inclui as marcas dos colisores da §5.9) |
@@ -586,10 +653,16 @@ As 8 perguntas da v0.1 foram respondidas em `formulas.md` §13 e aplicadas nesta
 6. Onde fica o remapeamento salvo (configurações separadas do save de jogo?).
 7. Colisão no plano: círculo contra polígonos com deslizamento — feita pela simulação ou por biblioteca?
 8. §5.9: o dado dos colisores traz altura e quatro marcas (movimento, projétil, golpe, visão). A simulação consegue testar segmento (golpe e visão) contra eles a cada quadro ativo, sem alocação?
+9. **Câmera isométrica (ADR-002):** ortográfica ou perspectiva estreita; resolução interna e densidade de px por tile; `camera_inclinacao_graus` com o 10 (26,6°–35,3°).
+10. **Cursor → mundo:** raio da tela ao plano do chão, por quadro; seleção de alvo pela hurtbox projetada (§3.5), independente da imagem.
+11. **Ordem de desenho e oclusão (§8.4):** como ordenar sprites e objetos por profundidade na cena e recortar o que cobre o herói e o aviso, sem custo alto.
+12. **Caminho:** `reta_deslizando` no M1 e `a_estrela` depois; confirmar o custo de A* em grade de 0,5 tile.
 
 ### 12.3 Para o 07 e o 10 (alinhamento)
 - 07: ~~nomes das ações e mapeamento~~ — **resolvido** (D1–D5 do 07 §8, aprovadas pelo Produtor).
-- 10: `camera_angulo_graus`, IDs de efeito de impacto (§5.6) e luz curta de impacto. Aviso de golpe (§6.2): o 03 concorda com a convenção; só pede que o preenchimento chegue a 100 % exatamente no quadro 1 do ativo.
+- 07 (D-025): ações novas `mover_para`, `acao_principal`, `parar_no_lugar` e os dois esquemas de controle (§3.2); cursor de espada/mão, contorno e barra de vida do inimigo sob o cursor; HUD das habilidades em 1·2·3; atualizar `controles_acessibilidade.md` (o clique esquerdo deixa de ser só `atacar`).
+- 04/10 (D-025): sprites com 8 direções e histerese (§4.6); marcador de destino do clique; recorte em pontilhado e silhueta atrás de objetos (§8.4).
+- 10: `camera_inclinacao_graus` (§8.1), IDs de efeito de impacto (§5.6) e luz curta de impacto. Aviso de golpe (§6.2): o 03 concorda com a convenção; só pede que o preenchimento chegue a 100 % exatamente no quadro 1 do ativo.
 
 ---
 
@@ -597,6 +670,9 @@ As 8 perguntas da v0.1 foram respondidas em `formulas.md` §13 e aplicadas nesta
 - Movimento: velocidade, diagonal, aceleração/freada, deslizar em parede.
 - Máquina de estados: transições permitidas e proibidas, janelas de combo/cancelamento.
 - Buffer: dentro e fora da janela, prioridade.
+- Clique: chão anda até a chegada (±0,15); segurar acompanha; clique em inimigo anda até `alcance − 0,1` e bate; Shift bate parado; WASD, esquiva e dano cancelam o destino; clique durante golpe fica na fila por 12 q; clique em UI não age no mundo.
+- Mira: direção do golpe, esquiva e investida = ângulo do cursor (contínuo); zona morta de 0,4 tile; sprite com histerese.
+- Oclusão: herói e aviso nunca ficam cobertos (silhueta/recorte); clique atravessa objeto decorativo.
 - Alcance: cada ataque acerta alvo a 90 % do `alcance_tiles` em todas as `direcoes_movimento` e erra a 110 % (mesmo critério do M1-15b).
 - Laço: 600 ± 1 ticks em 10 s; mesma distância percorrida com taxas de quadro diferentes (M1-04); aba em segundo plano não simula tempo perdido (M1-05).
 - Justiça: todo ataque inimigo com aviso ≥ mínimo da categoria.
@@ -616,7 +692,8 @@ As 8 perguntas da v0.1 foram respondidas em `formulas.md` §13 e aplicadas nesta
 | Movimento | pendente |
 | Esquiva | pendente |
 | Recursos (vida, mana, fôlego) | pendente |
-| Câmera | pendente |
+| Câmera isométrica, ordem de desenho e oclusão | pendente |
+| Entrada à mouse (clicar para mover/atacar, mira no cursor) | pendente |
 | Combate (caixas, ataques, pipeline) | pendente |
 | Feedback de impacto | pendente |
 | Colisores, parede e linha de visão | pendente |
@@ -685,3 +762,4 @@ Parâmetros novos (dados; propostas):
 - v0.1 (2026-10-24) — rascunho inicial (BRF-003). Sem stack, sem premissa. Inclui a convenção de aviso do 10 e o alinhamento com os critérios M1 do 09.
 - v0.2 (2026-10-24) — alinhamento com 06 (formulas.md, metricas.md, D-009), 07 (controles, D1–D5), 10 (diagonais, tingimento, IDs fx_, câmera) e D-007: fôlego e `esquiva_custo` 25, `mana_max`/`folego_max`, colunas de dano nos ataques, `travamento_quadros`, estado QUEBRADO, colisores e linha de visão (§5.9), `map_sala_teste` no M1, novos itens 14b/14c.
 - v0.2.1 (2026-10-24) — §15 Respostas ao Produtor (BRF-010, e–h): variantes de mapa por flags, cena de morte do chefe e memento, regras de soft-lock, M1 inalterado; estado CENA no §5.1.
+- v0.3 (2026-10-24) — **D-025:** só a visão e o estilo de controle mudam. Câmera isométrica no lugar da 3/4 a 35° (§8.1), ordem de desenho e oclusão (§8.4), movimento no plano isométrico com 8 direções no teclado e direção livre no mouse/analógico (§0, §4.1), esquema de controle `mouse` à Diablo (clique para mover/atacar, cursor mira, 1·2·3 habilidades, Espaço esquiva, clique direito golpe forte) com o esquema `teclado`/gamepad mantido (§3), sprite com 8 direções proposto (§4.6), itens novos do M1 (15b, 17b, 17c). A tentativa de reescrever tudo a partir do protótipo (D-024) foi **descartada** pela D-025: nenhum número, controle nem sistema do protótipo foi copiado.

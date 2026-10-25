@@ -1,227 +1,227 @@
-# Controles e acessibilidade — vertical slice (v0.2, direção do protótipo)
+# Controles e acessibilidade — vertical slice
 
-> **Dono:** 07 Cenários e UI · **Versão:** v0.2 (BRF-011 / D-024) · **Data:** 2026-10-24 · substitui a v0.1 (BRF-005).
-> **Base:** controles do protótipo "Vale de Dunwick" (`referencia/prototipo/index.html`, `Input`, `drawTitle`), reconciliados com as regras do projeto. Nomes das ações: alinhar com o 03 (`docs/gameplay.md`, reescrita em andamento). Telas: [inventario_telas.md](inventario_telas.md).
-
-## 0. O que mudou em relação à v0.1
-
-| Tema | v0.1 | v0.2 |
-|---|---|---|
-| Esquema padrão | J/K/L, 1–3, R, I… (esquema do 03 v0.2) | **o do protótipo:** WASD/setas, Shift, Espaço/clique, Q, E, esquiva, F, M, Esc |
-| Ataque forte | `forte` (K / clique direito) | **sai**: o protótipo não tem; o botão direito vira **esquiva**. Habilidades **Q (giro)** e **E (investida)** ocupam esse papel (03 confirma) |
-| Habilidades | `habilidade_1..3` em 1/2/3 | `habilidade_1` = giro (Q) · `habilidade_2` = investida (E) · `habilidade_3` reservada |
-| Mira | opcional | **mouse mira** (protótipo); gamepad: analógico direito + assistência |
-| Menus | só teclado/gamepad | protótipo: **só mouse/toque**. Mantemos teclado e gamepad e **mantemos** os cliques |
-| Gamepad | padrão do 03 | o protótipo **não** tem gamepad (a análise cita, o código não); proposta nova (§3.2) |
-| Atalhos de tela | N = diário, B = bolsa | **N volta a ser ciclo dia/noite** (protótipo): diário em **J** |
+> **Dono:** 07 Cenários e UI · **Versão:** v0.3 (v0.1 restaurada + D-025: visão isométrica e controles à Diablo) · **Data:** 2026-10-24
+> Sem stack. Nomes das ações = `docs/gameplay.md` §3.1 (03; D1–D5 aprovadas, D-007). Telas: [inventario_telas.md](inventario_telas.md).
+> **O que mudou na v0.3 (só isto):** (1) **mouse como controle principal** — clicar para mover/atacar/interagir, mira no cursor, cursor que muda de forma; (2) novas ações `mover_clique` e `ancorar`; (3) acessibilidade e armadilhas do navegador para o jogo com mouse; (4) isometria: movimento em 8 direções relativas à **tela**. Tudo o mais continua como na v0.1 (D-025).
 
 ## 1. Princípios
 1. O código só conhece **ações lógicas**; teclas e botões são dados remapeáveis.
 2. Teclado por **posição física** (WASD funciona em ABNT2/AZERTY); o rótulo exibido segue o layout do jogador.
-3. Toda ação de segurar tem alternativa "alternar" (correr, atacar contínuo).
-4. Ícones/selos mudam para o **último dispositivo usado**, em HUD, dicas, "Como jogar" e barra de comandos; o selo da tecla no HUD (Q/E) mostra a **atribuição atual**, não "Q" fixo.
-5. Jogável **só com teclado**, **só com mouse+teclado** e **só com gamepad**; menus navegáveis pelos três.
+3. Toda ação de segurar tem alternativa "alternar".
+4. Ícones e selos mudam para o **último dispositivo usado**, em HUD, dicas, barra de comandos e "Como jogar".
+5. **Três formas de jogar, todas completas:** mouse + teclado (padrão), só teclado e só gamepad; menus navegáveis pelos três.
+6. **O mouse comanda, o teclado assiste:** o cursor decide *o que* se faz (mover, atacar, interagir); as teclas decidem *como* (habilidades, esquiva, corrida).
 
 ## 2. Ações lógicas
 
-⚠ = divergência/pendência (§8). Coluna "Protótipo" = como está no código.
+⚠ = divergência/pendência (§8). "Origem": 03 = `gameplay.md`; **07** = acrescentada por este documento.
 
-| Ação | Protótipo | Contexto | Tipo | Observação |
+| Ação | Origem | Contexto | Tipo | Observação |
 |---|---|---|---|---|
-| `mover` | WASD / setas | jogo | eixo 2D | 8 direções no plano isométrico; "para cima" = para cima na tela |
-| `correr` | Shift | jogo | segurar / alternar | gasta fôlego (protótipo: 18/s) |
-| `atacar` | Espaço / clique esq. | jogo | apertar (+ segurar contínuo, opção) | combo ×3 |
-| `habilidade_1` | **Q** — golpe giratório (recarga 6 s) | jogo | apertar | |
-| `habilidade_2` | **E** — investida (recarga 8 s) | jogo | apertar | |
-| `habilidade_3` | — | jogo | apertar | reservada (D-007) |
-| `esquivar` | Ctrl / C / botão direito | jogo | apertar | rolamento; custa 20 de fôlego (06) ⚠ Ctrl |
-| `interagir` | F | jogo, diálogo | apertar | também avança diálogo e abre baús |
-| `mirar` | mouse | jogo | posição / eixo 2D | o golpe sai na direção do cursor |
-| `item` | — (não existe) | jogo | apertar | **novo:** item rápido (cura) |
-| `mapa` | M | jogo | apertar | abre/fecha o mapa grande |
-| `menu` | Esc | jogo | apertar | pausa |
-| `bolsa` | — | jogo | apertar | **novo** (tela de itens, se mantida — §8 do inventário) |
-| `diario` | — (missão fica no HUD) | jogo | apertar | **novo** (histórico de missões) |
-| `ciclo_tempo` | N | jogo | apertar | alterna dia/noite; ⚠ **só build de dev** ou opção (pergunta ao usuário) |
-| `debug` | F3 | dev | apertar | só no build de desenvolvimento (F1–F10, regra do 03) |
-| `confirmar` / `cancelar` | clique / (nada) | telas | apertar | `cancelar` não existe no protótipo; novo |
-| `aba_anterior` / `aba_proxima` | — | telas | apertar | novo |
-| `acao_2` / `acao_3` | — | telas | apertar | novo |
-| `pular_dialogo` | — | diálogo | segurar / alternar | novo |
+| `mover` | 03 | jogo | eixo 2D | 8 direções **relativas à tela** (W = para cima na tela, que é uma diagonal do mundo; conversão no 03/08) |
+| **`mover_clique`** | **07** ⚠ | jogo | apertar / segurar | **Diablo:** clique esquerdo no chão = andar até o ponto; **segurar** = seguir o cursor; qualquer entrada de `mover` cancela |
+| `correr` | 03 | jogo | segurar / alternar | `correr_modo`; vale também para `mover_clique` |
+| `mirar` | 03 | jogo | posição / eixo 2D | **cursor do mouse** (padrão com mouse); gamepad: analógico direito; sem mouse: assistência (03 §3.3) |
+| `atacar` | 03 | jogo | apertar (+ segurar) | clique esquerdo **sobre inimigo** = aproxima e ataca; com ataque no cursor, segurar repete o combo |
+| `forte` | 03 | jogo | apertar | clique direito |
+| `esquivar` | 03 | jogo | apertar | rolamento na direção do `mover`; sem direção = para onde o cursor aponta |
+| `habilidade_1..3` | 03 | jogo | apertar | disparam **no cursor** (cone/área/projétil na direção do cursor); `habilidade_4` reservada |
+| `item` | 03 | jogo | apertar | item rápido |
+| `interagir` | 03 | jogo, diálogo | apertar | também **clique sobre NPC/objeto** (anda até o raio de interação e interage) |
+| **`ancorar`** | **07** ⚠ | jogo | segurar | **Diablo "ficar parado":** ataca sem sair do lugar; **sem tecla padrão** até o 03 decidir (D8) |
+| `menu` | 03 | jogo, telas | apertar | Pausa |
+| `inventario`, `missoes` | 03 | jogo | apertar | atalhos para as telas |
+| `mapa` | 03 | — | — | reservada, **sem tecla** (tela fora do slice) |
+| `confirmar` / `cancelar` | 03 | telas, diálogo | apertar | nunca ficam sem atribuição |
+| `aba_anterior` / `aba_proxima` | 03 | telas | apertar | |
+| `acao_2` / `acao_3` | 03 | telas | apertar | |
+| `pular_dialogo` | 03 | diálogo | segurar / alternar | |
+
+**Regra do cursor ("o que está sob o mouse manda"):** o clique esquerdo escolhe a ação pelo alvo sob o cursor, nesta prioridade: **elemento de UI** (não gera ação de jogo) → **inimigo** (atacar) → **NPC/objeto interativo** (interagir) → **chão** (mover). Tolerância de alvo em dados (03): raio de acerto do cursor ≥ 0,6 tile, favorecendo o que está mais à frente na profundidade.
 
 ## 3. Mapeamento padrão
 
 ### 3.1 Jogo — teclado + mouse
 
-| Ação | Principal | Alternativa | Mouse |
+| Ação | Teclado + mouse | Teclado só | Gamepad |
 |---|---|---|---|
-| `mover` | W A S D | setas | — |
-| `correr` | Shift esquerdo | — | — |
-| `atacar` | Espaço | K | clique esquerdo |
-| `habilidade_1` (giro) | Q | 1 | — |
-| `habilidade_2` (investida) | E | 2 | — |
-| `habilidade_3` | — | 3 | — |
-| `esquivar` | **C** | L | **botão direito** |
-| `interagir` | F | — | — |
-| `item` | R | H | — |
-| `mapa` | M | — | — |
-| `menu` | Esc | P | — |
-| `bolsa` | B | — | — |
-| `diario` | J | — | — |
-| `mirar` | — | — | posição do cursor |
+| `mover` | W A S D / setas | setas | analógico esquerdo (direcional só com `direcional_move`) |
+| `mover_clique` | **clique esquerdo no chão** (segurar = seguir) | — | — |
+| `correr` | Shift esquerdo | Shift esquerdo | gatilho esquerdo |
+| `mirar` | **posição do cursor** | assistência (03) | analógico direito |
+| `atacar` | **clique esquerdo sobre inimigo** | J | face oeste |
+| `forte` | **clique direito** (menu de contexto bloqueado só sobre o jogo) | K | face norte |
+| `esquivar` | Espaço | L | face leste |
+| `habilidade_1` / `_2` / `_3` | 1 / 2 / 3 | U / I / O | ombro direito / gatilho direito / ombro esquerdo |
+| `item` | Q | H | direcional ↑ |
+| `interagir` | E (ou clique sobre o alvo) | E | face sul |
+| `ancorar` | ⚠ sem tecla (D8) | — | — |
+| `menu` | Esc / P | Esc / P | Start |
+| `inventario` | B | B | Select |
+| `missoes` | N | N | direcional ↓ |
+| `mapa` | — | — | — |
 
-**Sem mouse:** o esquema principal funciona inteiro no teclado; `mirar` passa a ser automático (assistência do 03, `mira_modo = movimento`), que vira o padrão quando não há movimento de mouse.
+- As **habilidades também são clicáveis** nos ícones do HUD (jogo só com mouse; A37).
+- O **item rápido** também é clicável no HUD.
+- **Sem mouse:** `mirar` passa a ser a assistência do 03 (`mira_modo = movimento`) automaticamente.
+- **Gamepad:** não há clique para mover; o analógico esquerdo move e o direito mira.
 
-### 3.2 Jogo — gamepad (proposta; o protótipo não tem; posição sem marca)
-
-| Ação | Botão |
-|---|---|
-| `mover` | analógico esquerdo |
-| `correr` | gatilho esquerdo (alternar: opção) |
-| `atacar` | face oeste |
-| `esquivar` | face leste |
-| `interagir` | face sul |
-| `habilidade_1` / `habilidade_2` | ombro direito / gatilho direito |
-| `habilidade_3` | face norte (reservada) |
-| `item` | direcional ↑ |
-| `bolsa` / `diario` | direcional ← / direcional ↓ |
-| `mapa` | Select |
-| `menu` | Start |
-| `mirar` | analógico direito (com assistência do 03) |
-
-- Zona morta do analógico 20 % (opção 5–40 %); vibração desligável.
-- O direcional faz atalhos em jogo (só o analógico move); opção "direcional também move" desliga os atalhos dele.
-- Gamepad desconectado → **abre a Pausa** (`ui_aviso_gamepad_desconectado`).
-
-### 3.3 Telas e diálogo
+### 3.2 Telas e diálogo
 
 | Ação | Teclado + mouse | Gamepad |
 |---|---|---|
-| Mover foco | setas / WASD; foco segue o cursor | analógico esq. / direcional |
+| Mover foco | setas / WASD; o foco segue o cursor | analógico esq. / direcional |
 | `confirmar` | Enter / Espaço / clique esquerdo | face sul |
 | `cancelar` | Esc / Backspace / clique direito / botão "Voltar" | face leste |
-| `aba_anterior` / `aba_proxima` | Q / E; clique na aba | ombros esq. / dir. |
-| `acao_2` / `acao_3` | F / R; botões na tela | face oeste / norte |
-| Avançar diálogo | `interagir` (F) / `confirmar` / clique | face sul |
+| `aba_anterior` / `aba_proxima` | Q / E; clique na aba | ombros |
+| `acao_2` / `acao_3` | F / R; botões | face oeste / norte |
+| Avançar diálogo | `interagir` (E) / `confirmar` / clique | face sul |
 | `pular_dialogo` | segurar Esc ou Backspace; botão "Pular" | segurar Start |
 | Escolha de resposta | 1–4 / setas + Enter / clique | direcional + face sul |
 | Rolar lista | Page Up/Down; roda | analógico dir. |
 
-### 3.4 Teclas do navegador e armadilhas
+### 3.3 Cursor e retorno visual (mouse)
+O cursor **muda de forma** (nunca só de cor) e o mundo responde sob ele:
 
-| Tecla | Problema | Regra |
+| Sob o cursor | Cursor | Resposta no mundo |
 |---|---|---|
-| **Ctrl (como esquiva do protótipo)** | **Ctrl+W fecha a aba, Ctrl+T/N abrem abas, Ctrl+Shift+… — o navegador reserva e o jogo não consegue cancelar.** Como W = andar para cima, **esquivar para cima com Ctrl fecha o jogo**. O protótipo bloqueia Ctrl com `preventDefault`, mas isso **não impede** Ctrl+W, Ctrl+T, Ctrl+N, Ctrl+Tab no Chrome | **Ctrl não vem como padrão.** Esquiva = **C** e botão direito. Ctrl só como atribuição opcional, com aviso `ui_aviso_ctrl_navegador` e proibido em combinação com W/T/N |
-| Espaço | rola a página | bloqueado sobre o jogo (como no protótipo) |
-| Setas, Tab | rolam/movem foco da página | bloqueadas sobre o jogo; Tab recusado no remapeamento |
-| Botão direito | menu de contexto | bloqueado **só sobre o canvas** (como no protótipo) |
-| Esc | sai da tela cheia | permitido; **sair da tela cheia abre a Pausa**; `cancelar` tem também Backspace |
-| F1–F12 | ajuda, recarregar, tela cheia, ferramentas, busca (F3) | recusadas no remapeamento do jogador; F1–F10 só como atalhos de dev (03) |
-| Alt, Windows/Command, Print Screen | menu/sistema | recusadas |
-| Teclas mortas do ABNT2 (´ ~ ^ `) e Ç | variam por layout | permitidas com aviso; nunca padrão |
-| Segurar tecla / repetição do SO | repetição automática | ações usam "apertou" (sem repetição); o protótipo faz `!e.repeat` — manter |
+| Chão andável | seta simples | marcador de destino (anel suave no chão, **não magenta**, some ao chegar) |
+| Chão não andável | seta com ✕ | nada |
+| Inimigo | **espada** | **contorno** do inimigo + nome e barra de vida (ver inventário §3.2) |
+| NPC / objeto interativo | **mão** / balão | contorno dourado + dica `[selo] ui_interagir_{tipo}` |
+| Elemento de UI | seta de menu | foco do componente |
+| Alvo fora do alcance de uma habilidade | cursor com anel vermelho-brasa (`alerta_ui`) **e** ícone de distância | prévia da área em tracejado |
 
-## 4. Ícones e selos
-- Selos de tecla (placa de madeira com borda de ouro, protótipo: círculo no canto do ícone de habilidade), botões do mouse e posições do gamepad (sul/leste/oeste/norte, ombros, gatilhos, analógicos, Start, Select). **Sem símbolos de fabricantes** no slice.
-- Troca de conjunto na primeira entrada de outro dispositivo, no máximo 1 vez por 0,5 s.
-- Texto "Q", "E" nunca fixo em dica, diálogo ou tutorial: sempre `{tecla_habilidade_1}` etc. (o protótipo escreve "F ▶" e "Q"/"E" no código).
+- **Prévia de habilidade:** ao segurar uma habilidade (ou com a opção "mostrar alcance"), o chão mostra o **alcance e a área** em contorno claro — **não** magenta (magenta é aviso de golpe inimigo).
+- **Cursor do sistema:** o cursor desenhado pelo jogo é grande o bastante (≥ 32 px) e há opção de **cursor grande**/alto contraste; sem mouse, o cursor some.
+- **Cursor e telegraph:** o cursor e seus marcadores **nunca ficam acima** do aviso de golpe.
+
+### 3.4 Teclas do navegador a evitar
+
+| Tecla | Por quê | Regra |
+|---|---|---|
+| F1–F12 | ajuda, recarregar (F5), tela cheia (F11), ferramentas (F12), busca (F3) | bloqueadas no remapeamento do jogador; F1–F10 só como atalhos de debug no build de dev (03) |
+| **Ctrl + letra** (Ctrl+W, T, N, Tab…) | o navegador reserva fechar/abrir aba; o jogo **não consegue** cancelar | **Ctrl não é padrão de nenhuma ação**; combinações bloqueadas; Ctrl sozinho só como atribuição opcional com `ui_aviso_ctrl_navegador` (A34) |
+| Alt sozinho | barra de menu no Windows | bloqueado |
+| Tab | move o foco da página | bloqueado como padrão; permitido com aviso |
+| Esc | sai da tela cheia | permitido; **sair da tela cheia abre a Pausa**; `cancelar` tem também Backspace |
+| Botão direito | menu de contexto | bloqueado **só sobre o canvas** |
+| Roda do mouse | rola a página / zoom | bloqueada sobre o jogo (a câmera é fixa); em listas, rola a lista |
+| Clique e arraste | seleciona texto/arrasta imagem | bloqueado sobre o jogo |
+| Teclas mortas do ABNT2 (´ ~ ^ `) e Ç | variam por layout | permitidas com aviso; nunca padrão |
+| Windows/Command, Print Screen | sistema | recusadas |
+| Saída do cursor da janela | mouse "solto" no meio do combate | com `mover_clique` segurando, sair da janela **para** o movimento; o jogo mostra "mouse fora" só se perder o foco |
+
+## 4. Ícones por dispositivo
+- Conjunto original (10): teclas com rótulo do layout, botões do mouse (esquerdo/direito/roda) e posições do gamepad (face sul/leste/oeste/norte, ombros, gatilhos, analógicos, Start, Select). Sem símbolos de fabricantes no slice.
+- Troca de conjunto na primeira entrada de outro dispositivo; no máximo 1 vez por 0,5 s.
 
 ## 5. Remapeamento (Opções → Controles)
 | # | Regra | Verificável por |
 |---|---|---|
 | RM1 | 2 atribuições por ação e dispositivo | Opções |
-| RM2 | Conflito no mesmo contexto: aviso mostrando a outra ação, com "Trocar" ou "Cancelar"; **nenhum conflito silencioso** | atribuir C a `habilidade_1` |
+| RM2 | Conflito no mesmo contexto: aviso mostrando a outra ação, com "Trocar" ou "Cancelar"; **nenhum conflito silencioso** | atribuir E a `habilidade_1` |
 | RM3 | `confirmar`, `cancelar` e `menu` nunca ficam sem atribuição | tentar limpar |
-| RM4 | Teclas de §3.4 recusadas com `ui_aviso_tecla_reservada` | tentar F5 e Alt |
+| RM4 | Teclas de §3.4 recusadas com `ui_aviso_tecla_reservada` | tentar F5 |
 | RM5 | "Restaurar padrão" por dispositivo, com confirmação | Opções |
 | RM6 | Segurar/alternar para `correr`, `atacar` (contínuo) e `pular_dialogo` | Opções |
 | RM7 | Esperando tecla: Esc ou "Voltar" cancela; 5 s sem entrada cancela | Opções |
-| RM8 | Remapeamento salvo nas configurações (separadas do save), versionado; inválido → padrão + aviso | recarregar |
+| RM8 | Salvo nas configurações (separadas do save), versionado; inválido → padrão + aviso | recarregar |
 | RM9 | HUD, dicas e "Como jogar" mostram a atribuição **atual** | remapear e abrir |
+| RM10 | Botões do **mouse** são remapeáveis (esquerdo/direito/ambos trocáveis: canhoto) | trocar e jogar |
 
 ## 6. Ajuda e tutorial
-"Como jogar" sempre acessível (título e pausa); tutorial contextual curto na primeira vez de cada ação (o protótipo só mostra a tabela no título); repetível; desligável. **Primeira área = tutorial** com um lobo/dummy para combo, giro, investida, rolamento (aviso de golpe incluso).
+"Como jogar" sempre acessível (menu e pausa) com as atribuições atuais e **demonstração do clique** (mover, atacar, interagir); tutorial contextual curto, repetível, desligável; a primeira área ensina `mover_clique`, `atacar`, esquiva e aviso de golpe.
 
 ## 7. Checklist de acessibilidade (para o 09)
 
-**P** = garantido por padrão · **O** = opção do jogador. Itens marcados **[protótipo]** descrevem algo que o protótipo faz hoje e que precisa de controle.
+**P** = garantido por padrão · **O** = opção. Texto das opções em `ui_opt_*`.
 
-### 7.1 Sensibilidade (fotossensibilidade e movimento)
+### 7.1 Sensibilidade
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A01 | Nenhum flash/clarão acima de **3 por segundo** em qualquer configuração | P | gravar combate com chefe, efeitos no máximo; contar transições |
-| A02 | Desligar **tremor de tela** (`ui_opt_tremor`) | O | desligar e levar golpe forte |
-| A03 | Desligar/reduzir **flashes** (`ui_opt_flashes`): inclui o **clarão vermelho do retrato** ao levar dano e o brilho de habilidade pronta **[protótipo]** | O | desligar e levar dano |
-| A04 | Reduzir **partículas** (normal/reduzido/mínimo): faíscas, poeira, folhas, pássaros **[protótipo]** | O | mínimo: só as que comunicam jogo (telegraph, cura) |
-| A05 | Desligar **desfoque**: o do título/pausa (`blurScreen`) **[protótipo]** e o de profundidade | O | desligado: fundo nítido |
-| A06 | **Reduzir movimento** (`ui_opt_reduzir_movimento`): UI sem deslizar/pulsar, sem balanço de câmera, cartões de capítulo sem fade, ícone de habilidade sem girar | O | ligar e navegar por todas as telas |
+| A01 | Nenhum flash acima de **3 por segundo** em qualquer configuração | P | gravar combate com chefe e efeitos no máximo |
+| A02 | Desligar **tremor** (`ui_opt_tremor`) | O | desligar e levar golpe forte |
+| A03 | Desligar/reduzir **flashes** (`ui_opt_flashes`) | O | desligar: impacto e vida baixa sem clarão |
+| A04 | Reduzir **partículas** (normal/reduzido/mínimo) | O | mínimo: só as que comunicam jogo |
+| A05 | Desligar **desfoque de profundidade** | O | cena inteira nítida |
+| A06 | **Reduzir movimento**: transições de UI instantâneas, marcador de destino e cursor sem animação | O | navegar por todas as telas |
 | A07 | Aviso de fotossensibilidade na 1ª execução | P | limpar dados e abrir |
-| A08 | **Ciclo dia/noite** com opção **dia fixo** e **noite fixa**; transições lentas (≥ 5 s) sem variação brusca **[protótipo]** | O | alternar em Opções |
-| A09 | **Números de dano e texto flutuante** (`floatText`) desligáveis/reduzidos **[protótipo]** | O | desligar e lutar |
 
 ### 7.2 Visão
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A10 | **Contraste:** ≥ 4,5:1 texto pequeno, ≥ 3:1 texto grande, ícones, foco, barras | P | medir todas as combinações; **base medida pelo 07 no protótipo** (calculadas, contra painel **opaco**): texto `#F2E6C8`/madeira `#3A2818` 11,3:1 · ouro `#E8C877`/madeira 8,7:1 · borda de ouro `#C9A24A` 5,8:1 · pergaminho `#3A2614`/`#F0E2BE` 11,1:1 · botão `#FFE9A0`/`#9A2A28` 6,4:1 · selo de tecla 13,5:1 · `alerta_ui` `#F44D21`/madeira 4,0:1 (**só para ícone e contorno, nunca como cor de texto**) · narração no pergaminho `#6A5034`/`#D8C49A` **4,4:1 → falha; escurecer** |
-| A11 | **Texto sobre o mundo** sempre com painel ou contorno; painéis atrás de texto com **opacidade ≥ 0,9** (o protótipo usa 0,7–0,82: o contraste cai sobre grama clara) | P + O | texto sobre a praça de dia e na grama clara |
-| A12 | **Nenhum significado só por cor:** vida baixa, estados, missão (feita/atual/bloqueada), mapa (§2.9 do inventário), habilidade indisponível, raridade — sempre forma, ícone ou texto **[protótipo]: missões e minimapa usam só cor** | P | ver tudo em escala de cinza |
-| A13 | **Modo daltônico** (protanopia, deuteranopia, tritanopia) ajusta cores de UI, minimapa e telegraph mantendo formas | O | simulador |
-| A14 | **Tamanho da UI** (100/125/150 %) | O | conferir margens e zona de ação |
-| A15 | **Tamanho do texto** (normal/grande), independente da UI, sem cortar; **mínimo 14 px a 1280×720** (o protótipo tem textos de **9 px** — "XP" — e **11 px** — selo de tecla — abaixo disso) | O + P | medir |
-| A16 | **Foco sempre visível por forma + cor** (anel duplo + setas) | P | navegar só com teclado |
-| A17 | **Telegraph sempre visível:** noite, névoa, desfoque, HUD, partículas e números de dano nunca o cobrem; contraste do magenta com o chão **à noite** ≥ 3:1 | P | combate de dia, entardecer e noite em cada área |
-| A18 | **Reservas de cor:** nenhuma UI em magenta `perigo_*`; dourado como moldura/foco; erro e vida baixa em `alerta_ui` com forma + ícone + texto; **vermelho do HUD** distinto de `perigo_*` e `alerta_ui` nos 4 modos (pergunta ao 10) | P | varredura de cores |
+| A10 | Contraste ≥ **4,5:1** (texto pequeno) e ≥ 3:1 (texto grande, ícones, foco, barras). Base medida pelo 10 no painel de UI: texto 16,2:1 · secundário 9,6:1 · borda 3,7:1 | P | medir todas as combinações |
+| A11 | Texto sobre o 3D com fundo próprio; opção de fundo opaco | P + O | diálogo e notificações em cena clara e escura |
+| A12 | **Nenhum significado só por cor:** vida baixa, estados, raridade, missão principal/secundária, habilidade indisponível, item selecionado, **tipo de alvo sob o cursor** (forma do cursor) | P | ver tudo em escala de cinza |
+| A13 | Modo daltônico (3 tipos) em UI e telegraph, mantendo formas | O | simulador |
+| A14 | **Tamanho da UI** (escalas disponíveis) | O | margens e zona de ação |
+| A15 | **Tamanho do texto** independente da UI | O | grande + textos +40 % |
+| A16 | Foco sempre visível por **forma + cor** | P | navegar só com teclado |
+| A17 | **Telegraph sempre visível:** névoa, desfoque, partículas, HUD, cursor, marcadores, números de dano e **objetos altos da cena isométrica** nunca o cobrem (A80) | P | combate em cada área |
+| A18 | **Reservas de cor:** nenhuma UI em magenta `perigo_*`; erro de UI e vida baixa com forma + ícone + texto e a rampa **`alerta_ui`** (`paleta.json` v0.2: `#f44d21`, contorno `#780105`, contraste ≥ 5,1:1 no painel, validada nos 4 modos); dourado `brilho_*` só no foco da UI e em interativos | P | varredura de cores |
+| A19 | **Cursor grande/alto contraste** e **cor do marcador de destino** configurável | O | Opções |
 
 ### 7.3 Audição
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
 | A20 | **Legendas** de falas fora da caixa e sons narrativos, com nome do falante | O (ligada) | cena com fala ambiente |
-| A21 | **Indicador visual de sons importantes** (ataque fora da tela, inimigo se aproximando, sino) na borda da tela | O | inimigo atacando fora da tela, som mudo |
-| A22 | Volumes: geral, música, efeitos, ambiente, interface (o protótipo só tem "Som: sim/não") **[protótipo]** | O | zerar um por vez |
-| A23 | Nenhuma informação só por som (o **sino**, o **aviso de golpe**, o **alerta de vida baixa** têm par visual) | P | jogar sem som |
+| A21 | **Indicador visual de sons importantes** na borda da tela (ataque fora da tela, inimigo se aproximando) | O | inimigo atacando fora da tela, mudo |
+| A22 | Volumes separados: geral, música, efeitos, ambiente, interface | O | zerar um por vez |
+| A23 | Nenhuma informação de jogo só por som | P | jogar sem som |
 
-### 7.4 Controle
+### 7.4 Controle e movimento
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A30 | Remapeamento completo (§5) **[protótipo]: não há** | O | RM1–RM9 |
-| A31 | Alternativa a segurar: `correr` alternar, `atacar` contínuo ao segurar (o protótipo usa "segure p/ combo" no toque), `pular_dialogo` | O | modo alternar |
-| A32 | Jogo completo só com teclado, só com mouse+teclado e só com gamepad; **menus** navegáveis por teclado e gamepad **[protótipo]: só mouse** | P | terminar o slice com cada um |
-| A33 | Sem eventos de apertar repetidamente | P | revisão |
-| A34 | **Esquiva sem Ctrl por padrão** (§3.4) | P | esquivar para cima 20× sem fechar a aba |
+| A30 | Remapeamento completo (§5) | O | RM1–RM10 |
+| A31 | Alternativa a segurar (`correr`, `atacar` contínuo, `pular_dialogo`, **seguir o cursor**) | O | modo alternar |
+| A32 | Jogo completo **só com teclado**, **só com mouse** (A37) e **só com gamepad**; menus pelos três | P | terminar o slice com cada um |
+| A33 | Sem eventos de apertar repetidamente rápido | P | revisão |
+| A34 | Nenhuma ação padrão usa Ctrl; nenhum atalho do navegador (Ctrl+W/T/N, F5, F11) dispara por acidente | P | jogar 10 min esquivando e andando |
 | A35 | Assistências de combate (06) | — | **Fora do slice** (D-005) |
-| A36 | Mira assistida e `mira_modo = movimento` para quem joga sem mouse | O | jogar só com teclado |
+| A36 | **Assistência de mira** (03 §3.3) e `mira_modo` quando não há mouse | O | jogar só com teclado |
+| A37 | **Modo só mouse:** andar/atacar/interagir por clique, habilidades e item pelos ícones clicáveis do HUD, pausa por botão na tela | O | terminar o slice só com o mouse |
+| A38 | **Tolerância do cursor** (tamanho do alvo clicável) ajustável; **travar alvo** (alvo fica marcado até morrer ou sair do alcance) | O | Opções |
+| A39 | Sem clique duplo ou arrastar obrigatórios; clique longo tem alternativa | P | revisão |
 
 ### 7.5 Cognição
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A40 | Objetivo atual sempre visível (painel de missão no HUD, opção ligada) e na pausa | P + O | abrir pausa em qualquer momento |
-| A41 | **Pausar a qualquer momento** (inclui diálogo, cena e chefe) | P | pausar em cada estado |
-| A42 | Tutorial repetível | P | abrir do título e da pausa |
+| A40 | Objetivo atual sempre visível (HUD, ligada por padrão) e na pausa | P + O | pausa em qualquer momento |
+| A41 | **Pausar a qualquer momento** (inclui diálogo e chefe) | P | pausar em cada estado |
+| A42 | Tutorial repetível | P | título e pausa |
 | A43 | Diálogo sem limite de tempo, velocidade ajustável, avanço manual, histórico | P + O | deixar 2 min parado |
-| A44 | Nenhum menu com tempo limite; **cartões e mensagens** (3–3,5 s no protótipo) dispensáveis e revisáveis no diário | P | revisão |
+| A44 | Nenhum menu com tempo limite | P | revisão |
 
 ### 7.6 Navegador
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A50 | Redimensionar e zoom 50–200 % sem cortar UI nem esticar a imagem; **1280×720 lógicos** com proporção mantida | P | redimensionar durante o jogo |
-| A51 | Pausa automática ao perder foco, trocar de aba ou sair da tela cheia; tempo perdido não é simulado (o protótipo limpa as teclas ao perder o foco: manter) | P | trocar de aba em combate |
-| A52 | Áudio só após o primeiro gesto (título) | P | abrir e não tocar |
-| A53 | **Ctrl+W/T/N não podem ser acionados por acidente pelo esquema padrão** | P | A34 |
+| A50 | Redimensionar e zoom sem cortar UI nem esticar pixel; **proporção da área visível** mantida (o mundo mostra mais/menos, nunca distorce) | P | redimensionar durante o jogo |
+| A51 | Pausa ao perder foco, trocar de aba ou sair da tela cheia; tempo perdido não é simulado; **teclas e botões do mouse são soltos** ao perder o foco | P | trocar de aba em combate |
+| A52 | Áudio só após o primeiro gesto | P | abrir e não tocar |
 
-### 7.7 Texto e localização
+### 7.7 Texto
 | ID | Requisito | Tipo | Como verificar |
 |---|---|---|---|
-| A60 | Todo texto por ID; nenhum no código; nenhuma frase concatenada (o protótipo escreve tudo no código, inclusive "(baixinho)" e "[ação]" como marcas no texto) **[protótipo]** | P | busca no código |
+| A60 | Todo texto por ID; nenhuma frase concatenada | P | busca no código |
 | A61 | +40 % sem cortar | P | pseudo-localização |
 | A62 | Fonte com todos os acentos do português | P | tela de teste |
 
-## 8. Pendências para o Produtor
+### 7.8 Câmera isométrica (novo na v0.3)
+| ID | Requisito | Tipo | Como verificar |
+|---|---|---|---|
+| A80 | **Oclusão:** o herói, os inimigos em combate e **toda zona de aviso de golpe** nunca ficam escondidos por parede, telhado, árvore ou torre: o objeto alto fica translúcido (recorte) ou o herói/telegraph ganha silhueta por cima | P | andar rente a cada objeto alto e lutar atrás dele |
+| A81 | Silhueta de oclusão do herói **desligável** e com opção de **contorno forte** | O | Opções |
+| A82 | **Câmera fixa**, sem rotação nem zoom do jogador (evita enjoo; o jogo é desenhado para um só ângulo) | P | revisão |
+| A83 | Alvos clicáveis **não ficam atrás** de objetos altos sem indicação (contorno visível através do objeto) | P | clicar em NPC atrás de casa |
+| A84 | **8 direções relativas à tela** coincidem com o que se vê (W = cima na tela) | P | andar em círculo |
+
+## 8. Pendências para o Produtor (alinhamento com o 03)
 | # | Ponto | Proposta do 07 |
 |---|---|---|
-| D1 | **Ctrl como esquiva do protótipo** fecha a aba com W (Ctrl+W) | Padrão **C** e botão direito; Ctrl só opcional com aviso (A34) |
-| D2 | `diario` em J e alternativa de `atacar` em K (evita conflito) | 03 confirma |
-| D3 | `forte` some do esquema | 03 confirma: habilidades Q/E assumem o papel; D-007 dizia "golpes fortes entram" |
-| D4 | `habilidade_3` | reservada; 1–3 como alternativas de teclado |
-| D5 | `ciclo_tempo` (N) | **só opção/dev** (pergunta ao usuário no inventário §8) |
-| D6 | Gamepad não existe no protótipo | proposta de §3.2; 03 valida |
-| D7 | `item` (R) e `bolsa` (B) são novos | só se o usuário quiser bolsa/itens (inventário §8) |
+| D6 | `mover_clique` e a regra "o que está sob o cursor manda" | 03 inclui no `gameplay.md` (§3.1 e §7) e define pathfinding (08 confirma custo) |
+| D7 | **Mira no cursor** passa a ser o padrão com mouse (`mira_modo`) | 03 troca o padrão `movimento` → `cursor` quando há mouse; sem mouse, `movimento` |
+| D8 | `ancorar` (ficar parado e atacar) | 03 decide se entra e a tecla; **não** usar Ctrl |
+| D9 | Esquiva sem direção: para onde o cursor aponta | 03 confirma |
+| D10 | Raio de acerto do cursor (≥ 0,6 tile) e prioridade de alvos | 03/06 definem em dados |
+| D11 | Tecla da esquiva continua **Espaço** | confirmar com o 03 que Espaço não conflita com `mover_clique` segurado |

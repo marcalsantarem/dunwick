@@ -1,5 +1,7 @@
 # Impacto da D-024 nos documentos de QA
 
+> **ARQUIVADO (D-025, 2026-10-24):** o protótipo era só referência de estilo; a D-025 anulou a mudança de sistemas e critérios. Este documento não vale. Os trechos que a D-025 mantém (câmera isométrica, clique, oclusão, nitidez, sala de teste) foram aplicados direto em `criterios_marcos.md` e `plano_testes.md`.
+
 > **Status:** RASCUNHO v0.1 (BRF-011) · Dono: 09 QA · 2026-10-24 · Só documentos; sem números novos até o **ADR-002** (08) e o `gameplay.md` novo (03).
 > Alvo novo: protótipo do usuário (isométrico 2:1, 1280×720, Canvas 2D, arte pintada por código). O esqueleto cinza 3D 640×360 foi rejeitado.
 > Marcação nos outros arquivos: **`[a atualizar D-024]`** = depende de algo que mudou; **`[mantém]`** = vale como está; **`[substituir D-024]`** = sai e entra o novo critério da §3.

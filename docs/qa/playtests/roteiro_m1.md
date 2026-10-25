@@ -1,7 +1,5 @@
 # Roteiro de playtest — M1 (protótipo cinza)
 
-> **⚠️ D-024:** controles, sala e bonecos deste roteiro são do esqueleto cinza. **[a atualizar D-024]** para WASD/Shift/Espaço/Q/E/Ctrl, a praça de Baixo Orvalho e os inimigos do protótipo. O formato (≤ 15 min, questionário de sensação, ficha) **[mantém]**. Ver [../impacto_d024.md](../impacto_d024.md).
-
 > **Status:** RASCUNHO v0.1 (BRF-006) · Dono: 09 QA · 2026-10-24
 > **Jogador:** o usuário (padrão D-006: usuário + bots). **Duração:** ≤ 15 min.
 > **Pergunta do marco:** andar e atacar são gostosos? A câmera incomoda?
@@ -22,9 +20,9 @@
 | Bloco | Tempo | O que fazer | O que o QA observa |
 |---|---|---|---|
 | 0. Controles | 1 min | Ler a lista de comandos do protótipo (tela ou papel do 03) | Dúvidas sobre comandos |
-| 1. Andar | 2 min | Andar e correr pela sala toda, em círculos, em zigue-zague e contra paredes e quinas | Hesitação ao virar; herói preso; reclamação de inércia ou de patinar |
+| 1. Andar | 2 min | Andar e correr pela sala toda (teclado/gamepad e **clicando no chão**), em círculos, em zigue-zague e contra paredes e quinas, passando atrás de cenário | Hesitação ao virar; herói preso; reclamação de inércia ou de patinar |
 | 2. Câmera | 1 min | Ir aos 4 cantos e parar; andar rápido de um lado ao outro | Herói sai de vista ou fica escondido; enjoo, câmera "atrasada" |
-| 3. Atacar | 3 min | Bater no alvo de treino de todos os lados: combo leve, ataque forte, misturar | Golpes que "deviam ter acertado"; combo truncado; impacto fraco |
+| 3. Atacar | 3 min | Bater no alvo de treino de todos os lados, **clicando nele** e com as teclas: combo leve, ataque forte, misturar; habilidade mirando com o cursor | Golpes que "deviam ter acertado"; combo truncado; impacto fraco |
 | 4. Esquivar | 2 min | Esquivar em todas as direções, inclusive no meio de um ataque | Esquiva atrasada ou ignorada; distância estranha |
 | 5. Gamepad | 2 min | Conectar o gamepad e repetir 1, 3 e 4 rapidamente (se não houver gamepad, repetir com teclado e marcar "n/a") | Diferença de sensação entre dispositivos |
 | 6. Livre | 1 min | Fazer o que quiser | O que o jogador procura fazer sozinho |

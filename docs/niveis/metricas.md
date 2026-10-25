@@ -1,6 +1,5 @@
 # Métricas de nível e sala de teste do M1
 
-> ⚠ **A ATUALIZAR (D-024, 2026-10-24):** tile de 32 px, câmera a 35°, velocidades 3,5 / 6 e a sala 48×32 caem (protótipo: tile isométrico 64×32, 1280×720, 2,2 / 3,5 tiles/s). O que fica e o que muda está em `docs/sistemas/reconciliacao_prototipo.md` §6. Os números do chefe da §9 também mudam (§4 de lá).
 
 > **Dono:** 06 Sistemas e Níveis · **Status:** RASCUNHO v0.1 (BRF-004, onda 0) · 2026-10-24
 > Alinhado com `docs/gameplay.md` v0.1 (03): mesmos nomes de chave. Valores iniciais, que o playtest ajusta.
@@ -15,9 +14,9 @@ Unidades: **tiles** (1 tile = 1 unidade do mundo = 32×32 px de arte), **segundo
 | Item | Valor | Observação |
 |---|---|---|
 | Tile | 1,0 × 1,0 | 32 px de arte |
-| Célula de sprite do herói/NPC | 2 × 2 tiles (64 × 64 px) | âncora nos pés (32, 60) |
+| Célula de sprite do herói/NPC | a rever com 04/10 (câmera isométrica) | âncora nos pés |
 | Altura visual do herói | ~1,5 tile (≈ 48 px) | personagem compacto, cabeça grande |
-| Área visível | 20 × 11,25 tiles | `camera_area_visivel_tiles` (03 §8.1); 08/10 confirmam |
+| Área visível | a definir pelo 08/10 (resolução e câmera isométrica; antes 20 × 11,25 tiles) | `camera_area_visivel_tiles` (03 §8.1) |
 | Zona de ação sem HUD | 12 × 6,75 tiles (60 % × 60 %) | D-007 |
 
 ## 2. Herói (confirma `gameplay.md` §4.3)
@@ -68,6 +67,29 @@ Unidades: **tiles** (1 tile = 1 unidade do mundo = 32×32 px de arte), **segundo
 
 **Regra do diorama (06 §11.6):** a altura serve para composição e mirantes; o **combate acontece num plano só** (sem combate em rampa ou escada no slice).
 
+## 5-A. Projeção isométrica (D-025)
+
+Câmera isométrica fixa. **Parâmetros provisórios** (08/10 confirmam no ADR-002): `camera_yaw` 45° (a câmera fica a **sudeste** olhando para **noroeste**; +x = leste, +z = sul; o fundo da tela é o noroeste) e `camera_pitch` ≈ 30° (o tile vira um losango 2:1). Todas as medidas continuam em **tiles do mundo**; só o desenho se projeta. Hitboxes, alcances e telegraphs são formas no chão (03).
+
+| Efeito da projeção | Regra | Com pitch 30° |
+|---|---|---|
+| Losango do tile | largura : altura = 1 : sen θ | **2 : 1** |
+| Altura x chão | 1 tile de altura sobe cos θ na tela; 1 tile de chão ao longo de um eixo sobe sen θ × 0,71 | altura 1,0 → 0,87 · passo de 1 tile em x ou z → 0,35 na vertical e 0,71 na horizontal |
+| Velocidade na tela | constante no mundo; ao longo do fundo da tela (diagonal do mundo) o movimento parece **metade** do lateral (sen θ = 0,5) | a antecipação da câmera (03) compensa; não se muda a velocidade |
+| Círculo no chão (aviso, área) | vira elipse com semieixos r (horizontal) e r · sen θ (vertical) | aviso de r 2,0: 4 tiles de largura × 2 de altura na tela |
+| **Sombra de oclusão** | objeto de altura h esconde o chão atrás dele, na direção da vista, até **h / tan θ** | h 0,75 → 1,3 · h 1,0 → 1,7 · h 2,0 → 3,5 tiles (≈ 2,4 em x e 2,4 em z) |
+
+**Regras de nível (valem para todo mapa):**
+1. **Fundo alto, frente baixa:** plataformas, mirantes e paredes grandes ficam no **noroeste** (longe da câmera); a frente (sul e leste) fica aberta.
+2. **Rampas e escadas sobem para longe da câmera** (norte ou oeste), para a superfície aparecer inteira.
+3. **Paredes voltadas para a câmera** (lados sul e leste de uma área jogável): altura ≤ **0,75** (mureta) ou recorte/transparência automática (`camera_oclusao_alpha`, 07).
+4. **Nada importante na sombra de oclusão** de um objeto com altura ≥ 1,0: inimigo, baú, NPC, portal, ponto de salvamento, porta e armadilha. Cada mapa é validado por script (a sala de teste, §8.5). O telegraph desenha por cima do chão e nunca é coberto (guia do 10 §9).
+5. **Duas alturas sobrepostas na tela:** o caminho no nível baixo atrás de uma plataforma de altura h fica a pelo menos h / tan θ da borda (1,7 tiles para h = 1) ou tem recorte.
+6. **Grade alinhada aos eixos:** corredores, salas e muros seguem x ou z (na tela viram diagonais). Nada de diagonais na grade lógica.
+7. **Mouse:** o clique vira ponto no chão na altura do tile clicado (plataformas incluídas); a mira usa o mesmo ponto.
+
+---
+
 ## 6. Encontros e perigos
 
 | Métrica | Valor | Por quê |
@@ -91,101 +113,99 @@ Unidades: **tiles** (1 tile = 1 unidade do mundo = 32×32 px de arte), **segundo
 
 ---
 
-## 8. Sala de teste do M1 — `map_sala_teste`
+## 8. Sala de teste do M1 — `map_sala_teste` (isométrica)
 
-Nome provisório (chave de texto `txt_map_sala_teste_nome`). Tamanho **48 × 32 tiles**. Origem no canto noroeste; **x cresce para leste** (direita da tela), **z cresce para sul** (em direção à câmera). O tile (x, z) ocupa [x, x+1) × [z, z+1); o centro é (x + 0,5, z + 0,5).
+Nome provisório (chave de texto `txt_map_sala_teste_nome`). Tamanho **48 × 32 tiles**. **+x = leste (direita), +z = sul (para a câmera)**; o fundo da tela é o noroeste. O tile (x, z) ocupa [x, x+1) × [z, z+1).
+Esta versão segue as regras da §5-A: plataforma no fundo, rampa e escada que sobem para longe da câmera, nada importante em sombra de oclusão.
 
 ### 8.1 Planta (1 caractere = 1 tile)
 ```
     000000000011111111112222222222333333333344444444
     012345678901234567890123456789012345678901234567
   0 ################################################
-  1 #....................###^^^^^^^^^^^^############
-  2 #......N.............###^^^^^^^^^^B^############
-  3 #....................///^^^^^^^^^^^^############
-  4 #..........a....g....///^^^^^^^^^^^^############
-  5 #....................///^^^^^^^^^^^^############
-  6 #....................###^^^^^^^^^^^^############
-  7 #...S................###^^^^^^^^^^^^############
-  8 #....................###^^^^^^^^^^^^############
-  9 #...........######...############HHH############
- 10 #.....V..............############HHH############
- 11 #........................................#######
- 12 #........................................#######
- 13 #.P......................................#######
- 14 #........................................#######
- 15 #####...########################################
- 16 #####...########################################
- 17 #####...########################################
- 18 #####...######################,,,,,,,,,,,,,,,,##
- 19 #####...######################,,,,,,,,,,,,,,,,##
- 20 #####...######################,,,,,,,mmm,,,,,,##
- 21 #####...######################,,,,##,,,,,,e,,,##
- 22 #####..........AAA...........D,,,,##,,,,,,,,,,##
+  1 #^^^^^^^^^^^^............#######################
+  2 #^^^^^B^^^^^^............#######################
+  3 #^^^^^^^^^^^^HH..........#######################
+  4 #^^^^^^^^^^^^HH..........#######################
+  5 #^^^^^^^^^^^^HH..........#######################
+  6 #^^^^^^^^^^^^............#######################
+  7 #^^^^^^^^^^^^............#######################
+  8 #^^^^^^^^^^^^............#######################
+  9 #....///.................#######################
+ 10 #....///.................#######################
+ 11 #....///.................#######################
+ 12 #........N....######.....#######################
+ 13 #........................#######################
+ 14 #........................#######################
+ 15 #.....S......a....g......#######################
+ 16 #........................#######################
+ 17 #..V.....................#####,,,,,,,,,,,,,,,,##
+ 18 #........................#####,,,,,,,,,,,,,,,,##
+ 19 #.P......................#####,,,,,,,mmm,,e,,,##
+ 20 #........................#####,,,,##,,,,,,,,,,##
+ 21 #####...######################,,,,##,,,,,,,,,,##
+ 22 #####..........AAA...........D,,,,,,,,,,,,,,,,##
  23 #####..........AAA...........D,,,,,,,,E,,,,,,,##
- 24 #####..........AAA...........D,,,,,,,,,,,,,,,,##
- 25 ##############################,,,,,,,,,,##,,,,##
- 26 ##############################,,,,,,,,,,##,,,,##
- 27 ##############################,,,,,,,,,,,,f,,,##
- 28 ##############################,,,,,,,,,,,,,,Q,##
- 29 ##############################,,,,,,,,,,,,,,,,##
+ 24 #####..........AAA...........D,,,,,,,,,,,,,##,##
+ 25 ##############################,,,,,,,,,,,,,##,##
+ 26 ##############################,,,,,,,,,,,,,,,,##
+ 27 ##############################,,,,,,,,,,,,f,Q,##
+ 28 ##############################,,,,,,,,,,,,,,,,##
+ 29 ################################################
  30 ################################################
  31 ################################################
 ```
-Legenda: `.` chão (altura 0) · `^` plataforma (altura 1) · `/` rampa (0→1, sobe para leste) · `H` escada (1→0, desce para sul) · `#` parede alta/rocha · `m` meia-parede 0,75 · `,` chão da arena (altura 0) · `A` armadilha · `D` porta com chave · letras = objetos (§8.3).
+Legenda: `.` chão (altura 0) · `^` plataforma (altura 1) · `/` rampa (0 → 1, **sobe para o norte**) · `H` escada (0 → 1, **sobe para o oeste**) · `#` parede (as faces sul e leste de áreas jogáveis são mureta 0,75 ou recorte; a parede solta e os pilares são **altos**, 2,0) · `m` meia-parede 0,75 · `,` chão da arena · `A` armadilha · `D` porta com chave · letras = objetos (§8.3).
 
 ### 8.2 Zonas (retângulos inclusivos, em tiles)
 | ID | Zona | x | z | Tamanho | Altura | O que testa | M1? |
 |---|---|---|---|---|---|---|---|
-| `z_campo` | Campo aberto | 1–20 | 1–14 | 20 × 14 | 0 | andar/correr em 8 direções, câmera, bonecos | **sim** |
-| `z_parede_solta` | Parede solta | 12–17 | 9 | 6 × 1 | parede alta | deslizar em parede, quinas, oclusão de câmera | **sim** |
-| `z_rampa` | Rampa | 21–23 | 3–5 | 3 × 3 | 0 → 1 | subir rampa, sombra no chão | **sim** |
-| `z_plataforma` | Plataforma | 24–35 | 1–8 | 12 × 8 | 1 | borda com colisão, câmera em altura | **sim** |
-| `z_escada` | Escada | 33–35 | 9–10 | 3 × 2 | 1 → 0 | descer escada; fecha o **laço** campo → plataforma → pátio | **sim** |
-| `z_patio` | Pátio | 21–40 | 11–14 | 20 × 4 | 0 | volta do laço | **sim** |
-| `z_corredor` | Corredor de combate | 5–7 (z 15–24) e 5–28 (z 22–24) | — | **3 de largura** | 0 | corredor mínimo, armadilha | sim (sem armadilha) |
-| `z_arena` | Arena média | 30–45 | 18–29 | **16 × 12** | 0 | encontro, cobertura, câmera com limites | sim (vazia, porta aberta) |
+| `z_campo` | Campo aberto | 1–24 | 1–20 (fora da plataforma) | 24 × 20 | 0 | andar/correr, clique para mover, câmera, bonecos | **sim** |
+| `z_parede_solta` | Parede solta (alta) | 14–19 | 12 | 6 × 1 | 2,0 | deslizar em parede, quinas, recorte de oclusão | **sim** |
+| `z_plataforma` | Plataforma (no fundo) | 1–12 | 1–8 | 12 × 8 | 1 | borda com colisão, câmera em altura | **sim** |
+| `z_rampa` | Rampa | 5–7 | 9–11 | 3 × 3 | 0 → 1 (sobe ao norte) | subir rampa, sombra no chão | **sim** |
+| `z_escada` | Escada | 13–14 | 3–5 | 2 × 3 | 0 → 1 (sobe ao oeste) | descer escada; fecha o **laço** campo → rampa → plataforma → escada → campo | **sim** |
+| `z_corredor` | Corredor de combate | 5–7 (z 21–24) e 5–28 (z 22–24) | — | **3 de largura** | 0 | corredor mínimo, armadilha | sim (sem armadilha) |
+| `z_arena` | Arena média | 30–45 | 17–28 | **16 × 12** | 0 | encontro, cobertura, limites de câmera | sim (vazia, porta aberta) |
 
-Pilares 2×2 na arena, **parede alta**: (34–35, 21–22) e (40–41, 25–26). Meia-parede (0,75): (37–39, 20).
+Pilares 2×2 **altos** na arena: (34–35, 20–21) e (43–44, 24–25). Meia-parede (0,75): (37–39, 19).
 
 ### 8.3 Objetos
 | ID | Tipo | Tile (x, z) | Altura | Propriedades | M1? |
 |---|---|---|---|---|---|
-| `inicio_jogador` | início | (4, 7) | 0 | direção S | **sim** |
-| `enemy_boneco_alvo` | alvo de treino (03 §11.1-11) | (11, 4) | 0 | fixo, não ataca; hurtbox raio 0,40 e altura 0,0–1,4; `concede_mana` = não (debug pode forçar sim); vida infinita no debug; contador F10 | **sim** |
-| `enemy_boneco_golpe` | boneco que ataca (03 §11.1-12) | (16, 4) | 0 | fixo; hurtbox raio 0,40 e altura 0,0–1,4 (igual ao alvo); golpe a cada 120 q com aviso ≥ `aviso_min_comum_quadros`; dano de teste base 18, tipo `impacto` | **sim** |
-| `npc_teste` | NPC | (7, 2) | 0 | fala 1 linha (`txt_npc_teste_1`) | não (interação fora do M1) |
-| `salvamento_teste` | ponto de salvamento | (6, 10) | 0 | luz quente | não |
-| `bau_teste` | baú | (34, 2) | 1 | contém `item_chave_teste`; luz-guia pontual | não |
+| `inicio_jogador` | início | (6, 15) | 0 | direção S | **sim** |
+| `enemy_boneco_alvo` | alvo de treino | (13, 15) | 0 | fixo, não ataca; hurtbox raio 0,40 e altura 0,0–1,4; `concede_mana` = não (debug pode forçar sim); vida infinita no debug; contador F10 | **sim** |
+| `enemy_boneco_golpe` | boneco que ataca | (18, 15) | 0 | fixo; hurtbox raio 0,40 e altura 0,0–1,4 (igual ao alvo); golpe a cada 120 q com aviso ≥ `aviso_min_comum_quadros`; dano de teste base 18, tipo `impacto` | **sim** |
+| `npc_teste` | NPC | (9, 12) | 0 | fala 1 linha (`txt_npc_teste_1`) | não |
+| `salvamento_teste` | ponto de salvamento | (3, 17) | 0 | luz quente | não |
+| `bau_teste` | baú | (6, 2) | 1 | no fundo da plataforma; contém `item_chave_teste`; luz-guia | não |
 | `porta_teste` | porta com chave | (29, 22–24) | 0 | 3 de largura; exige `item_chave_teste`; **no M1 começa aberta** (`aberta_inicial: sim`) | sim (aberta) |
-| `armadilha_teste` | espinhos periódicos | (15–17, 22–24) | 0 | ciclo: aviso 30 q (magenta, enche) → ativo 20 q → inativo 90 q; dano base 15, `impacto`, passa pela fórmula com `mult_dano_recebido` | não |
-| `encontro_teste_1` | encontro | centro (38, 23), raio 6 | 0 | 2 inimigos de teste em (42, 21) e (42, 27); IDs no bestiário (futuro) | não |
-| `portal_teste_a` | portal | (44, 28) | 0 | destino `portal_teste_b`; aceso só com a flag `flag_teste_encontro_1` (atalho de volta) | não |
-| `portal_teste_b` | portal | (2, 13) | 0 | destino `portal_teste_a`; mesma flag | não |
+| `armadilha_teste` | espinhos periódicos | (15–17, 22–24) | 0 | aviso 30 q (magenta, enche) → ativo 20 q → inativo 90 q; dano base 15, `impacto` | não |
+| `encontro_teste_1` | encontro | centro (38, 23), raio 6 | 0 | 2 inimigos de teste em (42, 19) e (42, 27) | não |
+| `portal_teste_a` | portal | (44, 27) | 0 | destino `portal_teste_b`; aceso só com `flag_teste_encontro_1` | não |
+| `portal_teste_b` | portal | (2, 19) | 0 | destino `portal_teste_a`; mesma flag | não |
 | `limites_camera` | retângulo | x 0–48, z 0–32 | — | câmera nunca mostra fora (03 §8.1) | **sim** |
 | `luz_principal` | direcional | — | — | ângulo/cor pelo 10 | **sim** |
 | `luz_bau`, `luz_porta`, `luz_salvamento` | pontuais | junto ao objeto | — | luz guia o caminho | não |
-| `zona_musica_campo` / `zona_musica_arena` | zonas | `z_campo`+`z_patio` / `z_arena` | — | `mus_teste_exploracao` / `mus_teste_combate` (05, placeholders) | não |
+| `zona_musica_campo` / `zona_musica_arena` | zonas | `z_campo` / `z_arena` | — | `mus_teste_exploracao` / `mus_teste_combate` (placeholders) | não |
 
-Os bonecos ficam a 5 tiles um do outro e a ≥ 7 tiles do início. O aviso do `enemy_boneco_golpe` não alcança o `enemy_boneco_alvo`, então dá para testar alcance e esquiva separadamente.
+Os bonecos ficam a 5 tiles um do outro e a ≥ 7 tiles do início. O aviso do `enemy_boneco_golpe` não alcança o `enemy_boneco_alvo`.
 
-### 8.4 Fluxo pensado (depois do M1, quando houver interação)
-`inicio` → NPC indica o baú → rampa → plataforma → **baú (chave)** → escada → pátio → corredor → **armadilha** (esquivar no tempo) → **porta** → **arena** (encontro) → portal aceso → volta ao campo.
-Fluxo da masmorra em miniatura (06 §11.5): fechadura, chave, desafio e atalho de volta.
+### 8.4 Fluxo pensado (depois do M1, com interação)
+`inicio` → NPC indica o baú → **rampa** → plataforma → **baú (chave)** → **escada** → campo → corredor → **armadilha** → **porta** → **arena** (encontro) → portal aceso → volta ao campo.
 
-### 8.5 Validação (script de referência do 06, BFS em grade com 4 vizinhos)
+### 8.5 Validação (script de referência do 06: BFS em grade com 4 vizinhos + sombras de oclusão)
 | Verificação | Resultado |
 |---|---|
-| Todo tile andável é alcançável do início | ✓ (740 tiles) |
-| De todo tile andável existe caminho a pé de volta ao início (sem portal) | ✓ (impossível ficar preso) |
-| Arena alcançável sem a chave | ✗, como esperado (porta fecha) |
-| Baú alcançável sem a chave | ✓ (a chave nunca fica atrás da própria porta) |
+| Todo tile andável é alcançável do início | ✓ (733 tiles) |
+| De todo tile andável há caminho a pé de volta ao início, sem portal | ✓ (impossível ficar preso) |
+| Arena alcançável sem a chave | ✗, como esperado; baú alcançável sem a chave ✓ (13 passos) |
 | Corredor e porta com 3 tiles de largura | ✓ |
-| Início → baú | 35 tiles ≈ 10 s andando |
-| Baú → arena (centro) | 55 tiles ≈ 15,7 s andando / 9,2 s correndo, com a armadilha no meio (ritmo ok) |
-| Arena → início a pé (sem portal) | 61 tiles ≈ 17 s; com o portal, 0 s (atalho que se nota) |
+| **Objetos importantes em sombra de oclusão** (oclusores altos: parede solta e 2 pilares, h = 2,0, sombra de 3,5 tiles; meia-parede h = 0,75, sombra de 1,3) | **nenhum** ✓ |
+| Início → baú | 13 passos ≈ 3,7 s andando |
+| Baú → arena (centro) | 32 passos ≈ 9 s andando / 5,3 s correndo, com a armadilha no caminho |
 
-A distância é contada por passos em 4 direções, então é o limite de cima. Com 8 direções o percurso real fica mais curto.
+A distância é contada em 4 direções, então é o limite de cima. A sombra de oclusão usa pitch 30° e yaw 45° (provisórios): se o ADR-002 mudar a câmera, o script é rodado de novo.
 
 ---
 
@@ -239,4 +259,5 @@ Sem moedas como recompensa (só trocam de mão na secundária do viajante). **Al
 | Data | Mudança | Antes → depois | Motivo |
 |---|---|---|---|
 | 2026-10-24 | Criação (BRF-004) | — | Onda 0; alinhado ao `gameplay.md` v0.1 |
+| 2026-10-24 | §5-A projeção isométrica e §8 sala isométrica | planta 3/4 → planta isométrica | D-025 |
 | 2026-10-24 | §9 Respostas ao Produtor (BRF-010) | — | D-017/D-018; `formulas.md` §4.4 ganha `ponto_fraco` ×1,25 |

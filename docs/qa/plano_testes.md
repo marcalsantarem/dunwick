@@ -1,7 +1,5 @@
 # Plano de testes — Dunwick (nome provisório)
 
-> **⚠️ D-024 (2026-10-24): mudança de direção** (isométrico 2:1, 1280×720, protótipo do usuário). **[mantém]:** princípios, pirâmide, matriz de navegadores, §6.5 save, §6.6 navegador, §6.9 soft-lock, §8 playtests (formato), §9 bugs. **[a atualizar D-024]:** §2.1 máquina e nº de tiles, §4.1 modo debug, §5 faixas TC-MOV/TC-CMB/TC-VIS/TC-DBG, §6.1 combate (quadros, valores), §6.2 câmera 35°, §6.3 visual (pixel 1×/2×/3×, normal map, DoF) e §6.7 desempenho (cena e resolução). Critérios novos de carregamento, nitidez a 1280×720, dia/noite, câmera isométrica e combate: [impacto_d024.md](impacto_d024.md).
-
 > **Status:** RASCUNHO v0.1 (BRF-006, onda 0) · Dono: 09 QA · 2026-10-24
 > Ainda não há stack nem build. O que depende do ADR-001 está marcado **[aguarda 08]**.
 > Critérios de passa/não passa por marco: [criterios_marcos.md](criterios_marcos.md). Roteiro de playtest do M1: [playtests/roteiro_m1.md](playtests/roteiro_m1.md).
@@ -21,7 +19,7 @@ Garantir qualidade **verificável** em cada marco: encontrar, reproduzir, medir 
 ### 2.1 Máquinas
 | Classe | Uso | Máquina |
 |---|---|---|
-| **Intermediária (referência)** | Metas de fps e de tempo de carga | **[aguarda 08/usuário]**. Provisório: GPU integrada recente + Chrome (BRF-001). Registrar sempre a máquina real usada (CPU, GPU, RAM, SO, resolução e taxa de atualização do monitor) |
+| **Referência oficial (D-022)** | Metas de fps e de tempo de carga | AMD Ryzen 3 5300G, gráfico integrado Radeon, 32 GB DDR4 3200, SSD SATA. Registrar SO, resolução e taxa do monitor em cada medição |
 | Fraca | Perfil Baixo, a partir do M2 | [aguarda 08] |
 | Boa | Perfil Alto, a partir do M2 | [aguarda 08] |
 
@@ -33,7 +31,7 @@ O usuário é o único com hardware físico. Por isso, todo teste de desempenho 
 | Chrome recente | ✔ | ✔ | M1 (Windows) |
 | Edge recente | ✔ | ✔ | M1 (Windows) |
 | Firefox recente | ✔ | ✔ | M1 (Windows) |
-| Safari recente | — | ✔ | M2, **se houver Mac disponível** [aguarda usuário] |
+| Safari recente | — | ✔ | **Fora da matriz até o M5** (D-022: o usuário não tem Mac; iPhone só no teste de celular, depois do M5) |
 
 Celular só depois do M5 (fora do slice). Versões exatas anotadas em cada execução.
 
@@ -111,11 +109,12 @@ Base: `09_qa.md` §5. Marco indica quando o item passa a ser cobrado.
 ### 6.2 Movimento e câmera
 - [ ] (M1) Pés não deslizam; diagonais na mesma velocidade
 - [ ] (M1) Sem atravessar paredes nem prender em quinas
-- [ ] (M1) Câmera dentro dos limites; (M2) oclusão funciona, herói nunca some
+- [ ] (M1) Câmera isométrica fixa e dentro dos limites; (M1) oclusão e ordem de desenho corretas, herói nunca some (M1-14c, M1-14f)
+- [ ] (M1) Mouse: clicar para mover/atacar, mira no cursor, troca de dispositivo sem menu (M1-07b)
 - [ ] (M3) Movimentos de câmera em cenas voltam ao padrão
 
 ### 6.3 Visual (diorama)
-- [ ] (M1) Pixel nítido em 1×, 2×, 3× e ao redimensionar a janela
+- [ ] (M1) Sprites e UI nítidos na resolução/escala do ADR-002 **[aguarda 08/10]** e ao redimensionar a janela
 - [ ] (M1) Pixels não tremem quando a câmera se move
 - [ ] (M1) Sprite iluminado (normal map) e com sombra no chão; não flutua nem afunda
 - [ ] (M2) Desfoque não atinge herói, inimigos próximos nem UI
@@ -240,5 +239,5 @@ sempre | às vezes (<n>/<m> tentativas) | 1 vez
 | 2 | Ferramentas de teste (executor, captura, gravação de entradas) | 08 (ADR-001) |
 | 3 | ~~Valores de movimento/combate do M1~~ — aplicados em `criterios_marcos.md` (2026-10-24) | 03 (`docs/gameplay.md` v0.1) ✅ |
 | 4 | Fórmulas e exemplos resolvidos para testes de unidade | 06 (`formulas.md`, BRF-004) |
-| 5 | Haverá Mac para Safari? Haverá jogadores reais? | Usuário (via 01) |
+| 5 | ~~Haverá Mac para Safari?~~ Não (D-022). Haverá jogadores reais? | Usuário (via 01) |
 | 6 | Projeto dos bots (`tools/qa/`) | Stack + briefing futuro |

@@ -1,8 +1,9 @@
 # Guia Visual
 
-> **Status:** etapa 1 — RASCUNHO v0.2 (BRF-002) + adendo A1 (§13, alinhamento com o gameplay v0.1). Autor: 10 Diretor de Arte.
+> **Status:** etapa 1 — RASCUNHO v0.4 (BRF-002) + adendo A1 (§13, alinhamento com o gameplay v0.1). Autor: 10 Diretor de Arte.
 > v0.2: alerta de UI separado do perigo (D-007); paleta v0.2.
 > v0.3: direção de clima **A · Lanterna e Musgo** escolhida pelo usuário (D-008); §7.1 = tabela de cor padrão.
+> **v0.4 (D-025): câmera isométrica.** O estilo continua **HD-2D** (sprites de pixel art nítido em cena 3D com luz, sombra, profundidade e névoa); a v0.3 foi **restaurada** e só mudou o que a câmera isométrica pede: ângulo, área visível, direções do sprite, leitura de profundidade/sobreposição/oclusão, marcadores do mouse e níveis de polimento. Marcado **[ISO]** onde mudou. O protótipo do usuário é **só referência do estilo isométrico**, não se copia (a tentativa baseada nele está em `_provisorio/d024_descartado_prototipo/`).
 > Vale para 04 Sprites, 07 Cenários e UI e para os spikes do 08. Hierarquia: usuário > Bíblia > este guia.
 > **[ETAPA 2]** = depende da premissa/mundo (D-006); até lá vale o padrão escrito ao lado.
 > **[TRAVA 08]** = requisito visual cujo limite numérico espera os spikes do 08 (BRF-001); não está travado.
@@ -36,21 +37,25 @@ Quando uma região puxar para B ou C, vale a lista daquela direção em [direcoe
 
 | Item | Requisito | Situação |
 |---|---|---|
-| Densidade | **1 tile = 1 unidade do mundo = 32×32 px de arte**, em sprites, texturas, UI e efeitos | travado |
-| Área visível | referência **640×360 px de arte**; escala **inteira** (2× em 720p, 3× em 1080p, 4× em 1440p, 6× em 4K) | travado; em telas fora de proporção, sobra vira moldura ou mais mundo, nunca escala quebrada |
-| Filtro | vizinho mais próximo em tudo que é pixel art (sprites, texturas, UI, VFX) | travado |
-| Câmera de jogo | 3/4 inclinada **35°** (faixa aceitável 30–45°), campo de visão estreito (≈ 15–25°, aparência de maquete), fixa | ângulo final **[TRAVA 08]** (depende de como o pixel fica nítido no spike) |
+| Densidade | **1 tile = 1 unidade do mundo = 32×32 px de arte** em **sprites, UI e efeitos**. Texturas de **chão e parede**: ver a linha abaixo | travado (sprites/UI/FX) |
+| Texturas de chão e parede **[ISO]** | com a câmera girada 45° e achatada, uma textura de 32 px/tile vira **menos de 1 pixel de tela por texel** e **serrilha/pisca** ao mover. Requisito: chão e parede **nítidos e sem tremer** em movimento. Recomendação: **64 texels por tile** (2× o sprite), pintadas em pixel art, com mipmap e filtro que preserve a nitidez (a mistura "sprite de pixel nítido em mundo mais detalhado" é a própria assinatura do HD-2D); alternativa: tiles isométricos pré-assados em losango. **O 08 testa as duas no ADR-002.** Muda a regra "densidade única" do CLAUDE.md (Produtor decide) | **[TRAVA 08]** |
+| Área visível **[ISO]** | referência **960×540 px de arte** (era 640×360): em isométrico 1 tile é um losango de **≈ 45×23 px** e a tela mostra **≈ 21 tiles na diagonal horizontal × ≈ 24 na vertical** (visão de ação à Diablo). Escala **inteira** do pixel de arte: **2× em 1080p**, 4× em 4K. Em outras telas, fator inteiro mais próximo; sobra ou falta vira mais/menos mundo (entre 0,8× e 1,5× da referência) ou moldura, nunca escala quebrada | proposta do 10; **[TRAVA 08]** (confirmar no ADR-002) |
+| Filtro | vizinho mais próximo em tudo que é pixel art (sprites, UI, VFX); pós-processamento e mundo em resolução nativa da tela | travado |
+| Câmera de jogo **[ISO]** | **isométrica fixa**: giro **45°** + inclinação **30°** (o chão vira losango **2:1**, 30° é a inclinação que dá exatamente 2:1); projeção **ortográfica ou de campo de visão muito estreito (≈ 10–15°)** para o pixel não variar com a distância; **segue o herói** com suavização; sem rotação nem zoom do jogador. Movimento de câmera (aproximação, tremor) só em cenas, entrada de chefe e golpes especiais | ângulo final e tipo de projeção **[TRAVA 08]** (spike de nitidez do pixel) |
+| Projeção no chão **[ISO]** | eixo +x do mundo → tela **(+22,6; +11,3) px por tile**; +y → **(−22,6; +11,3)**; altura +z → **(0; −27,7) px por unidade** (cos 30° × 32). Ordenação de desenho por profundidade `x + y` do ponto dos pés | travado como requisito (números exatos com o 08) |
 | Herói e NPCs | célula **64×64**, corpo **44–48 px**, **2,5–3 cabeças** de altura, âncora nos pés **(32,60)** | travado |
 | Inimigos | 32–96 px de altura; chefe 128–256 px; célula múltipla de 32 | travado |
-| Direções | 4 desenhadas: S, N, L; O espelhada; diagonais usam o lado | travado |
+| Direções **[ISO]** | **5 desenhadas**: S, SE, E, NE, N; as outras 3 espelhadas. No isométrico as **diagonais é que dominam a tela**, então o "só frente/costas/lado" da v0.3 não serve. Movimento livre em 8 direções (e mira do mouse) usa a direção mais próxima; o ataque trava a direção no 1º quadro | travado (alinhado ao plano do 04) |
 | Animação | 8–12 fps, tempo por quadro ajustável nos metadados | travado |
 | Alpha | só 0 ou 255 (sem semitransparência pintada) | travado |
 | Paleta | mestra ≤ 64 cores em rampas; **16–32 cores por sprite**; sombras frias, luzes quentes | provisória ([paleta.json](paleta.json)); final **[ETAPA 2]** |
 | Contorno | **seletivo (selout)**: escuro na base e nas bordas externas, sem contorno preto contínuo; o tom do contorno é o passo mais escuro da rampa do material | travado |
 | Luz desenhada | **suave, frontal-superior**, volume em 2–3 passos; pouca sombra pintada — a sombra forte vem da cena | travado |
 | Mapas extras | **normal map** por sprite (todo quadro) + **máscara de brilho** opcional (olhos, runas, lâminas, chamas) | convenção do normal map: **[TRAVA 08]** (ADR-001) |
-| Sprite no mundo | plano vertical voltado para a câmera, ancorado nos pés, com **sombra projetada** da silhueta + **sombra de contato** no chão | travado como requisito; técnica com o 08 |
-| Cenário | geometria 3D simples (blocos, rampas, telhados, rochas) com texturas pixel art de 32 px por tile | travado |
+| Sprite no mundo **[ISO]** | plano **vertical na tela** (inclinado para compensar os 30°), ancorado nos pés, com **sombra projetada** da silhueta + **sombra de contato** no chão; **posição em pixel de arte inteiro** para não tremer | travado como requisito; técnica com o 08 |
+| Luz-chave **[ISO]** | fixa em relação à tela: vem do **alto-esquerda-atrás**; faces voltadas para a esquerda ficam claras, as da direita escuras; sombras caem para **baixo-direita na tela**. A hora do dia muda **cor, altura (comprimento da sombra) e intensidade**, não a direção | travado |
+| Cenário | geometria 3D simples (blocos, rampas, telhados, rochas) com texturas pixel art (densidade na linha "Texturas de chão e parede") | travado |
+| Altura do cenário **[ISO]** | em isométrico o que está **mais perto da câmera tapa o que está atrás**; por isso: parede na faixa de combate **≤ 2× a altura do herói (≈ 90 px)**, sem muros altos "na frente" de áreas de luta; construções grandes só nas bordas e com **corte/recorte** (§9.1) | travado |
 
 ## 4. Paleta
 
@@ -73,6 +78,8 @@ Quando uma região puxar para B ou C, vale a lista daquela direção em [direcoe
 - **Proporção:** cabeça ≈ 40 % da altura; cabeça e cabelo carregam a personalidade (ver Bíblia §Referências: proporção 16-bit, não personagens).
 - **Silhueta:** reconhecível só pelo preenchimento escuro — teste obrigatório "silhueta preta sobre fundo médio".
 - **Contraste interno:** a cabeça e as mãos/arma são as áreas de maior contraste; roupa de base em valores médios.
+- **5 direções [ISO]:** S, SE, E, NE, N (o resto espelhado). O personagem é visto de cima-de-lado, então **cabeça e ombros ocupam mais área** que numa visão frontal; o desenho precisa funcionar em **3/4** (rosto, ombreira e arma legíveis nas diagonais). Assimetrias do herói (ombreira só no ombro direito, faixa no antebraço esquerdo) **não se resolvem só espelhando**: o espelho vale para a pose, a ombreira e a faixa invertem no desenho.
+- **Silhueta no chão:** a base do sprite (pés + sombra de contato) deve ocupar um **losango/elipse 2:1** sob o personagem para ancorá-lo ao chão e mostrar para onde ele está virado.
 - **Luz desenhada:** frontal-superior suave; nada de luz lateral pintada (a cena faz isso pelo normal map).
 - **Sombra:** sem sombra no chão desenhada no sprite (vem da cena); sombra interna mínima (1–2 passos).
 - **Normal map:** um por quadro, mesmo tamanho e mesma âncora; o volume deve "ler" como bola/cilindro (cabeça redonda, tronco cilíndrico), sem ruído de pixel a pixel. A codificação (eixos, verde para cima ou para baixo) quem define é o 08 **[TRAVA 08]**.
@@ -81,12 +88,14 @@ Quando uma região puxar para B ou C, vale a lista daquela direção em [direcoe
 
 ## 6. Cenários
 
-- **Densidade de textura:** 32 px por tile em toda superfície; paredes e telhados alinhados à grade de tiles para não distorcer o pixel.
+- **Densidade de textura [ISO]:** ver §3 (chão e parede: 64 texels/tile recomendados, **08 decide**); paredes e telhados alinhados à grade de tiles; as **linhas do chão correm em diagonal na tela**, então juntas de pedra, trilhas e muros devem seguir os eixos do mundo (nunca horizontais na tela).
+- **Faces visíveis [ISO]:** só 2 faces de cada volume aparecem (esquerda clara, direita escura) + o topo. Dê a cada uma **material e luz próprios**; a face de trás nunca é vista, não gaste detalhe nela.
+- **Telhados e interiores [ISO]:** telhado e parede da frente **desaparecem (fade ou corte)** quando o herói entra, para mostrar o interior; o interior é desenhado como **diorama cortado**.
 - **Geometria:** formas simples e chanfradas; volume vem da luz, não de polígonos. Nada de curvas lisas de alta contagem.
 - **Leitura do chão:** caminho andável com valor e textura mais calmos; bordas e quedas com contorno de luz/sombra claro.
 - **Vegetação:** grama e arbustos como sprites no mundo (planos voltados para a câmera) ou cartões cruzados; balanço leve de vento; nunca mais alta que a cintura do herói no plano de combate (não esconder perigo).
 - **Água:** superfície em pixel art animada com reflexo simplificado; brilho especular limitado ao limiar do bloom.
-- **Primeiro plano:** objetos entre câmera e herói (galhos, colunas) recebem desfoque e ficam **translúcidos/recortados** quando cobrem o herói ou um inimigo.
+- **Primeiro plano:** objetos entre câmera e herói (galhos, colunas) recebem desfoque e ficam **translúcidos/recortados** quando cobrem o herói ou um inimigo (regras em §9.1).
 - Materiais e kit modular por região: **[ETAPA 2]** com o 07.
 
 ## 7. Luz e pós-processamento (requisitos) — [TRAVA 08]
@@ -98,7 +107,7 @@ O que cada recurso **precisa fazer**. Custos, resolução de sombra e quantidade
 | Luz-chave (sol/lua) | 1 direcional com sombra; define a hora do dia | sombra suave de boa resolução | sombra menor, borda dura | **sem sombra projetada**; só sombra de contato |
 | Luzes pontuais | tochas, janelas, magia; sprites reagem pelo normal map | várias, algumas com sombra | várias sem sombra | poucas, sem sombra |
 | Sombra de contato (blob) | todo personagem e prop móvel | sim | sim | sim (**obrigatória**) |
-| Profundidade de campo / tilt-shift | foco na faixa do herói; desfoque no primeiro plano e no fundo | desfoque de qualidade | desfoque simplificado | **gradiente de névoa/escurecimento** no lugar do desfoque |
+| Profundidade de campo / tilt-shift **[ISO]** | foco numa **faixa diagonal** em volta do herói; em isométrico o "fundo" é a parte de **cima da tela** e o "primeiro plano" a de **baixo**, então o desfoque sobe pela borda superior e desce pela inferior (efeito de maquete) | desfoque de qualidade | desfoque simplificado | **gradiente de névoa/escurecimento** no lugar do desfoque |
 | Bloom | tochas, magia, cristais, sol; limiar alto | sim | reduzido | desligado (luz emissiva pintada) |
 | Névoa de distância | profundidade e clima | sim | sim | sim (barata, linear) |
 | Luz volumétrica | florestas, cavernas, catedrais | sim | desligada | desligada |
@@ -113,6 +122,18 @@ O que cada recurso **precisa fazer**. Custos, resolução de sombra e quantidade
 - Névoa nunca reduz o contraste de aviso/perigo abaixo do mínimo; avisos são desenhados **depois** da névoa.
 - Bloom não estoura branco em áreas grandes (conta para o limite de flashes).
 - Valores por região (sol, névoa, tabela de cor): **[ETAPA 2]**; até lá vale a tabela padrão do §7.1.
+
+### 7.0 Níveis de polimento — "bonito, polido e trabalhado" (HD-2D) [ISO]
+
+O alvo é o acabamento HD-2D (sprite de pixel nítido em mundo iluminado), **não** o do protótipo. O slice precisa chegar ao **P2**; cada item tem interruptor no perfil de qualidade (§7), então o que não couber a 60 fps cai de perfil, **não de estilo**.
+
+| Nível | O que é | Conteúdo |
+|---|---|---|
+| **P1 — base (mínimo para a cena-modelo)** | tudo que dá a cara de diorama iluminado | câmera isométrica, luz-chave com sombra projetada, sombra de contato, luzes pontuais (tochas, lanternas), névoa de distância, correção de cor por hora/região, vinheta, partículas de ambiente, normal map nos sprites |
+| **P2 — meta do slice** | "mais polido e trabalhado" | **oclusão ambiente** na base de paredes e props, **sombra de copa** sobre o chão, **halo e poça de luz** de lanterna, **bloom** nas luzes, **tilt-shift** em faixa (perfil Alto), **luz volumétrica** em frestas (caverna/floresta), **rim light** e contorno hierárquico nos sprites, movimento secundário (cabelo, capa, bandeiras, vegetação ao vento), **marcadores de mouse** animados (§9.1), transições de UI de 150–250 ms, luz curta de impacto (A1.4) |
+| **P3 — extra** | só se sobrar tempo e orçamento | reflexos na água, clima (chuva, neve), variantes sazonais, câmera dramática em golpes especiais |
+
+**Regras:** (1) leitura antes de brilho: nenhum efeito esconde o telegraph, o herói ou um inimigo; (2) um único ângulo de luz e uma única direção de sombra; (3) todo efeito tem versão reduzida (menos partículas, sem flash, sem tremor, sem desfoque).
 
 ### 7.1 Tabela de cor padrão (direção A · Lanterna e Musgo, D-008)
 
@@ -155,7 +176,7 @@ Prioridade de atenção: **perigo > herói > inimigos > interativos > cenário >
 
 | Significado | Cor | Forma | Movimento | Camada |
 |---|---|---|---|---|
-| **Aviso de golpe (telegraph)** | `perigo` (magenta) com borda clara `perigo_4` e contorno escuro `perigo_1` | forma exata da zona no chão (círculo, cone, retângulo, linha) | **enche da borda para o centro até o impacto**; mesma duração do aviso | acima do chão, abaixo dos personagens; nunca coberta por efeito do jogador |
+| **Aviso de golpe (telegraph)** | `perigo` (magenta) com borda clara `perigo_4` e contorno escuro `perigo_1` | forma exata da zona no chão, **projetada em 2:1 [ISO]**: círculo de raio `r` tiles → **elipse** de semi-eixos `r·45,3 × r·22,6` px; cone → setor projetado; retângulo/linha → **paralelogramo** alinhado aos eixos do mundo (diagonais na tela); sempre com contorno | **enche da borda para o centro até o impacto**; mesma duração do aviso | acima do chão, abaixo dos personagens; nunca coberta por efeito do jogador; **visível mesmo sob objeto alto** (§9.1) |
 | **Zona de dano contínuo** | `perigo` com menos saturação/opacidade de padrão (pontilhado/listras) | área com borda tracejada | pulsa lento (≤ 1 Hz) | chão |
 | **Golpe iminente no corpo do inimigo** | brilho `perigo_4` curto na arma/olhos | pose de antecipação exagerada | 1 piscada (conta no limite de flashes) | corpo |
 | **Herói** | maior contraste da tela + cor-assinatura **[ETAPA 2]** | silhueta mais limpa | — | — |
@@ -164,6 +185,21 @@ Prioridade de atenção: **perigo > herói > inimigos > interativos > cenário >
 | **Coletável no chão** | `brilho` + cor de raridade **[ETAPA 2]** | coluna de luz curta + forma do item | flutua/gira lento | acima do chão |
 | **Saída/portal** | luz direcional fixa, temperatura diferente da cena | arco/abertura de luz | partículas indo para fora | cenário |
 | **Ponto de salvamento** | luz quente estável | marco no mundo **[ETAPA 2]** | chama/brilho calmo | cenário |
+
+| **Alvo sob o cursor [ISO]** | contorno claro `neutro_frio_6` (nunca magenta nem dourado de brilho) | contorno de 1 px em volta da silhueta do inimigo/NPC/objeto sob o mouse + anel no chão | pulsa 1× ao entrar | corpo + chão |
+| **Destino do clique [ISO]** | `neutro_quente_5` (branco quente) | **anel em losango 2:1** no ponto clicado | expande e some em ~0,4 s | chão, sob os personagens |
+| **Mira / direção do ataque [ISO]** | `neutro_quente_5` | cursor próprio (mira pequena) + traço curto do herói até o cursor, só enquanto ataca | — | chão/acima |
+
+### 9.1 Leitura em isométrico: profundidade, sobreposição e oclusão [ISO]
+
+1. **Ordenação:** desenha-se por profundidade `x + y` do ponto dos pés (objeto grande: pela base). Sprites se sobrepõem de forma previsível; o de baixo da tela fica na frente.
+2. **Herói sempre legível:** quando um objeto o cobre, mostra-se a **silhueta do herói por cima**, com contorno e preenchimento de ~35 % na **cor-assinatura fria** [ETAPA 2], e o objeto fica **recortado em pontilhado** (ou alpha 0,35, conforme o perfil) num raio ≈ 3 tiles em volta dele. Inimigos cobertos **não** ganham silhueta (o jogador não deve "ver através" de tudo), mas o **telegraph deles continua visível**.
+3. **Telegraph sob objeto alto:** o contorno e o enchimento do aviso são redesenhados por cima do objeto em alpha ≈ 0,6; nunca ficam totalmente escondidos.
+4. **Telegraph emissivo:** não escurece com a hora do dia nem recebe névoa; desenhado depois das camadas de cor da cena, mas **abaixo dos personagens** (o 08 define o método).
+5. **Sobreposição entre inimigos e chefe:** o chefe grande (128–256 px) nunca cobre o herói por mais de ~30 % da área do herói; se cobrir, aplica-se a regra 2 também ao herói em relação ao chefe. Aglomeração: sombras de contato separam as figuras.
+6. **Paredes e telhados:** na faixa de combate, parede ≤ 2× a altura do herói (§3). Edifício que cobre o herói **some em fade (telhado e parede da frente)**, não por recorte duro.
+7. **Alturas diferentes:** degraus, rampas e plataformas mostram a **face lateral** (esquerda clara/direita escura) e **sombra de queda**; o herói em nível mais alto ganha **sombra de contato no próprio degrau**, nunca no chão de baixo.
+8. **Objetos pequenos no chão** (itens, marcadores) ficam **sempre acima do chão e abaixo dos personagens**, com a coluna de luz/brilho que os separa do cenário.
 
 Reservas de cor:
 - **Ninguém** usa magenta fora de golpe vindo no mundo. Isso vale para UI, VFX do herói e roupas.
@@ -174,7 +210,11 @@ Reservas de cor:
 
 | Faça | Não faça |
 |---|---|
-| Sprite em escala inteira e filtro sem suavização | Escalar 1,5×, girar sprite, usar filtro linear |
+| Sprite em escala inteira e filtro sem suavização; posição em pixel de arte inteiro | Escalar 1,5×, girar sprite, usar filtro linear, deixar o sprite "nadar" em subpixel quando a câmera segue o herói |
+| Linhas do cenário nos eixos do mundo (diagonais na tela) | Juntas, trilhas e muros horizontais na tela, que quebram a perspectiva |
+| Telegraph como losango/elipse 2:1 projetado no chão | Círculo "redondo" de tela ou aviso desenhado sob parede |
+| Muro e edifício baixos na faixa de combate; fade ao entrar | Parede alta na frente de uma arena de luta |
+| Marcadores de mouse discretos (destino, alvo) | Cursor ou marcador com magenta ou com o dourado de interativo |
 | Sombra pintada mínima; deixar a cena iluminar | Pintar sombra forte de um lado no sprite (briga com as luzes da cena) |
 | Contorno seletivo, mais escuro na base | Contorno preto contínuo em volta de tudo |
 | Sombra em azul/violeta escuro | Sombra em preto puro ou em cinza neutro |
@@ -182,43 +222,45 @@ Reservas de cor:
 | Desfoque só fora da faixa de combate | Desfocar inimigo próximo ou a UI |
 | Perfil Baixo com névoa e tons de profundidade | Perfil Baixo como o Alto com tudo desligado e cara de "quebrado" |
 | UI com materiais do mundo (madeira, linho, latão) | Janela azul em degradê ou qualquer UI reconhecível de outro jogo |
-| Uma única densidade (32 px/tile) em tudo | Misturar arte de 16 px e 32 px por tile, ou UI em resolução de tela |
+| Sprite, UI e FX em 32 px/tile; chão e parede em densidade escolhida no ADR-002 (§3) | Misturar arte de 16 px e 32 px por tile, ou UI em resolução de tela |
 | Referência descrita em palavras | Usar sprite, paleta extraída, criatura ou símbolo de outro jogo como base |
 
 ## 11. Perguntas ao 08 (via Produtor)
 
 Para fechar os itens **[TRAVA 08]**:
-1. **Câmera:** com 35° de inclinação e FOV estreito, o pixel do sprite e da textura de chão fica nítido em escala inteira (1×, 2×, 3×)? Precisa de *snap* da câmera/sprites à grade de pixel de arte para não tremer em movimento?
+1. **Câmera isométrica [ISO]:** com giro 45° e inclinação 30° (losango 2:1), em **ortográfica** ou perspectiva de FOV ≈ 10–15°, o pixel do sprite fica nítido em escala inteira (1×, 2×)? Precisa de *snap* da câmera/sprites à grade de pixel de arte para não tremer ao seguir o herói? Qual das duas projeções recomenda?
+1a. **Textura de chão e parede [ISO]:** o chão de 32 px/tile girado 45° serrilha/pisca. Medir **64 texels/tile com mipmap** contra **tiles pré-assados em losango** (nitidez, peso, custo). Qual recomenda?
+1b. **Área visível [ISO]:** a referência de **960×540 px de arte (×2 em 1080p)** é viável (custo de desenho de ~21×24 tiles visíveis, ~40 inimigos)? Ou prefere outra base?
+1c. **Oclusão [ISO]:** como desenhar a **silhueta do herói atrás de objetos** e o **telegraph por cima de objetos altos** (passada extra, máscara, stencil)? Custo.
 2. **Sprites iluminados:** é viável um normal map por quadro, mais a máscara de brilho, nas ~40 entidades na tela? Qual a convenção de normal map (verde para cima ou para baixo, espaço do sprite)?
 3. **Sombras:** quantas luzes com sombra projetada por perfil? O sprite consegue projetar a sombra da **silhueta** (com alpha recortado) a partir do sol e das tochas?
 4. **Pós:** custo medido de tilt-shift/profundidade de campo, bloom, névoa e volumétrica por perfil. Qual é o perfil Baixo realista (desfoque desligado é o bastante?)
 5. **Luzes pontuais:** quantas sem sombra cabem por perfil a 60 fps (para tochas e magias simultâneas)?
 6. **Partículas:** o orçamento de ~150 partículas/projéteis cabe nos 3 perfis? Partículas recebem luz da cena ou só emitem?
-7. **Resolução interna:** o mundo é renderizado em 640×360 e depois escalado (pixel perfeito, mas o 3D fica serrilhado), ou em resolução nativa com o sprite em escala inteira (3D liso, pixel misturado)? Preciso dos dois prints no spike para decidir o visual.
+7. **Resolução interna:** o mundo é renderizado em resolução **nativa da tela** (3D liso, com o sprite em escala inteira de pixel de arte — recomendado para o HD-2D) ou numa base baixa depois escalada (pixel perfeito, mas o 3D fica serrilhado)? Preciso dos dois prints no spike para decidir o visual.
 8. **Translucidez do primeiro plano:** dá para recortar ou deixar translúcido um objeto que cobre o herói sem custo alto?
 
 ## 12. Pendências
 
 - ~~Escolha da direção de clima~~ — **resolvida (D-008):** A · Lanterna e Musgo como base; masmorra pode puxar para B, região aberta de dia para C. Tabela de cor padrão no §7.1.
 - Etapa 2 (depois do mundo do 02; premissa do usuário ainda pendente): roteiro de cor por região (`cor_<regiao>.md`) dizendo qual região usa A, B ou C, cor-assinatura do herói, acentos, paleta final.
-- Trava da spec de câmera, luz e pós depois dos números do 08 (BRF-001).
-- Convenções de leitura: revisão com 03, 06 e 07.
+- Trava da spec de câmera, luz e pós depois dos números do 08 (ADR-002, perguntas 1–1c do §11).
+- Convenções de leitura (§9, §9.1): revisão com 03, 06 e 07.
+- **Decisões que sobem ao usuário/Produtor [ISO]:** (1) **mudar a regra "densidade única 32 px/tile"** do CLAUDE.md para "sprite, UI e FX 32 px/tile; chão e parede conforme ADR-002" (recomendado 64 texels/tile); (2) **área visível 960×540** no lugar de 640×360. Ambas são propostas do 10 até o 08 medir.
+- Atualizar `gameplay.md`: `camera_angulo_graus=35` e `camera_area_visivel_tiles=20×11,25` caem (ver A1.1); 03 define marcadores de mouse e tecla de "ficar parado/atacar sem mover" à Diablo.
+- Itens-modelo e cena-modelo: **a refazer** para o HD-2D (`itens_modelo.md`, `cena_modelo_praca.md`) depois que o Produtor liberar; a versão baseada no protótipo está em `_provisorio/d024_descartado_prototipo/`.
 
 ## 13. Adendo A1 — respostas ao `docs/gameplay.md` v0.1 (03, §12.3 e §5.6)
 
 > 2026-10-24 · pedido do Produtor. Propostas; o 03 aplica nos dados e o 08 confirma custos.
 
-### A1.1 Câmera
-- **`camera_angulo_graus = 35`: confirmado** pelo lado visual. Fica provisório até o spike do 08 mostrar o pixel nítido em 1×/2×/3× (§11, perguntas 1 e 7).
-- **`camera_area_visivel_tiles = 20 × 11,25`: confirmado** — é exatamente a referência de 640×360 px de arte ÷ 32 px por tile (§3).
+### A1.1 Câmera — **atualizado pela D-025 (isométrica)**
+- ~~`camera_angulo_graus = 35`~~ → **`camera_giro_graus = 45` e `camera_inclinacao_graus = 30`** (losango 2:1); projeção ortográfica ou FOV ≈ 10–15° (08 decide). Fica provisório até o spike do 08 (§11, perguntas 1–1c).
+- ~~`camera_area_visivel_tiles = 20 × 11,25`~~ → **referência 960×540 px de arte** (≈ 21 tiles na diagonal horizontal × ≈ 24 na vertical, tile ≈ 45×23 px). Em dados: `camera_area_visivel_arte_px = 960×540`.
 - **`camera_oclusao_alpha = 0,35`:** de acordo como valor. Proponho que o objeto oculto seja recortado com **pontilhado em grade de pixel de arte** (dither ordenado), e não com uma transparência suave, para manter a linguagem do pixel; alpha suave só se o dither custar caro (08 decide).
 
-### A1.2 Direção do sprite nas diagonais (divergência com a §4.6 do 03)
-O 03 propõe que diagonais usem S/N. Este guia (§3) e o documento do 10 dizem "diagonais usam o lado". **Proposta de meio-termo:**
-- **Na diagonal, mantém a direção atual se ela for uma das duas componentes** (ex.: andando para L e virando para SE continua L; vindo de S e virando para SE continua S). Isso evita o sprite piscar entre poses.
-- **Partindo de PARADO direto na diagonal:** usa o **lado** (L/O). O perfil mostra melhor o movimento e o arco da arma no setor de ataque diagonal.
-- Ataque: vira para a direção mais próxima do alvo/mira no 1º quadro e não troca durante o golpe.
-Decisão final do Produtor, com o 03 e o 04.
+### A1.2 Direção do sprite nas diagonais — **substituído pela D-025 (isométrico)**
+No isométrico as diagonais dominam a tela e o sprite tem **5 direções** (S, SE, E, NE, N; resto espelhado). Movimento em 8 direções e mira do mouse usam a direção desenhada mais próxima; o ataque trava a direção no 1º quadro. A regra de histerese do meio-termo anterior continua útil só para **não piscar** ao virar entre duas direções vizinhas: mantém a direção atual se ela ainda for uma das duas mais próximas do vetor de movimento. A tabela `DIR8→DIR5` fica com o 03/04.
 
 ### A1.3 IDs de efeitos de impacto e de combate (slice)
 Padrão: `fx_<categoria>_<variante>`. Cada ficha vai em `docs/arte/vfx/fx_<id>.md` (§10.3 do documento do 10).
