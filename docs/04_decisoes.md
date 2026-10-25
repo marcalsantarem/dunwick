@@ -153,3 +153,11 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Ponto fraco do urso: SIMPLIFICADO** (usuário): apenas bônus quando a postura quebra, sem hurtbox por zona (o ×1,25 de ponto fraco em formulas §4.4 vira só o bônus de postura quebrada; 06 ajusta).
 - **Aceito das respostas do 03/06:** estado CENA do herói (invencível, trava na morte do chefe, pausa de 30 quadros); roteiro de cena em dados (passos temporizados) compartilhado pelas cenas 1.4, 2.2, 3.3 e 3.4, com formato do 08; flag `flag_urso_derrotado` (o urso não renasce); manter uma só flag entre `flag_vila_curada` e `flag_vila_acordada`; não salvar em CENA ou DIÁLOGO; ponto da cura checa flags, não inventário; Grace seguidora sem colisão com o herói; itens com valores iniciais (doce 25, sopa 30, poção 50, carimbo sem efeito).
 - **O M1 não muda** (tudo isso é M3).
+
+## D-020 — Treinamento íntimo, nomes e a aldeia (2026-10-24)
+- **Treinamento (usuário):** é **íntimo**: o Edric tem **um mestre** que o treina e ele é o **único aluno**. O desafio final **não é uma formatura de guilda**: é um **teste para o mestre considerar que ele está pronto** para ir ao mundo. O plano dele seria então **alistar-se na Guarda de Mor-Allen**, mas isso **não acontece** por causa do desenrolar da história.
+- **Mestre:** **Torvan Keel** (ex-sargento aposentado da Guarda, seco, cita o regulamento; substitui "o sargento"). **Cuidadora/curandeira:** **Maren**. **Instituição:** **A Guarda de Mor-Allen** (o que ele sonha em integrar). **Capital:** **Valmora**. **O sino:** **O Sino de Cobre**.
+- **Aldeia saqueada há 10 anos = a própria Baixo Orvalho** (reconstruída). O sino era dela; volta para casa. Maren e Torvan são sobreviventes. Não há outra aldeia a nomear.
+- **Regra de nomes (usuário):** **nomes típicos de RPG, não brasileiros** (pessoas). Nomes de lugares em português descritivo (Baixo Orvalho) são aceitos. Renomear NPCs com nomes brasileiros (ex.: "Zefa", "Seu Tadeu Doce").
+- **Pendentes:** nome do urso-musgo, do vendedor da feira e de demais NPCs menores (02 propõe, tipo RPG); mal gigante; nome do jogo.
+- **Ajuste de história:** onde os textos dizem "graduação/formatura" ou "cavaleiro", trocar pelo teste do mestre; o "plano de ser cavaleiro" vira "alistar-se na Guarda"; a "vingança" segue como pano de fundo.
