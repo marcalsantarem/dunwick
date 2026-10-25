@@ -172,3 +172,4 @@ Respostas do usuário às perguntas t, u, v do 02:
 ## D-022 — Máquina de referência (2026-10-24)
 - **Informada pelo usuário:** AMD Ryzen 3 5300G (4 núcleos, 8 threads, 4,0 GHz), gráfico integrado Radeon, 2 × 16 GB DDR4 3200 MHz, SSD SATA 480 GB, fonte 500 W. **É a mesma máquina em que o 08 mediu os spikes e o esqueleto M1**, então os números do ADR-001 já valem para ela.
 - Efeito: a máquina de referência passa a ser **oficial**; "computador intermediário" = esta. Continuam pendentes: navegador que o usuário usa (assumido Chrome) e se há Mac/Safari.
+- **Navegador e dispositivos (usuário, 2026-10-24):** usa **Chrome** no PC; **não tem Mac**, só **iPhone**. **Safari/macOS ficam fora da matriz de testes até o M5** (teste do áudio Ogg-Opus no Safari adiado; plano B AAC/MP3 do ADR-001 permanece). Celular continua depois do M5 (já previsto); o iPhone serve para um teste de celular nessa fase. Matriz do slice: **Chrome (principal), Edge e Firefox** no Windows.
