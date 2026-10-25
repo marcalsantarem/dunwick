@@ -3,7 +3,7 @@
 > Secundária curta (4ª, D-018 v=B). **[PROPOSTA]** (02). Valores de recompensa com o 06. Textos em `textos.csv` (`txt_quest_sec_letras_*`, `txt_npc_vendedor_feira_*`, `txt_npc_curiosa_*`, `txt_item_contrato_ysolt_*`).
 
 - **Tipo:** secundária (feira).
-- **Quem dá, onde, condição:** `npc_vendedor_feira` (nome provisório **Seu Tadeu Doce**, `{nome_vendedor}`), na feira. Aparece ao chegar à feira (Cena 3.2), **antes de o jogador falar com Ysolt**.
+- **Quem dá, onde, condição:** `npc_vendedor_feira` (nome provisório **Bram Honeywell**, pergunta j; nome de RPG, D-020), na feira. Aparece ao chegar à feira (Cena 3.2), **antes de o jogador falar com Ysolt**.
 - **Objetivo no diário (≤ 90 caracteres):** "Descubra a cláusula que prende o vendedor ao contrato da Ysolt."
 - **Motivo emocional:** o vendedor comprou o "Pacote Anti-Dívida" para salvar o telhado da mãe e a dívida cresceu; Grace quer ver Ysolt corrigir o que mente, e Edric conhece o preço de um papel mal lido.
 - **Passos:**

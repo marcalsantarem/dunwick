@@ -10,7 +10,7 @@
 - **Voz:** corrige a si mesma, pede desculpa, fala rápido; quando cura, a voz fica firme.
 - **Desejo:** ser reconhecida. **Necessidade:** confiar no próprio poder. **Medo:** falhar e ferir quem tenta curar. **Segredo:** sabe curar de verdade, e Ysolt vende o crédito. **Falha:** esconde o que importa sob a tagarelice.
 - **Estilo de combate/habilidades (semente, 06):** **cura/apoio**; no slice só aparece a **Bênção** (`skill_bencao_branca`, nome provisório): feitiço branco antigo que limpa o sino. Sem Luz/Sombra no sistema (D-015); "branco" é cor do rito, não elemento.
-- **Relações:** Ysolt (mestra de fachada); Edric (companheiro); Cuidadora (a quem Grace salva).
+- **Relações:** Ysolt (mestra de fachada); Edric (companheiro); Maren (a quem Grace salva).
 - **Arco em 3 marcos [PROPOSTA]:** (1) esconde o dom; (2) usa o dom para limpar o sino; (3) assume o dom diante de Ysolt.
 - **Ganchos jogáveis:** a cena da **bênção** no sino; a cena da **cura** na vila; o caderno (item de lore).
 

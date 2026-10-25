@@ -3,7 +3,7 @@
 > Secundária curta. **[PROPOSTA]** (02). Textos em `textos.csv` (`txt_quest_sec_viajante_*`, `txt_npc_viajante_*`).
 
 - **Tipo:** secundária (estrada).
-- **Quem dá, onde, condição:** `npc_viajante` (nome provisório **Tomé Carga**, `{nome_viajante}`), num posto de pedágio vazio da estrada. Aparece na Parte 3.
+- **Quem dá, onde, condição:** `npc_viajante` (nome provisório **Tam Rowley**, pergunta j; nome de RPG, D-020), num posto de pedágio vazio da estrada. Aparece na Parte 3.
 - **Objetivo no diário (≤ 90 caracteres):** "Ajude o viajante preso no pedágio sem fiscal."
 - **Motivo emocional:** o viajante carrega o que sobrou de uma casa perdida por tributo; ele ecoa o passado de Edric.
 - **Passos:**

@@ -1,83 +1,69 @@
-# Perguntas abertas — pontas soltas da história (v4, após D-018)
+# Perguntas abertas — pontas soltas da história (v5, após D-020)
 
 > Autor: 02 Roteirista · Para o Produtor levar ao usuário. Cada pergunta tem 2–3 opções e uma **recomendada**.
-> Nada aqui é fato até o usuário escolher. As letras são citadas em `biblia_do_mundo.md`, `missao_principal_slice.md` e nas fichas.
-> O mal gigante **não precisa** ser respondido agora.
+> Nada aqui é fato até o usuário escolher. Letras citadas em `biblia_do_mundo.md`, `missao_principal_slice.md` e nas fichas.
+> **Regra de nomes (D-020):** pessoas com nomes **típicos de RPG, não brasileiros**; lugares podem ser descritivos em português.
 
 ---
 
-## 1. Já respondido pelo usuário (D-015 a D-018; não reabrir)
+## 1. Já respondido pelo usuário (D-015 a D-020; não reabrir)
 
-| Antiga | Tema | Resposta |
-|---|---|---|
-| a | Quem roubou o sino, quem o guardava | Perdido no saque da aldeia de Edric (10 anos); um monstro o achou; **o chefe é o monstro** |
-| b | Quem treina Edric | **Sargento aposentado da Guarda** |
-| c | Ordem da queima | **Chanceler Oswin com o selo do rei**; Edric crê que foi o rei |
-| d | Sino × chanceler × mal | **Sem vínculo com o chanceler**; mistério sobre o mal mantido |
-| e | Fim do slice | **Cura na vila** (sino limpo soa; todos acordam) |
-| f / g | Maldição e por que a cuidadora | **Todos adormecem**; sem resposta específica |
-| h | Idade | **18 hoje, saque há 10** |
-| i | Luz e Sombra | **Não por ora** |
-| k | Rei | **Lúcido e arrependido**; nome **Ondric** |
-| l / o / s | Poder de Grace, cura, classe | **Curandeira**; Grace **abençoa e limpa o sino** (feitiço branco); sem estado adormecido jogável |
-| n | Marca | **Desenho de sino no antebraço**, esquenta e brilha quando o sino toca |
-| p | Chefe | **Urso-musgo gigante** |
-| q | Urgência | **Sono sem prazo** |
-| r | Sino no fim | **Limpo**, sem vínculo com a Coroa |
-| t | Secundárias da vila | **Epílogo livre na vila acordada** (D-018); não expiram |
-| u | Destino do urso | **Morre**; armaduras de quem tentou antes como memento (D-018) |
-| v | Nº de secundárias | **4** (total 5); a nova é `quest_sec_letras_miudas`, na feira (D-018) |
+| Tema | Resposta |
+|---|---|
+| Sino | **O Sino de Cobre**, de **Baixo Orvalho**, perdido no saque; um urso-musgo o guarda no covil (D-015/D-020) |
+| Saque | Baixo Orvalho foi saqueada e queimada há 10 anos e **reconstruída**; Maren e Torvan são sobreviventes (D-020) |
+| Treinamento | **Íntimo**: Torvan Keel é o único mestre, Edric o único aluno; o desafio final é o **teste do mestre**; o plano de alistar-se na Guarda de Mor-Allen **não se cumpre** (D-020) |
+| Nomes decididos | **Torvan Keel** (mestre), **Maren** (curandeira), **Valmora** (capital), **O Sino de Cobre**, **A Guarda de Mor-Allen** (D-020) |
+| Ordem da queima | Chanceler Oswin com o selo do rei; Edric crê que foi o rei (D-015) |
+| Rei | Lúcido e arrependido; **Ondric** (D-015) |
+| Marca, cura, classe | Sino no antebraço; Grace abençoa e limpa o sino; **curandeira** (D-017) |
+| Urso | Urso-musgo gigante; **morre**; armaduras como memento **só visual** (D-018/D-019) |
+| Epílogo | Livre, na vila acordada; secundárias da vila não expiram; **4 secundárias** (D-018) |
+| Vila em 3 estados | **Versão completa**: sprites novos de aldeões deitados e poses da vila acordada (D-019) |
+| Ponto fraco do urso | Só bônus quando a postura quebra (D-019) |
+| Flags | `flag_urso_derrotado` criada; só `flag_vila_acordada` (sem `flag_vila_curada`); sem `flag_armaduras_circulo` (D-019) |
 
 ### Originalidade (busca web)
-**Ondric**, **Edric Moss**, **Baixo Orvalho**, **Mor-Allen**, **Ysolt Brum** e **Oswin Cathe** (completo): sem conflito encontrado. "Oswin" sozinho existe em Fire Emblem. Busca de texto, sem checagem de marca (fica para o M6).
-Nomes menores propostos abaixo (j) e nomes dos NPCs de aldeões: **não checados**; checo quando o usuário escolher.
+- **Torvan Keel:** nenhum resultado. **Valmora:** existe o jogo indie **Legend of Valmorra** (grafia com "rr", outro nome); **risco baixo-médio**, avisar o Produtor para a checagem formal de marca (M6).
+- **Ondric, Edric Moss, Baixo Orvalho, Mor-Allen, Ysolt Brum, Oswin Cathe:** sem conflito encontrado (checagens anteriores).
+- **Propostas de urso abaixo:** "Thornmaw" foi **descartado** (é criatura de World of Warcraft). As três propostas atuais **não foram encontradas** como personagens, mas só em busca de texto.
 
 ---
 
-## j) Nomes de NPCs menores e instituições [pendente; o 02 usa a primeira opção como PROPOSTA nos textos]
+## y) Nome do urso-musgo
 
-Nos textos, esses nomes aparecem como **variáveis** (`{nome_cuidadora}`, `{nome_sargento}`, `{nome_urso}`, `{nome_guarda}`), então trocar não exige reescrever. Os nomes de personagens abaixo ainda estão nas fichas, não nos textos.
+- **A — Mossback (recomendada):** "costas de musgo". Curto, fácil de ler na UI e de falar; combina com o visual.
+- **B — Grumhold:** soa como bicho que guarda tesouro; tom mais pesado.
+- **C — Hollowpaw:** "pata oca", lembra o sino que ele segura; mais melancólico.
 
-| Item | Opções (a primeira é a PROPOSTA em uso) |
+Nos textos o nome aparece como variável `{nome_urso}`; trocar não exige reescrever.
+
+---
+
+## j) Nomes de NPCs menores (PROPOSTA; usuário escolhe um a um)
+
+Todos de RPG, não brasileiros (D-020). A primeira opção é a PROPOSTA em uso nas fichas; os textos usam o papel ("o ferreiro", "a taverneira") e não o nome.
+
+| Papel | Opções (a primeira é a PROPOSTA) |
 |---|---|
-| **Cuidadora** | **Dona Brisolda** · Tia Nelva · Mãe Tuca · Vó Cacilda |
-| **Sargento aposentado** | **Sargento Bartolo Quint** · Instrutor Vasco Pell · Hobart Tuck |
-| **Instituição que forma cavaleiros** | **A Guarda de Mor-Allen** · A Ordem do Selo · A Academia Real |
-| **Capital de Mor-Allen** | **Aldeburgo** · Ostenwall · Valmora |
-| **O sino** | **O Sino de Cobre** · O Sino Rouco · O Sino da Aldeia |
-| **Aldeia queimada de Edric** | **Vale Seco** · Pedra Alta · Rio Fundo · Ferrugem |
-| **Urso-musgo** | **Musgoso** · O Guardião do Covil · Garra-de-Prata |
-| **Ferreiro** | **Mestre Odilon** · Mestre Gedeão · Tobias Brant |
-| **Taverneira** | **Zefa Caneca** · Tia Marta · Dona Ivete |
-| **Escrivão** | **Escrivão Plínio Selo** · Escrivão Arlindo Pena · Escrivão Teófilo Tinta |
-| **Viajante da estrada** | **Tomé Carga** · Beto Mala · Zé Cancela |
-| **Vendedor da feira** | **Seu Tadeu Doce** · Seu Anselmo · Dona Lídia |
+| **Ferreiro** | **Hargen Stoll** · Brannoch Vael · Dorwin Ash |
+| **Taverneira** | **Elda Pott** · Wenna Brandt · Isolde Crumb |
+| **Escrivão do tributo (Coroa)** | **Corvin Ledge** · Alder Penwick · Marsden Quill |
+| **Viajante da estrada** | **Tam Rowley** · Willem Cart · Joss Marrow |
+| **Vendedor da feira** | **Bram Honeywell** · Tobin Sweetbriar · Alaric Dulcet |
 | **Nome do feitiço branco** | **A Bênção Branca** · O Rito da Água Limpa · A Limpeza |
 
----
-
-## w) O memento do urso: ação opcional ou automática?
-
-D-018 fixa que o urso morre e as armaduras ficam como memento. Falta definir como o jogador participa.
-- **A — Ação opcional (recomendada):** o jogador escolhe pôr as armaduras em círculo (`txt_amb_covil_armaduras_acao`); quem não faz vê o círculo já formado, só que menos arrumado. Pouco custo, peso emocional, sem obrigar.
-- **B — Cena automática:** Edric arruma sozinho numa cena curta. Mais controlado; − tira a escolha.
-- **C — Só cenário:** as armaduras ficam como estão. Mais barato; − perde o gesto.
-
-## x) Custo dos três estados do mapa (06/03 confirmam)
-
-Para cumprir D-017/D-018, `map_baixo_orvalho` precisa de **dia**, **adormecida** (cenário) e **acordada** (epílogo).
-- **A — Três estados com o mesmo mapa e props trocados (recomendada):** reaproveita o mapa; NPCs mudam de pose (em pé, deitados, em pé); luz muda. O 06/03 decide se é por estado do mapa ou por flags.
-- **B — Duas cenas separadas para dormir e acordar:** só o dia e o epílogo são jogáveis; o sono é cutscene. Mais simples; − o jogador não anda pela vila adormecida (hoje a casa da Cuidadora é interativa).
-- **C — Cortar a adormecida jogável:** a casa da Cuidadora vira cutscene e o jogador só controla Edric de novo na estrada. Corte maior.
+Renomeados por D-020 e removidos desta lista: Dona Brisolda → **Maren**, Bartolo Quint → **Torvan Keel**, Aldeburgo → **Valmora**, "Zefa Caneca" e "Seu Tadeu Doce" (brasileiros) → propostas acima.
+Checagem de originalidade dos nomes desta tabela: **não feita** (são propostas).
 
 ---
 
 ## Mal gigante (sem pressão)
-Nome e natureza continuam **em aberto**; o slice não os usa. Quando o usuário quiser, o 02 propõe 2–3 opções coerentes com o sino limpo e a marca.
+Nome e natureza continuam **em aberto**; o slice não os usa. Quando o usuário quiser, o 02 propõe 2–3 opções coerentes com o Sino de Cobre limpo e a marca.
 
 ---
 
 ## Resumo das recomendações (para o Produtor levar em bloco)
-w A · x A · j (usuário escolhe um a um; os recomendados já estão nos textos como variáveis).
+y A (Mossback) · j (usuário escolhe um a um).
 
-**Combinações a evitar:** x=C com a Parte 2 atual (a casa da Cuidadora deixa de ser interativa, o livro precisaria virar cena); w=B com u de D-018 (morte do urso fica ainda mais "de cena", pouco de jogador).
+**Combinação a evitar:** y=B (Grumhold) se o usuário preferir um nome mais gentil para um chefe que morre em cena sóbria; evitei "Brannoch" para o urso por já ser opção do ferreiro.

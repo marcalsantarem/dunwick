@@ -1,6 +1,6 @@
 # O ferreiro — id: npc_ferreiro
 
-> Ficha completa (NPC). **[PROPOSTA]** nome provisório **Mestre Odilon** (`{nome_ferreiro}`, pergunta j). Papel e rotina [PROPOSTA]; nada fixado pelo usuário além de "aldeões".
+> Ficha completa (NPC). **[PROPOSTA]** nome provisório **Hargen Stoll** (pergunta j; nome de RPG, D-020). Papel e rotina [PROPOSTA]; nada fixado pelo usuário além de "aldeões".
 
 - **Tipo e papel no jogo:** NPC de vila; vende e conserta equipamento (loja, 06); participa de `quest_sec_formulario_27b` (carimbo de armas).
 - **Papel na história:** representa o povo que depende da Coroa.
@@ -14,7 +14,7 @@
   1. "Espada nova só com recibo. Sem recibo é arma de origem duvidosa. Eu sei porque já fui multado por isso."
   2. "A taxa de fogo subiu. Agora cobram até pelo calor que sai pela janela."
   3. "Sei que aparenta ser caro. É. Mas é artesanal e sem garantia, como a vida."
-- **Relações:** Sargento (cliente fiel); Escrivão (desafeto); taverneira (vizinha).
+- **Relações:** Torvan (cliente fiel); Escrivão (desafeto); taverneira (vizinha).
 - **Arco em 3 marcos:** (1) vende com mau humor; (2) dorme; (3) acorda e finge ter dormido de propósito.
 
 ## Background (~100 palavras)

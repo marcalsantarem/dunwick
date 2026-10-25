@@ -49,14 +49,13 @@
 | `sfx_martelo_forja` | Ferreiro | Bate-bate-pausa, ritmo fixo |
 | `sfx_panela_taverna` | Taverneira | Borbulhar e colher de pau |
 | `sfx_sineta_ysolt` | Ysolt chama fregueses | Sineta aguda de mão (diferente do sino antigo) |
-| `sfx_pilao_ervas` | Cuidadora | Batida de pilão em tigela |
-| `sfx_bengala_sargento` | Sargento | Bengala na pedra |
+| `sfx_pilao_ervas` | Maren | Batida de pilão em tigela |
+| `sfx_bengala_sargento` | Torvan | Bengala na pedra |
 | `sfx_urso_rugido` | Entrada do chefe | Grave, curto, com tilintar do monte |
 | `sfx_urso_passo` | Passos do urso | Peso + metal tilintando |
 | `sfx_urso_cristais` | Estouro de cristais | Vidro grosso em pedra |
 | `sfx_urso_gemido` | Fase 3 | Gemido curto, vulnerável |
 | `sfx_urso_queda` | Morte do urso | Queda de peso, um último tilintar do monte, silêncio longo |
-| `sfx_armaduras_circulo` | Edric põe as armaduras em círculo | Metal pousando devagar, sem batida; respeitoso |
 | `sfx_vila_acordada_amb` | Epílogo | Vozes, panelas, passos: a vila volta aos poucos |
 | `sfx_contrato_papel` | Contrato da Ysolt | Papel grosso, páginas virando |
 | `sfx_letreiro_troca` | Grace troca o letreiro | Tinta, madeira raspando, risada curta |
@@ -67,8 +66,8 @@
 
 ## Sons característicos por personagem (§6.2 do 02)
 - **Edric:** passos de bota, respiração curta; sem voz falada (texto).
-- **Cuidadora:** pilão, cadeira de balanço.
-- **Sargento:** bengala, folhas do Regulamento, tosse.
+- **Maren:** pilão, cadeira de balanço.
+- **Torvan:** bengala, folhas do Regulamento, tosse.
 - **Ysolt:** colares, frascos, sineta.
 - **Grace:** páginas de caderno, frascos.
 - **Urso:** passadas pesadas, tilintar, rugido grave.
@@ -76,5 +75,5 @@
 
 ## Para o 05: três regras de narrativa
 1. O **sino** é sempre a mesma nota. Antes da limpeza tem sombra; depois, não. O jogador deve **ouvir** a diferença.
-2. A vila adormecida é o momento mais quieto do jogo; o silêncio deve ser **desconfortável**, não relaxante. A **morte do urso** é o momento mais **solene**: sem comemoração musical; o sino é a única voz.
+2. A vila adormecida é o momento mais quieto do jogo; o silêncio deve ser **desconfortável**, não relaxante. A **morte do urso** é o momento mais **solene** (memento só visual, sem interação): sem comemoração musical; o sino é a única voz.
 3. A sineta de Ysolt e o sino antigo **não podem ser confundidos**.
