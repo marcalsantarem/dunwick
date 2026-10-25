@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_ciclo",
+  "title": "Ciclo dia/noite (pontos por hora)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "duracao_dia_s", "hora_inicial", "ligado", "sol_azimute_graus", "pontos"],
+  "$defs": { "cor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" } },
+  "properties": {
+    "id": { "const": "cfg_ciclo" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "duracao_dia_s": { "type": "number", "exclusiveMinimum": 0 },
+    "hora_inicial": { "type": "number", "minimum": 0, "maximum": 24 },
+    "ligado": { "type": "boolean" },
+    "sol_azimute_graus": { "type": "number", "minimum": 0, "maximum": 360 },
+    "pontos": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["hora", "sol_cor", "sol_int", "sol_elev", "hemi_ceu", "hemi_chao", "hemi_int", "fundo", "nevoa", "tom", "luz_artificial"],
+        "properties": {
+          "hora": { "type": "number", "minimum": 0, "maximum": 24 },
+          "sol_cor": { "$ref": "#/$defs/cor" }, "sol_int": { "type": "number", "minimum": 0 }, "sol_elev": { "type": "number", "minimum": 1, "maximum": 89 },
+          "hemi_ceu": { "$ref": "#/$defs/cor" }, "hemi_chao": { "$ref": "#/$defs/cor" }, "hemi_int": { "type": "number", "minimum": 0 },
+          "fundo": { "$ref": "#/$defs/cor" }, "nevoa": { "$ref": "#/$defs/cor" },
+          "tom": { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0 }, { "type": "number", "minimum": 0 }, { "type": "number", "minimum": 0 }], "items": false, "minItems": 3 },
+          "luz_artificial": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    }
+  }
+}

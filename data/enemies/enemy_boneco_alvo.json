@@ -1,8 +1,8 @@
 {
   "id": "enemy_boneco_alvo",
   "versao": 1,
-  "nota": "Alvo de treino (gameplay.md §11.1-11): fixo, não ataca; contador de acertos no debug. Lógica de dano é do 03.",
+  "nota": "Alvo de treino: fixo, não ataca. Contadores no debug; o dano real é do 03.",
   "sprite": "enemy_boneco_alvo",
   "tipo": "alvo_treino",
-  "caixas": { "pushbox_raio_tiles": 0.4, "hurtbox_raio_tiles": 0.4, "hurtbox_altura_tiles": [0, 1.4] }
+  "caixas": { "pushbox_raio_tiles": 0.45, "hurtbox_raio_tiles": 0.5, "hurtbox_altura_tiles": [0, 2.0] }
 }

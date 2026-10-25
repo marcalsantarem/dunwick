@@ -1,67 +1,50 @@
-// Validador de assets (roda no build): folhas de sprite (albedo + normal + brilho + meta), atlas de cenário, FX e áudio.
-// Regras do projeto (CLAUDE.md / ADR-001): célula 64×64, âncora nos pés, alpha só 0/255, normal map com alpha 0 fora da silhueta,
-// texturas ≤ 2048 px, tiles de 32 px. Uso: node tools/validar_assets.mjs [raiz]
+// Validador de assets (roda no build): atlas de sprites (PNG + meta), texturas tileáveis do cenário e áudio.
+// Regras (ADR-002): atlas de sprite com grade exata (colunas × célula), âncora dentro da célula, direções s/se/l/ne/n (as de oeste são
+// espelho), 8 bits RGBA, texturas de cenário 256×256, todas ≤ 4096. Uso: node tools/validar_assets.mjs [raiz]
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { decodificarPng, lerCabecalhoPng } from './lib/png.mjs';
+import { lerCabecalhoPng } from './lib/png.mjs';
 import { lerCabecalhoWav } from './lib/wav.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const MAX_TEXTURA = 2048;
-
-function alphaBinario(img) { for (let i = 3; i < img.px.length; i += 4) if (img.px[i] !== 0 && img.px[i] !== 255) return false; return true; }
+const MAX_TEXTURA = 4096, TEXTURAS = ['grama_a', 'grama_b', 'grama_c', 'terra', 'calcada', 'reboco', 'madeira', 'telha_laranja', 'telha_musgo', 'ardosia', 'casca', 'pedra', 'folhagem', 'tabuas'];
+const DIRS = ['s', 'se', 'l', 'ne', 'n'];
 
 export function validarAssets(raiz = RAIZ_PADRAO) {
   const erros = [], avisos = [];
   const erro = (arq, msg) => erros.push(`assets/${arq}: ${msg}`);
-  const lerPng = (arq) => { try { return decodificarPng(readFileSync(join(raiz, 'assets', arq))); } catch (e) { erro(arq, e.message); return null; } };
+  const cab = (arq) => { try { return lerCabecalhoPng(readFileSync(join(raiz, 'assets', arq))); } catch (e) { erro(arq, e.message); return null; } };
   const dirSprites = join(raiz, 'assets', 'sprites');
   let sprites = 0;
   if (existsSync(dirSprites)) for (const id of readdirSync(dirSprites).sort()) {
     if (!statSync(join(dirSprites, id)).isDirectory()) continue;
     sprites++;
-    const rel = (s) => `sprites/${id}/${id}${s}`;
-    for (const s of ['.png', '_n.png', '_e.png', '.meta.json']) if (!existsSync(join(raiz, 'assets', rel(s)))) erro(rel(s), 'arquivo obrigatório não existe');
-    if (!existsSync(join(raiz, 'assets', rel('.meta.json')))) continue;
-    let meta;
-    try { meta = JSON.parse(readFileSync(join(raiz, 'assets', rel('.meta.json')), 'utf8')); } catch (e) { erro(rel('.meta.json'), `JSON inválido (${e.message})`); continue; }
-    if (meta.id !== id) erro(rel('.meta.json'), `id "${meta.id}" deve ser "${id}"`);
-    const { celula, ancora, direcoes, quadros } = meta;
-    if (!Array.isArray(celula) || celula.length !== 2 || celula.some((n) => !Number.isInteger(n) || n < 8)) { erro(rel('.meta.json'), 'celula deve ser [largura, altura] inteiros'); continue; }
-    if (!Array.isArray(ancora) || ancora[0] < 0 || ancora[0] >= celula[0] || ancora[1] < 0 || ancora[1] >= celula[1]) erro(rel('.meta.json'), 'ancora fora da célula');
-    if (!Array.isArray(direcoes) || !direcoes.length || direcoes.some((d) => !['s', 'n', 'l', 'o'].includes(d))) erro(rel('.meta.json'), 'direcoes deve listar s, n, l (o é espelhada de l)');
-    if (!Number.isInteger(quadros) || quadros < 1) { erro(rel('.meta.json'), 'quadros deve ser inteiro >= 1'); continue; }
-    if (meta.normal_map !== 'opengl_y_cima') erro(rel('.meta.json'), 'normal_map deve ser "opengl_y_cima" (ADR-001 §7)');
-    const W = celula[0] * quadros, H = celula[1] * (direcoes?.length ?? 0);
-    if (W > MAX_TEXTURA || H > MAX_TEXTURA) erro(rel('.png'), `folha ${W}×${H} passa de ${MAX_TEXTURA} px`);
-    const alb = lerPng(rel('.png')), nrm = lerPng(rel('_n.png')), emi = lerPng(rel('_e.png'));
-    for (const [nome, img] of [['.png', alb], ['_n.png', nrm], ['_e.png', emi]]) {
-      if (!img) continue;
-      if (img.w !== W || img.h !== H) erro(rel(nome), `tamanho ${img.w}×${img.h}; esperado ${W}×${H} (${quadros} quadros × ${direcoes?.length} direções de ${celula[0]}×${celula[1]})`);
-      else if (!alphaBinario(img)) erro(rel(nome), 'alpha deve ser só 0 ou 255 (sem meio-tom)');
+    const png = `sprites/${id}/${id}.png`, mj = `sprites/${id}/${id}.meta.json`;
+    for (const a of [png, mj]) if (!existsSync(join(raiz, 'assets', a))) erro(a, 'arquivo obrigatório não existe');
+    if (!existsSync(join(raiz, 'assets', mj)) || !existsSync(join(raiz, 'assets', png))) continue;
+    let meta; try { meta = JSON.parse(readFileSync(join(raiz, 'assets', mj), 'utf8')); } catch (e) { erro(mj, `JSON inválido (${e.message})`); continue; }
+    if (meta.id !== id) erro(mj, `id "${meta.id}" deve ser "${id}"`);
+    const { celula, ancora, direcoes, colunas, anims, arte_escala: esc } = meta;
+    if (!Array.isArray(celula) || celula.length !== 2 || celula.some((n) => !Number.isInteger(n) || n < 16)) { erro(mj, 'celula deve ser [largura, altura] inteiros'); continue; }
+    if (!Array.isArray(ancora) || ancora[0] < 0 || ancora[0] >= celula[0] || ancora[1] < 0 || ancora[1] >= celula[1]) erro(mj, 'ancora fora da célula');
+    if (!Array.isArray(direcoes) || !direcoes.length || direcoes.some((d) => !DIRS.includes(d))) erro(mj, `direcoes deve listar ${DIRS.join(', ')}`);
+    if (!(esc > 0)) erro(mj, 'arte_escala deve ser > 0');
+    if (!Number.isInteger(colunas) || colunas < 1 || !anims || !Object.keys(anims).length) { erro(mj, 'colunas e anims são obrigatórios'); continue; }
+    let proximo = 0;
+    for (const [nome, a] of Object.entries(anims)) {
+      if (!Number.isInteger(a.quadros) || a.quadros < 1 || !(a.fps > 0) || !Number.isInteger(a.inicio)) { erro(mj, `animação "${nome}": quadros, fps e inicio são obrigatórios`); continue; }
+      if (a.inicio !== proximo) erro(mj, `animação "${nome}": inicio ${a.inicio} deveria ser ${proximo} (quadros em sequência: direção a direção)`);
+      proximo = a.inicio + a.quadros * direcoes.length;
+      for (const ev of a.eventos ?? []) if (ev.quadro < 0 || ev.quadro >= a.quadros) erro(mj, `animação "${nome}": evento "${ev.tipo}" fora dos quadros`);
     }
-    if (alb && nrm && alb.w === nrm.w && alb.h === nrm.h) {
-      let fora = 0;
-      for (let i = 3; i < alb.px.length; i += 4) if (alb.px[i] === 0 && nrm.px[i] !== 0) fora++;
-      if (fora) erro(rel('_n.png'), `${fora} pixels de normal fora da silhueta (alpha deve ser 0 onde o albedo é transparente)`);
-    }
+    const c = cab(png); if (!c) continue;
+    const W = colunas * celula[0], H = Math.ceil(proximo / colunas) * celula[1];
+    if (c.w !== W || c.h !== H) erro(png, `tamanho ${c.w}×${c.h}; esperado ${W}×${H} (${proximo} quadros em ${colunas} colunas de ${celula[0]}×${celula[1]})`);
+    if (c.w > MAX_TEXTURA || c.h > MAX_TEXTURA) erro(png, `atlas ${c.w}×${c.h} passa de ${MAX_TEXTURA} px`);
   }
-  // atlas de cenário
-  const dirEnv = join(raiz, 'assets', 'env');
-  if (existsSync(dirEnv)) for (const nome of readdirSync(dirEnv).filter((n) => n.endsWith('.png') && !n.endsWith('_n.png'))) {
-    const base = nome.replace('.png', ''), meta = join(dirEnv, `${base}.meta.json`);
-    if (!existsSync(meta)) { erro(`env/${nome}`, 'falta o .meta.json do atlas'); continue; }
-    if (!existsSync(join(dirEnv, `${base}_n.png`))) erro(`env/${nome}`, 'falta o normal map (_n.png)');
-    const { tile, colunas } = JSON.parse(readFileSync(meta, 'utf8')), cab = lerCabecalhoPng(readFileSync(join(dirEnv, nome)));
-    if (cab.w > MAX_TEXTURA || cab.h > MAX_TEXTURA) erro(`env/${nome}`, `atlas ${cab.w}×${cab.h} passa de ${MAX_TEXTURA} px`);
-    if (cab.w % tile || cab.h % tile) erro(`env/${nome}`, `atlas ${cab.w}×${cab.h} não é múltiplo do tile de ${tile} px`);
-    if (cab.w / tile !== colunas) erro(`env/${nome}`, `colunas do meta (${colunas}) ≠ largura/tile (${cab.w / tile})`);
-    const nrm = lerPng(`env/${base}_n.png`); if (nrm && (nrm.w !== cab.w || nrm.h !== cab.h)) erro(`env/${base}_n.png`, 'tamanho diferente do albedo');
-  }
-  // FX
-  const dirFx = join(raiz, 'assets', 'fx');
-  if (existsSync(dirFx)) for (const nome of readdirSync(dirFx).filter((n) => n.endsWith('.png'))) { const img = lerPng(`fx/${nome}`); if (img && (img.w > MAX_TEXTURA || img.h > MAX_TEXTURA)) erro(`fx/${nome}`, 'textura grande demais'); }
+  // texturas tileáveis do cenário
+  for (const n of TEXTURAS) { const a = `env/tex_${n}.png`; if (!existsSync(join(raiz, 'assets', a))) { erro(a, 'textura obrigatória não existe (rode npm run assets)'); continue; } const c = cab(a); if (c && (c.w !== 256 || c.h !== 256)) erro(a, `textura tileável deve ser 256×256 (é ${c.w}×${c.h})`); }
   // áudio
   const dirAudio = join(raiz, 'assets', 'audio');
   if (existsSync(dirAudio)) for (const nome of readdirSync(dirAudio)) {
@@ -77,5 +60,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const { erros, avisos, sprites } = validarAssets(process.argv[2] || RAIZ_PADRAO);
   for (const a of avisos) console.warn('aviso:', a);
   if (erros.length) { console.error(`\n✗ validar assets: ${erros.length} erro(s)`); for (const e of erros) console.error('  ' + e); process.exit(1); }
-  console.log(`✓ validar assets: ${sprites} sprites, atlas, fx e áudio válidos`);
+  console.log(`✓ validar assets: ${sprites} atlas de sprite, ${TEXTURAS.length} texturas e áudio válidos`);
 }

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_kit",
+  "title": "Kit isométrico: pegadas (colisão) e medidas visuais",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "pegadas", "visual", "luz_lanterna"],
+  "$defs": {
+    "pegada": {
+      "type": "object", "additionalProperties": false, "required": ["forma"],
+      "properties": {
+        "forma": { "enum": ["ret", "circ", "linha"] },
+        "raio": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "w": { "type": "number", "exclusiveMinimum": 0 }, "d": { "type": "number", "exclusiveMinimum": 0 },
+        "espessura": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 }
+      }
+    }
+  },
+  "properties": {
+    "id": { "const": "cfg_kit" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "pegadas": { "type": "object", "propertyNames": { "pattern": "^[a-z_]+$" }, "additionalProperties": { "$ref": "#/$defs/pegada" } },
+    "visual": { "type": "object", "additionalProperties": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } } },
+    "luz_lanterna": {
+      "type": "object", "additionalProperties": false, "required": ["cor", "intensidade", "alcance_tiles", "altura_tiles", "acende_hora", "apaga_hora"],
+      "properties": {
+        "cor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }, "intensidade": { "type": "number", "minimum": 0 }, "alcance_tiles": { "type": "number", "exclusiveMinimum": 0 },
+        "altura_tiles": { "type": "number", "minimum": 0 }, "acende_hora": { "type": "number", "minimum": 0, "maximum": 24 }, "apaga_hora": { "type": "number", "minimum": 0, "maximum": 24 }
+      }
+    }
+  }
+}

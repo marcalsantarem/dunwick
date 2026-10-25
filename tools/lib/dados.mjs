@@ -8,6 +8,8 @@ export const REGISTRO = [
   ['config', /^cfg_perfis\.json$/, 'cfg_perfis'],
   ['config', /^cfg_orcamento\.json$/, 'cfg_orcamento'],
   ['config', /^cfg_entrada\.json$/, 'cfg_entrada'],
+  ['config', /^cfg_ciclo\.json$/, 'cfg_ciclo'],
+  ['config', /^cfg_kit\.json$/, 'cfg_kit'],
   ['characters', /^hero_[a-z0-9_]+\.json$/, 'personagem'],
   ['enemies', /^enemy_[a-z0-9_]+\.json$/, 'inimigo'],
   ['maps', /^map_[a-z0-9_]+\.json$/, 'mapa'],

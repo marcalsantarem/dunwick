@@ -1,36 +1,38 @@
 {
   "id": "cfg_jogo",
-  "versao": 1,
+  "versao": 2,
   "passo_logico_hz": 60,
   "max_passos_por_quadro": 5,
-  "resolucao_interna": [
-    640,
-    360
-  ],
-  "pixels_por_tile": 32,
-  "camera": {
-    "angulo_graus": 35,
-    "area_tiles": [
-      20,
-      11.25
+  "resolucao": {
+    "modo": "arte",
+    "arte": [
+      960,
+      540
     ],
+    "ampliacao": "inteira"
+  },
+  "pixels_por_unidade": 32,
+  "camera": {
+    "giro_graus": 45,
+    "inclinacao_graus": 30,
     "suavizacao_s": 0.15,
     "antecipacao_tiles": 1.0,
-    "zona_morta_tiles": 0.25,
-    "distancia": 40,
+    "zona_morta_tiles": 0.4,
+    "distancia": 90,
     "near": 1,
-    "far": 120,
-    "oclusao_alpha": 0.35,
-    "oclusao_raio_tiles": 2.6
+    "far": 220,
+    "oclusao_alpha": 0.55,
+    "sprite_recuo_tiles": 0.9
   },
   "entrada": {
     "buffer_entrada_quadros": 7,
     "zona_morta_analogico": 0.2,
     "direcoes_movimento": 8,
-    "correr_modo": "segurar"
+    "correr_modo": "segurar",
+    "clique_corrida_distancia_tiles": 5,
+    "chegada_tiles": 0.12
   },
   "mundo": {
-    "degrau_max_tiles": 0.4,
     "colisao_iteracoes": 4
   },
   "regras": {

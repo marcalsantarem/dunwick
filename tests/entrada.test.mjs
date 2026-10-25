@@ -12,7 +12,7 @@ test('teclado: mover por WASD/setas, diagonal, ações por tecla e mouse', () =>
   e.teclaAbaixo('KeyD'); e.teclaAbaixo('KeyS');
   let s = e.amostrar(0); assert.deepEqual([s.mover.x, s.mover.z], [1, 1]);
   e.teclaAcima('KeyD'); e.teclaAbaixo('ArrowLeft'); s = e.amostrar(1); assert.deepEqual([s.mover.x, s.mover.z], [-1, 1]);
-  e.teclaAbaixo('mouse:0'); s = e.amostrar(2); assert.ok(s.apertou.includes('atacar') && s.segurando.has('atacar'));
+  e.teclaAbaixo('mouse:0'); s = e.amostrar(2); assert.ok(s.apertou.includes('clique_principal') && s.segurando.has('clique_principal'));
   e.teclaAbaixo('ShiftLeft'); assert.ok(e.amostrar(3).segurando.has('correr'));
 });
 
@@ -24,10 +24,17 @@ test('aperto curto entre dois passos NÃO se perde (fila)', () => {
   assert.deepEqual(e.amostrar(6).apertou, [], 'só reporta uma vez');
 });
 
-test('duas teclas da mesma ação: soltar uma não solta a ação', () => {
+test('duas teclas da mesma ação: soltar uma não solta a ação (forte = clique direito ou K)', () => {
   const e = nova();
-  e.teclaAbaixo('KeyJ'); e.teclaAbaixo('mouse:0'); e.teclaAcima('KeyJ');
-  assert.ok(e.amostrar(0).segurando.has('atacar')); e.teclaAcima('mouse:0'); assert.ok(!e.amostrar(1).segurando.has('atacar'));
+  e.teclaAbaixo('KeyK'); e.teclaAbaixo('mouse:2'); e.teclaAcima('KeyK');
+  assert.ok(e.amostrar(0).segurando.has('forte')); e.teclaAcima('mouse:2'); assert.ok(!e.amostrar(1).segurando.has('forte'));
+});
+
+test('à Diablo: clique sobre inimigo vira intenção de atacar no buffer; clique no chão, não', () => {
+  const e = nova();
+  e.definirCursor(5, 5, null); e.teclaAbaixo('mouse:0'); let s = e.amostrar(0); assert.ok(s.apertou.includes('clique_principal')); assert.deepEqual(e.buffer.conteudo(0), []); assert.equal(s.alvoSob, null);
+  e.teclaAcima('mouse:0'); e.amostrar(1); e.definirCursor(11.5, 24, 'enemy_boneco_alvo'); e.teclaAbaixo('mouse:0'); s = e.amostrar(2);
+  assert.deepEqual(e.buffer.conteudo(2), ['atacar(0)']); assert.equal(s.alvoSob, 'enemy_boneco_alvo'); assert.deepEqual([s.cursor.x, s.cursor.z], [11.5, 24]);
 });
 
 test('teclas do navegador (F5, F11) e Ctrl+W não são do jogo (preventDefault só para teclas do jogo)', () => {

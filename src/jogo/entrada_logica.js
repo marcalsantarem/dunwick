@@ -15,7 +15,8 @@ export function criarEntradaLogica(cfgEntrada, cfgJogo) {
   const abaixoTeclado = new Set(), contagem = new Map(), segurando = new Set(), apertadasPendentes = [], debugPendentes = [];
   const dirs = { cima: false, baixo: false, esquerda: false, direita: false }, dirsContagem = new Map();
   let padAnterior = [], padEixo = { x: 0, z: 0 }, padConectado = false;
-  const snap = { mover: { x: 0, z: 0 }, segurando, apertou: [], gamepad: false, tick: 0 };
+  const snap = { mover: { x: 0, z: 0 }, segurando, apertou: [], gamepad: false, tick: 0, cursor: { x: 0, z: 0, valido: false }, alvoSob: null };
+  const cursorDom = { x: 0, z: 0, valido: false, alvo: null };
 
   const incAcao = (nome) => { const c = (contagem.get(nome) ?? 0) + 1; contagem.set(nome, c); if (c === 1) { segurando.add(nome); apertadasPendentes.push(nome); } };
   const decAcao = (nome) => { const c = (contagem.get(nome) ?? 0) - 1; if (c <= 0) { contagem.delete(nome); segurando.delete(nome); } else contagem.set(nome, c); };
@@ -68,6 +69,8 @@ export function criarEntradaLogica(cfgEntrada, cfgJogo) {
     get gamepadConectado() { return padConectado; },
     /** Ações de debug apertadas desde a última chamada (lidas por QUADRO, não por passo: F6 pausa a simulação). */
     drenarDebug() { const r = debugPendentes.slice(); debugPendentes.length = 0; return r; },
+    /** Posição do cursor no chão (tiles) e o inimigo sob ele (id ou null), calculados pela plataforma a cada quadro desenhado. */
+    definirCursor(x, z, alvo, valido = true) { cursorDom.x = x; cursorDom.z = z; cursorDom.alvo = alvo; cursorDom.valido = valido; },
     /** Início de cada passo lógico: devolve o instantâneo (objeto reutilizado) e alimenta o buffer. */
     amostrar(tick) {
       snap.tick = tick;
@@ -75,7 +78,11 @@ export function criarEntradaLogica(cfgEntrada, cfgJogo) {
       if (x === 0 && z === 0) { x = padEixo.x; z = padEixo.z; }
       snap.mover.x = x; snap.mover.z = z;
       snap.apertou.length = 0;
-      for (const nome of apertadasPendentes) { snap.apertou.push(nome); if (acoes[nome].buffer) buffer.empurrar(nome, tick); }
+      snap.cursor.x = cursorDom.x; snap.cursor.z = cursorDom.z; snap.cursor.valido = cursorDom.valido; snap.alvoSob = cursorDom.alvo;
+      for (const nome of apertadasPendentes) {
+        snap.apertou.push(nome); if (acoes[nome].buffer) buffer.empurrar(nome, tick);
+        if (nome === 'clique_principal' && cursorDom.alvo) buffer.empurrar('atacar', tick); // clique sobre inimigo = atacar (à Diablo)
+      }
       apertadasPendentes.length = 0;
       buffer.expirar(tick);
       snap.gamepad = padConectado;

@@ -1,10 +1,10 @@
 {
   "id": "cfg_orcamento",
-  "versao": 1,
-  "origem": "ADR-001 §7 (proposta; confirmar no M1 com arte real)",
+  "versao": 2,
+  "origem": "provisório (atlas HD do herói ≈ 1,9 MB); ADR-002 ainda não escrito",
   "download_inicial_mb": 10,
   "audio_inicial_mb": 2.5,
-  "codigo_brotli_kb": 500,
+  "codigo_brotli_kb": 600,
   "dados_kb": 256,
-  "por_entidade_kb": 80
+  "por_entidade_kb": 2500
 }

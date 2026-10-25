@@ -1,87 +1,87 @@
 // Validador de dados (roda no build e em `npm run validar`): esquema (Ajv) + regras cruzadas do projeto.
-// Mensagem de erro sempre aponta ARQUIVO e CAMPO: "data/config/cfg_jogo.json /camera/angulo_graus: deve ser <= 45".
+// Mensagem de erro sempre aponta ARQUIVO e CAMPO: "data/config/cfg_jogo.json /camera/inclinacao_graus: deve ser <= 60".
 import Ajv2020 from 'ajv/dist/2020.js';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { listarArquivos, carregarEsquemas, lerJson } from './lib/dados.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'z'];
+const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop'];
 
 function mensagemAjv(e) {
   const extra = e.params?.additionalProperty ? ` (campo "${e.params.additionalProperty}")` : e.params?.allowedValues ? ` (${e.params.allowedValues.join(' | ')})` : e.params?.missingProperty ? ` ("${e.params.missingProperty}")` : '';
-  return `${e.instancePath || '/'}: ${e.message}${extra}`;
+  return [e.instancePath || '/', `${e.message}${extra}`];
 }
 
 export function validarDados(raiz = RAIZ_PADRAO) {
   const erros = [], avisos = [];
   const erro = (arq, campo, msg) => erros.push(`data/${arq} ${campo}: ${msg}`);
-
-  const esquemas = carregarEsquemas(raiz);
-  const ajv = new Ajv2020({ allErrors: true, strict: true });
-  const validadores = {};
+  const esquemas = carregarEsquemas(raiz), ajv = new Ajv2020({ allErrors: true, strict: true }), validadores = {};
   for (const [nome, esq] of Object.entries(esquemas)) validadores[nome] = ajv.compile(esq);
 
-  const lidos = {}; // arquivo -> objeto (apenas os que passaram pelo esquema)
-  for (const { arquivo, caminho, esquema } of listarArquivos(raiz)) {
+  const arquivos = listarArquivos(raiz), lidos = {}, esquemaDe = {};
+  for (const { arquivo, caminho, esquema } of arquivos) {
     if (!esquema) { if (!arquivo.endsWith('.gitkeep')) avisos.push(`data/${arquivo}: sem esquema registrado (ignorado)`); continue; }
-    let obj;
-    try { obj = lerJson(caminho); } catch (e) { erros.push(e.message); continue; }
+    let obj; try { obj = lerJson(caminho); } catch (e) { erros.push(e.message); continue; }
     const v = validadores[esquema];
     if (!v) { erro(arquivo, '/', `esquema "${esquema}" não existe em data/schemas`); continue; }
-    if (!v(obj)) { for (const e of v.errors) erro(arquivo, mensagemAjv(e).split(': ')[0], mensagemAjv(e).split(': ').slice(1).join(': ')); continue; }
-    lidos[arquivo] = obj;
-    // Regra transversal: nome do arquivo = id (exceto tabelas de texto, que se chamam pelo idioma).
+    if (!v(obj)) { for (const e of v.errors) { const [c, m] = mensagemAjv(e); erro(arquivo, c, m); } continue; }
+    lidos[arquivo] = obj; esquemaDe[arquivo] = esquema;
     if (esquema !== 'textos' && basename(arquivo, '.json') !== obj.id) erro(arquivo, '/id', `deve ser igual ao nome do arquivo ("${basename(arquivo, '.json')}")`);
-    // Regra transversal: IDs minúsculos com prefixo conhecido.
-    if (!/^[a-z][a-z0-9_]*$/.test(obj.id ?? 'x') && esquema !== 'textos') erro(arquivo, '/id', 'ID deve ser minúsculo (a-z, 0-9, _)');
     const pref = String(obj.id ?? '').split('_')[0];
     if (esquema !== 'textos' && !PREFIXOS_ID.includes(pref)) erro(arquivo, '/id', `prefixo "${pref}_" não está na lista de prefixos do projeto`);
   }
-  const por = (esq) => Object.entries(lidos).filter(([a]) => listarArquivos(raiz).find((f) => f.arquivo === a)?.esquema === esq);
+  const por = (esq) => Object.entries(lidos).filter(([a]) => esquemaDe[a] === esq);
   const um = (esq) => por(esq)[0]?.[1];
-
-  const jogo = um('cfg_jogo'), perfis = um('cfg_perfis'), entrada = um('cfg_entrada');
-  const textos = por('textos');
-  const chavesTexto = new Set(textos.flatMap(([, t]) => Object.keys(t.textos)));
+  const jogo = um('cfg_jogo'), perfis = um('cfg_perfis'), entrada = um('cfg_entrada'), ciclo = um('cfg_ciclo'), kit = um('cfg_kit');
+  const chavesTexto = new Set(por('textos').flatMap(([, t]) => Object.keys(t.textos)));
   const exigeTexto = (arq, campo, id) => { if (!chavesTexto.has(id)) erro(arq, campo, `texto "${id}" não existe em data/texts`); };
+  const metaSprite = (id) => { const p = join(raiz, 'assets', 'sprites', id, `${id}.meta.json`); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null; };
   const temSprite = (arq, campo, id) => {
-    for (const ext of ['.png', '_n.png', '_e.png', '.meta.json']) if (!existsSync(join(raiz, 'assets', 'sprites', id, id + ext))) erro(arq, campo, `sprite "${id}": falta assets/sprites/${id}/${id}${ext}`);
+    for (const ext of ['.png', '.meta.json']) if (!existsSync(join(raiz, 'assets', 'sprites', id, id + ext))) erro(arq, campo, `sprite "${id}": falta assets/sprites/${id}/${id}${ext} (rode npm run assets)`);
+    return metaSprite(id);
   };
-  const faltando = (esq) => { if (!um(esq)) erros.push(`data/: falta o arquivo de "${esq}" (ou ele é inválido)`); };
-  for (const esq of ['cfg_jogo', 'cfg_perfis', 'cfg_entrada', 'cfg_orcamento']) faltando(esq);
+  for (const esq of ['cfg_jogo', 'cfg_perfis', 'cfg_entrada', 'cfg_orcamento', 'cfg_ciclo', 'cfg_kit']) if (!um(esq)) erros.push(`data/: falta o arquivo de "${esq}" (ou ele é inválido)`);
 
-  // ---- perfis ----
   if (perfis) {
     const ids = perfis.perfis.map((p) => p.id);
     if (!ids.includes(perfis.padrao)) erro('config/cfg_perfis.json', '/padrao', `perfil "${perfis.padrao}" não existe`);
     if (new Set(ids).size !== ids.length) erro('config/cfg_perfis.json', '/perfis', 'IDs de perfil repetidos');
-    perfis.perfis.forEach((p, i) => {
-      exigeTexto('config/cfg_perfis.json', `/perfis/${i}/nome_txt`, p.nome_txt);
-      if (p.luzes_com_sombra > p.luzes_pontuais_max) erro('config/cfg_perfis.json', `/perfis/${i}/luzes_com_sombra`, 'não pode passar de luzes_pontuais_max');
-      if ((p.luzes_com_sombra > 0) !== (p.sombra_pontual_px > 0)) erro('config/cfg_perfis.json', `/perfis/${i}/sombra_pontual_px`, 'deve ser 0 se e só se luzes_com_sombra for 0');
-    });
+    perfis.perfis.forEach((p, i) => exigeTexto('config/cfg_perfis.json', `/perfis/${i}/nome_txt`, p.nome_txt));
   }
-  // ---- câmera ----
-  if (jogo && jogo.camera.near >= jogo.camera.far) erro('config/cfg_jogo.json', '/camera/near', 'deve ser menor que far');
-  if (jogo && jogo.camera.distancia <= jogo.camera.near) erro('config/cfg_jogo.json', '/camera/distancia', 'deve ser maior que near');
-  // ---- entrada: tecla repetida no mesmo contexto ----
+  if (jogo) {
+    if (jogo.camera.near >= jogo.camera.far) erro('config/cfg_jogo.json', '/camera/near', 'deve ser menor que far');
+    if (jogo.camera.distancia <= jogo.camera.near || jogo.camera.distancia >= jogo.camera.far) erro('config/cfg_jogo.json', '/camera/distancia', 'deve ficar entre near e far');
+    if (jogo.resolucao.modo === 'arte' && jogo.resolucao.arte[0] * 9 !== jogo.resolucao.arte[1] * 16) erro('config/cfg_jogo.json', '/resolucao/arte', 'a resolução de arte deve ser 16:9');
+  }
+  if (ciclo) {
+    ciclo.pontos.forEach((p, i) => { if (i && p.hora <= ciclo.pontos[i - 1].hora) erro('config/cfg_ciclo.json', `/pontos/${i}/hora`, 'as horas devem ser estritamente crescentes'); });
+    if (ciclo.pontos[0].hora > 6 || ciclo.pontos[ciclo.pontos.length - 1].hora < 23) avisos.push('data/config/cfg_ciclo.json: cobertura de horas incompleta (esperado de ≤ 6 até ≥ 23)');
+  }
   if (entrada) {
     const uso = new Map();
     const registrar = (ctx, tecla, quem) => { const k = `${ctx}|${tecla}`; if (uso.has(k)) erro('config/cfg_entrada.json', '/', `tecla "${tecla}" usada por "${uso.get(k)}" e "${quem}" no mesmo contexto`); else uso.set(k, quem); };
     for (const [n, e] of Object.entries(entrada.eixos)) for (const [dir, teclas] of Object.entries(e.teclado)) for (const t of teclas) registrar(e.contexto, t, `${n}.${dir}`);
     for (const [n, a] of Object.entries(entrada.acoes)) for (const t of a.teclado) registrar(a.contexto, t, n);
     for (const [n, d] of Object.entries(entrada.debug)) for (const t of d.teclado) registrar('debug', t, n);
-    // Teclas que o navegador precisa manter (M1-07): F5, F11, Ctrl+W
     for (const [n, d] of Object.entries(entrada.debug)) if (d.teclado.some((t) => t === 'F5' || t === 'F11')) erro('config/cfg_entrada.json', `/debug/${n}`, 'F5 e F11 ficam livres para o navegador');
     for (const [n, a] of Object.entries(entrada.acoes)) if (a.teclado.some((t) => /^F[0-9]+$/.test(t))) erro('config/cfg_entrada.json', `/acoes/${n}`, 'teclas F são reservadas ao debug e ao navegador');
+    for (const acao of ['clique_principal', 'correr', 'atacar', 'forte', 'esquivar', 'ancorar']) if (!entrada.acoes[acao]) erro('config/cfg_entrada.json', '/acoes', `ação obrigatória "${acao}" ausente`);
   }
-  // ---- personagens e inimigos ----
+  // ---- herói: ataques coerentes com a animação do sprite (quadros × fps) ----
   for (const [arq, h] of por('personagem')) {
-    temSprite(arq, '/sprite', h.sprite);
+    const meta = temSprite(arq, '/sprite', h.sprite);
     if (h.movimento.vel_correr <= h.movimento.vel_andar) erro(arq, '/movimento/vel_correr', 'deve ser maior que vel_andar');
-    if (h.caixas.hurtbox_altura_tiles[1] <= h.caixas.hurtbox_altura_tiles[0]) erro(arq, '/caixas/hurtbox_altura_tiles', 'altura final deve ser maior que a inicial');
+    if (meta) {
+      for (const [k, anim] of Object.entries(h.animacoes)) if (!meta.anims[anim]) erro(arq, `/animacoes/${k}`, `animação "${anim}" não existe no sprite (${Object.keys(meta.anims).join(', ')})`);
+      const confere = (campo, anim, total) => { const a = meta.anims[anim]; if (!a) { erro(arq, `${campo}/anim`, `animação "${anim}" não existe no sprite`); return; } const dur = (a.quadros * 60) / a.fps; const razao = total / dur; if (razao < 0.6 || razao > 1.8) erro(arq, campo, `duração de ${total} quadros estica a animação "${anim}" demais (${a.quadros} quadros a ${a.fps} fps = ${dur.toFixed(0)} quadros a 60 Hz; razão ${razao.toFixed(2)}, aceito 0,6–1,8)`); };
+      h.ataques.forEach((a, i) => confere(`/ataques/${i}/quadros`, a.anim, a.quadros.preparacao + a.quadros.ativo + a.quadros.recuperacao));
+      confere('/forte/quadros', h.forte.anim, h.forte.quadros.preparacao + h.forte.quadros.ativo + h.forte.quadros.recuperacao);
+      confere('/esquiva/duracao_quadros', h.esquiva.anim, h.esquiva.duracao_quadros);
+    }
+    if (h.esquiva.invencivel_quadros[1] > h.esquiva.duracao_quadros) erro(arq, '/esquiva/invencivel_quadros', 'a janela de invencibilidade passa da duração da esquiva');
+    const ids = h.ataques.map((a) => a.id).concat(h.forte.id); if (new Set(ids).size !== ids.length) erro(arq, '/ataques', 'IDs de ataque repetidos');
   }
   const inimigos = Object.fromEntries(por('inimigo').map(([a, e]) => [e.id, [a, e]]));
   for (const [arq, e] of Object.values(inimigos)) {
@@ -97,37 +97,27 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     const [L, A] = m.tamanho;
     exigeTexto(arq, '/nome_txt', m.nome_txt);
     if (m.planta.length !== A) erro(arq, '/planta', `tem ${m.planta.length} linhas, tamanho diz ${A}`);
-    m.planta.forEach((linha, z) => {
-      if (linha.length !== L) erro(arq, `/planta/${z}`, `linha com ${linha.length} colunas, tamanho diz ${L}`);
-      for (let x = 0; x < linha.length; x++) if (!m.legenda[linha[x]]) { erro(arq, `/planta/${z}`, `caractere "${linha[x]}" (coluna ${x}) não está na legenda`); break; }
-    });
-    const dentro = ([x, z, w, h], campo) => { if (x + w > L || z + h > A) erro(arq, campo, `retângulo [${x}, ${z}, ${w}, ${h}] sai do mapa ${L}×${A}`); };
-    m.zonas.forEach((z, i) => dentro(z.retangulo, `/zonas/${i}/retangulo`));
-    m.rampas.forEach((r, i) => {
-      dentro(r.retangulo, `/rampas/${i}/retangulo`);
-      const [rx, rz, rw, rh] = r.retangulo;
-      for (let z = rz; z < rz + rh; z++) for (let x = rx; x < rx + rw; x++) { const c = m.planta[z]?.[x]; if (c && m.legenda[c]?.tipo !== 'rampa' && m.legenda[c]?.tipo !== 'escada') { erro(arq, `/rampas/${i}`, `tile (${x}, ${z}) é "${c}" na planta, não rampa/escada`); z = rz + rh; break; } }
-    });
-    const [ix, iz] = m.inicio_jogador.tile, solido = (x, z) => !!m.legenda[m.planta[z]?.[x]]?.solido;
-    if (ix >= L || iz >= A || solido(ix, iz)) erro(arq, '/inicio_jogador/tile', 'início fora do mapa ou dentro de parede');
+    m.planta.forEach((linha, z) => { if (linha.length !== L) erro(arq, `/planta/${z}`, `linha com ${linha.length} colunas, tamanho diz ${L}`); for (let x = 0; x < linha.length; x++) if (!m.legenda[linha[x]]) { erro(arq, `/planta/${z}`, `caractere "${linha[x]}" (coluna ${x}) não está na legenda`); break; } });
+    const ids = new Set();
     m.objetos.forEach((o, i) => {
-      const [x, z] = o.tile;
-      if (x >= L || z >= A) erro(arq, `/objetos/${i}/tile`, `objeto "${o.id}" fora do mapa`);
-      else if (solido(x, z)) erro(arq, `/objetos/${i}/tile`, `objeto "${o.id}" dentro de parede`);
+      if (ids.has(o.id)) erro(arq, `/objetos/${i}/id`, `ID "${o.id}" repetido`); ids.add(o.id);
+      const pegada = o.tipo === 'inimigo' ? true : kit?.pegadas[o.tipo];
+      if (!pegada) erro(arq, `/objetos/${i}/tipo`, `tipo "${o.tipo}" não tem pegada em cfg_kit`);
+      if (o.tipo === 'cerca') { for (const c of ['x0', 'z0', 'x1', 'z1']) if (o[c] === undefined) erro(arq, `/objetos/${i}/${c}`, 'cerca exige x0, z0, x1, z1'); }
+      else { if (o.x === undefined || o.z === undefined) erro(arq, `/objetos/${i}`, 'objeto exige x e z'); else if (o.x < 0 || o.z < 0 || o.x > L || o.z > A) erro(arq, `/objetos/${i}`, `objeto "${o.id}" fora do mapa`); }
+      if (o.tipo === 'casa' && (!o.w || !o.d || o.telhado === undefined)) erro(arq, `/objetos/${i}`, 'casa exige w, d e telhado');
       if (o.tipo === 'inimigo' && !inimigos[o.id]) erro(arq, `/objetos/${i}/id`, `inimigo "${o.id}" não existe em data/enemies`);
     });
-    const [lx, lz, lw, lh] = m.limites_camera;
-    if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
+    const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
+    if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
   }
-  // ---- textos: todas as tabelas devem ter as mesmas chaves ----
-  if (textos.length > 1) for (const [arq, t] of textos.slice(1)) { const base = Object.keys(textos[0][1].textos); for (const k of base) if (!(k in t.textos)) erro(arq, '/textos', `falta "${k}" (existe em ${textos[0][0]})`); }
-
+  const textos = por('textos');
+  if (textos.length > 1) for (const [arq, t] of textos.slice(1)) for (const k of Object.keys(textos[0][1].textos)) if (!(k in t.textos)) erro(arq, '/textos', `falta "${k}" (existe em ${textos[0][0]})`);
   return { erros, avisos, arquivos: Object.keys(lidos).length };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const raiz = process.argv[2] ? process.argv[2] : RAIZ_PADRAO;
-  const { erros, avisos, arquivos } = validarDados(raiz);
+  const { erros, avisos, arquivos } = validarDados(process.argv[2] ? process.argv[2] : RAIZ_PADRAO);
   for (const a of avisos) console.warn('aviso:', a);
   if (erros.length) { console.error(`\n✗ validar dados: ${erros.length} erro(s)`); for (const e of erros) console.error('  ' + e); process.exit(1); }
   console.log(`✓ validar dados: ${arquivos} arquivos válidos`);

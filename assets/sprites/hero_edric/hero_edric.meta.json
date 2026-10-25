@@ -1,0 +1,127 @@
+{
+  "id": "hero_edric",
+  "tipo": "sprite_humanoide",
+  "celula": [
+    192,
+    192
+  ],
+  "ancora": [
+    96,
+    168
+  ],
+  "arte_escala": 1.5,
+  "ref_celula": 128,
+  "direcoes": [
+    "s",
+    "se",
+    "l",
+    "ne",
+    "n"
+  ],
+  "espelhar": {
+    "sw": "se",
+    "o": "l",
+    "nw": "ne"
+  },
+  "colunas": 12,
+  "anims": {
+    "idle": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "andar": {
+      "quadros": 8,
+      "fps": 10,
+      "loop": true,
+      "eventos": [
+        {
+          "quadro": 1,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 5,
+          "tipo": "passo"
+        }
+      ],
+      "inicio": 20
+    },
+    "correr": {
+      "quadros": 8,
+      "fps": 14,
+      "loop": true,
+      "eventos": [
+        {
+          "quadro": 1,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 5,
+          "tipo": "passo"
+        }
+      ],
+      "inicio": 60
+    },
+    "ataque1": {
+      "quadros": 6,
+      "fps": 16,
+      "loop": false,
+      "eventos": [
+        {
+          "quadro": 2,
+          "tipo": "hit_inicio"
+        },
+        {
+          "quadro": 4,
+          "tipo": "hit_fim"
+        }
+      ],
+      "inicio": 100
+    },
+    "ataque2": {
+      "quadros": 6,
+      "fps": 16,
+      "loop": false,
+      "eventos": [
+        {
+          "quadro": 2,
+          "tipo": "hit_inicio"
+        },
+        {
+          "quadro": 4,
+          "tipo": "hit_fim"
+        }
+      ],
+      "inicio": 130
+    },
+    "ataque3": {
+      "quadros": 6,
+      "fps": 16,
+      "loop": false,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "hit_inicio"
+        },
+        {
+          "quadro": 4,
+          "tipo": "hit_fim"
+        }
+      ],
+      "inicio": 160
+    },
+    "rolar": {
+      "quadros": 6,
+      "fps": 15,
+      "loop": false,
+      "inicio": 190
+    },
+    "dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 220
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id": "hero_edric",
+  "versao": 1,
+  "nota": "Edric Moss. Movimento, ataques (combo de 3), golpe forte e rolamento em DADOS; dano, fôlego e atributos são do 03/06. Quadros a 60 Hz.",
+  "sprite": "hero_edric",
+  "movimento": {
+    "vel_andar": 3.5,
+    "vel_correr": 6.0,
+    "aceleracao_s": 0.06,
+    "freada_s": 0.05
+  },
+  "caixas": {
+    "pushbox_raio_tiles": 0.35,
+    "hurtbox_raio_tiles": 0.3,
+    "hurtbox_altura_tiles": [
+      0,
+      1.4
+    ]
+  },
+  "animacoes": {
+    "parado": "idle",
+    "andar": "andar",
+    "correr": "correr",
+    "dano": "dano"
+  },
+  "ataques": [
+    {
+      "id": "atk_edric_1",
+      "anim": "ataque1",
+      "quadros": {
+        "preparacao": 8,
+        "ativo": 8,
+        "recuperacao": 8
+      },
+      "janela_combo_quadros": 14,
+      "avanco_tiles": 0.7,
+      "hitbox": {
+        "forma": "arco",
+        "alcance_tiles": 1.6,
+        "abertura_graus": 130
+      }
+    },
+    {
+      "id": "atk_edric_2",
+      "anim": "ataque2",
+      "quadros": {
+        "preparacao": 8,
+        "ativo": 8,
+        "recuperacao": 8
+      },
+      "janela_combo_quadros": 14,
+      "avanco_tiles": 0.7,
+      "hitbox": {
+        "forma": "arco",
+        "alcance_tiles": 1.6,
+        "abertura_graus": 130
+      }
+    },
+    {
+      "id": "atk_edric_3",
+      "anim": "ataque3",
+      "quadros": {
+        "preparacao": 11,
+        "ativo": 6,
+        "recuperacao": 11
+      },
+      "janela_combo_quadros": 0,
+      "avanco_tiles": 1.0,
+      "hitbox": {
+        "forma": "arco",
+        "alcance_tiles": 1.9,
+        "abertura_graus": 90
+      }
+    }
+  ],
+  "forte": {
+    "id": "atk_edric_forte",
+    "anim": "ataque3",
+    "quadros": {
+      "preparacao": 16,
+      "ativo": 6,
+      "recuperacao": 14
+    },
+    "janela_combo_quadros": 0,
+    "avanco_tiles": 1.2,
+    "hitbox": {
+      "forma": "arco",
+      "alcance_tiles": 2.1,
+      "abertura_graus": 100
+    }
+  },
+  "esquiva": {
+    "anim": "rolar",
+    "duracao_quadros": 18,
+    "distancia_tiles": 3.0,
+    "invencivel_quadros": [
+      2,
+      10
+    ],
+    "recarga_quadros": 24
+  },
+  "luz": {
+    "cor": "#ffb070",
+    "intensidade": 3,
+    "alcance_tiles": 6,
+    "altura_tiles": 1.4
+  }
+}

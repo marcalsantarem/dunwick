@@ -1,14 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "dunwick/mapa",
-  "title": "Mapa em grade de tiles (layout é do 06)",
+  "title": "Mapa isométrico: terreno por tiles + objetos do kit (layout é do 06)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "versao", "nome_txt", "tamanho", "legenda", "planta", "rampas", "zonas", "inicio_jogador", "limites_camera", "luzes", "objetos"],
+  "required": ["id", "versao", "nome_txt", "tamanho", "legenda", "planta", "objetos", "inicio_jogador", "limites_camera"],
   "$defs": {
-    "cor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-    "tile": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }], "items": false, "minItems": 2 },
-    "retangulo": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1 }], "items": false, "minItems": 4 }
+    "tile": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }], "items": false, "minItems": 2 }
   },
   "properties": {
     "id": { "type": "string", "pattern": "^map_[a-z0-9_]+$" },
@@ -16,75 +14,26 @@
     "nome_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
     "origem": { "type": "string" },
     "tamanho": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1 }], "items": false, "minItems": 2 },
-    "legenda": {
-      "type": "object", "minProperties": 1,
-      "propertyNames": { "type": "string", "minLength": 1, "maxLength": 1 },
-      "additionalProperties": {
-        "type": "object", "additionalProperties": false, "required": ["tipo", "piso", "altura_tiles"],
-        "properties": {
-          "tipo": { "type": "string", "pattern": "^[a-z_]+$" },
-          "piso": { "enum": ["piso", "parede", "plataforma", "rampa"] },
-          "altura_tiles": { "type": "number", "minimum": 0, "maximum": 8 },
-          "solido": { "type": "boolean" }
-        }
-      }
-    },
+    "legenda": { "type": "object", "minProperties": 1, "propertyNames": { "type": "string", "minLength": 1, "maxLength": 1 }, "additionalProperties": { "enum": ["grama", "terra", "calcada", "musgo"] } },
     "planta": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-    "rampas": {
+    "objetos": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false, "required": ["id", "retangulo", "eixo", "altura_no_inicio", "altura_no_fim"],
+        "type": "object", "additionalProperties": false, "required": ["id", "tipo"],
         "properties": {
-          "id": { "type": "string", "pattern": "^z_[a-z0-9_]+$" },
-          "retangulo": { "$ref": "#/$defs/retangulo" },
-          "eixo": { "enum": ["x", "z"] },
-          "altura_no_inicio": { "type": "number", "minimum": 0 },
-          "altura_no_fim": { "type": "number", "minimum": 0 }
+          "id": { "type": "string", "pattern": "^[a-z]+(_[a-z0-9]+)*$" },
+          "tipo": { "enum": ["casa", "torre_sino", "poco", "arvore", "pinheiro", "arbusto", "pedra", "lanterna", "barril", "caixote", "cerca", "inimigo"] },
+          "x": { "type": "number" }, "z": { "type": "number" }, "x0": { "type": "number" }, "z0": { "type": "number" }, "x1": { "type": "number" }, "z1": { "type": "number" },
+          "w": { "type": "number", "exclusiveMinimum": 0 }, "d": { "type": "number", "exclusiveMinimum": 0 },
+          "rot": { "type": "number" }, "escala": { "type": "number", "exclusiveMinimum": 0 }, "seed": { "type": "integer" },
+          "telhado": { "enum": ["telha", "ardosia", "musgo"] }, "janelas": { "type": "integer", "minimum": 0, "maximum": 8 }, "chamine": { "type": "boolean" }
         }
-      }
-    },
-    "zonas": {
-      "type": "array",
-      "items": {
-        "type": "object", "additionalProperties": false, "required": ["id", "retangulo", "m1"],
-        "properties": { "id": { "type": "string", "pattern": "^z_[a-z0-9_]+$" }, "retangulo": { "$ref": "#/$defs/retangulo" }, "m1": { "type": "boolean" } }
       }
     },
     "inicio_jogador": {
       "type": "object", "additionalProperties": false, "required": ["tile", "direcao"],
       "properties": { "tile": { "$ref": "#/$defs/tile" }, "direcao": { "enum": ["s", "n", "l", "o"] } }
     },
-    "limites_camera": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }, { "type": "number" }], "items": false, "minItems": 4 },
-    "luzes": {
-      "type": "object", "additionalProperties": false, "required": ["hemisferica", "principal"],
-      "properties": {
-        "hemisferica": {
-          "type": "object", "additionalProperties": false, "required": ["cor_ceu", "cor_chao", "intensidade"],
-          "properties": { "cor_ceu": { "$ref": "#/$defs/cor" }, "cor_chao": { "$ref": "#/$defs/cor" }, "intensidade": { "type": "number", "minimum": 0 } }
-        },
-        "principal": {
-          "type": "object", "additionalProperties": false, "required": ["tipo", "cor", "intensidade", "direcao"],
-          "properties": {
-            "tipo": { "const": "direcional" },
-            "cor": { "$ref": "#/$defs/cor" },
-            "intensidade": { "type": "number", "minimum": 0 },
-            "direcao": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }], "items": false, "minItems": 3 }
-          }
-        }
-      }
-    },
-    "objetos": {
-      "type": "array",
-      "items": {
-        "type": "object", "additionalProperties": false, "required": ["id", "tipo", "tile", "m1"],
-        "properties": {
-          "id": { "type": "string", "pattern": "^[a-z]+_[a-z0-9_]+$" },
-          "tipo": { "type": "string", "pattern": "^[a-z_]+$" },
-          "tile": { "$ref": "#/$defs/tile" },
-          "m1": { "type": "boolean" },
-          "aberta_inicial": { "type": "boolean" }
-        }
-      }
-    }
+    "limites_camera": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }, { "type": "number" }], "items": false, "minItems": 4 }
   }
 }
