@@ -161,3 +161,10 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Regra de nomes (usuário):** **nomes típicos de RPG, não brasileiros** (pessoas). Nomes de lugares em português descritivo (Baixo Orvalho) são aceitos. Renomear NPCs com nomes brasileiros (ex.: "Zefa", "Seu Tadeu Doce").
 - **Pendentes:** nome do urso-musgo, do vendedor da feira e de demais NPCs menores (02 propõe, tipo RPG); mal gigante; nome do jogo.
 - **Ajuste de história:** onde os textos dizem "graduação/formatura" ou "cavaleiro", trocar pelo teste do mestre; o "plano de ser cavaleiro" vira "alistar-se na Guarda"; a "vingança" segue como pano de fundo.
+
+## D-021 — Nomes finais do slice (2026-10-24)
+- **Urso-musgo (chefe):** **Hollowpaw**.
+- **NPCs menores (aceitos):** ferreiro **Hargen Stoll**, taverneira **Elda Pott**, escrivão **Corvin Ledge**, viajante **Tam Rowley**, vendedor da feira **Bram Honeywell**.
+- **Resumo dos nomes fixados:** Edric Moss · Baixo Orvalho · Mor-Allen · Valmora · Oswin Cathe · Ondric · Ysolt Brum · Grace · Torvan Keel · Maren · Hollowpaw · O Sino de Cobre · A Guarda de Mor-Allen.
+- **Pendentes:** nome do mal gigante e nome do jogo ("Dunwick" provisório). Checagem formal de marca no M6 (Valmora lembra o jogo indie "Legend of Valmorra"; risco baixo-médio).
+- O 02 atualiza a ficha do urso e os textos com os nomes decididos (será avisado junto com o próximo pacote, para não gastar mensagem).
