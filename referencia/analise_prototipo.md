@@ -1,7 +1,7 @@
 # Análise do protótipo "Vale de Dunwick" (do usuário)
 
 > Autor: 01 Produtor · 2026-10-24 · Fonte: https://dunwick.netlify.app (cópia local: `referencia/prototipo/index.html`, 1 arquivo, ~228 KB de JavaScript, 171 funções)
-> **Este é o alvo visual e de jogabilidade do usuário** ("aquela ideia, só que mais bonito e polido"). O esqueleto cinza em Three.js foi **rejeitado** (D-024).
+> **CORREÇÃO (D-025):** este protótipo é **só referência do estilo isométrico**. O usuário **não quer copiá-lo** nem mudar os sistemas já combinados; quer um jogo isométrico, com jogabilidade meio Diablo e gráfico **HD-2D** bonito e polido. Tudo abaixo é descrição do protótipo, não especificação.
 
 ## 1. O que o protótipo é
 - **Canvas 2D puro** (sem biblioteca), 1280×720, visão **isométrica 2:1** (`TILE_W 64 · TILE_H 32`), mapa 80×80 tiles em blocos de 16, semente fixa.

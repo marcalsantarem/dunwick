@@ -1,70 +1,361 @@
 {
-  "id": "paleta_neutra",
-  "versao": "0.2.0",
+  "id": "paleta_v1",
+  "versao": "1.0.0-rascunho",
   "status": "provisoria",
-  "aviso": "Paleta neutra para placeholders e spikes (BRF-002). Não usar em arte final. Será substituída na etapa 2 do guia visual (roteiro de cor por região).",
+  "aviso": "Rascunho da direção D-024 (visual do protótipo + direção A). Dados para 04/07/08; vale até a etapa 2 (roteiro de cor por região). Substitui a paleta neutra v0.2 de 64 cores (pixel art).",
+  "base": "cores de partida lidas do protótipo (referencia/prototipo/index.html, objeto PAL e funções de desenho) + sombra azul-esverdeada, luz de lanterna e sino da direção A",
   "regras": {
-    "max_cores_por_sprite": 32,
-    "alpha_permitido": [
-      0,
-      255
-    ],
-    "deslocamento_de_matiz": "sombras puxam para azul/violeta (frio), luzes para amarelo (quente)",
-    "rampas_reservadas": "perigo: só golpe vindo no mundo (nunca na UI); brilho: interativos, coletáveis e foco da UI; alerta_ui: só erro e vida baixa na UI/HUD, com forma + ícone + texto; nenhuma delas em decoração, roupas ou cenário",
-    "vagas_etapa_2": "cor-assinatura do herói, acentos de facção/inimigo, acentos por região e escolas de magia entram na etapa 2 (sobram vagas até 64 + rampas de VFX separadas)"
+    "sombreamento": "3–4 passos por material nos personagens (bordas suaves por supersampling); cenário pode ter gradiente sutil",
+    "contorno": "tom escuro da própria rampa do material, translúcido (rgba(42,30,20,0.7) como base); nunca preto puro",
+    "sombra": "azul-esverdeada (sombra_a) na direção A; nunca preto puro nem cinza neutro",
+    "reservadas": "perigo: só golpe vindo no mundo (nunca na UI); brilho: interativos, coletáveis e foco da UI; alerta_ui: só erro e vida baixa na UI/HUD com ícone + texto; sino_aqua: só sino, marca do Edric e a Bênção",
+    "telegraph": "emissivo: não escurece com o grade nem recebe névoa; desenhado acima do chão e abaixo dos personagens"
   },
   "rampas": [
     {
-      "nome": "neutro_frio",
-      "uso": "contorno, sombra-chave, cinzas de base, branco",
+      "nome": "grama",
+      "uso": "chão de grama; sombra azul-esverdeada no 1º passo",
       "reservada": false,
       "cores": [
         {
-          "id": "neutro_frio_1",
-          "hex": "#070911"
+          "id": "grama_1",
+          "hex": "#2E5434"
         },
         {
-          "id": "neutro_frio_2",
-          "hex": "#292e3c"
+          "id": "grama_2",
+          "hex": "#3F6B2A"
         },
         {
-          "id": "neutro_frio_3",
-          "hex": "#525b6b"
+          "id": "grama_3",
+          "hex": "#4F7A30"
         },
         {
-          "id": "neutro_frio_4",
-          "hex": "#7e8b9c"
+          "id": "grama_4",
+          "hex": "#5E8C3A"
         },
         {
-          "id": "neutro_frio_5",
-          "hex": "#afbfcc"
+          "id": "grama_5",
+          "hex": "#6FA046"
         },
         {
-          "id": "neutro_frio_6",
-          "hex": "#e6f4fc"
+          "id": "grama_6",
+          "hex": "#8DBA5A"
         }
       ]
     },
     {
-      "nome": "neutro_quente",
-      "uso": "papel, linho, cinzas de luz quente",
+      "nome": "copa_pinheiro",
+      "uso": "pinheiros e folhagem escura",
       "reservada": false,
       "cores": [
         {
-          "id": "neutro_quente_1",
-          "hex": "#281f1c"
+          "id": "copa_pinheiro_1",
+          "hex": "#1C3622"
         },
         {
-          "id": "neutro_quente_2",
-          "hex": "#685a50"
+          "id": "copa_pinheiro_2",
+          "hex": "#24452A"
         },
         {
-          "id": "neutro_quente_3",
-          "hex": "#a99d90"
+          "id": "copa_pinheiro_3",
+          "hex": "#2E5434"
         },
         {
-          "id": "neutro_quente_4",
-          "hex": "#ece7dd"
+          "id": "copa_pinheiro_4",
+          "hex": "#386440"
+        },
+        {
+          "id": "copa_pinheiro_5",
+          "hex": "#4E8458"
+        }
+      ]
+    },
+    {
+      "nome": "terra",
+      "uso": "estradas, trilhas, barro",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "terra_1",
+          "hex": "#5A4030"
+        },
+        {
+          "id": "terra_2",
+          "hex": "#6E5235"
+        },
+        {
+          "id": "terra_3",
+          "hex": "#8A6B45"
+        },
+        {
+          "id": "terra_4",
+          "hex": "#A3845A"
+        },
+        {
+          "id": "terra_5",
+          "hex": "#BFA079"
+        }
+      ]
+    },
+    {
+      "nome": "pedra",
+      "uso": "pedra, calçamento da praça, muros",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "pedra_1",
+          "hex": "#5A5750"
+        },
+        {
+          "id": "pedra_2",
+          "hex": "#7D786E"
+        },
+        {
+          "id": "pedra_3",
+          "hex": "#9A958A"
+        },
+        {
+          "id": "pedra_4",
+          "hex": "#B3AEA2"
+        },
+        {
+          "id": "pedra_5",
+          "hex": "#CFCBC0"
+        }
+      ]
+    },
+    {
+      "nome": "madeira",
+      "uso": "vigas do enxaimel, cercas, portas, caixotes",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "madeira_1",
+          "hex": "#3A2418"
+        },
+        {
+          "id": "madeira_2",
+          "hex": "#4A2E1A"
+        },
+        {
+          "id": "madeira_3",
+          "hex": "#6B4428"
+        },
+        {
+          "id": "madeira_4",
+          "hex": "#855632"
+        },
+        {
+          "id": "madeira_5",
+          "hex": "#A8703F"
+        }
+      ]
+    },
+    {
+      "nome": "reboco",
+      "uso": "parede de reboco entre as vigas",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "reboco_1",
+          "hex": "#B8A886"
+        },
+        {
+          "id": "reboco_2",
+          "hex": "#D6C7A6"
+        },
+        {
+          "id": "reboco_3",
+          "hex": "#E8DCC0"
+        },
+        {
+          "id": "reboco_4",
+          "hex": "#F4EEDC"
+        }
+      ]
+    },
+    {
+      "nome": "ardosia",
+      "uso": "telhado de ardósia azul",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "ardosia_1",
+          "hex": "#2E3A52"
+        },
+        {
+          "id": "ardosia_2",
+          "hex": "#3A4762"
+        },
+        {
+          "id": "ardosia_3",
+          "hex": "#4A5A78"
+        },
+        {
+          "id": "ardosia_4",
+          "hex": "#5C6E8F"
+        },
+        {
+          "id": "ardosia_5",
+          "hex": "#7A8CAD"
+        }
+      ]
+    },
+    {
+      "nome": "telha",
+      "uso": "telhado de telha laranja, chaminés de tijolo",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "telha_1",
+          "hex": "#7A3A20"
+        },
+        {
+          "id": "telha_2",
+          "hex": "#9E4B2A"
+        },
+        {
+          "id": "telha_3",
+          "hex": "#C2643A"
+        },
+        {
+          "id": "telha_4",
+          "hex": "#D97A48"
+        },
+        {
+          "id": "telha_5",
+          "hex": "#EC9A66"
+        }
+      ]
+    },
+    {
+      "nome": "rubi",
+      "uso": "bandeiras, botões primários da UI, barra de vida",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "rubi_1",
+          "hex": "#3A0E10"
+        },
+        {
+          "id": "rubi_2",
+          "hex": "#541717"
+        },
+        {
+          "id": "rubi_3",
+          "hex": "#7A2424"
+        },
+        {
+          "id": "rubi_4",
+          "hex": "#A8262B"
+        },
+        {
+          "id": "rubi_5",
+          "hex": "#C93A3A"
+        },
+        {
+          "id": "rubi_6",
+          "hex": "#E8574A"
+        }
+      ]
+    },
+    {
+      "nome": "ouro",
+      "uso": "molduras da UI, fivelas, detalhes metálicos quentes",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "ouro_1",
+          "hex": "#5A3A10"
+        },
+        {
+          "id": "ouro_2",
+          "hex": "#8A6A2A"
+        },
+        {
+          "id": "ouro_3",
+          "hex": "#C9A24A"
+        },
+        {
+          "id": "ouro_4",
+          "hex": "#E8C877"
+        },
+        {
+          "id": "ouro_5",
+          "hex": "#FFE9A0"
+        }
+      ]
+    },
+    {
+      "nome": "aco",
+      "uso": "lâminas, armaduras, ferragens",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "aco_1",
+          "hex": "#3A3E46"
+        },
+        {
+          "id": "aco_2",
+          "hex": "#69717B"
+        },
+        {
+          "id": "aco_3",
+          "hex": "#A9B1BA"
+        },
+        {
+          "id": "aco_4",
+          "hex": "#C9CFD7"
+        },
+        {
+          "id": "aco_5",
+          "hex": "#E6EAEE"
+        }
+      ]
+    },
+    {
+      "nome": "couro",
+      "uso": "couro, correias, botas",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "couro_1",
+          "hex": "#3E2615"
+        },
+        {
+          "id": "couro_2",
+          "hex": "#5A3A22"
+        },
+        {
+          "id": "couro_3",
+          "hex": "#7A5232"
+        },
+        {
+          "id": "couro_4",
+          "hex": "#9A6A3E"
+        }
+      ]
+    },
+    {
+      "nome": "linho",
+      "uso": "linho, pergaminho, texto da UI, faixa do Edric",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "linho_1",
+          "hex": "#A89878"
+        },
+        {
+          "id": "linho_2",
+          "hex": "#D8CCAE"
+        },
+        {
+          "id": "linho_3",
+          "hex": "#F2E6C8"
+        },
+        {
+          "id": "linho_4",
+          "hex": "#FFF8E8"
         }
       ]
     },
@@ -75,19 +366,19 @@
       "cores": [
         {
           "id": "pele_clara_1",
-          "hex": "#624441"
+          "hex": "#8E5A3E"
         },
         {
           "id": "pele_clara_2",
-          "hex": "#9e6e5c"
+          "hex": "#C48A64"
         },
         {
           "id": "pele_clara_3",
-          "hex": "#cea383"
+          "hex": "#E9B98F"
         },
         {
           "id": "pele_clara_4",
-          "hex": "#f2dec3"
+          "hex": "#F6D2AE"
         }
       ]
     },
@@ -98,19 +389,19 @@
       "cores": [
         {
           "id": "pele_media_1",
-          "hex": "#502c2a"
+          "hex": "#6A3E28"
         },
         {
           "id": "pele_media_2",
-          "hex": "#8a4f3a"
+          "hex": "#9A6244"
         },
         {
           "id": "pele_media_3",
-          "hex": "#b7805a"
+          "hex": "#C78C62"
         },
         {
           "id": "pele_media_4",
-          "hex": "#d5b899"
+          "hex": "#E2B088"
         }
       ]
     },
@@ -121,252 +412,213 @@
       "cores": [
         {
           "id": "pele_escura_1",
-          "hex": "#321616"
+          "hex": "#3E2218"
         },
         {
           "id": "pele_escura_2",
-          "hex": "#633328"
+          "hex": "#6A4030"
         },
         {
           "id": "pele_escura_3",
-          "hex": "#8b5c43"
+          "hex": "#8E5E44"
         },
         {
           "id": "pele_escura_4",
-          "hex": "#a78d76"
+          "hex": "#B07C5C"
         }
       ]
     },
     {
-      "nome": "metal_aco",
-      "uso": "armas, armaduras, ferragens",
+      "nome": "cabelo",
+      "uso": "cabelos castanhos a escuros",
       "reservada": false,
       "cores": [
         {
-          "id": "metal_aco_1",
-          "hex": "#161b23"
+          "id": "cabelo_1",
+          "hex": "#2A1A10"
         },
         {
-          "id": "metal_aco_2",
-          "hex": "#3d4956"
+          "id": "cabelo_2",
+          "hex": "#4A2E1A"
         },
         {
-          "id": "metal_aco_3",
-          "hex": "#6b7d8b"
+          "id": "cabelo_3",
+          "hex": "#7A5232"
         },
         {
-          "id": "metal_aco_4",
-          "hex": "#a2b7ae"
-        },
-        {
-          "id": "metal_aco_5",
-          "hex": "#efebde"
+          "id": "cabelo_4",
+          "hex": "#A8703F"
         }
       ]
     },
     {
-      "nome": "metal_latao",
-      "uso": "latão, bronze, ouro velho, fivelas",
+      "nome": "musgo_edric",
+      "uso": "gibão do Edric (verde-musgo azulado; escuro de propósito para separar da grama)",
       "reservada": false,
       "cores": [
         {
-          "id": "metal_latao_1",
-          "hex": "#492112"
+          "id": "musgo_edric_1",
+          "hex": "#14302C"
         },
         {
-          "id": "metal_latao_2",
-          "hex": "#7f4613"
+          "id": "musgo_edric_2",
+          "hex": "#1E3E3A"
         },
         {
-          "id": "metal_latao_3",
-          "hex": "#a9792b"
+          "id": "musgo_edric_3",
+          "hex": "#2C524C"
         },
         {
-          "id": "metal_latao_4",
-          "hex": "#d0ae66"
-        },
-        {
-          "id": "metal_latao_5",
-          "hex": "#f2e5b3"
+          "id": "musgo_edric_4",
+          "hex": "#467466"
         }
       ]
     },
     {
-      "nome": "madeira",
-      "uso": "madeira, couro, cordas",
+      "nome": "sombra_a",
+      "uso": "tinta de sombra da direção A (azul-esverdeada); nunca preto",
       "reservada": false,
       "cores": [
         {
-          "id": "madeira_1",
-          "hex": "#2c120e"
+          "id": "sombra_a_1",
+          "hex": "#12242A"
         },
         {
-          "id": "madeira_2",
-          "hex": "#5c3120"
+          "id": "sombra_a_2",
+          "hex": "#1E3A3E"
         },
         {
-          "id": "madeira_3",
-          "hex": "#875a3b"
+          "id": "sombra_a_3",
+          "hex": "#2E4A44"
         },
         {
-          "id": "madeira_4",
-          "hex": "#ae8865"
-        },
-        {
-          "id": "madeira_5",
-          "hex": "#cfba9e"
+          "id": "sombra_a_4",
+          "hex": "#3E5E58"
         }
       ]
     },
     {
-      "nome": "pedra",
-      "uso": "pedra, alvenaria, rocha",
+      "nome": "luz_fogo",
+      "uso": "tochas, lanternas, forja, janelas acesas, brasas",
       "reservada": false,
       "cores": [
         {
-          "id": "pedra_1",
-          "hex": "#22232d"
+          "id": "luz_fogo_1",
+          "hex": "#B83A14"
         },
         {
-          "id": "pedra_2",
-          "hex": "#444a59"
+          "id": "luz_fogo_2",
+          "hex": "#E8641E"
         },
         {
-          "id": "pedra_3",
-          "hex": "#697686"
+          "id": "luz_fogo_3",
+          "hex": "#FF9A3A"
         },
         {
-          "id": "pedra_4",
-          "hex": "#92a79e"
+          "id": "luz_fogo_4",
+          "hex": "#FFD27A"
         },
         {
-          "id": "pedra_5",
-          "hex": "#d7d0c4"
+          "id": "luz_fogo_5",
+          "hex": "#FFF2C8"
         }
       ]
     },
     {
-      "nome": "vegetacao",
-      "uso": "grama, folhas, musgo",
-      "reservada": false,
+      "nome": "sino_aqua",
+      "uso": "RESERVADA: Sino de Cobre, marca do Edric, rito da Bênção (azul-esverdeado)",
+      "reservada": true,
       "cores": [
         {
-          "id": "vegetacao_1",
-          "hex": "#012020"
+          "id": "sino_aqua_1",
+          "hex": "#1E5A5A"
         },
         {
-          "id": "vegetacao_2",
-          "hex": "#01523c"
+          "id": "sino_aqua_2",
+          "hex": "#3A9A92"
         },
         {
-          "id": "vegetacao_3",
-          "hex": "#478638"
+          "id": "sino_aqua_3",
+          "hex": "#7AD8C8"
         },
         {
-          "id": "vegetacao_4",
-          "hex": "#97b55f"
-        },
-        {
-          "id": "vegetacao_5",
-          "hex": "#e1e3a7"
+          "id": "sino_aqua_4",
+          "hex": "#C8F5EA"
         }
       ]
     },
     {
-      "nome": "terra",
-      "uso": "chão de terra, trilhas, barro",
+      "nome": "ui_madeira",
+      "uso": "fundo e bordas internas dos painéis de UI",
       "reservada": false,
       "cores": [
         {
-          "id": "terra_1",
-          "hex": "#3e2820"
+          "id": "ui_madeira_1",
+          "hex": "#1E140C"
         },
         {
-          "id": "terra_2",
-          "hex": "#704d37"
+          "id": "ui_madeira_2",
+          "hex": "#2A1E14"
         },
         {
-          "id": "terra_3",
-          "hex": "#9a7c5d"
+          "id": "ui_madeira_3",
+          "hex": "#3A2818"
         },
         {
-          "id": "terra_4",
-          "hex": "#bdaf98"
+          "id": "ui_madeira_4",
+          "hex": "#5A4028"
+        },
+        {
+          "id": "ui_madeira_5",
+          "hex": "#7A5A3A"
         }
       ]
     },
     {
       "nome": "perigo",
-      "uso": "RESERVADA: golpe vindo no mundo (avisos, zonas de dano); nunca na UI",
+      "uso": "RESERVADA: golpe vindo no mundo (telegraph, zona de dano); nunca na UI",
       "reservada": true,
       "cores": [
         {
           "id": "perigo_1",
-          "hex": "#6d2073"
+          "hex": "#6D2073"
         },
         {
           "id": "perigo_2",
-          "hex": "#dd48d6"
+          "hex": "#DD48D6"
         },
         {
           "id": "perigo_3",
-          "hex": "#ff65e0"
+          "hex": "#FF65E0"
         },
         {
           "id": "perigo_4",
-          "hex": "#fed8ec"
+          "hex": "#FED8EC"
         }
       ]
     },
     {
       "nome": "brilho",
-      "uso": "RESERVADA: interativos, coletáveis, luz de destaque",
+      "uso": "RESERVADA: interativos, coletáveis, foco da UI",
       "reservada": true,
       "cores": [
         {
           "id": "brilho_1",
-          "hex": "#fcd176"
+          "hex": "#FCD176"
         },
         {
           "id": "brilho_2",
-          "hex": "#ffe79d"
+          "hex": "#FFE79D"
         },
         {
           "id": "brilho_3",
-          "hex": "#fffad8"
-        }
-      ]
-    },
-    {
-      "nome": "ui",
-      "uso": "painéis, bordas, texto e foco da interface",
-      "reservada": false,
-      "cores": [
-        {
-          "id": "ui_1",
-          "hex": "#211209",
-          "papel": "painel"
-        },
-        {
-          "id": "ui_2",
-          "hex": "#886b56",
-          "papel": "borda"
-        },
-        {
-          "id": "ui_3",
-          "hex": "#d3b89e",
-          "papel": "texto_secundario"
-        },
-        {
-          "id": "ui_4",
-          "hex": "#fdf0dc",
-          "papel": "texto"
+          "hex": "#FFFAD8"
         }
       ]
     },
     {
       "nome": "alerta_ui",
-      "uso": "RESERVADA: só UI/HUD (erro, vida baixa), sempre com forma + ícone + texto",
+      "uso": "RESERVADA: só UI/HUD (erro, vida baixa), sempre com ícone + texto",
       "reservada": true,
       "cores": [
         {
@@ -375,24 +627,94 @@
         },
         {
           "id": "alerta_ui_2",
-          "hex": "#f44d21"
+          "hex": "#F44D21"
         }
       ]
+    }
+  ],
+  "luz_por_hora": [
+    {
+      "id": "manha",
+      "nome": "manhã (orvalho)",
+      "grade_multiply": "#FFE8CC",
+      "sombra_projetada": "rgba(24,40,44,0.36)",
+      "nevoa_cor": "#DDE8E0",
+      "nevoa_densidade": 0.1,
+      "sombra_comprimento": 1.4,
+      "luzes_artificiais": 0.0,
+      "particulas": "orvalho, pólen"
+    },
+    {
+      "id": "dia",
+      "nome": "dia (C)",
+      "grade_multiply": "#FFFFFF",
+      "sombra_projetada": "rgba(20,30,10,0.35)",
+      "nevoa_cor": "#E6EEF0",
+      "nevoa_densidade": 0.05,
+      "sombra_comprimento": 0.8,
+      "luzes_artificiais": 0.0,
+      "particulas": "pétalas, borboletas"
+    },
+    {
+      "id": "tarde",
+      "nome": "fim de tarde (A, hora-base)",
+      "grade_multiply": "#FFC892",
+      "sombra_projetada": "rgba(18,46,48,0.42)",
+      "nevoa_cor": "#F2D3A0",
+      "nevoa_densidade": 0.14,
+      "sombra_comprimento": 1.6,
+      "luzes_artificiais": 0.35,
+      "particulas": "poeira dourada, folhas"
+    },
+    {
+      "id": "crepusculo",
+      "nome": "crepúsculo",
+      "grade_multiply": "#E0A890",
+      "sombra_projetada": "rgba(24,36,60,0.46)",
+      "nevoa_cor": "#B8A8C8",
+      "nevoa_densidade": 0.16,
+      "sombra_comprimento": 1.8,
+      "luzes_artificiais": 0.8,
+      "particulas": "vaga-lumes, brasas"
+    },
+    {
+      "id": "noite",
+      "nome": "noite (B)",
+      "grade_multiply": "#5F6B98",
+      "sombra_projetada": "rgba(10,14,34,0.50)",
+      "nevoa_cor": "#6A78A8",
+      "nevoa_densidade": 0.12,
+      "sombra_comprimento": 0.5,
+      "luzes_artificiais": 1.0,
+      "particulas": "vaga-lumes, brasas, fumaça"
     }
   ],
   "validacao": {
     "erros": [],
     "avisos": [],
     "relatorio": [
-      "Total de cores: 64",
-      "Contraste ui texto x painel: 16.17:1 (mín 7.0)",
-      "Contraste ui texto_secundario x painel: 9.63:1 (mín 4.5)",
-      "Contraste ui borda x painel: 3.71:1 (mín 3.0)",
-      "Pior distância perigo x chão (ΔE OKLab): 0.125 em perigo_2 x pedra_3 (deuteranopia) (mín 0,10)",
-      "Pior distância brilho x chão (ΔE OKLab): 0.115 em brilho_1 x vegetacao_4 (protanopia) (mín 0,10)",
-      "Pior distância perigo x brilho (ΔE OKLab): 0.187 em perigo_3 x brilho_1 (tritanopia) (mín 0,10)",
-      "Contraste alerta_ui_2 x painel: 5.13:1 (mín 4.5)",
-      "Pior distância alerta_ui x perigo/brilho (ΔE OKLab): 0.104 em alerta_ui_2 x perigo_2 (tritanopia) (mín 0,10)"
+      "Total: 111 cores em 25 rampas",
+      "Contraste texto (linho_3) x painel #2A1E14: 13.08:1 (mín 7.0)",
+      "Contraste texto secundário (linho_2) x painel #2A1E14: 10.17:1 (mín 4.5)",
+      "Contraste borda (ouro_3) x painel #2A1E14: 6.76:1 (mín 3.0)",
+      "Contraste destaque (ouro_5) x painel #2A1E14: 13.46:1 (mín 7.0)",
+      "Contraste alerta_ui_2 x painel: 4.58:1 (mín 4.5)",
+      "Pior ΔE perigo (enchimento perigo_2) x chão (4 modos de visão): 0.122 em perigo_2 x terra_4 (mín 0.1)",
+      "Pior ΔE perigo (realce perigo_3, informativo) x chão (4 modos de visão): 0.094 em perigo_3 x pedra_4 (mín 0.0)",
+      "Pior ΔE brilho x chão (4 modos de visão): 0.105 em brilho_1 x grama_6 (mín 0.1)",
+      "Pior ΔE perigo x vermelhos/laranjas do cenário: 0.121 em perigo_2 x rubi_5 (mín 0.10)",
+      "ΔE perigo_3 x brilho_1: 0.187",
+      "ΔE alerta_ui_2 x perigo_2: 0.104",
+      "ΔE alerta_ui_2 x brilho_1: 0.220",
+      "ΔE alerta_ui_2 x rubi_4: 0.147",
+      "musgo_edric_2 x chão: ΔL mín 0.193 · ΔE mín (4 modos) 0.188",
+      "musgo_edric_3 x chão: ΔL mín 0.122 · ΔE mín (4 modos) 0.121",
+      "Luminância do grade de noite: 0.152 (protótipo no auge da noite: 0.149; mín = protótipo)",
+      "Grade manha: #FFE8CC (luminância 0.833)",
+      "Grade dia: #FFFFFF (luminância 1.000)",
+      "Grade tarde: #FFC892 (luminância 0.646)",
+      "Grade crepusculo: #E0A890 (luminância 0.459)",
+      "Grade noite: #5F6B98 (luminância 0.152)"
     ]
   }
 }

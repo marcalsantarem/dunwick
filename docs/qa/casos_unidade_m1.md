@@ -1,5 +1,7 @@
 # Casos de unidade derivados de `formulas.md` (TC-FRM)
 
+> **⚠️ D-024:** valores e IDs abaixo vêm do `formulas.md`/`gameplay.md` v0.2 do esqueleto cinza. **[a atualizar D-024]** quando o 06 reconciliar com o protótipo (vida 100, fôlego 100, dano 12, combo 12/14/20, crítico 10 %). Continua valendo o método: exemplos resolvidos viram testes de função pura. Ver [impacto_d024.md](impacto_d024.md) (N-08: crítico e semente).
+
 > **Status:** RASCUNHO v0.1 · Dono: 09 QA · 2026-10-24 · Fonte: `docs/sistemas/formulas.md` v0.1 (06). Critério: M1-22b.
 > Cada linha é um caso de teste automático de **função pura** (entrada → saída), sem render. O 03 implementa; o 09 confere os resultados e os arredondamentos. A execução depende do executor de testes [aguarda 08].
 > Convenção: `arred(x) = piso(x + 0,5)` (formulas §0), com tolerância de ponto flutuante.

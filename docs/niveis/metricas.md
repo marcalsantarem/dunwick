@@ -1,5 +1,7 @@
 # Métricas de nível e sala de teste do M1
 
+> ⚠ **A ATUALIZAR (D-024, 2026-10-24):** tile de 32 px, câmera a 35°, velocidades 3,5 / 6 e a sala 48×32 caem (protótipo: tile isométrico 64×32, 1280×720, 2,2 / 3,5 tiles/s). O que fica e o que muda está em `docs/sistemas/reconciliacao_prototipo.md` §6. Os números do chefe da §9 também mudam (§4 de lá).
+
 > **Dono:** 06 Sistemas e Níveis · **Status:** RASCUNHO v0.1 (BRF-004, onda 0) · 2026-10-24
 > Alinhado com `docs/gameplay.md` v0.1 (03): mesmos nomes de chave. Valores iniciais, que o playtest ajusta.
 > Fórmulas e números de combate: `docs/sistemas/formulas.md`. Formato final em `data/maps/` = ADR-001 (08); até lá, tabelas.

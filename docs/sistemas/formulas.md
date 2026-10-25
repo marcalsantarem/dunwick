@@ -1,5 +1,7 @@
 # Fórmulas, atributos, recursos, dano e estados
 
+> ⚠ **A ATUALIZAR (D-024, 2026-10-24):** a direção passou a ser a do protótipo "Vale de Dunwick". Atributos, mana, golpe forte, vida inicial, esquiva e crítico mudam. A proposta está em `docs/sistemas/reconciliacao_prototipo.md`. Este documento vale como estava até o usuário responder às perguntas da §7 dela.
+
 > **Dono:** 06 Sistemas e Níveis · **Status:** RASCUNHO v0.1 (BRF-004, onda 0) · 2026-10-24
 > **Fonte única** de toda fórmula do jogo. O 03 implementa daqui; o 09 transforma os exemplos resolvidos em testes.
 > Respeita: D-004 (sem vocações; kit fixo, habilidades por ID), D-005 (só Normal, multiplicadores expostos), D-007 (**sem dano aleatório nem crítico**, sem bloqueio/aparar, combo leve 3 + forte, 3 habilidades).

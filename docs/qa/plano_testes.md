@@ -1,5 +1,7 @@
 # Plano de testes — Dunwick (nome provisório)
 
+> **⚠️ D-024 (2026-10-24): mudança de direção** (isométrico 2:1, 1280×720, protótipo do usuário). **[mantém]:** princípios, pirâmide, matriz de navegadores, §6.5 save, §6.6 navegador, §6.9 soft-lock, §8 playtests (formato), §9 bugs. **[a atualizar D-024]:** §2.1 máquina e nº de tiles, §4.1 modo debug, §5 faixas TC-MOV/TC-CMB/TC-VIS/TC-DBG, §6.1 combate (quadros, valores), §6.2 câmera 35°, §6.3 visual (pixel 1×/2×/3×, normal map, DoF) e §6.7 desempenho (cena e resolução). Critérios novos de carregamento, nitidez a 1280×720, dia/noite, câmera isométrica e combate: [impacto_d024.md](impacto_d024.md).
+
 > **Status:** RASCUNHO v0.1 (BRF-006, onda 0) · Dono: 09 QA · 2026-10-24
 > Ainda não há stack nem build. O que depende do ADR-001 está marcado **[aguarda 08]**.
 > Critérios de passa/não passa por marco: [criterios_marcos.md](criterios_marcos.md). Roteiro de playtest do M1: [playtests/roteiro_m1.md](playtests/roteiro_m1.md).

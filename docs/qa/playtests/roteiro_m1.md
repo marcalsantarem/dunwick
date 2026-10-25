@@ -1,5 +1,7 @@
 # Roteiro de playtest — M1 (protótipo cinza)
 
+> **⚠️ D-024:** controles, sala e bonecos deste roteiro são do esqueleto cinza. **[a atualizar D-024]** para WASD/Shift/Espaço/Q/E/Ctrl, a praça de Baixo Orvalho e os inimigos do protótipo. O formato (≤ 15 min, questionário de sensação, ficha) **[mantém]**. Ver [../impacto_d024.md](../impacto_d024.md).
+
 > **Status:** RASCUNHO v0.1 (BRF-006) · Dono: 09 QA · 2026-10-24
 > **Jogador:** o usuário (padrão D-006: usuário + bots). **Duração:** ≤ 15 min.
 > **Pergunta do marco:** andar e atacar são gostosos? A câmera incomoda?
