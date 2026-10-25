@@ -168,3 +168,7 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Resumo dos nomes fixados:** Edric Moss · Baixo Orvalho · Mor-Allen · Valmora · Oswin Cathe · Ondric · Ysolt Brum · Grace · Torvan Keel · Maren · Hollowpaw · O Sino de Cobre · A Guarda de Mor-Allen.
 - **Pendentes:** nome do mal gigante e nome do jogo ("Dunwick" provisório). Checagem formal de marca no M6 (Valmora lembra o jogo indie "Legend of Valmorra"; risco baixo-médio).
 - O 02 atualiza a ficha do urso e os textos com os nomes decididos (será avisado junto com o próximo pacote, para não gastar mensagem).
+
+## D-022 — Máquina de referência (2026-10-24)
+- **Informada pelo usuário:** AMD Ryzen 3 5300G (4 núcleos, 8 threads, 4,0 GHz), gráfico integrado Radeon, 2 × 16 GB DDR4 3200 MHz, SSD SATA 480 GB, fonte 500 W. **É a mesma máquina em que o 08 mediu os spikes e o esqueleto M1**, então os números do ADR-001 já valem para ela.
+- Efeito: a máquina de referência passa a ser **oficial**; "computador intermediário" = esta. Continuam pendentes: navegador que o usuário usa (assumido Chrome) e se há Mac/Safari.
