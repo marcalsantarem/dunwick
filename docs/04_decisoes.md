@@ -179,3 +179,11 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Os 5 inimigos comuns (aceitos):** 1) **Morcego** (caverna, Rápido) · 2) **Slime** (caverna, Emboscador) · 3) **Besouro-couraça** (caverna, Pesado) · 4) **Lobo** (estrada, Combatente) · 5) **Goblin arqueiro** (estrada, Atirador). IDs sugeridos: `enemy_morcego`, `enemy_slime`, `enemy_besouro`, `enemy_lobo`, `enemy_goblin_arqueiro` (06 confirma).
 - **Efeito:** a "gente da estrada" deixa de ser saqueadores humanos arruinados por taxas; a piada da burocracia fica nos NPCs e nas secundárias. 02 ajusta a Bíblia do Mundo (§7) e os textos; 06 cria as fichas (arquétipos Rápido, Emboscador, Pesado, Combatente, Atirador) e 04/10 definem o visual.
 - O 02 e o 06 ainda não foram avisados (junto com o próximo pacote).
+
+## D-024 — Mudança de direção: gráfico e jogabilidade a partir do protótipo (2026-10-24)
+- **Usuário:** não gostou do esqueleto cinza em Three.js (gráfico e jogabilidade). Passou o protótipo **"Vale de Dunwick"** (https://dunwick.netlify.app; cópia em `referencia/prototipo/index.html`; análise em `referencia/analise_prototipo.md`). Quer **aquela ideia, mais bonita e polida**, **sprites bem feitas**, **cenário e UI melhores**, a **jogabilidade do protótipo**, e que o **esqueleto seja refeito**.
+- **Protótipo localizado:** substitui D-001 (que dizia não haver protótipo). A regra "ler o protótipo antes de decidir a stack" passa a valer: **D-016 (Three.js, 640×360, ortográfica 35°) fica em revisão**; o 08 propõe o **ADR-002**.
+- **Em revisão (a confirmar após as respostas dos agentes e do 08):** câmera 3/4 a 35° → **isométrica 2:1**; 32×32 px/tile e 640×360 → **tile 64×32 isométrico, 1280×720**; "pixel art 16-bit em 3D" → visual **do protótipo**; D-007 "sem crítico" (o protótipo tem 10 %); `CLAUDE.md` e Bíblia v1 serão atualizados quando o ADR-002 for aceito.
+- **Continua valendo:** história e nomes (D-013 a D-023), 16 anos, direção A Lanterna e Musgo (combinada com o protótipo pelo 10), telegraph obrigatório, passo fixo, dados fora do código, tudo gerado por código, escopo do slice.
+- **O que fica obsoleto:** o esqueleto `src/motor` em Three.js e os placeholders cinza (o 08 decide o que reaproveitar: laço, dados, testes, debug).
+- Briefing: `docs/briefings/BRF-011_mudanca-direcao-prototipo.md`.
