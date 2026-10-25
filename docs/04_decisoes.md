@@ -196,3 +196,7 @@ Respostas do usuário às perguntas t, u, v do 02:
 
 ## D-026 — Vila sem ciclo de dia e noite no slice (2026-10-24)
 - **Decisão (usuário, opção A):** a vila usa **estados fixos** (dia, adormecida, acordada), com um **entardecer** como luz da direção A. **Sem ciclo de dia e noite contínuo** no slice; o ciclo completo fica para depois do slice.
+
+## D-027 — Esqueleto isométrico aprovado como primeira versão (2026-10-25)
+- **Usuário (testou em casa, no Chrome):** gostou bastante do esqueleto isométrico HD-2D como **versão inicial**. **Pendências de qualidade:** **melhorar a animação** e **refinar os gráficos**. Para uma primeira versão do slice, "está bem válido".
+- **Efeito:** o rumo visual (isométrico, HD-2D, praça de Baixo Orvalho) está **aprovado**; o ADR-002 (medições comparativas) segue adiado; a polimento de animação e gráfico entra no backlog P1 para antes do M2.
