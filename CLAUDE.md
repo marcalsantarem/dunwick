@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual do repositório
 
-Ainda **não há código, build nem testes**. O repositório contém apenas `agentes-rpg/`: 10 documentos que definem os "agentes" (papéis) do time que vai produzir o jogo. Não é repositório git. Quando a stack for escolhida (ADR-001 do agente 08), adicione aqui os comandos de build, lint, testes (incluindo como rodar um teste isolado) e validadores.
+Há código: **esqueleto M1** (Three.js, ADR-001 aceito em D-016). Comandos: `npm install`; `npm run dev` (http://localhost:5173, debug ligado); `npm test` (node:test; um arquivo: `node --test tests/heroi.test.mjs`; um teste: `--test-name-pattern`); `npm run validar` (dados + assets); `npm run build` (validar → testes → empacotar → peso, saída em `build/prod`); `npm run test:navegador` (Chrome real; `-- --medir=60`). Detalhes em `docs/tecnico/esqueleto_m1.md`. `src/jogo/` é simulação pura (sem three/DOM); `src/motor/` é a única camada que importa `three`. Geradores de assets em JavaScript/Node (sem Python). Documentos dos agentes em `agentes-rpg/`; decisões em `docs/04_decisoes.md`; a Bíblia aprovada em `docs/00_biblia_projeto.md`. O repositório é git.
 
 Idioma do projeto: **português do Brasil** (documentos, textos e comunicação).
 
@@ -48,7 +48,7 @@ Ordem de dependências: Produtor (Bíblia + escopo) → 08 (spec + esqueleto) / 
 
 ## Convenções compartilhadas
 
-- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`).
+- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`, `atk_`, `cfg_`, `perfil_`, `z_`).
 - **Densidade única:** 1 tile = 1 unidade do mundo = 32×32 px de arte, em sprites, texturas, UI e efeitos. Escala inteira, sem filtro/suavização.
 - Sprites: célula 64×64 (herói/NPC), âncora nos pés (ex.: 32,60), 4 direções (S, N, L desenhadas; O espelhada), 8–12 fps, alpha só 0/255, pouca sombra pintada (a luz vem da cena via normal map).
 - Distâncias em **tiles** e **segundos**; tempos de combate em **quadros a 60 Hz**.
