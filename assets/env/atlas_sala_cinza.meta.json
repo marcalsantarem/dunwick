@@ -1,0 +1,10 @@
+{
+  "tile": 32,
+  "colunas": 4,
+  "tiles": [
+    "piso",
+    "parede",
+    "plataforma",
+    "rampa"
+  ]
+}

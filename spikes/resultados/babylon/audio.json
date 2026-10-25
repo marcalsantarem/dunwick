@@ -1,0 +1,70 @@
+{
+ "info": {
+  "renderer": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "webgl2": true
+ },
+ "estado": {
+  "audio": {
+   "estadoInicial": "suspended",
+   "desbloqueioMs": 26.3,
+   "formatos": {
+    "wav": {
+     "bytes": 384044,
+     "amostras": 96000,
+     "diferencaAmostras": 0,
+     "saltoNaEmenda": 0.0288,
+     "passoNormalMax": 0.0288,
+     "semEmenda": true
+    },
+    "ogg": {
+     "bytes": 30074,
+     "amostras": 96000,
+     "diferencaAmostras": 0,
+     "saltoNaEmenda": 0.0311,
+     "passoNormalMax": 0.0292,
+     "semEmenda": false
+    },
+    "webm": {
+     "bytes": 30918,
+     "amostras": 96000,
+     "diferencaAmostras": 0,
+     "saltoNaEmenda": 0.0311,
+     "passoNormalMax": 0.0292,
+     "semEmenda": false
+    },
+    "mp3": {
+     "bytes": 33069,
+     "amostras": 96000,
+     "diferencaAmostras": 0,
+     "saltoNaEmenda": 0.0301,
+     "passoNormalMax": 0.0274,
+     "semEmenda": false
+    },
+    "m4a": {
+     "bytes": 33616,
+     "amostras": 96000,
+     "diferencaAmostras": 0,
+     "saltoNaEmenda": 0.0448,
+     "passoNormalMax": 0.0297,
+     "semEmenda": false
+    }
+   },
+   "camadas": {
+    "bytesA": 510569,
+    "bytesB": 513877,
+    "decodMsA": 110,
+    "duracaoS": 32,
+    "mesmaDuracao": true,
+    "maiorPassoNaTroca": 0.1695
+   },
+   "pausaAba": null,
+   "estadoAposGesto": "running",
+   "prontoMs": 270
+  },
+  "audioInicial": "suspended"
+ },
+ "erros": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ]
+}

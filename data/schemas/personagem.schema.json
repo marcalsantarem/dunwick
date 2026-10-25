@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/personagem",
+  "title": "Herói jogável (movimento e caixas; combate é do 03)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "sprite", "movimento", "caixas"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^hero_[a-z0-9_]+$" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "sprite": { "type": "string", "pattern": "^[a-z]+_[a-z0-9_]+$" },
+    "movimento": {
+      "type": "object", "additionalProperties": false, "required": ["vel_andar", "vel_correr", "aceleracao_s", "freada_s"],
+      "properties": {
+        "vel_andar": { "type": "number", "exclusiveMinimum": 0, "maximum": 20 },
+        "vel_correr": { "type": "number", "exclusiveMinimum": 0, "maximum": 30 },
+        "aceleracao_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "freada_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "caixas": {
+      "type": "object", "additionalProperties": false, "required": ["pushbox_raio_tiles", "hurtbox_raio_tiles", "hurtbox_altura_tiles"],
+      "properties": {
+        "pushbox_raio_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "hurtbox_raio_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+        "hurtbox_altura_tiles": { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0 }, { "type": "number", "exclusiveMinimum": 0 }], "items": false, "minItems": 2 }
+      }
+    },
+    "luz": {
+      "type": "object", "additionalProperties": false, "required": ["cor", "intensidade", "alcance_tiles", "altura_tiles"],
+      "properties": {
+        "cor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "intensidade": { "type": "number", "minimum": 0 },
+        "alcance_tiles": { "type": "number", "exclusiveMinimum": 0 },
+        "altura_tiles": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}

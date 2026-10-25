@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_orcamento",
+  "title": "Orçamento de peso (ADR-001 §7)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "download_inicial_mb", "audio_inicial_mb", "codigo_brotli_kb", "dados_kb", "por_entidade_kb"],
+  "properties": {
+    "id": { "const": "cfg_orcamento" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "origem": { "type": "string" },
+    "download_inicial_mb": { "type": "number", "exclusiveMinimum": 0 },
+    "audio_inicial_mb": { "type": "number", "exclusiveMinimum": 0 },
+    "codigo_brotli_kb": { "type": "number", "exclusiveMinimum": 0 },
+    "dados_kb": { "type": "number", "exclusiveMinimum": 0 },
+    "por_entidade_kb": { "type": "number", "exclusiveMinimum": 0 }
+  }
+}

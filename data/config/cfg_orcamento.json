@@ -1,0 +1,10 @@
+{
+  "id": "cfg_orcamento",
+  "versao": 1,
+  "origem": "ADR-001 §7 (proposta; confirmar no M1 com arte real)",
+  "download_inicial_mb": 10,
+  "audio_inicial_mb": 2.5,
+  "codigo_brotli_kb": 500,
+  "dados_kb": 256,
+  "por_entidade_kb": 80
+}

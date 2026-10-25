@@ -1,0 +1,15 @@
+# Dependências e saídas geradas (nunca versionar)
+node_modules/
+build/
+*.log
+
+# Arquivos locais
+.DS_Store
+Thumbs.db
+.env
+.env.*
+
+# Spikes (BRF-001): o código fica, as dependências e as saídas regeneráveis não
+spikes/node_modules/
+spikes/dist/
+spikes/assets/

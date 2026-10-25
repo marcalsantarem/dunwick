@@ -1,0 +1,40 @@
+{
+ "opcao": "three",
+ "query": "spike=diorama&perfil=baixo&escala=3&luzes=4&hud=0&pos=",
+ "maquina": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+ "chrome": "Chrome/155.0.8059.85",
+ "downloadKB": 1014,
+ "requisicoes": 10,
+ "tempoAteTelaMs": 1466,
+ "quadros": 1130,
+ "segundos": 6.02,
+ "fpsMedio": 187.8,
+ "fpsPior1": 96.9,
+ "p99ms": 10.2,
+ "quadrosAcima22ms": 0,
+ "cpuMedianaMs": 5.1,
+ "cpuP99Ms": 9.9,
+ "chamadasDesenho": 34,
+ "triangulos": 15377,
+ "heapJsMB": 10.4,
+ "ticks": 518,
+ "estado": {
+  "primeiraTelaMs": 1425,
+  "montagemMs": 462,
+  "modulos": 30,
+  "pos": [],
+  "versao": "186"
+ },
+ "gl": {
+  "geometries": 34,
+  "textures": 12,
+  "programas": 11,
+  "internaResolucao": [
+   1920,
+   1080
+  ]
+ },
+ "erros": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ]
+}

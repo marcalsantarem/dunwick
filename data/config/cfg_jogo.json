@@ -1,0 +1,43 @@
+{
+  "id": "cfg_jogo",
+  "versao": 1,
+  "passo_logico_hz": 60,
+  "max_passos_por_quadro": 5,
+  "resolucao_interna": [
+    640,
+    360
+  ],
+  "pixels_por_tile": 32,
+  "camera": {
+    "angulo_graus": 35,
+    "area_tiles": [
+      20,
+      11.25
+    ],
+    "suavizacao_s": 0.15,
+    "antecipacao_tiles": 1.0,
+    "zona_morta_tiles": 0.25,
+    "distancia": 40,
+    "near": 1,
+    "far": 120,
+    "oclusao_alpha": 0.35,
+    "oclusao_raio_tiles": 2.6
+  },
+  "entrada": {
+    "buffer_entrada_quadros": 7,
+    "zona_morta_analogico": 0.2,
+    "direcoes_movimento": 8,
+    "correr_modo": "segurar"
+  },
+  "mundo": {
+    "degrau_max_tiles": 0.4,
+    "colisao_iteracoes": 4
+  },
+  "regras": {
+    "aviso_min_comum_quadros": 18
+  },
+  "debug": {
+    "lento_fator": 0.25,
+    "gravacao_max_s": 300
+  }
+}

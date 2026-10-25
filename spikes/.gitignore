@@ -1,0 +1,12 @@
+node_modules/
+dist/
+assets/
+resultados/*/*.png
+!resultados/*/res_*.png
+!resultados/*/sprite_*.png
+!resultados/*/nit_e3_orto_snap1_mov0_nativa.png
+!resultados/*/nit_e2_orto_snap1_mov0_nativa.png
+!resultados/*/nit_e1_orto_snap1_mov0_nativa.png
+!resultados/*/multidao_alto.png
+!resultados/*/diorama_alto.png
+resultados/teste.png

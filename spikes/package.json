@@ -1,0 +1,19 @@
+{
+  "name": "dunwick-spikes",
+  "private": true,
+  "type": "module",
+  "description": "Spikes do ADR-001 (BRF-001). Código descartável, não é o esqueleto do jogo.",
+  "scripts": {
+    "placeholders": "node ferramentas/gerar_placeholders.mjs",
+    "build": "node ferramentas/build.mjs",
+    "servir": "node ferramentas/servidor.mjs",
+    "medir": "node ferramentas/medir.mjs"
+  },
+  "devDependencies": {
+    "three": "0.186.1",
+    "@babylonjs/core": "9.32.0",
+    "playcanvas": "2.23.3",
+    "esbuild": "0.28.2",
+    "puppeteer-core": "25.16.0"
+  }
+}

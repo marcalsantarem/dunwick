@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/textos",
+  "title": "Tabela de textos por idioma (ID → string com {variaveis})",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "idioma", "versao", "textos"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^txt_tabela_[a-z_]+$" },
+    "idioma": { "type": "string", "pattern": "^[a-z]{2}-[A-Z]{2}$" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "textos": {
+      "type": "object",
+      "propertyNames": { "pattern": "^(txt|ui)_[a-z0-9_]+$" },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    }
+  }
+}

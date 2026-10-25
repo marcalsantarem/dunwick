@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_entrada",
+  "title": "Mapeamento de entrada por ações lógicas",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "eixos", "acoes", "debug"],
+  "$defs": {
+    "tecla": { "type": "string", "pattern": "^(Key[A-Z]|Digit[0-9]|F[0-9]{1,2}|Arrow(Up|Down|Left|Right)|Space|Enter|Escape|Backspace|Tab|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|mouse:[0-4])$" },
+    "botao": { "type": "string", "pattern": "^botao:([0-9]|1[0-6])$" },
+    "teclas": { "type": "array", "items": { "$ref": "#/$defs/tecla" }, "uniqueItems": true }
+  },
+  "properties": {
+    "id": { "const": "cfg_entrada" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "eixos": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false, "required": ["contexto", "teclado", "gamepad"],
+        "properties": {
+          "contexto": { "enum": ["jogo", "telas"] },
+          "teclado": {
+            "type": "object", "additionalProperties": false, "required": ["cima", "baixo", "esquerda", "direita"],
+            "properties": { "cima": { "$ref": "#/$defs/teclas" }, "baixo": { "$ref": "#/$defs/teclas" }, "esquerda": { "$ref": "#/$defs/teclas" }, "direita": { "$ref": "#/$defs/teclas" } }
+          },
+          "gamepad": {
+            "type": "object", "additionalProperties": false, "required": ["eixo_x", "eixo_z"],
+            "properties": { "eixo_x": { "type": "integer", "minimum": 0, "maximum": 3 }, "eixo_z": { "type": "integer", "minimum": 0, "maximum": 3 } }
+          }
+        }
+      }
+    },
+    "acoes": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false, "required": ["contexto", "tipo", "teclado", "gamepad"],
+        "properties": {
+          "contexto": { "enum": ["jogo", "telas"] },
+          "tipo": { "enum": ["apertar", "segurar"] },
+          "buffer": { "type": "boolean" },
+          "teclado": { "$ref": "#/$defs/teclas" },
+          "gamepad": { "type": "array", "items": { "$ref": "#/$defs/botao" }, "uniqueItems": true }
+        }
+      }
+    },
+    "debug": {
+      "type": "object",
+      "propertyNames": { "pattern": "^debug_[a-z]+$" },
+      "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["teclado"], "properties": { "teclado": { "$ref": "#/$defs/teclas" } } }
+    }
+  }
+}
