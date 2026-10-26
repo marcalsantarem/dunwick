@@ -6,11 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Há código: **esqueleto M1** (Three.js, ADR-001 aceito em D-016). Comandos: `npm install`; `npm run dev` (http://localhost:5173, debug ligado); `npm test` (node:test; um arquivo: `node --test tests/heroi.test.mjs`; um teste: `--test-name-pattern`); `npm run validar` (dados + assets); `npm run build` (validar → testes → empacotar → peso, saída em `build/prod`); `npm run test:navegador` (Chrome real; `-- --medir=60`). Detalhes em `docs/tecnico/esqueleto_m1.md`. `src/jogo/` é simulação pura (sem three/DOM); `src/motor/` é a única camada que importa `three`. Geradores de assets em JavaScript/Node (sem Python). Documentos dos agentes em `agentes-rpg/`; decisões em `docs/04_decisoes.md`; a Bíblia aprovada em `docs/00_biblia_projeto.md`. O repositório é git.
 
+**Atenção (D-028):** o combate de ação em tempo real foi arquivado em `docs/arquivo/combate_acao/` e na tag `combate-acao-v1`. Trechos abaixo sobre passo fixo de 60 Hz, quadros, telegraph e esquiva valem para a exploração e para um possível modo de ação futuro; o combate por turnos será especificado depois.
+
 Idioma do projeto: **português do Brasil** (documentos, textos e comunicação).
 
 ## O projeto
 
-RPG de ação em tempo real, fantasia medieval **original**, single-player, **no navegador**. Sprites em pixel art 16-bit (compactos, cabeça grande) dentro de cenários 3D com luz dinâmica, sombras, profundidade de campo, névoa e partículas (estilo "diorama"/HD-2D). Câmera 3/4 fixa (≈30–45°); movimento de câmera só em cenas e golpes especiais.
+RPG **de combate por turnos** (D-028, estilo Breath of Fire; mundo isométrico), fantasia medieval **original**, single-player, **no navegador**. Sprites em pixel art 16-bit (compactos, cabeça grande) dentro de cenários 3D com luz dinâmica, sombras, profundidade de campo, névoa e partículas (estilo "diorama"/HD-2D). Câmera 3/4 fixa (≈30–45°); movimento de câmera só em cenas e golpes especiais.
 
 **Meta atual (vertical slice):** 1 vila, 1 região aberta, 1 masmorra, 1 herói, 5 inimigos, 1 chefe, 3–5 missões, save. Nada de P2/P3 antes do slice.
 

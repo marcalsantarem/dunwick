@@ -10,5 +10,5 @@
 - **Preparar agora (barato):** manter habilidades por ID desacopladas do herói (já em D-004), e o save guardar contadores por habilidade. Não implementar antes do slice.
 - **Decisões abertas:** classe/evolução do Edric (fixa por nível, árvore, escolha de direção ou **evolução por uso**); modo de combate (tempo real, turnos ou híbrido).
 
-### BL-002 · Combate em turnos estilo Breath of Fire (decisão pendente) — 2026-10-26
+### BL-002 · Combate em turnos estilo Breath of Fire (DECIDIDO, D-028) — 2026-10-26
 - **Ideia (usuário):** combate de turnos em cena de batalha, personagens e inimigos em sprite sobre o cenário, caixas de vida e habilidade embaixo. Grupo de 3 (herói + 2 aliados). Possibilidade de modo híbrido ou por partes (dungeons em ação). Comparação de custo a pedido do usuário quando o limite de uso permitir.

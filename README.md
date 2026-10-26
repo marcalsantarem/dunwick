@@ -2,7 +2,7 @@
 
 # 🔔 Dunwick
 
-**Um RPG de ação isométrico, em tempo real, direto no navegador.**
+**Um RPG isométrico de combate por turnos, direto no navegador.**
 Fantasia medieval original, humor ácido e um sino que nunca devia ter voltado para casa.
 
 [**▶ Jogar a versão estável**](https://dunwick.netlify.app) · [**🧪 Versão em desenvolvimento**](https://dev--dunwick.netlify.app)
@@ -27,8 +27,8 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 ## ✨ O jogo
 
 - **Visão isométrica HD-2D:** sprites de pixel art nítidos dentro de um cenário 3D com luz, sombras, névoa e profundidade.
-- **Ação à moda de hack'n'slash:** clique para andar e atacar, esquiva, fôlego, mana, combo e habilidades.
-- **Combate justo:** todo golpe inimigo tem **aviso** antes de acertar. Esquiva e tempo valem mais que números.
+- **Combate por turnos** no estilo de RPGs clássicos: cena de batalha com o grupo e os inimigos em sprite, comandos e habilidades. *(em definição; o design de ação em tempo real está arquivado em `docs/arquivo/combate_acao/`)*
+- **Exploração isométrica:** clique para andar pelo mundo.
 - **Tudo gerado por código:** sprites, texturas, cenário e sons são produzidos por scripts, sem arte externa.
 - **Acessível:** tremor, flashes, partículas e desfoque podem ser desligados.
 
@@ -39,7 +39,7 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 | Estável (`main`) | https://dunwick.netlify.app |
 | Em desenvolvimento (`dev`) | https://dev--dunwick.netlify.app |
 
-**Controles atuais do esqueleto:** clique no chão para andar, clique em um alvo para atacar, `W A S D` também movem. `F1`–`F12` abrem o modo debug (`F3` mostra o fps, `F12` troca o perfil de qualidade).
+**Controles atuais do esqueleto (exploração):** clique no chão para andar, `W A S D` também movem. `F1`–`F12` abrem o modo debug (`F3` mostra o fps, `F12` troca o perfil de qualidade).
 
 > O jogo ainda está no começo. O que existe hoje é a praça de Baixo Orvalho, o herói andando e atacando, e a base técnica. Combate completo, inimigos, chefe e missões estão a caminho.
 

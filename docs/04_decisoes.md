@@ -200,3 +200,10 @@ Respostas do usuário às perguntas t, u, v do 02:
 ## D-027 — Esqueleto isométrico aprovado como primeira versão (2026-10-25)
 - **Usuário (testou em casa, no Chrome):** gostou bastante do esqueleto isométrico HD-2D como **versão inicial**. **Pendências de qualidade:** **melhorar a animação** e **refinar os gráficos**. Para uma primeira versão do slice, "está bem válido".
 - **Efeito:** o rumo visual (isométrico, HD-2D, praça de Baixo Orvalho) está **aprovado**; o ADR-002 (medições comparativas) segue adiado; a polimento de animação e gráfico entra no backlog P1 para antes do M2.
+
+## D-028 — Combate por turnos (2026-10-26)
+- **Decisão (usuário):** o jogo segue com **combate por turnos**, no estilo **Breath of Fire** (cena de batalha com personagens e inimigos em sprite sobre o cenário, caixas de vida e habilidade embaixo), mundo **isométrico** para exploração. Grupo de **3** (herói + 2 aliados) como ideia de longo prazo.
+- **Preservado:** tudo o que foi projetado para o combate de ação fica em `docs/arquivo/combate_acao/` e na **tag `combate-acao-v1`** (modo de ação futuro, seções em ação ou híbrido).
+- **Substitui:** D-007, D-009 (partes de tempo real), D-010 e D-019 (partes de aviso/esquiva em tempo real), BRF-003/BRF-010 no que for de tempo real. **Segue:** história, nomes, direção de arte, inimigos (D-023), vila em 3 estados (D-019), esqueleto técnico (render, câmera, dados, testes).
+- **Em aberto (a decidir com o usuário):** como o inimigo aparece (visível no mapa ou encontro aleatório), turnos por rodada ou barra de tempo (ATB), quantos no grupo no slice (companheira entra em cena, D-012), evolução de habilidades por uso (BL-001), classe do Edric.
+- **Próximo passo:** o Produtor monta a comparação curta de formatos de turno quando o limite de uso do usuário permitir; só então os agentes (03, 06, 07, 04, 09) revisam seus documentos.
