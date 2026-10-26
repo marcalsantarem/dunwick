@@ -1,0 +1,28 @@
+{
+  "id": "txt_tabela_pt_br",
+  "idioma": "pt-BR",
+  "versao": 2,
+  "textos": {
+    "txt_map_praca_nome": "Praça de Baixo Orvalho",
+    "ui_comecar": "Pressione qualquer tecla ou clique para ativar o áudio",
+    "ui_perfil_alto": "Alto",
+    "ui_perfil_medio": "Médio",
+    "ui_perfil_baixo": "Baixo",
+    "ui_debug_ajuda": "F1 caixas · F2 estados · F3 fps · F4 entrada · F6 pausar · F7 passo · F8 lento · F9 exportar · F10 zerar · F12 perfil · Backquote +1 h · Backslash ciclo",
+    "ui_debug_fps": "fps {media} (pior 1 % {pior})  quadro {ms} ms  ticks {ticks}",
+    "ui_debug_posicao": "herói tile ({x}, {z})  v {vel} tiles/s",
+    "ui_debug_estado_heroi": "estado {estado}  direção {direcao}",
+    "ui_debug_acao": "ação {acao}  quadro {quadro}  combo {combo}",
+    "ui_debug_estado_entidade": "{id}: {estado} (quadro {quadro})",
+    "ui_debug_entrada": "mover ({x}, {z})  segurando {segurando}  buffer {buffer}",
+    "ui_debug_cursor": "cursor ({x}, {z})  alvo {alvo}",
+    "ui_debug_contador": "alvo de treino: acertos {acertos}",
+    "ui_debug_hora": "hora {hora}  ciclo {ligado}",
+    "ui_debug_resolucao": "render {w}×{h}  escala {escala}  modo {modo}",
+    "ui_debug_pausado": "PAUSADO (F7 avança 1 passo)",
+    "ui_debug_lento": "CÂMERA LENTA {fator}×",
+    "ui_debug_gamepad_fora": "gamepad desconectado",
+    "ui_debug_perfil": "perfil {perfil}",
+    "ui_debug_audio": "áudio {estado}"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "cfg_perfis",
+  "versao": 2,
+  "padrao": "perfil_alto",
+  "perfis": [
+    { "id": "perfil_alto", "nome_txt": "ui_perfil_alto", "msaa": 4, "aniso": 8, "sombra_sol_px": 2048, "luzes_pontuais_max": 8, "pos_dof": true, "pos_bloom": true, "pos_vinheta": 0.35, "particulas_max": 150 },
+    { "id": "perfil_medio", "nome_txt": "ui_perfil_medio", "msaa": 0, "aniso": 4, "sombra_sol_px": 1024, "luzes_pontuais_max": 4, "pos_dof": true, "pos_bloom": false, "pos_vinheta": 0.3, "particulas_max": 100 },
+    { "id": "perfil_baixo", "nome_txt": "ui_perfil_baixo", "msaa": 0, "aniso": 1, "sombra_sol_px": 0, "luzes_pontuais_max": 2, "pos_dof": false, "pos_bloom": false, "pos_vinheta": 0, "particulas_max": 40 }
+  ]
+}

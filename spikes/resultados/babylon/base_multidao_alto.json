@@ -1,0 +1,40 @@
+{
+ "opcao": "babylon",
+ "query": "spike=multidao&perfil=alto&escala=3&luzes=4&hud=0&mover=1&pos=",
+ "maquina": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+ "chrome": "Chrome/155.0.8059.85",
+ "downloadKB": 1421,
+ "requisicoes": 25,
+ "tempoAteTelaMs": 3795,
+ "quadros": 1705,
+ "segundos": 10.02,
+ "fpsMedio": 170.2,
+ "fpsPior1": 53.1,
+ "p99ms": 15.6,
+ "quadrosAcima22ms": 1,
+ "cpuMedianaMs": 5.4,
+ "cpuP99Ms": 15.4,
+ "chamadasDesenho": 994,
+ "triangulos": 0,
+ "heapJsMB": 17.5,
+ "ticks": 754,
+ "estado": {
+  "primeiraTelaMs": 3786,
+  "montagemMs": 714,
+  "modulos": 30,
+  "pos": [],
+  "versao": "9.32.0"
+ },
+ "gl": {
+  "meshes": 75,
+  "materiais": 10,
+  "texturas": 26,
+  "internaResolucao": [
+   1920,
+   1080
+  ]
+ },
+ "erros": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ]
+}

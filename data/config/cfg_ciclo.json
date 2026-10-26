@@ -1,0 +1,18 @@
+{
+  "id": "cfg_ciclo",
+  "versao": 1,
+  "nota": "Dia/noite: interpolação entre pontos por hora (0–24). A direção da luz-chave é fixa na tela (alto-esquerda-atrás, guia §3); a hora muda cor, altura e intensidade. Provisório até o roteiro de cor do 10.",
+  "duracao_dia_s": 360,
+  "hora_inicial": 17.0,
+  "ligado": true,
+  "sol_azimute_graus": 200,
+  "pontos": [
+    { "hora": 5.5, "sol_cor": "#ffb089", "sol_int": 0.9, "sol_elev": 12, "hemi_ceu": "#8fa6c8", "hemi_chao": "#4b5a45", "hemi_int": 0.55, "fundo": "#7d8fa8", "nevoa": "#9fb0bf", "tom": [1.02, 0.98, 1.0], "luz_artificial": 0.6 },
+    { "hora": 9, "sol_cor": "#fff2d6", "sol_int": 2.0, "sol_elev": 42, "hemi_ceu": "#b8d4f0", "hemi_chao": "#5d7a48", "hemi_int": 0.85, "fundo": "#a9c7e3", "nevoa": "#c4d8e6", "tom": [1.0, 1.0, 1.0], "luz_artificial": 0 },
+    { "hora": 13, "sol_cor": "#fff6e0", "sol_int": 2.3, "sol_elev": 62, "hemi_ceu": "#c6e0f8", "hemi_chao": "#6a8a50", "hemi_int": 0.95, "fundo": "#b4d2ec", "nevoa": "#d0e2ee", "tom": [1.0, 1.0, 1.0], "luz_artificial": 0 },
+    { "hora": 17, "sol_cor": "#ffbf73", "sol_int": 1.9, "sol_elev": 24, "hemi_ceu": "#9bb7d6", "hemi_chao": "#506b44", "hemi_int": 0.7, "fundo": "#c9a67f", "nevoa": "#d6b78e", "tom": [1.06, 0.97, 0.9], "luz_artificial": 0.25 },
+    { "hora": 19, "sol_cor": "#ff8a4a", "sol_int": 1.0, "sol_elev": 8, "hemi_ceu": "#6d7fae", "hemi_chao": "#3d4f48", "hemi_int": 0.5, "fundo": "#7a6a8a", "nevoa": "#8d7e96", "tom": [1.04, 0.9, 0.9], "luz_artificial": 0.8 },
+    { "hora": 21.5, "sol_cor": "#7f93d8", "sol_int": 0.55, "sol_elev": 35, "hemi_ceu": "#4a5c92", "hemi_chao": "#27342f", "hemi_int": 0.42, "fundo": "#1d2740", "nevoa": "#2a3555", "tom": [0.82, 0.9, 1.1], "luz_artificial": 1 },
+    { "hora": 24, "sol_cor": "#7f93d8", "sol_int": 0.5, "sol_elev": 40, "hemi_ceu": "#44568a", "hemi_chao": "#222d2a", "hemi_int": 0.4, "fundo": "#18213a", "nevoa": "#252f4d", "tom": [0.8, 0.88, 1.12], "luz_artificial": 1 }
+  ]
+}

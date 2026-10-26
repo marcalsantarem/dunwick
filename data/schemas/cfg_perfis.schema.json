@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_perfis",
+  "title": "Perfis de qualidade (Alto/Médio/Baixo)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "padrao", "perfis"],
+  "properties": {
+    "id": { "const": "cfg_perfis" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "padrao": { "type": "string", "pattern": "^perfil_[a-z0-9_]+$" },
+    "perfis": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "nome_txt", "msaa", "aniso", "sombra_sol_px", "luzes_pontuais_max", "pos_dof", "pos_bloom", "pos_vinheta", "particulas_max"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^perfil_[a-z0-9_]+$" },
+          "nome_txt": { "type": "string", "pattern": "^ui_[a-z0-9_]+$" },
+          "msaa": { "enum": [0, 2, 4, 8] },
+          "aniso": { "enum": [1, 2, 4, 8, 16] },
+          "sombra_sol_px": { "enum": [0, 256, 512, 1024, 2048, 4096] },
+          "luzes_pontuais_max": { "type": "integer", "minimum": 0, "maximum": 16 },
+          "pos_dof": { "type": "boolean" },
+          "pos_bloom": { "type": "boolean" },
+          "pos_vinheta": { "type": "number", "minimum": 0, "maximum": 1 },
+          "particulas_max": { "type": "integer", "minimum": 0, "maximum": 1000 }
+        }
+      }
+    }
+  }
+}

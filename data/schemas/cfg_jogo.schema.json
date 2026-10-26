@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_jogo",
+  "title": "Configuração do jogo (laço, resolução, câmera isométrica, entrada, mundo)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "passo_logico_hz", "max_passos_por_quadro", "resolucao", "pixels_por_unidade", "camera", "entrada", "mundo", "regras", "debug"],
+  "properties": {
+    "id": { "const": "cfg_jogo" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "passo_logico_hz": { "type": "integer", "minimum": 30, "maximum": 240 },
+    "max_passos_por_quadro": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "resolucao": {
+      "type": "object", "additionalProperties": false, "required": ["modo", "arte", "ampliacao"],
+      "properties": {
+        "modo": { "enum": ["arte", "nativa"] },
+        "arte": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 320 }, { "type": "integer", "minimum": 180 }], "items": false, "minItems": 2 },
+        "ampliacao": { "enum": ["inteira", "livre"] }
+      }
+    },
+    "pixels_por_unidade": { "type": "integer", "minimum": 8, "maximum": 128 },
+    "camera": {
+      "type": "object", "additionalProperties": false,
+      "required": ["giro_graus", "inclinacao_graus", "suavizacao_s", "antecipacao_tiles", "zona_morta_tiles", "distancia", "near", "far", "oclusao_alpha", "sprite_recuo_tiles"],
+      "properties": {
+        "giro_graus": { "type": "number", "minimum": 0, "maximum": 90 },
+        "inclinacao_graus": { "type": "number", "minimum": 20, "maximum": 60 },
+        "suavizacao_s": { "type": "number", "minimum": 0, "maximum": 2 },
+        "antecipacao_tiles": { "type": "number", "minimum": 0, "maximum": 4 },
+        "zona_morta_tiles": { "type": "number", "minimum": 0, "maximum": 2 },
+        "distancia": { "type": "number", "exclusiveMinimum": 0 },
+        "near": { "type": "number", "exclusiveMinimum": 0 },
+        "far": { "type": "number", "exclusiveMinimum": 0 },
+        "oclusao_alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "sprite_recuo_tiles": { "type": "number", "minimum": 0, "maximum": 4 }
+      }
+    },
+    "entrada": {
+      "type": "object", "additionalProperties": false,
+      "required": ["buffer_entrada_quadros", "zona_morta_analogico", "direcoes_movimento", "correr_modo", "clique_corrida_distancia_tiles", "chegada_tiles"],
+      "properties": {
+        "buffer_entrada_quadros": { "type": "integer", "minimum": 6, "maximum": 8 },
+        "zona_morta_analogico": { "type": "number", "minimum": 0.05, "maximum": 0.4 },
+        "direcoes_movimento": { "const": 8 },
+        "correr_modo": { "enum": ["segurar", "alternar", "sempre"] },
+        "clique_corrida_distancia_tiles": { "type": "number", "minimum": 0, "maximum": 40 },
+        "chegada_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 }
+      }
+    },
+    "mundo": {
+      "type": "object", "additionalProperties": false, "required": ["colisao_iteracoes"],
+      "properties": { "colisao_iteracoes": { "type": "integer", "minimum": 1, "maximum": 10 } }
+    },
+    "regras": {
+      "type": "object", "additionalProperties": false, "required": ["aviso_min_comum_quadros"],
+      "properties": { "aviso_min_comum_quadros": { "type": "integer", "minimum": 1 } }
+    },
+    "debug": {
+      "type": "object", "additionalProperties": false, "required": ["lento_fator", "gravacao_max_s"],
+      "properties": {
+        "lento_fator": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "gravacao_max_s": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

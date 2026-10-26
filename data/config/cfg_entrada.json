@@ -1,0 +1,42 @@
+{
+  "id": "cfg_entrada",
+  "versao": 2,
+  "nota": "Controles à Diablo (docs/ui/controles_acessibilidade.md §3): o mouse comanda, o teclado assiste. Teclas por KeyboardEvent.code; mouse 'mouse:<botão>'; gamepad 'botao:<índice padrão>'. clique_principal decide pelo alvo sob o cursor: inimigo → atacar; chão → mover. 'ancorar' sem tecla padrão no 07 (D8): KeyX é PROVISÓRIA.",
+  "eixos": {
+    "mover": {
+      "contexto": "jogo",
+      "teclado": { "cima": ["KeyW", "ArrowUp"], "baixo": ["KeyS", "ArrowDown"], "esquerda": ["KeyA", "ArrowLeft"], "direita": ["KeyD", "ArrowRight"] },
+      "gamepad": { "eixo_x": 0, "eixo_z": 1 }
+    }
+  },
+  "acoes": {
+    "clique_principal": { "contexto": "jogo", "tipo": "segurar", "teclado": ["mouse:0"], "gamepad": [] },
+    "correr": { "contexto": "jogo", "tipo": "segurar", "teclado": ["ShiftLeft", "ShiftRight"], "gamepad": ["botao:6"] },
+    "ancorar": { "contexto": "jogo", "tipo": "segurar", "teclado": ["KeyX"], "gamepad": [] },
+    "atacar": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["KeyJ"], "gamepad": ["botao:2"] },
+    "forte": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["mouse:2", "KeyK"], "gamepad": ["botao:3"] },
+    "esquivar": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["Space", "KeyL"], "gamepad": ["botao:1"] },
+    "habilidade_1": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["Digit1", "KeyU"], "gamepad": ["botao:5"] },
+    "habilidade_2": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["Digit2", "KeyI"], "gamepad": ["botao:7"] },
+    "habilidade_3": { "contexto": "jogo", "tipo": "apertar", "buffer": true, "teclado": ["Digit3", "KeyO"], "gamepad": ["botao:4"] },
+    "item": { "contexto": "jogo", "tipo": "apertar", "teclado": ["KeyQ", "KeyH"], "gamepad": ["botao:12"] },
+    "interagir": { "contexto": "jogo", "tipo": "apertar", "teclado": ["KeyE"], "gamepad": ["botao:0"] },
+    "menu": { "contexto": "jogo", "tipo": "apertar", "teclado": ["Escape", "KeyP"], "gamepad": ["botao:9"] },
+    "inventario": { "contexto": "jogo", "tipo": "apertar", "teclado": ["KeyB"], "gamepad": ["botao:8"] },
+    "missoes": { "contexto": "jogo", "tipo": "apertar", "teclado": ["KeyN"], "gamepad": ["botao:13"] }
+  },
+  "debug": {
+    "debug_caixas": { "teclado": ["F1"] },
+    "debug_estados": { "teclado": ["F2"] },
+    "debug_fps": { "teclado": ["F3"] },
+    "debug_entrada": { "teclado": ["F4"] },
+    "debug_pausar": { "teclado": ["F6"] },
+    "debug_passo": { "teclado": ["F7"] },
+    "debug_lento": { "teclado": ["F8"] },
+    "debug_exportar": { "teclado": ["F9"] },
+    "debug_contadores": { "teclado": ["F10"] },
+    "debug_perfil": { "teclado": ["F12"] },
+    "debug_hora": { "teclado": ["Backquote"] },
+    "debug_ciclo": { "teclado": ["Backslash"] }
+  }
+}

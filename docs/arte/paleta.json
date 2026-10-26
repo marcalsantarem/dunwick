@@ -1,0 +1,398 @@
+{
+  "id": "paleta_neutra",
+  "versao": "0.2.0",
+  "status": "provisoria",
+  "aviso": "Paleta neutra para placeholders e spikes (BRF-002). Não usar em arte final. Será substituída na etapa 2 do guia visual (roteiro de cor por região).",
+  "regras": {
+    "max_cores_por_sprite": 32,
+    "alpha_permitido": [
+      0,
+      255
+    ],
+    "deslocamento_de_matiz": "sombras puxam para azul/violeta (frio), luzes para amarelo (quente)",
+    "rampas_reservadas": "perigo: só golpe vindo no mundo (nunca na UI); brilho: interativos, coletáveis e foco da UI; alerta_ui: só erro e vida baixa na UI/HUD, com forma + ícone + texto; nenhuma delas em decoração, roupas ou cenário",
+    "vagas_etapa_2": "cor-assinatura do herói, acentos de facção/inimigo, acentos por região e escolas de magia entram na etapa 2 (sobram vagas até 64 + rampas de VFX separadas)"
+  },
+  "rampas": [
+    {
+      "nome": "neutro_frio",
+      "uso": "contorno, sombra-chave, cinzas de base, branco",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "neutro_frio_1",
+          "hex": "#070911"
+        },
+        {
+          "id": "neutro_frio_2",
+          "hex": "#292e3c"
+        },
+        {
+          "id": "neutro_frio_3",
+          "hex": "#525b6b"
+        },
+        {
+          "id": "neutro_frio_4",
+          "hex": "#7e8b9c"
+        },
+        {
+          "id": "neutro_frio_5",
+          "hex": "#afbfcc"
+        },
+        {
+          "id": "neutro_frio_6",
+          "hex": "#e6f4fc"
+        }
+      ]
+    },
+    {
+      "nome": "neutro_quente",
+      "uso": "papel, linho, cinzas de luz quente",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "neutro_quente_1",
+          "hex": "#281f1c"
+        },
+        {
+          "id": "neutro_quente_2",
+          "hex": "#685a50"
+        },
+        {
+          "id": "neutro_quente_3",
+          "hex": "#a99d90"
+        },
+        {
+          "id": "neutro_quente_4",
+          "hex": "#ece7dd"
+        }
+      ]
+    },
+    {
+      "nome": "pele_clara",
+      "uso": "pele (tom claro)",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "pele_clara_1",
+          "hex": "#624441"
+        },
+        {
+          "id": "pele_clara_2",
+          "hex": "#9e6e5c"
+        },
+        {
+          "id": "pele_clara_3",
+          "hex": "#cea383"
+        },
+        {
+          "id": "pele_clara_4",
+          "hex": "#f2dec3"
+        }
+      ]
+    },
+    {
+      "nome": "pele_media",
+      "uso": "pele (tom médio)",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "pele_media_1",
+          "hex": "#502c2a"
+        },
+        {
+          "id": "pele_media_2",
+          "hex": "#8a4f3a"
+        },
+        {
+          "id": "pele_media_3",
+          "hex": "#b7805a"
+        },
+        {
+          "id": "pele_media_4",
+          "hex": "#d5b899"
+        }
+      ]
+    },
+    {
+      "nome": "pele_escura",
+      "uso": "pele (tom escuro)",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "pele_escura_1",
+          "hex": "#321616"
+        },
+        {
+          "id": "pele_escura_2",
+          "hex": "#633328"
+        },
+        {
+          "id": "pele_escura_3",
+          "hex": "#8b5c43"
+        },
+        {
+          "id": "pele_escura_4",
+          "hex": "#a78d76"
+        }
+      ]
+    },
+    {
+      "nome": "metal_aco",
+      "uso": "armas, armaduras, ferragens",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "metal_aco_1",
+          "hex": "#161b23"
+        },
+        {
+          "id": "metal_aco_2",
+          "hex": "#3d4956"
+        },
+        {
+          "id": "metal_aco_3",
+          "hex": "#6b7d8b"
+        },
+        {
+          "id": "metal_aco_4",
+          "hex": "#a2b7ae"
+        },
+        {
+          "id": "metal_aco_5",
+          "hex": "#efebde"
+        }
+      ]
+    },
+    {
+      "nome": "metal_latao",
+      "uso": "latão, bronze, ouro velho, fivelas",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "metal_latao_1",
+          "hex": "#492112"
+        },
+        {
+          "id": "metal_latao_2",
+          "hex": "#7f4613"
+        },
+        {
+          "id": "metal_latao_3",
+          "hex": "#a9792b"
+        },
+        {
+          "id": "metal_latao_4",
+          "hex": "#d0ae66"
+        },
+        {
+          "id": "metal_latao_5",
+          "hex": "#f2e5b3"
+        }
+      ]
+    },
+    {
+      "nome": "madeira",
+      "uso": "madeira, couro, cordas",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "madeira_1",
+          "hex": "#2c120e"
+        },
+        {
+          "id": "madeira_2",
+          "hex": "#5c3120"
+        },
+        {
+          "id": "madeira_3",
+          "hex": "#875a3b"
+        },
+        {
+          "id": "madeira_4",
+          "hex": "#ae8865"
+        },
+        {
+          "id": "madeira_5",
+          "hex": "#cfba9e"
+        }
+      ]
+    },
+    {
+      "nome": "pedra",
+      "uso": "pedra, alvenaria, rocha",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "pedra_1",
+          "hex": "#22232d"
+        },
+        {
+          "id": "pedra_2",
+          "hex": "#444a59"
+        },
+        {
+          "id": "pedra_3",
+          "hex": "#697686"
+        },
+        {
+          "id": "pedra_4",
+          "hex": "#92a79e"
+        },
+        {
+          "id": "pedra_5",
+          "hex": "#d7d0c4"
+        }
+      ]
+    },
+    {
+      "nome": "vegetacao",
+      "uso": "grama, folhas, musgo",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "vegetacao_1",
+          "hex": "#012020"
+        },
+        {
+          "id": "vegetacao_2",
+          "hex": "#01523c"
+        },
+        {
+          "id": "vegetacao_3",
+          "hex": "#478638"
+        },
+        {
+          "id": "vegetacao_4",
+          "hex": "#97b55f"
+        },
+        {
+          "id": "vegetacao_5",
+          "hex": "#e1e3a7"
+        }
+      ]
+    },
+    {
+      "nome": "terra",
+      "uso": "chão de terra, trilhas, barro",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "terra_1",
+          "hex": "#3e2820"
+        },
+        {
+          "id": "terra_2",
+          "hex": "#704d37"
+        },
+        {
+          "id": "terra_3",
+          "hex": "#9a7c5d"
+        },
+        {
+          "id": "terra_4",
+          "hex": "#bdaf98"
+        }
+      ]
+    },
+    {
+      "nome": "perigo",
+      "uso": "RESERVADA: golpe vindo no mundo (avisos, zonas de dano); nunca na UI",
+      "reservada": true,
+      "cores": [
+        {
+          "id": "perigo_1",
+          "hex": "#6d2073"
+        },
+        {
+          "id": "perigo_2",
+          "hex": "#dd48d6"
+        },
+        {
+          "id": "perigo_3",
+          "hex": "#ff65e0"
+        },
+        {
+          "id": "perigo_4",
+          "hex": "#fed8ec"
+        }
+      ]
+    },
+    {
+      "nome": "brilho",
+      "uso": "RESERVADA: interativos, coletáveis, luz de destaque",
+      "reservada": true,
+      "cores": [
+        {
+          "id": "brilho_1",
+          "hex": "#fcd176"
+        },
+        {
+          "id": "brilho_2",
+          "hex": "#ffe79d"
+        },
+        {
+          "id": "brilho_3",
+          "hex": "#fffad8"
+        }
+      ]
+    },
+    {
+      "nome": "ui",
+      "uso": "painéis, bordas, texto e foco da interface",
+      "reservada": false,
+      "cores": [
+        {
+          "id": "ui_1",
+          "hex": "#211209",
+          "papel": "painel"
+        },
+        {
+          "id": "ui_2",
+          "hex": "#886b56",
+          "papel": "borda"
+        },
+        {
+          "id": "ui_3",
+          "hex": "#d3b89e",
+          "papel": "texto_secundario"
+        },
+        {
+          "id": "ui_4",
+          "hex": "#fdf0dc",
+          "papel": "texto"
+        }
+      ]
+    },
+    {
+      "nome": "alerta_ui",
+      "uso": "RESERVADA: só UI/HUD (erro, vida baixa), sempre com forma + ícone + texto",
+      "reservada": true,
+      "cores": [
+        {
+          "id": "alerta_ui_1",
+          "hex": "#780105"
+        },
+        {
+          "id": "alerta_ui_2",
+          "hex": "#f44d21"
+        }
+      ]
+    }
+  ],
+  "validacao": {
+    "erros": [],
+    "avisos": [],
+    "relatorio": [
+      "Total de cores: 64",
+      "Contraste ui texto x painel: 16.17:1 (mín 7.0)",
+      "Contraste ui texto_secundario x painel: 9.63:1 (mín 4.5)",
+      "Contraste ui borda x painel: 3.71:1 (mín 3.0)",
+      "Pior distância perigo x chão (ΔE OKLab): 0.125 em perigo_2 x pedra_3 (deuteranopia) (mín 0,10)",
+      "Pior distância brilho x chão (ΔE OKLab): 0.115 em brilho_1 x vegetacao_4 (protanopia) (mín 0,10)",
+      "Pior distância perigo x brilho (ΔE OKLab): 0.187 em perigo_3 x brilho_1 (tritanopia) (mín 0,10)",
+      "Contraste alerta_ui_2 x painel: 5.13:1 (mín 4.5)",
+      "Pior distância alerta_ui x perigo/brilho (ΔE OKLab): 0.104 em alerta_ui_2 x perigo_2 (tritanopia) (mín 0,10)"
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/inimigo",
+  "title": "Inimigo (M1: bonecos de teste)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "sprite", "tipo", "caixas"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^enemy_[a-z0-9_]+$" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "sprite": { "type": "string", "pattern": "^[a-z]+_[a-z0-9_]+$" },
+    "tipo": { "enum": ["alvo_treino", "boneco_golpe"] },
+    "caixas": {
+      "type": "object", "additionalProperties": false, "required": ["pushbox_raio_tiles", "hurtbox_raio_tiles", "hurtbox_altura_tiles"],
+      "properties": {
+        "pushbox_raio_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "hurtbox_raio_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "hurtbox_altura_tiles": { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0 }, { "type": "number", "exclusiveMinimum": 0 }], "items": false, "minItems": 2 }
+      }
+    },
+    "golpe": {
+      "type": "object", "additionalProperties": false, "required": ["ciclo_quadros", "aviso_quadros", "ativo_quadros", "forma", "raio_tiles", "dano_base", "tipo_dano"],
+      "properties": {
+        "ciclo_quadros": { "type": "integer", "minimum": 1 },
+        "aviso_quadros": { "type": "integer", "minimum": 1 },
+        "ativo_quadros": { "type": "integer", "minimum": 1 },
+        "forma": { "enum": ["circulo"] },
+        "raio_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 8 },
+        "dano_base": { "type": "number", "minimum": 0 },
+        "tipo_dano": { "enum": ["impacto", "corte", "perfuracao"] }
+      }
+    }
+  },
+  "if": { "properties": { "tipo": { "const": "boneco_golpe" } } },
+  "then": { "required": ["golpe"], "properties": { "golpe": {} } }
+}

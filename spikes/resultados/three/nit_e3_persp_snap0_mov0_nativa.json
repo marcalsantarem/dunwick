@@ -1,0 +1,56 @@
+{
+ "opcao": "three",
+ "query": "spike=sprite&perfil=alto&teste=nitidez&escala=3&camera=persp&snap=0&mover=0&res=nativa&hud=0&w=1920&h=1080",
+ "maquina": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001638) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+ "chrome": "Chrome/155.0.8059.85",
+ "downloadKB": 160,
+ "requisicoes": 7,
+ "tempoAteTelaMs": 1239,
+ "quadros": 10514,
+ "segundos": 2.01,
+ "fpsMedio": 5238.9,
+ "fpsPior1": 796.4,
+ "p99ms": 0.4,
+ "quadrosAcima22ms": 2,
+ "cpuMedianaMs": 0,
+ "cpuP99Ms": 0.1,
+ "chamadasDesenho": 1,
+ "triangulos": 2,
+ "heapJsMB": 5.7,
+ "ticks": 280,
+ "estado": {
+  "primeiraTelaMs": 1114,
+  "montagemMs": 79,
+  "pos": [
+   "dof",
+   "bloom",
+   "vol",
+   "nevoa",
+   "cor"
+  ],
+  "versao": "186"
+ },
+ "gl": {
+  "geometries": 1,
+  "textures": 1,
+  "programas": 2,
+  "internaResolucao": [
+   1920,
+   1080
+  ]
+ },
+ "nitidez": {
+  "caixa": {
+   "x": 862,
+   "y": 442,
+   "w": 196,
+   "h": 196
+  },
+  "blocosUniformesPct": 100,
+  "blocos": 946,
+  "variacaoLumDentroDoTexel": 0
+ },
+ "erros": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ]
+}

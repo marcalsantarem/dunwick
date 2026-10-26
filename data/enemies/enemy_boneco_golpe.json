@@ -1,0 +1,9 @@
+{
+  "id": "enemy_boneco_golpe",
+  "versao": 1,
+  "nota": "Boneco que golpeia: ciclo fixo com aviso (telegraph magenta). No esqueleto só emite eventos e desenha o aviso; o dano é do 03.",
+  "sprite": "enemy_boneco_golpe",
+  "tipo": "boneco_golpe",
+  "caixas": { "pushbox_raio_tiles": 0.45, "hurtbox_raio_tiles": 0.5, "hurtbox_altura_tiles": [0, 2.0] },
+  "golpe": { "ciclo_quadros": 150, "aviso_quadros": 30, "ativo_quadros": 6, "forma": "circulo", "raio_tiles": 1.8, "dano_base": 18, "tipo_dano": "impacto" }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "enemy_boneco_golpe",
+  "tipo": "sprite_fixo",
+  "celula": [
+    192,
+    192
+  ],
+  "ancora": [
+    96,
+    168
+  ],
+  "arte_escala": 1.5,
+  "ref_celula": 128,
+  "direcoes": [
+    "s"
+  ],
+  "espelhar": {},
+  "colunas": 6,
+  "anims": {
+    "idle": {
+      "quadros": 2,
+      "fps": 4,
+      "loop": true,
+      "inicio": 0
+    },
+    "dano": {
+      "quadros": 3,
+      "fps": 12,
+      "loop": false,
+      "inicio": 2
+    },
+    "golpe": {
+      "quadros": 6,
+      "fps": 12,
+      "loop": false,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "hit_inicio"
+        },
+        {
+          "quadro": 5,
+          "tipo": "hit_fim"
+        }
+      ],
+      "inicio": 5
+    }
+  }
+}

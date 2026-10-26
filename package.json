@@ -1,0 +1,25 @@
+{
+  "name": "dunwick",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dunwick (nome provisório) — RPG de ação no navegador. Esqueleto M1 (BRF-009).",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "node tools/servir.mjs dev",
+    "preview": "node tools/servir.mjs prod",
+    "validar": "node tools/validar_dados.mjs && node tools/validar_assets.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "build": "node tools/build.mjs",
+    "test:navegador": "node tools/testar_navegador.mjs",
+    "assets": "node tools/gerar_placeholders.mjs"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "esbuild": "0.28.2",
+    "puppeteer-core": "25.16.0"
+  }
+}
