@@ -184,6 +184,15 @@ Nível 2 após ~4 batalhas (o misto dá 32 XP; o slime 12; o lobo 20). Ajuste: u
 **Adotei os nomes do 03:** `vida`, `vida_max`, `mana`, `mana_max`, `agilidade_efetiva`, `prioridade_comando`, `defender_mult_dano`, `defendendo`, `caido`, `caido_pos_batalha_vida`, `xp_caido_fracao`, `fugir_base/por_ponto/min/max`, `pode_fugir`, `atk_*`, `skill_*`, `mult_dano`, `escala`, `atributo`, `tipo_dano`, `alvo_tipo`, `semente_batalha`, `enc_*`, os eventos do 03 §8 e os IDs `atk_edric_golpe`, `atk_grace_cajado`, `skill_cura`.
 **Já bate:** XP total a cada vivo, caído sem XP, caídos voltam com 1 de vida, todo ato acerta, cura não revive, Defender ×0,5 com prioridade +1, empates, fuga sem XP, chefe sem fuga, IA do 03 (já simulada).
 
+**Valores iniciais para copiar (nível 1):**
+
+| Ator | Vida | Mana | Agilidade | **Defesa** | Força | Mente |
+|---|---|---|---|---|---|---|
+| `hero_edric` | 100 | 14 | 6 | **9** (vigor 7 + túnica 2) | 8 | 3 |
+| `hero_grace` | 70 | 29 | 5 | **5** (vigor 4 + manto 1) | 3 | 8 |
+| `enemy_slime` | 70 | — | 3 | **3** (confirmado) | 4 | — |
+| `enemy_lobo` | 90 | — | 9 | **4** | 6 | — |
+
 **O que o 03 precisa mudar** (só isto):
 1. **§5 passo 4b:** acrescentar o fator da defesa, `× 100 / (100 + defesa_do_alvo)`; campo `defesa` nos dados de heróis e inimigos.
 2. **§2 e §12:** a habilidade do Edric é `skill_golpe_firme` (`alvo_tipo` `inimigo_1`, 4 de mana, `mult_dano` 1,8), não `skill_giro` em área. A pose `bat_habilidade` fica; muda só o nome na descrição ("golpe firme" no lugar de "giro de espada") e o ataque em área sai da §10.1.

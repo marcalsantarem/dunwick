@@ -157,8 +157,9 @@ export const DIRS = [{ id: 's', phi: 0 }, { id: 'se', phi: Math.PI / 4 }, { id: 
 export const DIRS_OESTE = [{ id: 'sw', phi: -Math.PI / 4 }, { id: 'o', phi: -Math.PI / 2 }, { id: 'nw', phi: (-3 * Math.PI) / 4 }];
 const QUEIXO_Y = Math.round(ANCORA[1] - 37.5 * SC * CP); // linha do fundo do queixo (última linha do molde)
 /** Cola o molde da cabeça por cima do corpo (pixels do molde substituem; transparentes deixam o corpo). */
-function colarCabeca(px, dirId) {
-  const m = MOLDES[dirId], [dx, dy] = AJUSTE[dirId], ox = ANCORA[0] - 13 + dx, oy = QUEIXO_Y - 25 + dy;
+function colarCabeca(px, dirId, ex = 0, ey = 0, giros = 0) {
+  let m = MOLDES[dirId]; const [dx, dy] = AJUSTE[dirId], ox = ANCORA[0] - 13 + dx + ex, oy = QUEIXO_Y - 25 + dy + ey;
+  for (let g = 0; g < giros; g++) m = Array.from({ length: 26 }, (_, y) => Array.from({ length: 26 }, (_, x) => m[x][25 - y]).join('')); // giro de 90° anti-horário (queda)
   m.forEach((lin, y) => [...lin].forEach((ch, x) => {
     if (ch === '.') return; const [r, t] = LEGENDA[ch], c = RGB[r][t], X = ox + x, Y = oy + y; if (X < 0 || Y < 0 || X >= CELULA || Y >= CELULA) return;
     const i = (Y * CELULA + X) * 4; px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2]; px[i + 3] = 255;
@@ -261,4 +262,53 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   console.log(`hero_edric: ${r.img.w}×${r.img.h}, ${v.cores} cores (${v.propostas} propostas)`); v.info.forEach((l) => console.log('  ' + l));
   if (process.argv.includes('--previa')) { const p = gerarPrevia({ quadros: r.quadros }), d2 = join(raiz, 'docs/arte/sprites'); mkdirSync(d2, { recursive: true }); writeFileSync(join(d2, 'previa_edric.png'), codificarPng(p.img)); console.log(`prévia: docs/arte/sprites/previa_edric.png (${p.img.w}×${p.img.h})`); }
   if (v.erros.length) { console.error('✗ ' + v.erros.join('\n✗ ')); process.exit(1); }
+}
+
+// ---------- poses de batalha (BL-007): mesmo modelo e mesma cabeça (molde "l"), articulações dadas por pose ----------
+/** Monta o corpo numa pose. P: lean (inclinação do tronco), dz (agachar), rot/shift (queda), pe[0|1]=[f,u] dos pés (esq., dir.), maoD/maoE [f,l,u], espada θ em graus, frasco. Devolve o deslocamento (px) da cabeça. */
+export function montarPose(P = {}) {
+  prims.length = 0;
+  const lean = P.lean ?? 2.5, dz = P.dz ?? 2, rot = P.rot ?? 0, cr = Math.cos(rot), sr = Math.sin(rot), sh = P.shift ?? [0, 0];
+  const T = (f, l, u) => { const k = Math.min(1, Math.max(0, u) / 19), uu = u - dz * k, ff = f + lean * Math.max(0, u) / 36; return [ff * cr - uu * sr + sh[0], l, ff * sr + uu * cr + sh[1]]; };
+  const a = Math.abs(rot), c2 = Math.cos(a) ** 2, s2 = Math.sin(a) ** 2;
+  const Ee = (c, r, m, id, dec, off) => elip(T(...c), [r[0] * c2 + r[2] * s2, r[1], r[2] * c2 + r[0] * s2], m, id, rot ? null : dec, off);
+  const Ch = (p, q, r0, r1, m, id, dec, off) => cadeia(T(...p), T(...q), r0, r1, m, id, dec, off);
+  const pe = P.pe ?? [[-4.5, 0], [6.5, 0]];
+  for (const s of [-1, 1]) {                                   // pernas: joelho calculado para manter o comprimento
+    const [ff, fu] = pe[(s + 1) / 2], hip = T(0.4, s * 3.9, 19), foot = T(ff, s * 4, fu + 3.5);
+    const dfx = foot[0] - hip[0], dfu = foot[2] - hip[2], d = Math.hypot(dfx, dfu) || 1, h = Math.sqrt(Math.max(0.5, 66 - (d / 2) ** 2));
+    const knee = [(hip[0] + foot[0]) / 2 - dfu / d * h, s * 4, (hip[2] + foot[2]) / 2 + dfx / d * h];
+    cadeia(hip, knee, 3.2, 2.9, 'calca', 'perna' + s); cadeia(knee, foot, 2.9, 3.0, 'couro', 'bota' + s, null, -1);
+    elip([foot[0] + 2.6, s * 4, foot[2] - 1.5], [4.6, 2.9, 2.2], 'couro', 'pe' + s, null, -1);
+  }
+  Ee([0, 0, 17], [5.6, 6.2, 3.2], 'musgo', 'saia');
+  Ee([0, 0, 23.5], [4.7, 5.4, 5.0], 'musgo', 'tronco_b');
+  Ee([0, 0, 29.5], [4.9, 6.3, 5.8], 'musgo', 'tronco_a', (p) => {
+    if (p[0] < 1.5) return null;
+    if (Math.abs(p[2] - (31 + 1.12 * (p[1] - 5))) < 1.15 && p[1] > -4.5 && p[1] < 6 && p[2] > 21) return { m: 'couro', t: null };
+    if (Math.abs(p[1] + 3.2) < 2.1 && Math.abs(p[2] - 26.2) < 2.0) return { m: 'linho', t: null };
+    return null;
+  });
+  Ee([0.4, 0, 34.2], [3.8, 4.6, 1.5], 'musgo', 'gola'); Ee([-0.8, 0, 35.2], [4.0, 5.2, 2.0], 'musgo', 'trapezio');
+  Ee([0, 0, 21.2], [5.3, 6.2, 1.5], 'couro', 'cinto'); Ee([4.9, 0, 21.2], [0.8, 1.7, 1.5], 'latao', 'fivela'); Ee([1.6, -6.0, 20.6], [1.5, 1.0, 2.6], 'linho', 'recibo');
+  Ee([0.2, 0, 35.2], [3.0, 3.1, 2.6], 'pele', 'pescoco', (p) => (p[2] > 35.2 ? { m: 'pele', d: -1 } : null));
+  Ee([0, 7.0, 33.6], [4.6, 4.3, 2.9], 'couro', 'ombreira', (p) => (p[2] > 34.6 && Math.abs(p[1] - 7) > 3 ? { m: 'latao', t: null } : null));
+  // braços: direita (espada, ombreira) e esquerda (faixa de linho)
+  const maoD = P.maoD ?? [8.5, 7.6, 28], maoE = P.maoE ?? [4.5, -7.6, 26];
+  const cotovelo = (lado, m) => [m[0] / 2 - 1.6, lado * 7.6, (31.5 + m[2]) / 2 - 2.0];
+  const eD = P.cotD ?? cotovelo(1, maoD), eE = P.cotE ?? cotovelo(-1, maoE), mix = (p, q, t) => p.map((v, i) => v + (q[i] - v) * t);
+  Ch([0, 6.6, 31.5], eD, 3.0, 2.7, 'musgo', 'manga_d'); Ch(eD, maoD, 2.4, 2.1, 'pele', 'antebraco_d'); esfera(T(...maoD), 2.3, 'pele', 'mao_d');
+  Ch([0, -6.6, 31.5], eE, 3.0, 2.7, 'musgo', 'manga_e'); const pulso = mix(eE, maoE, 0.8); Ch(eE, pulso, 2.9, 2.8, 'linho', 'faixa'); Ch(pulso, maoE, 2.2, 2.2, 'pele', 'pulso_e'); esfera(T(...maoE), 2.3, 'pele', 'mao_e');
+  if (P.frasco) { Ee([maoE[0] + 1.2, maoE[1], maoE[2] + 2.4], [1.6, 1.6, 2.6], 'musgo', 'frasco'); Ee([maoE[0] + 1.2, maoE[1], maoE[2] + 5.2], [1.0, 1.0, 0.9], 'latao', 'rolha'); }
+  // espada de treino (θ medido a partir da frente, para cima)
+  const th = (P.theta ?? 30) * Math.PI / 180, d = [Math.cos(th), 0.06, Math.sin(th)], at = (t) => [maoD[0] + d[0] * t, maoD[1] + d[1] * t, maoD[2] + d[2] * t];
+  Ch(at(-3.6), at(1.5), 1.25, 1.25, 'couro', 'cabo'); Ee(at(-4.2), [1.5, 1.5, 1.5], 'latao', 'pomo'); Ee(at(2.4), [0.9, 3.4, 0.9], 'latao', 'guarda');
+  Ch(at(3.4), at(15), 1.6, 1.25, 'aco', 'lamina'); Ee(at(15.4), [1.3, 1.3, 1.3], 'aco', 'lamina');
+  const c0 = T(1, 0, 45.8);
+  return { dx: SC * (c0[0] - 1), dy: -SC * (c0[2] - 45.8) * CP };
+}
+export function quadroPose(P) {
+  const h = montarPose(P), px = acabar(renderizar(Math.PI / 2));
+  colarCabeca(px, 'l', Math.round(h.dx + (P.hdx || 0)), Math.round(h.dy + (P.hdy || 0)), P.giros || 0);
+  return px;
 }

@@ -9,6 +9,7 @@ import puppeteer from 'puppeteer-core';
 import { codificarWav } from './lib/wav.mjs';
 import { codificarPng } from './lib/png.mjs';
 import { gerarEdric, validarEdric } from './arte/edric.mjs';
+import { gerarBatalha } from './arte/edric_batalha.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..'), SAIDA = join(RAIZ, 'assets');
 const arg = (n, p) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? `--${n}=${p}`).split('=')[1];
@@ -33,6 +34,8 @@ try {
   const dir = join(SAIDA, 'sprites', 'hero_edric'); mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'hero_edric.png'), codificarPng(e.img)); writeFileSync(join(dir, 'hero_edric.meta.json'), JSON.stringify(e.meta, null, 2) + '\n');
   console.log(`hero_edric: ${e.img.w}×${e.img.h}, ${v.cores} cores`);
+  const b = gerarBatalha(); writeFileSync(join(dir, 'hero_edric_batalha.png'), codificarPng(b.img)); writeFileSync(join(dir, 'hero_edric_batalha.meta.json'), JSON.stringify(b.meta, null, 2) + '\n');
+  console.log(`hero_edric_batalha: ${b.frames.length} quadros`);
 }
 
 // SFX de teste (prova o desbloqueio do áudio por gesto): 0,15 s, mono, 24 kHz, sem dependências. Áudio real é do 05.
