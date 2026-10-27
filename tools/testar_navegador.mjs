@@ -189,6 +189,11 @@ if (SEG_MEDIR > 0) {
     checar('M1-02 média ≥ 58 fps (ou ≥ 98 % do teto do monitor)', medicao.fps_medio >= 58 || medicao.fps_medio >= 0.98 * base, `${medicao.fps_medio} fps · teto ${base.toFixed(1)} fps · ${(100 * medicao.fps_medio / base).toFixed(1)} %`); checar('M1-02 pior 1 % ≥ 45 fps', medicao.fps_pior_1pct >= 45, `${medicao.fps_pior_1pct} fps`); }
   checar('M1-03 nenhum quadro > 250 ms', medicao.maior_ms <= 250, `maior ${medicao.maior_ms} ms`);
 }
+{ // encontro SEM a tecla ] (mesmo caminho do gatilho por passos): a UI liga ao controlador, mostra o menu e a vista é a da batalha
+  await pag.evaluate(() => { __dunwick.jogo.iniciarBatalha('enc_slime_1'); }); await dormir(4000);
+  const b = await pag.evaluate(() => ({ modo: __dunwick.jogo.modo, visao: document.getElementById('ui').dataset.visao, ligada: !!__dunwick.batalhaUi.controlador, menu: !!document.querySelector('.bat:not([hidden])') }));
+  checar('batalha por encontro natural: UI ligada, menu visível e vista de batalha', b.modo === 'batalha' && b.visao === 'batalha' && b.ligada && b.menu, JSON.stringify(b));
+}
 checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 5).join(' | '));
 if (avisos.length) console.log(`  avisos do console (${avisos.length}): ${avisos.slice(0, 3).join(' | ')}`);
 writeFileSync(join(dirQA, 'resultado_navegador.json'), JSON.stringify({ data: new Date().toISOString(), navegador: await navegador.version(), gpu, resultados, medicao, avisos }, null, 1));

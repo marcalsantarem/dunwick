@@ -96,6 +96,8 @@ async function iniciar() {
     if (__DEV__ && debug.pausado) { passos = debug.consumirPasso() ? 1 : 0; acum.resetar(); alfa = 1; }
     else { passos = acum.avancar(dtMs / 1000, __DEV__ ? debug.fatorTempo() : 1); alfa = acum.alfa; tempoS += Math.min(dtMs, 100) / 1000; }
     for (let i = 0; i < passos; i++) { ultimoSnap = entrada.amostrar(mundo.ticks); mundo.passo(ultimoSnap, entrada.buffer); }
+    // encontro natural (passos) e de depuração entram pelo mesmo caminho: jogo.batalha novo → a UI liga a ele (antes só a tecla ] ligava, e em produção a batalha ficava sem UI)
+    if (batalhaUi && mundo.jogo.modo === 'batalha' && mundo.jogo.batalha && batalhaUi.controlador !== mundo.jogo.batalha) batalhaUi.ligar(mundo.jogo.batalha);
     batalhaUi?.atualizar(Math.min(dtMs, 100) / 1000);
     const dtS = Math.min(dtMs, 100) / 1000;
     if (apr) {

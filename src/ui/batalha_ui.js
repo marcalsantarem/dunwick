@@ -409,6 +409,8 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
 
   return {
     ligar, atualizar, encerrar,
+    /** Controlador ligado agora (ou null): a plataforma liga a UI a toda batalha, não só à de depuração. */
+    get controlador() { return ctrl; },
     get modo() { return modo; }, get ocupado() { return rep.ocupado; },
     /** A cena recebe cada evento no instante em que a UI o toca. Devolve a função que cancela. */
     aoEvento(fn) { observadores.push(fn); return () => observadores.splice(observadores.indexOf(fn), 1); },
