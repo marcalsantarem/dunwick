@@ -211,3 +211,8 @@ Respostas do usuário às perguntas t, u, v do 02:
 ## D-029 — Arte segue 100 % por código (2026-10-27)
 - **Decisão (usuário):** manter **todos os assets gerados por código** (sem editor externo, sem IA de imagem), por simplificação. Nenhuma conexão (MCP) de arte será adotada agora. Uma **versão remaster** com arte refeita (editor de pixel art ou IA de imagem local, com registro de origem e termos) fica como ideia futura (BL-003).
 - **Para melhorar a qualidade dentro da regra:** moldes de pixels desenhados à mão em texto (como o rosto do Edric) e, se o usuário quiser, imagens de referência de estilo para o 04 desenhar olhando.
+
+## D-030 — Visual do Edric aprovado (2026-10-27)
+- **Aprovado pelo usuário:** o sprite do Edric (pose parada, 5 direções, célula 96, rosto em molde de pixels desenhado à mão, pescoço encurtado). Gerado por `tools/arte/edric.mjs` e `tools/arte/rostos.mjs`.
+- **Pendências do Edric (não bloqueiam):** o lado oeste sai espelhado (ombreira e faixa trocam de lado); animações e poses de batalha por turnos ainda não existem; mapa de relevo para a luz não foi feito; o Diretor de Arte ainda precisa aprovar 5 cores novas (rampa verde-musgo e um tom de linho).
+- **Item-modelo:** serve de referência de estilo para os demais personagens (Torvan, Maren, Grace, inimigos, Hollowpaw).

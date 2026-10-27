@@ -2,15 +2,15 @@
   "id": "hero_edric",
   "tipo": "sprite_humanoide",
   "celula": [
-    192,
-    192
+    96,
+    96
   ],
   "ancora": [
-    96,
-    168
+    48,
+    88
   ],
-  "arte_escala": 1.5,
-  "ref_celula": 128,
+  "arte_escala": 1,
+  "ref_celula": 96,
   "direcoes": [
     "s",
     "se",
@@ -123,5 +123,6 @@
       "loop": false,
       "inicio": 220
     }
-  }
+  },
+  "nota": "Visual v2 (pixel art HD-2D, célula 96): pose parada. Todas as animações apontam o mesmo quadro estático por direção até a etapa de animação."
 }
