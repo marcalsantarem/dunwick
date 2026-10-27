@@ -1,0 +1,294 @@
+# Combate por turnos — especificação do M1 (BL-004)
+
+> **Dono:** 03 Combate por turnos e IA · **Status:** RASCUNHO v0.1 · 2026-10-27 · base: D-028 (turnos, estilo Breath of Fire), D-031 (rodadas, encontro aleatório, Grace luta), D-032, D-023.
+> Sem stack e sem código. Todo número abaixo é **dado** (vai para `data/`); os marcados **[06]** são do 06 (fórmulas e atributos), e o 03 só dá um valor inicial para destravar a BL-008.
+> Reaproveita do combate de ação arquivado (`docs/arquivo/combate_acao/`): o **pipeline de dano** em ordem fixa, atributos, tipos de dano e resistências, habilidades por ID, XP e `formulas.md` §4/§9/§10. Cai: quadros, hitboxes, esquiva, fôlego, aviso em tempo real.
+> Textos por ID; tempos em **segundos** (nunca quadros); IDs: `hero_`, `enemy_`, `enc_`, `atk_`, `skill_`, `item_`, `fx_`, `sfx_`.
+
+---
+
+## 1. A rodada (estilo Breath of Fire)
+
+```
+BATALHA_INICIA → [ RODADA: COMANDOS → EXECUÇÃO → FIM_DE_RODADA ] × n → BATALHA_TERMINA
+```
+
+| Fase | O que acontece |
+|---|---|
+| **COMANDOS** | Cada membro **vivo** do grupo escolhe um comando, na ordem fixa do grupo (Edric, Grace). `cancelar` volta ao membro anterior e refaz a escolha. Ao confirmar o último, a rodada trava os comandos. **Os inimigos escolhem a ação no mesmo instante** (IA, §7), sem ver os comandos do grupo |
+| **EXECUÇÃO** | Todos os atores vivos agem **um por vez**, em ordem de iniciativa (§3). Cada ato resolve por inteiro (custo, alvo, dano, eventos) antes do próximo |
+| **FIM_DE_RODADA** | Limpa `defendendo`; aplica regeneração de mana por rodada **[06]**; checa `rodadas_max`; abre a rodada seguinte |
+
+- Tudo é **determinístico** em regras (dano, ordem, empates). A aleatoriedade existe só na **IA**, na **fuga** e nos **drops**, sempre por PRNG com **semente da batalha** (`semente_batalha`, gravada no resultado), para os testes e o 06 repetirem qualquer batalha.
+- Segurança: `rodadas_max` = 50; passou disso, a batalha termina como `empate` (volta ao mapa sem recompensa).
+- `modo_automatico` (só para teste e simulação do 06/09): a IA também controla o grupo, sem UI.
+
+---
+
+## 2. Comandos do M1
+
+| Comando | Alvo | Custo | Efeito |
+|---|---|---|---|
+| **Atacar** | 1 inimigo vivo | — | Ataque básico do ator (`atk_*`), dano físico pela fórmula do 06 |
+| **Habilidade** | conforme `alvo_tipo` da habilidade | mana **[06]** | Lista do ator (`skill_*`); sem mana suficiente, o item da lista fica desabilitado e não pode ser escolhido |
+| **Item** | conforme o item | consome 1 | Só itens com `uso_batalha` = sim; M1: poção (cura 1 aliado vivo) |
+| **Defender** | si mesmo | — | Dano recebido × `defender_mult_dano` (0,5) até o fim da rodada; **age antes dos demais** (`prioridade_comando` +1) |
+| **Fugir** (opcional, ligado no M1) | — | — | Tenta fugir (§6.4); desabilitado em batalha de chefe (`pode_fugir` = não) |
+
+Habilidades do M1 (1 de cada, números **[06]**): Edric `skill_giro` (alvo `inimigos_todos`, custo mana, dano físico em área) e Grace `skill_cura` (alvo `aliado_1`, custo mana, cura escalada por Mente). Os ataques básicos são `atk_edric_golpe` e `atk_grace_cajado` (Grace bate fraco).
+
+`alvo_tipo`: `inimigo_1` · `inimigos_todos` · `aliado_1` · `aliados_todos` · `si`. Habilidade que reviver (caído) fica fora do M1.
+
+---
+
+## 3. Ordem de ação e empates
+
+```
+iniciativa = agilidade_efetiva × (1 + bonus_comando)            (decimal; sem arredondar)
+ordem      = ordenar por: prioridade_comando (maior primeiro) → iniciativa (maior primeiro) → desempate
+```
+
+| Chave | Valor | Observação |
+|---|---|---|
+| `prioridade_comando` | Defender +1 · demais 0 | Fugir 0; ajustável por habilidade (campo `prioridade`) |
+| `iniciativa_variacao` | 0 | Fração de sorteio ±; **0 no M1** (ordem 100 % previsível). Existe para o 06 ligar depois |
+| `desempate` | lado → posição | 1º: **grupo antes dos inimigos**; 2º: menor número de posição (Edric 1, Grace 2; inimigo slot 1, 2, 3) |
+
+- A ordem é calculada **uma vez**, ao travar os comandos. A agilidade não muda no meio da rodada no M1 (sem estados de velocidade).
+- Ator que cai antes de agir **perde o ato** (evento `ato_cancelado`); o custo não é cobrado.
+- Exemplos resolvidos (viram testes **O1–O4**):
+
+| # | Entrada | Ordem de execução |
+|---|---|---|
+| O1 | Edric ag 10 (Atacar), Grace ag 8 (Atacar), Lobo ag 12 | Lobo (12) → Edric (10) → Grace (8) |
+| O2 | O1, mas Grace escolhe **Defender** | Grace (prioridade +1) → Lobo → Edric |
+| O3 | Edric ag 10, Lobo ag 10 | Edric, Lobo (empate: grupo primeiro) |
+| O4 | Slime 1 ag 4 e Slime 2 ag 4, Edric ag 10 | Edric → Slime 1 → Slime 2 (empate: menor posição) |
+
+---
+
+## 4. Estados dos atores
+
+| Estado | Condição | Regras |
+|---|---|---|
+| `vivo` | vida > 0 | Age, pode ser alvo |
+| `caido` | vida = 0 | Não age, não é alvo de comando (inimigo sai da cena; aliado fica no chão), perde o ato pendente |
+| `defendendo` | marca temporária | Dura até `FIM_DE_RODADA` |
+
+- Estados de status do 06 (queimando, lento etc.) **fora do M1**; o campo `estados` existe vazio em cada ator para o 06 ligar depois.
+- Vida e mana ficam presas em `[0, máx]`. Cura não revive caído (no M1).
+- **Fim de batalha com vitória:** aliados `caido` voltam com `caido_pos_batalha_vida` = 1 de vida; mana e vida restantes seguem para o mapa.
+
+---
+
+## 5. Pipeline de dano e cura (reaproveitado, em ordem fixa)
+
+Para cada ato:
+1. **Validar:** ator vivo? comando ainda possível (mana, item em estoque)? Se não → `ato_falhou`, nada é cobrado.
+2. **Resolver alvos:** alvo morto no meio da rodada → **redireciona** para o próximo da mesma lista que esteja vivo (inimigo: menor posição; cura: o aliado vivo com **menor fração de vida**); sem alvo válido → `ato_falhou`.
+3. **Pagar o custo** (mana, item).
+4. **Para cada alvo:** (a) todo ato **acerta** (sem chance de errar no M1); (b) **dano** = fórmula do 06 §4.1 sem os termos de ação: `arred(dano_base × (1 + escala × atributo/100) × mult_defender × mult_dificuldade × (1 − resistência_ao_tipo))`, mínimo 1; (c) aplica; (d) estados (fora do M1).
+5. **Eventos** (§8), na ordem em que acontecem.
+6. **Checar queda** (vida 0 → `caiu`), depois **fim de batalha** (§6).
+
+- Cura: `arred(cura_base × (1 + escala × mente/100) × mult_cura)`, limitada ao que falta de vida (06 §9). Sem crítico, sem variação aleatória.
+- `mult_defender` vale para o alvo que está `defendendo` (0,5), também para golpes em área.
+
+---
+
+## 6. Fim da batalha
+
+### 6.1 Vitória
+Todos os inimigos `caidos`. Checada **após cada ato**, então a rodada termina na hora (os atos restantes não acontecem). Evento `venceu` com a recompensa.
+
+### 6.2 Derrota
+Todos do grupo `caidos`. Evento `perdeu`; a tela de game over (15) oferece **reiniciar do último ponto salvo** (13/08). Sem penalidade extra no M1.
+
+### 6.3 Recompensas
+| Item | Regra |
+|---|---|
+| XP | Soma do `xp` de cada inimigo derrotado; **cada membro vivo recebe o total** (caído não recebe, `xp_caido_fracao` = 0). Níveis: 06 §10 |
+| Ouro | Soma do `ouro` dos inimigos **[06]** |
+| Drops | `drops: [{item, chance, qtd}]` por inimigo, sorteio por PRNG com semente; resultado aparece na tela de recompensa |
+
+### 6.4 Fuga
+`chance = limitar(fugir_base + (ag_media_grupo − ag_media_inimigos) × fugir_por_ponto, fugir_min, fugir_max)`; com `fugir_base` 0,5 · `fugir_por_ponto` 0,02 · `fugir_min` 0,1 · `fugir_max` 0,9. Sorteio por PRNG. Sucesso: o ator some da rodada e **toda a batalha termina** como `fugiu` (sem XP, drops nem ouro); falha: o ato é gasto. Em chefe, `pode_fugir` = não. Exemplos **O5** (ag médias 10 e 8 → 0,54) e **O6** (grupo 5 contra 20 → 0,1, piso).
+
+---
+
+## 7. IA dos inimigos (simples)
+
+- Cada inimigo escolhe **uma ação por rodada**, no início dela, por **peso**, entre as ações cuja `condicao` é verdadeira. A IA **só vê o estado público** (vida e mana atuais, quem está caído); **nunca** lê os comandos do grupo nem trapaceia.
+- `alvo_regra` por ação: `aleatorio` (uniforme entre vivos) · `menor_vida` (menor fração de vida) · `maior_ameaca` (maior dano médio causado na batalha, só se houver dado) · `misto` (`prob_menor_vida` de escolher o de menor vida, senão aleatório).
+- Se o alvo cai antes do ato, redireciona como no §5 (para um vivo, conforme a mesma regra).
+
+Dados (exemplo, vão para `data/enemies/enemy_*.json` e seguem `inimigo.schema.json` + campo `ia`):
+
+```json
+{ "id": "enemy_lobo", "ia": [
+  { "acao": "atk_lobo_mordida", "peso": 70, "alvo_regra": "misto", "prob_menor_vida": 0.5 },
+  { "acao": "skill_lobo_investida", "peso": 30, "alvo_regra": "aleatorio", "condicao": { "rodada_min": 2 } } ] }
+```
+
+| Inimigo (D-023) | Arquétipo | Ações e pesos | Alvo | Observação |
+|---|---|---|---|---|
+| `enemy_slime` | Emboscador | `atk_slime_golpe` 70 · `skill_slime_balanco` 30 (passa a vez; só animação) | aleatório | Lento (agilidade baixa), dano baixo, vida baixa; é o inimigo do tutorial |
+| `enemy_lobo` | Combatente | `atk_lobo_mordida` 70 · `skill_lobo_investida` 30 (dano ×1,5; só da rodada 2 em diante) | misto, 50 % menor vida | Ágil; ataca quase sempre antes do grupo |
+
+**Chefe (fora do M1, gancho):** `fases: [{ vida_fracao_max, acoes, transicao }]`; ao cruzar o limite, a fase muda no **fim do ato** e o evento `fase_mudou` toca a cena (07/10). Hollowpaw terá 3 fases por vida.
+
+---
+
+## 8. Eventos para a apresentação
+
+A simulação resolve cada ato **por inteiro** e emite os eventos na ordem; a apresentação toca uma **fila** e só libera o próximo ato quando termina (`ato_apresentado`). Nos testes e no `modo_automatico`, a fila é instantânea. A simulação **não conhece** tempos de animação, só o `duracao_s` sugerido em cada ato.
+
+| Evento | Dados | Quem usa |
+|---|---|---|
+| `batalha_iniciou` | `encontro_id`, grupo, inimigos, semente | 07 (cena), 15, 05 (música) |
+| `rodada_iniciou` | `n` | 15 (ordem da rodada) |
+| `comando_pedido` | `ator`, comandos habilitados | 15 (menu) |
+| `comando_escolhido` | `ator`, comando, alvo(s) | 15 |
+| `execucao_iniciou` | `ordem` (lista de atores) | 15 (barra de ordem) |
+| `turno_iniciou` | `ator` | 07/04 (destaque do ator) |
+| `ato_executado` | `ator`, `tipo` (`atacar`/`habilidade`/`item`/`defender`/`fugir`/`espera`), `id`, alvos, `duracao_s` | 04 (pose), 05, 10 (fx) |
+| `dano` | `ator`, `alvo`, `valor`, `tipo_dano`, `efetividade` (`fraco`/`normal`/`resistente`), `defendendo` | 15 (número), 05, 10 |
+| `curou` | `ator`, `alvo`, `valor` | 15, 10 (fx de cura) |
+| `mana_gasta`, `item_usado` | ator, valor / item | 15 |
+| `defendeu` | `ator` | 04 (pose), 10 |
+| `fuga_tentada` | `ator`, `sucesso` | 04, 05 |
+| `ato_falhou`, `ato_cancelado` | `ator`, `motivo` | 15 (mensagem) |
+| `caiu` | `alvo` | 04 (pose), 05 |
+| `vida_mudou`, `mana_mudou` | `ator`, valor, máximo | 15 (caixas da HUD) |
+| `fase_mudou` | `inimigo`, `fase` (chefe) | 07/10 |
+| `rodada_terminou` | `n` | 15 |
+| `venceu` | XP, ouro, itens, níveis | 15 (tela de recompensa), 05 (música) |
+| `perdeu` / `fugiu` / `empate` | — | 15, 13 |
+| `batalha_terminou` | `resultado`, `semente`, recompensas, vida/mana finais | 13 (volta ao mapa) |
+
+---
+
+## 9. Tempos de animação (segundos; todos em `cfg_batalha`)
+
+| Chave | s | Observação |
+|---|---|---|
+| `t_entrada_batalha` | 1,0 | Transição do mapa + entrada dos sprites |
+| `t_intervalo_ato` | 0,2 | Respiro entre atos |
+| `t_atacar` | 0,9 | Avança 0,25 → golpe 0,25 (impacto em 0,40) → recua 0,25 |
+| `t_habilidade` | 1,2 | Prepara 0,5 → efeito 0,7 (impacto em 0,7) |
+| `t_cura` | 1,1 | Prepara 0,4 → brilho 0,7 |
+| `t_item` | 0,9 | Pega 0,4 → usa 0,5 |
+| `t_defender` | 0,4 | Assume a guarda e fica |
+| `t_dano` | 0,3 | Recuo do alvo, no impacto |
+| `t_cair` | 0,6 | Queda; inimigo some depois de 0,4 |
+| `t_numero_dano` | 0,8 | Número flutuando |
+| `t_barra_vida` | 0,4 | Barra desce animada |
+| `t_pausa_impacto` | 0,06 | Congela a cena ao acertar (peso do golpe) |
+| `t_fuga` | 0,8 | Corre para fora; tela some |
+| `t_vitoria` | 1,6 | Pose de vitória antes da tela de recompensa |
+| `velocidade_batalha` | 1× / 2× | Opção do jogador: divide todos os tempos |
+
+Uma rodada com 3 atos dura ≈ 3 s a 1×. Acessibilidade: flashes ≤ 3/s (o limitador global do 10 descarta o excedente), tremor e partículas desligáveis.
+
+---
+
+## 10. Cena: posições e poses
+
+### 10.1 Posições (plano de batalha, tiles; origem no centro do palco, **x** vai da esquerda para a direita da tela, **z** para a frente da câmera)
+| Slot | Grupo (lado direito) | Inimigos (lado esquerdo) |
+|---|---|---|
+| 1 | (+3,0 ; 0,0) Edric | (−3,0 ; 0,0) |
+| 2 | (+3,6 ; +1,6) Grace | (−3,6 ; −1,6) |
+| 3 | (+3,6 ; −1,6) reservado (meta futura) | (−3,6 ; +1,6) |
+
+- Até **3 inimigos** por batalha; o grupo do M1 tem 2 em campo.
+- **Direção do sprite:** em batalha cada personagem usa **uma só direção**: o grupo olha para a esquerda da tela (**O**, o L espelhado) e os inimigos para a direita (**L**). Isso exige que a **câmera de batalha** (07) deixe o eixo x horizontal na tela. O sprite continua com as 4 direções para a exploração.
+- **Contato:** ator corpo a corpo avança até `dist_contato_tiles` = 1,1 do alvo e volta; habilidades e cura são feitas do lugar. Ataque em área (`skill_giro`) acontece no centro entre os inimigos.
+- Altura do palco, fundo, luz e névoa: 07/10. Câmera de batalha **fixa**; movimento só em habilidades especiais e chefe.
+
+### 10.2 Lista de poses (para 04, 07 e 10)
+Uma direção por pose (a da batalha). `q` = quadros do sprite, `evento` = evento de quadro nos metadados (04).
+
+| Pose (id) | Quem | Loop | q @ fps | Evento | Observação |
+|---|---|---|---|---|---|
+| `bat_parado` | todos | sim | 4 @ 6 | — | Guarda de combate (inimigo: respira/balança) |
+| `bat_avanca` | Edric, Lobo | sim | 6 @ 10 | `passo` | Correr até o alvo; também usada na fuga (espelhada) |
+| `bat_ataque` | Edric, Grace, Slime, Lobo | não | 5 @ 12 | `impacto` (q3) | Edric: golpe de espada · Grace: cajado · Slime: salto/pancada · Lobo: mordida |
+| `bat_ataque_forte` | Lobo | não | 6 @ 10 | `impacto` (q4) | `skill_lobo_investida` |
+| `bat_habilidade` | Edric, Grace | não | 6 @ 10 | `solta_efeito` (q4) | Giro de espada (Edric) / conjurar (Grace) |
+| `bat_cura` | Grace | não | 6 @ 10 | `solta_efeito` (q3) | Mãos erguidas, brilho branco-esverdeado |
+| `bat_espera` | Slime | não | 4 @ 8 | — | `skill_slime_balanco` (treme e não ataca) |
+| `bat_item` | Edric, Grace | não | 4 @ 8 | `usa` (q3) | Pega e usa o item |
+| `bat_defender` | Edric, Grace | **mantém último quadro** | 2 @ 8 | — | Assume a guarda até o fim da rodada |
+| `bat_dano` | todos | não | 2 @ 8 | — | Recuo curto |
+| `bat_caido` | Edric, Grace | não (1 quadro) | 1 | — | Caído no chão (permanece) |
+| `bat_morte` | Slime, Lobo | não | 4 @ 7 | — | Slime derrete · Lobo tomba; some em seguida |
+| `bat_levanta` | Edric, Grace | não | 3 @ 8 | — | Volta de caído na vitória |
+| `bat_vitoria` | Edric, Grace | sim | 4 @ 6 | — | Comemoração curta |
+
+Total aproximado: Edric 11 poses, Grace 11, Slime 6, Lobo 7. Metadados: `fps`, `loop`, `evento_quadro`, âncora nos pés.
+
+---
+
+## 11. Encontros do M1 (Slime e Lobo)
+
+**Proposta:** três encontros em `data/encounters/`, para testar tudo sem acrescentar custo de arte:
+
+| Encontro | Composição | Para quê |
+|---|---|---|
+| `enc_slime_1` | 1 Slime | Tutorial: primeiro contato com os comandos |
+| `enc_lobo_1` | 1 Lobo | Inimigo ágil: ordem de ação e Defender fazem diferença |
+| `enc_misto_1` | 1 Lobo + 1 Slime | Alvos múltiplos, `skill_giro` em área, cura da Grace |
+
+Gatilho no M1 (BL-008): ponto fixo do mapa para cada encontro, **sem tabela de encontros aleatórios** (13 define passos e pesos por zona depois). Cada encontro tem `pode_fugir`, `musica` e `cenario`.
+
+---
+
+## 12. Dados (o que vai para `data/`)
+
+| Arquivo | Conteúdo |
+|---|---|
+| `data/config/cfg_batalha.json` | `rodadas_max`, `defender_mult_dano`, `prioridade_comando`, `iniciativa_variacao`, `desempate`, `caido_pos_batalha_vida`, `xp_caido_fracao`, fuga, tempos (§9), posições (§10.1), `dist_contato_tiles` |
+| `data/encounters/enc_*.json` | `id`, `inimigos` (ids por slot), `pode_fugir`, `cenario`, `musica` |
+| `data/enemies/enemy_slime.json`, `enemy_lobo.json` | vida, agilidade, resistências, `xp`, `ouro`, `drops`, `ia` |
+| `data/characters/hero_edric.json`, `hero_grace.json` | atributos, kit (`atk_*`, `skill_*`), poses |
+| `data/attacks/atk_*.json`, `skill_*.json` | `alvo_tipo`, `custo`, `mult_dano`, `atributo`, `escala`, `tipo_dano`, `prioridade`, `duracao_s`, `pose`, `fx`, `sfx` |
+
+O 08 estende os esquemas (`inimigo`, `personagem`, `config`) e acrescenta `encontro` e `ataque`; o `npm run validar` reprova campo faltando ou fora de faixa.
+
+### Valores iniciais para destravar a BL-008 (o 06 substitui)
+| Ator | Vida | Mana | Agilidade | Ataque base | Observação |
+|---|---|---|---|---|---|
+| `hero_edric` | 140 | 45 | 10 | 12 (`corte`) | números de `formulas.md` §3 |
+| `hero_grace` | 100 | 60 | 8 | 6 (`impacto`) | `skill_cura` cura 30 base |
+| `enemy_slime` | 30 | — | 4 | 6 | XP e ouro [06] |
+| `enemy_lobo` | 40 | — | 12 | 8 | XP e ouro [06]; vem do bestiário |
+
+---
+
+## 13. Testes previstos
+- **Ordem:** O1–O4 (agilidade, Defender, empate de lado, empate de posição).
+- **Dano e cura:** exemplos do 06 (D1–D11 adaptados) e `mult_defender`; cura limitada ao que falta; piso de 1.
+- **Redirecionamento:** alvo cai antes do ato → próximo vivo; cura em quem caiu → aliado vivo de menor fração; sem alvo → `ato_falhou`.
+- **Custo:** mana ou item faltando → ato falha sem cobrar; ator caído antes de agir → `ato_cancelado`.
+- **Fim:** vitória e derrota checadas **após cada ato**; vitória encerra os atos restantes; `empate` em `rodadas_max`.
+- **Fuga:** O5, O6 e bloqueio em chefe.
+- **Repetibilidade:** mesma semente → mesma batalha (IA, fuga, drops).
+- **Simulação (06/09):** `modo_automatico` roda 1.000 batalhas por encontro sem travar e devolve taxa de vitória e rodadas médias.
+- **Presentation:** fila de eventos tocada em modo instantâneo = mesmo resultado que animado.
+
+---
+
+## 14. Perguntas
+**Ao usuário (via Produtor):**
+1. **Fugir** entra no M1 (recomendado: sim, desligado em chefe)?
+2. **Encontros** do M1: os 3 propostos (Slime sozinho, Lobo sozinho, misto)? Ou só o misto?
+
+**Ao 06:** adaptar `formulas.md` aos turnos (tirar fôlego, esquiva, postura e janela em quadros; manter atributos, mana, dano, cura, XP); fichas de Edric, Grace, Slime e Lobo; `skill_giro`, `skill_cura`, poção; mana por rodada.
+**Ao 08:** esquemas `encontro`, `ataque`, `cfg_batalha`; PRNG com semente; fila de eventos instantânea para teste.
+**Ao 07/10/15:** câmera de batalha com eixo x horizontal (§10.1); poses e HUD (BL-005/006/007); número de dano e barra de ordem.
+
+---
+
+## Histórico
+- v0.1 (2026-10-27) — primeira versão (BL-004).
