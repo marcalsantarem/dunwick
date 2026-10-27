@@ -12,3 +12,7 @@
 
 ### BL-002 · Combate em turnos estilo Breath of Fire (DECIDIDO, D-028) — 2026-10-26
 - **Ideia (usuário):** combate de turnos em cena de batalha, personagens e inimigos em sprite sobre o cenário, caixas de vida e habilidade embaixo. Grupo de 3 (herói + 2 aliados). Possibilidade de modo híbrido ou por partes (dungeons em ação). Comparação de custo a pedido do usuário quando o limite de uso permitir.
+
+### BL-003 · Versão remaster com arte refeita (P3, futuro) — 2026-10-27
+- **Ideia (usuário):** depois do jogo pronto, retrabalhar a arte como uma versão "remaster", possivelmente com editor de pixel art ou IA de imagem local. Hoje tudo é por código (D-029).
+- **Cuidados:** registrar a origem de cada asset, revisar os termos das ferramentas de IA (Bíblia §10.3) e manter os IDs e o formato dos sprites para trocar os arquivos sem mexer no jogo.

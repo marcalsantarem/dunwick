@@ -207,3 +207,7 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Substitui:** D-007, D-009 (partes de tempo real), D-010 e D-019 (partes de aviso/esquiva em tempo real), BRF-003/BRF-010 no que for de tempo real. **Segue:** história, nomes, direção de arte, inimigos (D-023), vila em 3 estados (D-019), esqueleto técnico (render, câmera, dados, testes).
 - **Em aberto (a decidir com o usuário):** como o inimigo aparece (visível no mapa ou encontro aleatório), turnos por rodada ou barra de tempo (ATB), quantos no grupo no slice (companheira entra em cena, D-012), evolução de habilidades por uso (BL-001), classe do Edric.
 - **Próximo passo:** o Produtor monta a comparação curta de formatos de turno quando o limite de uso do usuário permitir; só então os agentes (03, 06, 07, 04, 09) revisam seus documentos.
+
+## D-029 — Arte segue 100 % por código (2026-10-27)
+- **Decisão (usuário):** manter **todos os assets gerados por código** (sem editor externo, sem IA de imagem), por simplificação. Nenhuma conexão (MCP) de arte será adotada agora. Uma **versão remaster** com arte refeita (editor de pixel art ou IA de imagem local, com registro de origem e termos) fica como ideia futura (BL-003).
+- **Para melhorar a qualidade dentro da regra:** moldes de pixels desenhados à mão em texto (como o rosto do Edric) e, se o usuário quiser, imagens de referência de estilo para o 04 desenhar olhando.
