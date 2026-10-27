@@ -216,3 +216,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Aprovado pelo usuário:** o sprite do Edric (pose parada, 5 direções, célula 96, rosto em molde de pixels desenhado à mão, pescoço encurtado). Gerado por `tools/arte/edric.mjs` e `tools/arte/rostos.mjs`.
 - **Pendências do Edric (não bloqueiam):** o lado oeste sai espelhado (ombreira e faixa trocam de lado); animações e poses de batalha por turnos ainda não existem; mapa de relevo para a luz não foi feito; o Diretor de Arte ainda precisa aprovar 5 cores novas (rampa verde-musgo e um tom de linho).
 - **Item-modelo:** serve de referência de estilo para os demais personagens (Torvan, Maren, Grace, inimigos, Hollowpaw).
+
+## D-031 — Combate por turnos: formato, encontros e grupo (2026-10-27)
+- **Formato A (usuário):** **rodadas, estilo Breath of Fire**: a cada rodada escolhem-se os comandos de todo o grupo e todos agem em ordem de agilidade; tela de batalha separada, com personagens e inimigos em sprite sobre o cenário.
+- **Encontros B (usuário):** **encontro aleatório** (passos no mapa disparam a batalha). Inimigos visíveis no mapa não entram por ora.
+- **Grupo A (usuário):** a **Grace luta com o Edric** a partir da feira (volta à vila e luta final do slice), com cura como habilidade. Isso **substitui a parte da D-012** que dizia "só em cena, sem lutar". Grupo de 3 segue como meta futura.
+- **Pendente:** revisão da estrutura de agentes (criar/dividir), que o usuário pediu para confirmar antes de qualquer alteração nos arquivos dos agentes.
