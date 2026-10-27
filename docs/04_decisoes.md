@@ -228,3 +228,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Quadro de tarefas em arquivo** (`docs/05_quadro.md`) por ora; espelhar no GitHub Projects quando o plugin do GitHub funcionar.
 - **Arquivos:** novos `agentes-rpg/11_*.md`, `13_*.md`, `14_*.md`, `15_*.md`; blocos de "DIVISÃO DE ESCOPO" em `03`, `06` e `07`. Os arquivos antigos mantêm o texto completo (que serve de base para as duas metades).
 - **Sessões:** o usuário abre sessões novas para 11, 13, 14 e 15; as sessões Jogabilidade, Sistemas e Cenario continuam com o escopo reduzido.
+
+## D-033 — Onda 1 aprovada e parâmetros do M1 (2026-10-27)
+- **Onda 1 aprovada** (BL-004 a BL-008). **BL-004** (especificação do combate por turnos, `docs/combate_turnos.md` v0.2 e `docs/sistemas/formulas_turnos.md`) **concluída**.
+- **M1:** **Fugir ligado** (desligado em chefe); **3 encontros** (`enc_slime_1`, `enc_lobo_1`, `enc_misto_1`), com **Slime e Lobo** como inimigos; **batalhas curtas aceitas** (20 s a 1 min, rebalancear no M3).
+- **Liberadas agora (em paralelo):** BL-005 UI de batalha (15), BL-006 cena de batalha (07, com o 10), BL-007 poses do Edric (04). **Depois:** BL-008 controlador e transição (03, 13, 08).
+- **Pendente do 06:** valores de `defesa` de Edric, Grace e Lobo.
