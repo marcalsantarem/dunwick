@@ -1,0 +1,13 @@
+{
+  "id": "skill_slime_balanco",
+  "versao": 1,
+  "nome_txt": "txt_skill_slime_balanco_nome",
+  "tipo": "habilidade",
+  "efeito": "espera",
+  "alvo_tipo": "si",
+  "custo": {
+    "mana": 0
+  },
+  "tempo": "t_espera",
+  "pose": "bat_espera"
+}

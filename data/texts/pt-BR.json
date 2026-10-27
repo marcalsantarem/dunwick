@@ -23,6 +23,22 @@
     "ui_debug_lento": "CÂMERA LENTA {fator}×",
     "ui_debug_gamepad_fora": "gamepad desconectado",
     "ui_debug_perfil": "perfil {perfil}",
-    "ui_debug_audio": "áudio {estado}"
+    "ui_debug_audio": "áudio {estado}",
+    "txt_hero_edric_nome": "Edric",
+    "txt_hero_grace_nome": "Grace",
+    "txt_enemy_slime_nome": "Slime",
+    "txt_enemy_lobo_nome": "Lobo",
+    "txt_enc_slime_1_nome": "Um Slime",
+    "txt_enc_lobo_1_nome": "Um Lobo",
+    "txt_enc_misto_1_nome": "Lobo e Slime",
+    "txt_atk_edric_golpe_nome": "Golpe",
+    "txt_atk_grace_cajado_nome": "Cajado",
+    "txt_atk_slime_golpe_nome": "Pancada gosmenta",
+    "txt_skill_slime_balanco_nome": "Balançar",
+    "txt_atk_lobo_mordida_nome": "Mordida",
+    "txt_skill_lobo_investida_nome": "Investida",
+    "txt_skill_golpe_firme_nome": "Golpe Firme",
+    "txt_skill_cura_nome": "Mão Boa",
+    "txt_item_pocao_ervas_nome": "Poção de Ervas"
   }
 }

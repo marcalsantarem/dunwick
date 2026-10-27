@@ -1,0 +1,415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_batalha",
+  "title": "Regras do combate por turnos (docs/combate_turnos.md): rodada, ordem, fuga, tempos em segundos, posições",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "rodadas_max",
+    "defender_mult_dano",
+    "prioridade_comando",
+    "iniciativa_variacao",
+    "caido_pos_batalha_vida",
+    "xp_caido_fracao",
+    "dificuldade",
+    "formulas",
+    "fuga",
+    "regen_mana",
+    "xp",
+    "tempos",
+    "velocidades_batalha",
+    "posicoes",
+    "dist_contato_tiles",
+    "inventario_teste"
+  ],
+  "properties": {
+    "id": {
+      "const": "cfg_batalha"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "rodadas_max": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "defender_mult_dano": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "prioridade_comando": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atacar",
+        "habilidade",
+        "item",
+        "defender",
+        "fugir"
+      ],
+      "properties": {
+        "atacar": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "habilidade": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "item": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "defender": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        },
+        "fugir": {
+          "type": "integer",
+          "minimum": -5,
+          "maximum": 5
+        }
+      }
+    },
+    "iniciativa_variacao": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "caido_pos_batalha_vida": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "xp_caido_fracao": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "dificuldade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mult_dano_causado",
+        "mult_dano_recebido",
+        "mult_cura"
+      ],
+      "properties": {
+        "mult_dano_causado": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mult_dano_recebido": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mult_cura": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "formulas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defesa_constante",
+        "vida_base",
+        "vida_por_vigor",
+        "mana_base",
+        "mana_por_mente",
+        "resistencia_min",
+        "resistencia_max",
+        "dano_minimo"
+      ],
+      "properties": {
+        "defesa_constante": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "vida_base": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "vida_por_vigor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mana_base": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mana_por_mente": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resistencia_min": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 0
+        },
+        "resistencia_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dano_minimo": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "fuga": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base",
+        "por_ponto",
+        "bonus_falha",
+        "min",
+        "max"
+      ],
+      "properties": {
+        "base": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "por_ponto": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bonus_falha": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "min": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "regen_mana": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base",
+        "divisor_mente"
+      ],
+      "properties": {
+        "base": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "divisor_mente": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "xp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base",
+        "expoente"
+      ],
+      "properties": {
+        "base": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "expoente": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "tempos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "t_entrada_batalha",
+        "t_intervalo_ato",
+        "t_atacar",
+        "t_habilidade",
+        "t_cura",
+        "t_item",
+        "t_defender",
+        "t_espera",
+        "t_dano",
+        "t_cair",
+        "t_numero_dano",
+        "t_barra_vida",
+        "t_pausa_impacto",
+        "t_fuga",
+        "t_vitoria"
+      ],
+      "properties": {
+        "t_entrada_batalha": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_intervalo_ato": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_atacar": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_habilidade": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_cura": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_item": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_defender": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_espera": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_dano": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_cair": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_numero_dano": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_barra_vida": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_pausa_impacto": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_fuga": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "t_vitoria": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "velocidades_batalha": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "posicoes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grupo",
+        "inimigos"
+      ],
+      "properties": {
+        "grupo": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 2
+          }
+        },
+        "inimigos": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "items": false,
+            "minItems": 2
+          }
+        }
+      }
+    },
+    "dist_contato_tiles": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 5
+    },
+    "inventario_teste": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^item_[a-z0-9_]+$"
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  }
+}

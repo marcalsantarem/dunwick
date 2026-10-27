@@ -1,0 +1,48 @@
+{
+  "id": "hero_edric",
+  "versao": 1,
+  "nota": "Edric no combate (nível 1). Ficha do 06 §2. A exploração fica em data/characters/hero_edric.json.",
+  "nome_txt": "txt_hero_edric_nome",
+  "sprite": "hero_edric",
+  "nivel": 1,
+  "xp": 0,
+  "atributos": {
+    "vigor": 7,
+    "forca": 8,
+    "destreza": 6,
+    "mente": 3
+  },
+  "armadura": 2,
+  "bonus_itens": {
+    "vida": 0,
+    "mana": 0,
+    "agilidade": 0
+  },
+  "arma": {
+    "poder": 14,
+    "tipo_dano": "corte"
+  },
+  "resistencias": {},
+  "kit": {
+    "ataque": "atk_edric_golpe",
+    "habilidades": [
+      "skill_golpe_firme"
+    ],
+    "itens": [
+      "item_pocao_ervas"
+    ]
+  },
+  "posicao": 1,
+  "poses": {
+    "parado": "bat_parado",
+    "avanca": "bat_avanca",
+    "ataque": "bat_ataque",
+    "habilidade": "bat_habilidade",
+    "item": "bat_item",
+    "defender": "bat_defender",
+    "dano": "bat_dano",
+    "caido": "bat_caido",
+    "levanta": "bat_levanta",
+    "vitoria": "bat_vitoria"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "item_pocao_ervas",
+  "versao": 1,
+  "nota": "Poção de Ervas: cura 40 PV fixos (06 §7).",
+  "nome_txt": "txt_item_pocao_ervas_nome",
+  "uso_batalha": true,
+  "alvo_tipo": "aliado_1",
+  "efeito": "cura",
+  "cura_base": 40,
+  "escala": 0,
+  "tempo": "t_item",
+  "pose": "bat_item"
+}

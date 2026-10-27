@@ -54,7 +54,7 @@ Ordem de dependências: Produtor (Bíblia + escopo) → 08 (spec + esqueleto) / 
 
 ## Convenções compartilhadas
 
-- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`, `atk_`, `cfg_`, `perfil_`, `z_`).
+- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`, `atk_`, `cfg_`, `enc_`, `perfil_`, `z_`, `cen_`).
 - **Densidade única:** 1 tile = 1 unidade do mundo = 32×32 px de arte, em sprites, texturas, UI e efeitos. Escala inteira, sem filtro/suavização.
 - Sprites: célula 64×64 (herói/NPC), âncora nos pés (ex.: 32,60), 4 direções (S, N, L desenhadas; O espelhada), 8–12 fps, alpha só 0/255, pouca sombra pintada (a luz vem da cena via normal map).
 - Distâncias em **tiles** e **segundos**; tempos de combate em **quadros a 60 Hz**.

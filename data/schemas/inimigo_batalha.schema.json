@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/inimigo_batalha",
+  "title": "Inimigo no combate por turnos: ficha, recompensa, IA por pesos e poses (docs/combate_turnos.md §7)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "papel",
+    "sprite",
+    "vida_max",
+    "forca",
+    "defesa",
+    "agilidade",
+    "resistencias",
+    "xp",
+    "moedas",
+    "drops",
+    "ia",
+    "poses"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^enemy_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "papel": {
+      "enum": [
+        "rapido",
+        "emboscador",
+        "pesado",
+        "combatente",
+        "atirador"
+      ]
+    },
+    "sprite": {
+      "type": "string",
+      "pattern": "^[a-z]+_[a-z0-9_]+$"
+    },
+    "vida_max": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "forca": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mente": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "defesa": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "agilidade": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "resistencias": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "corte",
+          "perfuracao",
+          "impacto",
+          "elem_1",
+          "elem_2",
+          "elem_3",
+          "elem_4"
+        ]
+      },
+      "additionalProperties": {
+        "type": "number",
+        "minimum": -0.5,
+        "maximum": 0.75
+      }
+    },
+    "imunidades": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "corte",
+          "perfuracao",
+          "impacto",
+          "elem_1",
+          "elem_2",
+          "elem_3",
+          "elem_4"
+        ]
+      }
+    },
+    "xp": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "moedas": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "drops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "chance",
+          "qtd"
+        ],
+        "properties": {
+          "item": {
+            "type": "string",
+            "pattern": "^item_"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "qtd": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "ia": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "acao",
+          "peso",
+          "alvo_regra"
+        ],
+        "properties": {
+          "acao": {
+            "type": "string",
+            "pattern": "^(atk|skill)_"
+          },
+          "peso": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "alvo_regra": {
+            "enum": [
+              "aleatorio",
+              "menor_vida",
+              "misto"
+            ]
+          },
+          "prob_menor_vida": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "condicao": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "rodada_min": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "poses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parado",
+        "ataque",
+        "dano",
+        "morte"
+      ],
+      "properties": {
+        "parado": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "avanca": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "ataque": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "ataque_forte": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "espera": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "dano": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "morte": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        }
+      }
+    }
+  }
+}

@@ -301,3 +301,9 @@ Os exemplos de ordem O1–O4 usam outras agilidades só para ilustrar a regra; o
 ## Histórico
 - v0.1 (2026-10-27) — primeira versão (BL-004).
 - v0.2 (2026-10-27) — alinhado ao `formulas_turnos.md` §11: fator de defesa no dano, `skill_golpe_firme` no lugar do giro, valores iniciais do 06, mana por rodada, fuga com bônus por falha, `dano_base` e `mult_dano × poder_arma`.
+
+## Implementação (BL-008 etapa 1, 2026-10-27)
+- **Motor:** `src/jogo/batalha/` (`batalha.js` controlador, `formulas.js`, `prng.js`, `politica.js` modo automático). API: `criarBatalha(dados, { encontro, semente })` → `iniciar()` → `escolher(ator, comando)` de cada herói (`voltar()` desfaz) → `executar()`; `.log` guarda os eventos; `.resultado` ao fim.
+- **Dados:** `data/combate/` (`cfg_batalha`, `hero_*`, `enemy_*`, `enc_*`, `item_*`) e `data/attacks/` (`atk_*`, `skill_*`); esquemas `cfg_batalha`, `heroi_batalha`, `inimigo_batalha`, `encontro`, `item_batalha`, `acao_batalha`. Prefixo novo `enc_` aceito no validador.
+- **Ferramenta:** `node tools/simular_batalha.mjs enc_misto_1 --semente=7` (registro dos eventos) ou `--lote=1000` (resumo). Testes: `tests/batalha.test.mjs`.
+- **Fora da etapa 1:** ligação ao mapa, à cena e à UI (etapa 2); estados de status, chefe em fases e subida de atributos por nível (o motor só soma XP e avisa o nível).

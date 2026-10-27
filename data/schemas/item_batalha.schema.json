@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/item_batalha",
+  "title": "Item usável em batalha (M1: poção de cura)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "uso_batalha",
+    "alvo_tipo",
+    "efeito",
+    "cura_base",
+    "escala",
+    "tempo",
+    "pose"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^item_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "uso_batalha": {
+      "type": "boolean"
+    },
+    "alvo_tipo": {
+      "enum": [
+        "aliado_1",
+        "aliados_todos",
+        "si"
+      ]
+    },
+    "efeito": {
+      "const": "cura"
+    },
+    "cura_base": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "escala": {
+      "type": "number",
+      "minimum": 0
+    },
+    "tempo": {
+      "type": "string",
+      "pattern": "^t_[a-z_]+$"
+    },
+    "pose": {
+      "type": "string",
+      "pattern": "^bat_[a-z_]+$"
+    }
+  }
+}

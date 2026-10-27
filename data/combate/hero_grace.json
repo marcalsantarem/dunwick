@@ -1,0 +1,48 @@
+{
+  "id": "hero_grace",
+  "versao": 1,
+  "nota": "Grace no combate (nível 1). Curandeira; sprite próprio na BL-009.",
+  "nome_txt": "txt_hero_grace_nome",
+  "sprite": "hero_grace",
+  "nivel": 1,
+  "xp": 0,
+  "atributos": {
+    "vigor": 4,
+    "forca": 3,
+    "destreza": 5,
+    "mente": 8
+  },
+  "armadura": 1,
+  "bonus_itens": {
+    "vida": 0,
+    "mana": 0,
+    "agilidade": 0
+  },
+  "arma": {
+    "poder": 8,
+    "tipo_dano": "impacto"
+  },
+  "resistencias": {},
+  "kit": {
+    "ataque": "atk_grace_cajado",
+    "habilidades": [
+      "skill_cura"
+    ],
+    "itens": [
+      "item_pocao_ervas"
+    ]
+  },
+  "posicao": 2,
+  "poses": {
+    "parado": "bat_parado",
+    "ataque": "bat_ataque",
+    "habilidade": "bat_habilidade",
+    "item": "bat_item",
+    "defender": "bat_defender",
+    "dano": "bat_dano",
+    "caido": "bat_caido",
+    "levanta": "bat_levanta",
+    "vitoria": "bat_vitoria",
+    "cura": "bat_cura"
+  }
+}
