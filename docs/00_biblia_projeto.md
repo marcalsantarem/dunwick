@@ -7,11 +7,11 @@
 ## Pitch e pilares
 
 > Um órfão treina para ser cavaleiro e, na missão final de graduação, traz de uma caverna um espólio que se revela maldito. Para salvar quem ele ama, adia a vingança contra o rei tirano e sai atrás de uma feiticeira. A busca cresce até virar a luta para salvar o mundo de um mal gigante.
-> Combate de ação em tempo real, rápido e legível, em cenários-diorama de luz viva.
+> Combate por turnos, estilo Breath of Fire, claro e estratégico, em cenários-diorama de luz viva.
 > Aventura épica com humor ácido e tom adulto (16 anos), com momentos melancólicos e tensão.
 
 **Pilares:**
-1. **Combate preciso:** todo golpe inimigo tem aviso; esquiva e timing valem mais que números.
+1. **Combate tático e legível:** escolhas claras a cada rodada; ordem de turno, habilidades e estratégia valem mais que reflexo *(ajustado à D-028; texto original de ação arquivado)*.
 2. **Mundo-diorama:** pixel art nítido em cenários 3D com luz, sombra e profundidade (direção de arte **A · Lanterna e Musgo**, D-008).
 3. **Começa pequena, termina grande:** a história parte de um aprendiz e de uma maldição na vila e cresce até o destino do mundo; humor ácido sem tirar o peso dos momentos sérios.
 
@@ -43,7 +43,7 @@
 | Inimigos comuns | 5 (`enemy_*`) |
 | Chefe | 1 (`boss_*`) |
 | Missões | 3–5 (1 principal em 3 partes: graduação, maldição, rumo à feiticeira; + 2–4 secundárias) |
-| Sistemas | movimento, esquiva, ataque básico, 2–3 habilidades, vida/recurso, itens de cura, inventário simples, diálogo, missões, save local |
+| Sistemas | exploração isométrica, encontros aleatórios, batalha por turnos (atacar, habilidade, item, defender, fugir) com Edric e Grace, vida/mana, itens de cura, inventário simples, diálogo, missões, save local |
 | Plataforma | navegador de computador, teclado + mouse, gamepad |
 | Idioma | português do Brasil |
 
@@ -51,7 +51,7 @@
 Vila (treino com um sargento aposentado) → dungeon da graduação (**masmorra** + **chefe**: o monstro dono do covil) → volta à vila com o sino, que dorme a vila inteira → **região aberta** até a feira de **Ysolt Brum**, que confessa não ter poder real → **Grace**, aprendiz de curandeira, se prontifica a ajudar → **volta à vila e a cura**: fim do slice. O mal por trás do sino, a marca do herói e o resto do mundo ficam depois do slice.
 
 ### FORA (até depois do slice)
-Grupo de combate (a companheira Grace entra **só como cena e diálogo** a partir da feira, sem lutar; D-012), multiplayer, árvore de talentos extensa, crafting, celular, idioma inglês (entra no M4), dublagem, editor de níveis para jogadores, conquistas, monetização ativa.
+Grupo de 3 completo e NPCs recrutáveis (no slice, só Edric e Grace lutam, a Grace a partir da feira; D-031), multiplayer, árvore de talentos extensa, crafting, celular, idioma inglês (entra no M4), dublagem, editor de níveis para jogadores, conquistas, monetização ativa.
 
 ## Referências (estilo e técnica, **nunca para copiar**)
 
