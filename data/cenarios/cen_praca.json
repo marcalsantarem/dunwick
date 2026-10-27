@@ -1,0 +1,49 @@
+{
+  "id": "cen_praca",
+  "versao": 1,
+  "nota": "Arena da batalha (07, docs/cenarios/cena_batalha.md §3.1). Coordenadas LOCAIS do palco (z+ = para a câmera); o motor desloca tudo por `origem` e monta num grupo separado do mapa. Os encontros do M1 apontam para cenários que ainda não existem (cen_campo_baixo_orvalho): sem cenário próprio vale `padrao`.",
+  "padrao": true,
+  "camera": {
+    "giro_graus": 0,
+    "inclinacao_graus": 25,
+    "arte": [640, 360],
+    "alvo": [0, -1.6]
+  },
+  "palco": {
+    "tamanho": [44, 36],
+    "origem": [22, 24],
+    "calcada_raio": [9, 4],
+    "musgo_borda": 1.4,
+    "terra_z_min": 5.5,
+    "marca_raio": 0.8
+  },
+  "luz": {
+    "sombra_cobertura": 14,
+    "preenchimento": 0.12,
+    "vinheta_extra": 0.05,
+    "lanternas_por_perfil": { "perfil_alto": 4, "perfil_medio": 4, "perfil_baixo": 2 }
+  },
+  "nevoa": { "z_inicio": 0, "z_fim": -30 },
+  "foco": { "z": 0, "faixa_tiles": 4 },
+  "objetos": [
+    { "id": "casa_a", "tipo": "casa", "x": -6, "z": -8.5, "w": 4, "d": 3, "rot": 0, "telhado": "musgo", "janelas": 3, "chamine": true, "seed": 21 },
+    { "id": "casa_b", "tipo": "casa", "x": 5, "z": -9, "w": 5, "d": 4, "rot": 0, "telhado": "telha", "janelas": 4, "chamine": true, "seed": 22 },
+    { "id": "lanterna_1", "tipo": "lanterna", "x": -7, "z": -3.2 },
+    { "id": "lanterna_2", "tipo": "lanterna", "x": 7, "z": -3.2 },
+    { "id": "lanterna_3", "tipo": "lanterna", "x": -7.5, "z": 3.6 },
+    { "id": "lanterna_4", "tipo": "lanterna", "x": 7.5, "z": 3.6 },
+    { "id": "poco_1", "tipo": "poco", "x": 7.5, "z": -5.2 },
+    { "id": "barril_1", "tipo": "barril", "x": -8, "z": -4.6 },
+    { "id": "caixote_1", "tipo": "caixote", "x": -9, "z": -3.6 },
+    { "id": "arbusto_1", "tipo": "arbusto", "x": 9.5, "z": 1.2 },
+    { "id": "arbusto_2", "tipo": "arbusto", "x": -10, "z": 1.8 },
+    { "id": "pedra_1", "tipo": "pedra", "x": 10.5, "z": -2.4 },
+    { "id": "pedra_2", "tipo": "pedra", "x": -9.6, "z": 4.2 },
+    { "id": "arvore_1", "tipo": "arvore", "x": -12, "z": -12, "seed": 31 },
+    { "id": "pinheiro_1", "tipo": "pinheiro", "x": -8, "z": -13.5, "seed": 32 },
+    { "id": "arvore_2", "tipo": "arvore", "x": -2, "z": -14, "seed": 33 },
+    { "id": "pinheiro_2", "tipo": "pinheiro", "x": 3, "z": -13, "seed": 34 },
+    { "id": "arvore_3", "tipo": "arvore", "x": 9, "z": -12.5, "seed": 35 },
+    { "id": "pinheiro_3", "tipo": "pinheiro", "x": 13, "z": -11, "seed": 36 }
+  ]
+}

@@ -139,3 +139,14 @@ function mechas(linhas, costas) {
 export const MOLDES = { s: mechas(ler(S, 's'), false), se: mechas(ler(SE, 'se'), false), l: mechas(ler(E, 'l'), false), ne: mechas(ler(NE, 'ne'), true), n: mechas(ler(N, 'n'), true) };
 // deslocamento (colunas, linhas) do molde em relação à cabeça de referência, por vista; ajustado olhando a imagem
 export const AJUSTE = { s: [0, 2], se: [1, 2], l: [2, 2], ne: [0, 2], n: [0, 2] };
+
+// ---------- Grace (perfil, voltada para a direita): derivada do molde E, com óculos de lente trincada e coque bagunçado (30 linhas) ----------
+export const LEGENDAS = { g: { ...LEGENDA, a: ['calca', 1], b: ['calca', 2], c: ['calca', 3] } };   // cabelo castanho-claro (rampa terra)
+const COQUE = ['..... ...oo oo... ..... ..... .', '..... .ocbb bbao. ..... ..... .', '..... ocbbb bbbao ..... ..... .', '..... .obbb babo. ..... ..... .'].map((l) => l.replace(/ /g, ''));
+const G = MOLDES.l.map((l) => [...l]);
+const poe = (r, c, ch) => { G[r][c] = ch; };
+for (let c = 16; c <= 21; c++) { poe(12, c, 'o'); poe(16, c, 'o'); }
+for (const r of [13, 14, 15]) { poe(r, 16, 'o'); poe(r, 21, 'o'); }
+poe(13, 14, 'o'); poe(13, 15, 'o'); poe(14, 20, 'w'); poe(15, 17, 'w');                                // haste dos óculos e rachadura na lente
+MOLDES.g = [...COQUE, ...G.map((l) => l.join(''))];
+AJUSTE.g = [2, 2];

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { listarArquivos, carregarEsquemas, lerJson } from './lib/dados.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc'];
+const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc', 'z', 'cen'];
 
 function mensagemAjv(e) {
   const extra = e.params?.additionalProperty ? ` (campo "${e.params.additionalProperty}")` : e.params?.allowedValues ? ` (${e.params.allowedValues.join(' | ')})` : e.params?.missingProperty ? ` ("${e.params.missingProperty}")` : '';
@@ -155,6 +155,25 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     }
     cb.debug.encontros.forEach((id, i) => { if (!por('encontro').some(([, e]) => e.id === id)) erro('combate/cfg_batalha.json', `/debug/encontros/${i}`, `encontro "${id}" não existe em data/combate`); });
     for (const id of Object.keys(cb.inventario_teste)) if (!itensB[id]) erro('combate/cfg_batalha.json', `/inventario_teste/${id}`, 'item não existe em data/combate');
+  }
+  // ---- exploração: encontro aleatório por passos (13) ----
+  for (const [arq, z] of por('zonas_encontro')) {
+    const mapa = por('mapa').find(([, m]) => m.id === z.mapa)?.[1];
+    if (!mapa) { erro(arq, '/mapa', `mapa "${z.mapa}" não existe em data/maps`); continue; }
+    if (por('zonas_encontro').filter(([, o]) => o.mapa === z.mapa).length > 1) erro(arq, '/mapa', `mais de um arquivo de encontros para "${z.mapa}"`);
+    const [L, A] = mapa.tamanho, ids = new Set();
+    const ret = (campo, r, id) => {
+      if (ids.has(id)) erro(arq, campo, `zona "${id}" repetida`); ids.add(id);
+      if (r[0] > r[2] || r[1] > r[3]) erro(arq, campo + '/ret', 'x0 ≤ x1 e z0 ≤ z1');
+      if (r[2] >= L || r[3] >= A) erro(arq, campo + '/ret', `fora do mapa (${L} × ${A} tiles)`);
+    };
+    z.zonas_seguras.forEach((s, i) => ret(`/zonas_seguras/${i}`, s.ret, s.id));
+    z.zonas_encontro.forEach((s, i) => {
+      ret(`/zonas_encontro/${i}`, s.ret, s.id);
+      s.tabela.forEach((t, j) => { if (!por('encontro').some(([, e]) => e.id === t.encontro)) erro(arq, `/zonas_encontro/${i}/tabela/${j}/encontro`, `encontro "${t.encontro}" não existe em data/combate`); });
+    });
+    const [ix, iz] = mapa.inicio_jogador.tile;
+    if (z.zonas_encontro.some((s) => ix >= s.ret[0] && ix <= s.ret[2] && iz >= s.ret[1] && iz <= s.ret[3]) && !z.zonas_seguras.some((s) => ix >= s.ret[0] && ix <= s.ret[2] && iz >= s.ret[1] && iz <= s.ret[3])) avisos.push(`data/${arq}: o início do jogador está numa zona de encontro`);
   }
   const textos = por('textos');
   if (textos.length > 1) for (const [arq, t] of textos.slice(1)) for (const k of Object.keys(textos[0][1].textos)) if (!(k in t.textos)) erro(arq, '/textos', `falta "${k}" (existe em ${textos[0][0]})`);

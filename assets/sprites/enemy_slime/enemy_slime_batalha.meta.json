@@ -1,0 +1,122 @@
+{
+  "id": "enemy_slime",
+  "tipo": "sprite_batalha",
+  "celula": [
+    88,
+    64
+  ],
+  "ancora": [
+    40,
+    50
+  ],
+  "arte_escala": 1,
+  "ref_celula": 88,
+  "direcoes": [
+    "l"
+  ],
+  "espelhar": {
+    "o": "l"
+  },
+  "colunas": 8,
+  "anims": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 4,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 2,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 8,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_espera": {
+      "quadros": 4,
+      "fps": 8,
+      "loop": false,
+      "inicio": 13
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 17
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 19
+    }
+  },
+  "poses": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 4,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 2,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 8,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_espera": {
+      "quadros": 4,
+      "fps": 8,
+      "loop": false,
+      "inicio": 13
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 17
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 19
+    }
+  },
+  "nota": "Slime: poses de batalha numa só direção (L); o motor espelha. Sem normal map."
+}

@@ -17,7 +17,8 @@ export function criarCarregador(manifesto) {
   const textura = (rel, { premultiplicar = false } = {}) => new Promise((ok, erro) => carregadorTex.load(url(rel), (t) => { t.colorSpace = THREE.SRGBColorSpace; t.premultiplyAlpha = premultiplicar; t.needsUpdate = true; ok(t); }, undefined, () => erro(new Error(`falha ao carregar ${rel}`))));
   return {
     async dados() { const r = await fetch(manifesto.dados); if (!r.ok) throw new Error(`dados: HTTP ${r.status}`); return r.json(); },
-    async atlas(id) { const [meta, t] = await Promise.all([json(`sprites/${id}/${id}.meta.json`), textura(`sprites/${id}/${id}.png`, { premultiplicar: true })]); t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; return { meta, textura: t }; },
+    /** `pasta` = pasta em assets/sprites (os atlas de batalha moram na pasta do personagem: hero_edric_batalha → hero_edric). */
+    async atlas(id, pasta = id) { const [meta, t] = await Promise.all([json(`sprites/${pasta}/${id}.meta.json`), textura(`sprites/${pasta}/${id}.png`, { premultiplicar: true })]); t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; return { meta, textura: t }; },
     textura: (nome) => textura(`env/tex_${nome}.png`),
     async bytes(rel) { const r = await fetch(url(rel)); if (!r.ok) throw new Error(`${rel}: HTTP ${r.status}`); return r.arrayBuffer(); },
   };
@@ -26,6 +27,8 @@ export function criarCarregador(manifesto) {
 /** Carrega tudo que a cena precisa, em paralelo, a partir dos dados já lidos. */
 export async function carregarRecursos(carregador, dados) {
   const ids = [...new Set([...Object.values(dados.personagens), ...Object.values(dados.inimigos)].map((d) => d.sprite))];
-  const [atlas, texs, ping] = await Promise.all([Promise.all(ids.map((id) => carregador.atlas(id))), Promise.all(NOMES_TEXTURAS.map((n) => carregador.textura(n))), carregador.bytes('audio/sfx_teste_ping.wav')]);
-  return { atlas: Object.fromEntries(ids.map((id, i) => [id, atlas[i]])), metas: Object.fromEntries(ids.map((id, i) => [id, atlas[i].meta])), texturas: Object.fromEntries(NOMES_TEXTURAS.map((n, i) => [n, texs[i]])), sfxPing: ping };
+  // atlas de batalha (cfg_sprites_batalha): o próprio ou a base do provisório
+  const sb = dados.config.sprites_batalha?.atores ?? {}, idsBatalha = [...new Set(Object.values(sb).map((a) => a.atlas ?? a.provisorio.base))];
+  const [atlas, texs, ping, atlasBat] = await Promise.all([Promise.all(ids.map((id) => carregador.atlas(id))), Promise.all(NOMES_TEXTURAS.map((n) => carregador.textura(n))), carregador.bytes('audio/sfx_teste_ping.wav'), Promise.all(idsBatalha.map((id) => carregador.atlas(id, id.replace(/_batalha$/, ''))))]);
+  return { atlas: Object.fromEntries(ids.map((id, i) => [id, atlas[i]])), metas: Object.fromEntries(ids.map((id, i) => [id, atlas[i].meta])), texturas: Object.fromEntries(NOMES_TEXTURAS.map((n, i) => [n, texs[i]])), sfxPing: ping, atlasBatalha: Object.fromEntries(idsBatalha.map((id, i) => [id, atlasBat[i]])) };
 }

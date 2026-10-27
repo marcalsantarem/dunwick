@@ -9,8 +9,11 @@ import { criarEntradaLogica } from '../jogo/entrada_logica.js';
 import { Acumulador } from '../jogo/acumulador.js';
 import { criarRenderizador } from '../motor/renderizador.js';
 import { criarCena } from '../motor/cena.js';
+import { criarCenaBatalha } from '../motor/cena_batalha.js';
+import { criarApresentacao } from './apresentacao.js';
 import { ligarEntradaDom } from './entrada_dom.js';
 import { criarAudio } from './audio.js';
+import { criarBatalhaUi } from '../ui/batalha_ui.js';
 
 async function iniciar() {
   const marcas = { inicio: performance.now() }; // só desenvolvimento: tempos de cada etapa da carga
@@ -18,7 +21,7 @@ async function iniciar() {
   const dados = await carregador.dados(); marcas.dados = performance.now();
   const t = criarTextos(dados.textos['pt-BR']);
   const recursos = await carregarRecursos(carregador, dados); marcas.assets = performance.now();
-  const cfg = dados.config.jogo, eventos = criarEventos(), mundo = criarMundo(dados, eventos, recursos.metas);
+  const cfg = dados.config.jogo, eventos = criarEventos(), mundo = criarMundo(dados, eventos, recursos.metas, { sementeEncontros: (crypto.getRandomValues(new Uint32Array(1))[0] || 1) });
 
   if (__DEV__ && P.get('hora')) { mundo.hora = Number(P.get('hora')); mundo.cicloLigado = false; } // ?hora=21 para olhar a noite
   const cfgEntrada = __DEV__ ? dados.config.entrada : { ...dados.config.entrada, debug: {} };
@@ -34,7 +37,11 @@ async function iniciar() {
   const redimensionar = () => ren.ajustar(innerWidth, innerHeight, window.devicePixelRatio || 1);
   redimensionar(); addEventListener('resize', redimensionar);
   const cena = criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest' } });
-  const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); cena.aplicarPerfil(perfis[iPerfil]); };
+  // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
+  const temBatalha = !!(mundo.jogo && dados.cenarios && dados.config.sprites_batalha);
+  const cenaBat = temBatalha ? criarCenaBatalha({ dados, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64) } }) : null;
+  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { reduzirMovimento: P.get('reduzir') === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
+  const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); cena.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
   aplicarPerfil(); marcas.cena = performance.now();
 
   // ---------- áudio desbloqueado por clique/tecla ----------
@@ -43,6 +50,9 @@ async function iniciar() {
   let desbloqueando = false;
   const aoGesto = () => { if (desbloqueando || audio.estado === 'running') return; desbloqueando = true; audio.desbloquear().then((ok) => { desbloqueando = false; if (ok) aviso.remove(); }); };
   const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto });
+  // UI da batalha por turnos (15): só aparece com mundo.jogo.modo === 'batalha'; no desenvolvimento, ] dispara o próximo encontro de teste
+  const batalhaUi = mundo.jogo ? criarBatalhaUi({ mundo, dados, t, debug: __DEV__ }) : null;
+  if (batalhaUi && apr) { apr.assumirComandos(); batalhaUi.definirProjecao((p) => { const q = cenaBat.projetarPonto(p); return { x: q.x * 100, y: q.y * 100 }; }); batalhaUi.definirEspera(() => !!apr.toque && !apr.toque.ocioso); } // a UI escolhe os comandos e fecha a batalha; a apresentação só toca as animações e troca a vista
 
   // ---------- debug (só desenvolvimento) ----------
   let debug = null, debugDesenho = null;
@@ -54,7 +64,9 @@ async function iniciar() {
   }
 
   // Compila shaders e sobe texturas ANTES do primeiro quadro (sem engasgo no começo)
-  cena.atualizar(1, 0); await ren.renderer.compileAsync(cena.cena, cena.camera); ren.desenhar(cena.cena, cena.camera, cena.visual); marcas.compilado = performance.now();
+  cena.atualizar(1, 0); await ren.renderer.compileAsync(cena.cena, cena.camera); ren.desenhar(cena.cena, cena.camera, cena.visual);
+  if (cenaBat) { cenaBat.preparar(); await ren.renderer.compileAsync(cenaBat.cena, cenaBat.camera); cenaBat.desligar(); }
+  marcas.compilado = performance.now();
 
   // ---------- cursor do mouse → ponto no chão e inimigo sob ele ----------
   const heroiNdc = new THREE.Vector3();
@@ -68,7 +80,7 @@ async function iniciar() {
   // ---------- laço de passo fixo ----------
   const sincronizar = __DEV__ && P.get('sync') === '1', glFinish = () => ren.renderer.getContext().finish();
   const acum = new Acumulador(cfg.passo_logico_hz, cfg.max_passos_por_quadro);
-  let ultimo = performance.now(), oculto = document.hidden, ultimoSnap = null, proximoTexto = 0, tempoS = 0;
+  let cursor = { x: 0, z: 0, alvo: null }, ultimo = performance.now(), oculto = document.hidden, ultimoSnap = null, proximoTexto = 0, tempoS = 0;
   document.addEventListener('visibilitychange', () => {
     oculto = document.hidden;
     if (oculto) { entrada.soltarTudo(); audio.suspender(); } else { ultimo = performance.now(); acum.resetar(); audio.retomar(); } // volta sem simular o tempo perdido
@@ -78,16 +90,28 @@ async function iniciar() {
     requestAnimationFrame(quadro);
     if (oculto) return;
     const dtMs = agora - ultimo; ultimo = agora;
-    ponte.amostrarGamepad(); const cursor = atualizarCursor();
+    ponte.amostrarGamepad(); if (apr?.visao !== 'batalha') cursor = atualizarCursor();
     let passos, alfa;
     if (__DEV__) for (const a of entrada.drenarDebug()) debug.tratar(a);
     if (__DEV__ && debug.pausado) { passos = debug.consumirPasso() ? 1 : 0; acum.resetar(); alfa = 1; }
     else { passos = acum.avancar(dtMs / 1000, __DEV__ ? debug.fatorTempo() : 1); alfa = acum.alfa; tempoS += Math.min(dtMs, 100) / 1000; }
     for (let i = 0; i < passos; i++) { ultimoSnap = entrada.amostrar(mundo.ticks); mundo.passo(ultimoSnap, entrada.buffer); }
-    cena.atualizar(alfa, tempoS, Math.min(dtMs, 100) / 1000);
-    if (__DEV__) debugDesenho.atualizar(debug.estado.caixas, alfa);
-    heroiNdc.set(mundo.heroi.x, 1, mundo.heroi.z).project(cena.camera);
-    ren.desenhar(cena.cena, cena.camera, cena.visual, heroiNdc.y * 0.5 + 0.5);
+    batalhaUi?.atualizar(Math.min(dtMs, 100) / 1000);
+    const dtS = Math.min(dtMs, 100) / 1000;
+    if (apr) {
+      const pausado = __DEV__ && debug.pausado;
+      apr.atualizar(pausado ? (passos ? 1 / cfg.passo_logico_hz : 0) : dtS * (__DEV__ ? debug.fatorTempo() : 1));
+      apr.layoutUi(canvas);
+    }
+    if (apr?.visao === 'batalha') {
+      cenaBat.atualizar(dtS, tempoS, mundo.hora); const ex = cenaBat.extrasDesenho();
+      ren.desenhar(cenaBat.cena, cenaBat.camera, cenaBat.visual, ex.focoY, { faixa: ex.faixa, vinhetaExtra: ex.vinhetaExtra, cobertura: apr.cobertura, corCobertura: cenaBat.visual.ciclo.nevoa });
+    } else {
+      cena.atualizar(alfa, tempoS, dtS);
+      if (__DEV__) debugDesenho.atualizar(debug.estado.caixas, alfa);
+      heroiNdc.set(mundo.heroi.x, 1, mundo.heroi.z).project(cena.camera);
+      ren.desenhar(cena.cena, cena.camera, cena.visual, heroiNdc.y * 0.5 + 0.5, apr ? { cobertura: apr.cobertura, corCobertura: cena.visual.ciclo.nevoa } : {});
+    }
     if (__DEV__ && sincronizar) glFinish();
     if (__DEV__) {
       debug.registrarQuadro(dtMs);
@@ -99,7 +123,7 @@ async function iniciar() {
   if (__DEV__) {
     // Gancho para testes automáticos e medições (tools/testar_navegador.mjs). NÃO existe no build de produção.
     window.__dunwick = {
-      mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos,
+      mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
       ticks: () => mundo.ticks, exportarTempos: () => debug.exportar(false), estatisticasGl: () => ren.estatisticas(), escala: () => ren.escala, perfilAtual: () => perfis[iPerfil].id,
       textosFaltando: () => [...t.faltando], redimensionar, modo: () => ren.modo, atualizarCursor,
       definirModo: (m) => ren.definirModo(m, innerWidth, innerHeight, window.devicePixelRatio || 1),

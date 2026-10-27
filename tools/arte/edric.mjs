@@ -10,11 +10,11 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { codificarPng, novaImagem } from '../lib/png.mjs';
-import { MOLDES, AJUSTE, LEGENDA } from './rostos.mjs';
+import { MOLDES, AJUSTE, LEGENDA, LEGENDAS } from './rostos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const CELULA = 96, ANCORA = [48, 88], COLUNAS = 12;
-const PITCH = Math.PI / 6, CP = Math.cos(PITCH), SP = Math.sin(PITCH);
+export const PITCH = Math.PI / 6, CP = Math.cos(PITCH), SP = Math.sin(PITCH);
 const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 
 // ---------- paleta: rampas [fundo/contorno, sombra, base, luz]; as marcadas (mestra) vêm de docs/arte/paleta.json; (proposta) são novas ----------
@@ -26,20 +26,23 @@ export const RAMPAS = {
   linho: ['#685a50', '#a99d90', '#d8d1c3', '#ece7dd'],           // neutro_quente (+ #d8d1c3 PROPOSTA)
   aco: ['#161b23', '#3d4956', '#6b7d8b', '#a2b7ae'],             // metal_aco (mestra); brilho especular abaixo
   latao: ['#492112', '#7f4613', '#a9792b', '#d0ae66'],           // metal_latao (mestra); também a íris âmbar
+  lilas: ['#3b3350', '#6a5e86', '#9a8fb0', '#c9c0d8'],           // capa da Grace, lilás desbotado (PROPOSTA ao 10)
+  pelagem: ['#292e3c', '#525b6b', '#7e8b9c', '#afbfcc'],         // neutro_frio (mestra): lobo
+  verde: ['#01523c', '#478638', '#97b55f', '#e1e3a7'],           // vegetacao (mestra): slime e verde-erva
 };
 const ESPECULAR = '#efebde', BORDA_FRIA = '#a2b7ae';             // metal_aco_5 e luz de borda (metal_aco_4)
-export const PROPOSTAS = ['#1b3a33', '#35583c', '#5c7d3f', '#8fa95a', '#d8d1c3'];
-const RGB = Object.fromEntries(Object.entries(RAMPAS).map(([k, v]) => [k, v.map(hex)]));
+export const PROPOSTAS = ['#1b3a33', '#35583c', '#5c7d3f', '#8fa95a', '#d8d1c3', '#3b3350', '#6a5e86', '#9a8fb0', '#c9c0d8'];
+export const RGB = Object.fromEntries(Object.entries(RAMPAS).map(([k, v]) => [k, v.map(hex)]));
 const ESP = hex(ESPECULAR), FRIA = hex(BORDA_FRIA);
 
 // ---------- modelo ----------
 // prim = { c:[f,l,u], r:[rf,rl,ru], m:rampa, id, dec?(p) }   f = frente do personagem, l = sua direita, u = altura
-const prims = [];
-const SC = 1.5; // escala global do modelo (corpo ≈ 72-77 px na tela); os decalques usam coordenadas sem escala
-const elip = (c, r, m, id, dec, off = 0) => prims.push({ c: c.map((v) => v * SC), r: r.map((v) => v * SC), m, id, dec, off });
-const esfera = (c, r, m, id, dec, off) => elip(c, [r, r, r], m, id, dec, off);
+export const prims = [];
+export const SC = 1.5; // escala global do modelo (corpo ≈ 72-77 px na tela); os decalques usam coordenadas sem escala
+export const elip = (c, r, m, id, dec, off = 0) => prims.push({ c: c.map((v) => v * SC), r: r.map((v) => v * SC), m, id, dec, off });
+export const esfera = (c, r, m, id, dec, off) => elip(c, [r, r, r], m, id, dec, off);
 /** Cadeia de esferas de a até b com raio interpolado (membros, lâmina). */
-function cadeia(a, b, r0, r1, m, id, dec, off) {
+export function cadeia(a, b, r0, r1, m, id, dec, off) {
   const n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) / 0.35));
   for (let i = 0; i <= n; i++) { const t = i / n; esfera([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t], r0 + (r1 - r0) * t, m, id, dec, off); }
 }
@@ -90,13 +93,14 @@ function montar() {
 const LUZ = (() => { const v = [-0.55, 0.55, 0.38], n = Math.hypot(...v); return v.map((x) => x / n); })(); // (x tela, cima, em direção à câmera)
 const LIM = [0.74, 0.44, 0.13]; // limiares de luz: acima do 1º = tom 3 (luz), 2º = 2 (base), 3º = 1 (sombra), abaixo = 0 (fundo)
 
-function renderizar(phi) {
+export function renderizar(phi, cel = CELULA, anc = ANCORA) {
+  const [CW, CH] = Array.isArray(cel) ? cel : [cel, cel];
   const sx = Math.sin(phi), cx = Math.cos(phi);
   const D = [CP * cx, CP * sx, SP]; // direção do raio em coordenadas do personagem (aponta para a câmera)
-  const W = CELULA, H = CELULA, mat = new Int16Array(W * H).fill(-1), tom = new Int8Array(W * H), prof = new Float32Array(W * H), parte = new Int16Array(W * H).fill(-1), nx = new Float32Array(W * H), cor = new Array(W * H);
+  const W = CW, H = CH, mat = new Int16Array(W * H).fill(-1), tom = new Int8Array(W * H), prof = new Float32Array(W * H), parte = new Int16Array(W * H).fill(-1), nx = new Float32Array(W * H), cor = new Array(W * H);
   const ids = []; const nomesRampa = Object.keys(RAMPAS);
   for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
-    const X = px + 0.5 - ANCORA[0], Y = py + 0.5 - ANCORA[1], Z = Y / SP;
+    const X = px + 0.5 - anc[0], Y = py + 0.5 - anc[1], Z = Y / SP;
     const O = [X * sx + Z * cx, -X * cx + Z * sx, 0];
     let melhor = -Infinity, hit = null;
     for (let i = 0; i < prims.length; i++) {
@@ -122,7 +126,7 @@ function renderizar(phi) {
 }
 
 /** Pós-processamento pixel a pixel → { px: RGBA }. */
-function acabar(r) {
+export function acabar(r) {
   const { W, H, mat, tom, prof, parte, nx, nomesRampa } = r, op = (x, y) => x >= 0 && y >= 0 && x < W && y < H && mat[y * W + x] >= 0;
   // 1) limpeza: remove pixels órfãos (≤ 1 vizinho em 4) — evita "sujeira" de 1 px
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (op(x, y)) { const n = op(x - 1, y) + op(x + 1, y) + op(x, y - 1) + op(x, y + 1); if (n <= 1) mat[y * W + x] = -1; }
@@ -155,13 +159,13 @@ function acabar(r) {
 
 export const DIRS = [{ id: 's', phi: 0 }, { id: 'se', phi: Math.PI / 4 }, { id: 'l', phi: Math.PI / 2 }, { id: 'ne', phi: (3 * Math.PI) / 4 }, { id: 'n', phi: Math.PI }];
 export const DIRS_OESTE = [{ id: 'sw', phi: -Math.PI / 4 }, { id: 'o', phi: -Math.PI / 2 }, { id: 'nw', phi: (-3 * Math.PI) / 4 }];
-const QUEIXO_Y = Math.round(ANCORA[1] - 37.5 * SC * CP); // linha do fundo do queixo (última linha do molde)
+export const QUEIXO_Y = Math.round(ANCORA[1] - 37.5 * SC * CP); // linha do fundo do queixo (última linha do molde)
 /** Cola o molde da cabeça por cima do corpo (pixels do molde substituem; transparentes deixam o corpo). */
-function colarCabeca(px, dirId, ex = 0, ey = 0, giros = 0) {
-  let m = MOLDES[dirId]; const [dx, dy] = AJUSTE[dirId], ox = ANCORA[0] - 13 + dx + ex, oy = QUEIXO_Y - 25 + dy + ey;
-  for (let g = 0; g < giros; g++) m = Array.from({ length: 26 }, (_, y) => Array.from({ length: 26 }, (_, x) => m[x][25 - y]).join('')); // giro de 90° anti-horário (queda)
+export function colarCabeca(px, dirId, ex = 0, ey = 0, giros = 0) {
+  let m = MOLDES[dirId]; const [dx, dy] = AJUSTE[dirId], leg = LEGENDAS[dirId] ?? LEGENDA, ox = ANCORA[0] - 13 + dx + ex, oy = QUEIXO_Y - (m.length - 1) + dy + ey;
+  for (let g = 0; g < giros; g++) { const Wd = m[0].length, Ht = m.length; m = Array.from({ length: Wd }, (_, y) => Array.from({ length: Ht }, (_, x) => m[x][Wd - 1 - y]).join('')); } // giro de 90° anti-horário (queda)
   m.forEach((lin, y) => [...lin].forEach((ch, x) => {
-    if (ch === '.') return; const [r, t] = LEGENDA[ch], c = RGB[r][t], X = ox + x, Y = oy + y; if (X < 0 || Y < 0 || X >= CELULA || Y >= CELULA) return;
+    if (ch === '.') return; const [r, t] = leg[ch], c = RGB[r][t], X = ox + x, Y = oy + y; if (X < 0 || Y < 0 || X >= CELULA || Y >= CELULA) return;
     const i = (Y * CELULA + X) * 4; px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2]; px[i + 3] = 255;
   }));
 }

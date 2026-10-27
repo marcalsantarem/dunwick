@@ -11,12 +11,14 @@ export const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const carregarDados = () => structuredClone(empacotarDados(RAIZ));
 export const carregarMetas = () => Object.fromEntries(readdirSync(join(RAIZ, 'assets/sprites')).map((id) => [id, JSON.parse(readFileSync(join(RAIZ, 'assets/sprites', id, `${id}.meta.json`), 'utf8'))]));
 
-/** Mundo pronto. `livre: true` remove cenário e deixa só os bonecos (campo aberto para testar movimento). */
-export function novoMundo(ajustar, { livre = false } = {}) {
+/** Mundo pronto. `livre: true` remove cenário e deixa só os bonecos (campo aberto para testar movimento). `encontros: true` liga o
+ * encontro aleatório (desligado por padrão para os testes de movimento não caírem numa batalha). */
+export function novoMundo(ajustar, { livre = false, encontros = false, sementeEncontros = 1 } = {}) {
   const dados = carregarDados();
+  if (!encontros) for (const z of Object.values(dados.exploracao.encontros)) z.ligado = false;
   if (livre) for (const m of Object.values(dados.mapas)) m.objetos = m.objetos.filter((o) => o.tipo === 'inimigo');
   if (ajustar) ajustar(dados);
-  const eventos = criarEventos(), mundo = criarMundo(dados, eventos, carregarMetas()), buffer = new BufferEntrada(dados.config.jogo.entrada.buffer_entrada_quadros), registro = [];
+  const eventos = criarEventos(), mundo = criarMundo(dados, eventos, carregarMetas(), { sementeEncontros }), buffer = new BufferEntrada(dados.config.jogo.entrada.buffer_entrada_quadros), registro = [];
   for (const n of ['golpe_acertou', 'ataque_inicio', 'ataque_fim', 'esquiva_inicio', 'aviso_inicio', 'golpe_ativo', 'golpe_fim']) eventos.em(n, (d) => registro.push({ n, ...d, tick: mundo.ticks }));
   return { dados, eventos, mundo, buffer, registro };
 }

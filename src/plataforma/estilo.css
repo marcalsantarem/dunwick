@@ -2,4 +2,99 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
 canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; outline: none; }
 #aviso { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); padding: 6px 14px; color: #fff; background: rgba(0, 0, 0, 0.6); font: 14px/1.3 system-ui, sans-serif; pointer-events: none; }
 #aviso:empty { display: none; }
+/* ponto de montagem da UI (15): acompanha o retângulo do jogo na tela (apresentacao.layoutUi); --k = px CSS por px de arte, --arte-w/--arte-h = tamanho da imagem de arte */
+#ui { position: fixed; pointer-events: none; overflow: hidden; }
+#ui:empty { display: none; }
 #debug { position: fixed; left: 6px; top: 6px; margin: 0; padding: 4px 6px; max-width: 96vw; color: #9f9; background: rgba(0, 0, 0, 0.55); font: 12px/1.35 ui-monospace, Consolas, monospace; white-space: pre-wrap; pointer-events: none; }
+
+/* ---------- UI de batalha (15, docs/ui/batalha.md): madeira escura + linho, cantos de latão; foco dourado (brilho_*); alerta só em alerta_ui. Sem magenta. ---------- */
+.bat {
+  --ui-1: #211209; --ui-2: #886b56; --ui-3: #d3b89e; --ui-4: #fdf0dc; --madeira-2: #5c3120; --madeira-3: #875a3b; --latao: #ae8865;
+  --brilho-1: #fcd176; --brilho-2: #ffe79d; --alerta-1: #780105; --alerta-2: #f44d21; --cura: #97b55f; --cura-claro: #e1e3a7;
+  position: fixed; inset: 0; pointer-events: none; color: var(--ui-4); font: 16px/1.3 ui-monospace, Consolas, "Courier New", monospace;
+  display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; padding: 16px; box-sizing: border-box; user-select: none;
+}
+.bat[hidden] { display: none; }
+.bat button { font: inherit; color: inherit; }
+.bat-painel { pointer-events: auto; background: var(--ui-1); border: 2px solid var(--madeira-3); outline: 2px solid var(--ui-1); box-shadow: inset 0 0 0 2px var(--madeira-2), 4px 4px 0 rgba(0, 0, 0, 0.45); position: relative; }
+.bat-painel::before, .bat-painel::after { content: ""; position: absolute; width: 6px; height: 6px; background: var(--latao); top: -4px; left: -4px; }
+.bat-painel::after { left: auto; right: -4px; }
+.bat-topo { display: flex; align-items: center; gap: 16px; pointer-events: auto; }
+.bat-ordem { display: flex; gap: 6px; margin: 0 auto; padding: 4px 8px; list-style: none; background: rgba(33, 18, 9, 0.85); border: 2px solid var(--madeira-3); }
+.bat-marco { display: flex; align-items: center; gap: 4px; padding: 2px 6px; border: 2px solid transparent; color: var(--ui-3); font-size: 13px; }
+.bat-marco.atual { border-color: var(--brilho-1); color: var(--brilho-2); }
+.bat-marco.atual::before { content: "▼"; color: var(--brilho-1); }
+.bat-marco.feito { opacity: 0.55; }
+.bat-marco.riscado .bat-marco-nome { text-decoration: line-through; opacity: 0.6; }
+.bat-marco-marca { min-width: 1ch; }
+.bat-retrato { display: inline-block; width: 20px; height: 20px; flex: none; background: var(--ui-2); border: 2px solid var(--ui-3); }
+.bat-retrato-grupo { border-radius: 50%; }
+.bat-retrato-inimigos { transform: rotate(45deg) scale(0.8); background: var(--madeira-3); }
+.bat-rodada { color: var(--ui-3); text-shadow: 2px 2px 0 #000; }
+.bat-vel { pointer-events: auto; background: var(--ui-1); border: 2px solid var(--madeira-3); padding: 2px 8px; cursor: pointer; }
+.bat-palco { position: relative; min-height: 0; }
+.bat-placa { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: 0; padding: 4px; pointer-events: auto; cursor: pointer; }
+.bat-placa.caido { opacity: 0.45; }
+.bat-placa-nome { font-size: 13px; padding: 0 6px; background: rgba(33, 18, 9, 0.85); border: 1px solid var(--madeira-3); white-space: nowrap; }
+.bat-cursor { visibility: hidden; color: var(--brilho-1); font-size: 20px; line-height: 1; text-shadow: 2px 2px 0 #000; animation: bat-cursor 0.8s steps(2) infinite; }
+.bat-placa.alvo-foco .bat-cursor { visibility: visible; }
+.bat-placa.alvo-foco .bat-figura, .bat-placa.alvo-foco .bat-placa-nome { outline: 2px solid var(--brilho-1); outline-offset: 2px; }
+.bat-figura { width: 40px; height: 56px; background: var(--ui-2); border: 2px solid var(--ui-3); }
+.bat-figura-grupo { border-radius: 20px 20px 4px 4px; background: var(--madeira-3); }
+.bat-figura-inimigos { width: 52px; height: 40px; border-radius: 50% 50% 8px 8px; background: var(--ui-2); }
+.bat-figura[hidden] { display: none; }
+.bat-barra { width: 100%; min-width: 64px; height: 6px; background: #000; border: 1px solid var(--ui-2); }
+.bat-barra[hidden] { display: none; }
+.bat-barra-enche { height: 100%; background: var(--ui-3); transition: width 0.4s steps(8); }
+.bat-barra-mana .bat-barra-enche { background: var(--latao); }
+.bat-numero { position: absolute; transform: translateX(-50%); display: flex; gap: 4px; align-items: center; font-size: 22px; font-weight: bold; color: var(--ui-4); text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000; animation: bat-sobe 0.8s ease-out forwards; pointer-events: none; }
+.bat-numero-fraco { font-size: 28px; color: var(--brilho-2); }
+.bat-numero-resiste { font-size: 18px; color: var(--ui-3); }
+.bat-numero-cura { color: var(--cura-claro); }
+.bat-info { padding: 6px 12px; min-height: 2.6em; }
+.bat-info p { margin: 0; }
+.bat-info-dados { color: var(--ui-3); font-size: 14px; }
+.bat-info.erro .bat-info-dados { color: var(--alerta-2); }
+.bat-info.pisca { animation: bat-pisca 0.5s steps(1) 1; }
+.bat-base { display: flex; gap: 12px; align-items: stretch; }
+.bat-menu { margin: 0; padding: 6px 4px; list-style: none; min-width: 16ch; }
+.bat-menu[hidden] { display: none; }
+.bat-item { display: flex; align-items: center; gap: 6px; padding: 3px 8px; border: 2px solid transparent; cursor: pointer; background: none; text-align: left; }
+.bat-item .bat-seta { visibility: hidden; color: var(--brilho-1); }
+.bat-item.foco { border-color: var(--brilho-1); color: var(--brilho-2); }
+.bat-item.foco .bat-seta { visibility: visible; }
+.bat-item.foco.pai { border-style: dashed; color: var(--ui-3); }
+.bat-item.desabilitado { color: var(--ui-2); }
+.bat-item-texto { flex: 1; }
+.bat-item-dado, .bat-atalho { color: var(--ui-3); font-size: 13px; }
+.bat-atalho { opacity: 0.6; }
+.bat-grupo { display: flex; gap: 12px; flex: 1; justify-content: flex-end; }
+.bat-caixa { padding: 6px 10px 6px 48px; min-width: 22ch; cursor: default; }
+.bat-caixa .bat-retrato { position: absolute; left: 10px; top: 10px; width: 28px; height: 28px; }
+.bat-caixa-cab { display: flex; gap: 8px; align-items: center; }
+.bat-caixa-nome { flex: 1; }
+.bat-caixa-vez { visibility: hidden; color: var(--brilho-1); }
+.bat-caixa.vez { border-color: var(--brilho-1); }
+.bat-caixa.vez .bat-caixa-vez { visibility: visible; }
+.bat-caixa.alvo-foco { outline-color: var(--brilho-1); }
+.bat-linha { display: grid; grid-template-columns: 5ch 9ch 1fr; gap: 6px; align-items: center; font-size: 14px; }
+.bat-rotulo { color: var(--ui-3); }
+.bat-estado { min-height: 1.2em; font-size: 13px; display: flex; gap: 4px; }
+.bat-caixa.alerta { border-color: var(--alerta-2); box-shadow: inset 0 0 0 2px var(--alerta-1), 4px 4px 0 rgba(0, 0, 0, 0.45); }
+.bat-caixa.alerta .bat-estado { color: var(--alerta-2); }
+.bat-caixa.alerta .bat-barra-vida .bat-barra-enche { background: var(--alerta-2); }
+.bat-icone-alerta { animation: bat-pulso 1.2s ease-in-out infinite; }
+.bat-caixa.caido { opacity: 0.7; }
+.bat-num-mana { position: absolute; right: 8px; top: -18px; font-size: 13px; color: var(--latao); text-shadow: 1px 1px 0 #000; }
+.bat-resultado { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); padding: 16px 24px; min-width: 32ch; text-align: center; }
+.bat-resultado[hidden] { display: none; }
+.bat-res-titulo { margin: 0 0 8px; font-size: 24px; color: var(--brilho-2); }
+.bat-res-lista { list-style: none; margin: 0 0 12px; padding: 0; text-align: left; }
+.bat-res-nivel { color: var(--brilho-2); }
+.bat-res-caido { color: var(--ui-3); }
+.bat-botao { margin: 0 auto; }
+@keyframes bat-sobe { from { transform: translate(-50%, 0); opacity: 1; } 70% { opacity: 1; } to { transform: translate(-50%, -32px); opacity: 0; } }
+@keyframes bat-cursor { 50% { transform: translateY(3px); } }
+@keyframes bat-pulso { 50% { opacity: 0.4; } }
+@keyframes bat-pisca { 50% { background: var(--alerta-1); } }
+@media (prefers-reduced-motion: reduce) { .bat *, .bat-numero { animation: none !important; transition: none !important; } }

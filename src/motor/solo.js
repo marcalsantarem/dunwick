@@ -17,7 +17,7 @@ export function gerarMapaMistura(mapaDados) {
 export function criarSolo(mapaDados, tex, perfil, texelsPorTile, nearest = false) {
   const [L, A] = mapaDados.tamanho, repeticaoTiles = 256 / texelsPorTile;
   const ajustar = (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = perfil.aniso; if (nearest) { t.magFilter = t.minFilter = THREE.NearestFilter; t.generateMipmaps = false; } else { t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; } t.needsUpdate = true; return t; };
-  const mistura = new THREE.CanvasTexture(gerarMapaMistura(mapaDados)); mistura.colorSpace = THREE.NoColorSpace; mistura.minFilter = mistura.magFilter = THREE.LinearFilter; mistura.generateMipmaps = false;
+  const mistura = new THREE.CanvasTexture(gerarMapaMistura(mapaDados)); mistura.colorSpace = THREE.NoColorSpace; mistura.flipY = false; // linha z da planta = v do mapa (sem inverter): o chão fica como desenhado no `planta` mistura.minFilter = mistura.magFilter = THREE.LinearFilter; mistura.generateMipmaps = false;
   const T = { gramaA: ajustar(tex.grama_a), gramaB: ajustar(tex.grama_b), terra: ajustar(tex.terra), calcada: ajustar(tex.calcada) };
   const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0 });
   mat.onBeforeCompile = (sh) => {

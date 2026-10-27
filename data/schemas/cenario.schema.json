@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cenario",
+  "title": "Cenário (arena) da batalha: câmera, palco, luz, névoa e peças do kit (docs/cenarios/cena_batalha.md)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "camera", "palco", "luz", "nevoa", "foco", "objetos"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^cen_[a-z0-9_]+$" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "padrao": { "type": "boolean" },
+    "camera": {
+      "type": "object", "additionalProperties": false, "required": ["giro_graus", "inclinacao_graus", "arte", "alvo"],
+      "properties": {
+        "giro_graus": { "type": "number", "minimum": 0, "maximum": 90 },
+        "inclinacao_graus": { "type": "number", "minimum": 15, "maximum": 45 },
+        "arte": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 320 }, { "type": "integer", "minimum": 180 }], "items": false, "minItems": 2 },
+        "alvo": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "items": false, "minItems": 2 }
+      }
+    },
+    "palco": {
+      "type": "object", "additionalProperties": false, "required": ["tamanho", "origem", "calcada_raio", "musgo_borda", "terra_z_min", "marca_raio"],
+      "properties": {
+        "tamanho": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 16 }, { "type": "integer", "minimum": 16 }], "items": false, "minItems": 2 },
+        "origem": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "items": false, "minItems": 2 },
+        "calcada_raio": { "type": "array", "prefixItems": [{ "type": "number", "exclusiveMinimum": 0 }, { "type": "number", "exclusiveMinimum": 0 }], "items": false, "minItems": 2 },
+        "musgo_borda": { "type": "number", "minimum": 0 },
+        "terra_z_min": { "type": "number" },
+        "marca_raio": { "type": "number", "minimum": 0 }
+      }
+    },
+    "luz": {
+      "type": "object", "additionalProperties": false, "required": ["sombra_cobertura", "preenchimento", "vinheta_extra", "lanternas_por_perfil"],
+      "properties": {
+        "sombra_cobertura": { "type": "number", "exclusiveMinimum": 0 },
+        "preenchimento": { "type": "number", "minimum": 0, "maximum": 1 },
+        "vinheta_extra": { "type": "number", "minimum": 0, "maximum": 1 },
+        "lanternas_por_perfil": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 8 } }
+      }
+    },
+    "nevoa": {
+      "type": "object", "additionalProperties": false, "required": ["z_inicio", "z_fim"],
+      "properties": { "z_inicio": { "type": "number" }, "z_fim": { "type": "number" } }
+    },
+    "foco": {
+      "type": "object", "additionalProperties": false, "required": ["z", "faixa_tiles"],
+      "properties": { "z": { "type": "number" }, "faixa_tiles": { "type": "number", "minimum": 0 } }
+    },
+    "objetos": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["id", "tipo", "x", "z"],
+        "properties": { "id": { "type": "string" }, "tipo": { "enum": ["casa", "arvore", "pinheiro", "arbusto", "pedra", "poco", "torre_sino", "lanterna", "barril", "caixote", "cerca"] }, "x": { "type": "number" }, "z": { "type": "number" } }
+      }
+    }
+  }
+}

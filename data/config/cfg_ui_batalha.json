@@ -1,0 +1,13 @@
+{
+  "id": "cfg_ui_batalha",
+  "versao": 1,
+  "nota": "UI de batalha por turnos (15, docs/ui/batalha.md). Tempos em segundos; o resto dos tempos vem de cfg_batalha.tempos.",
+  "t_mensagem": 1.2,
+  "t_barra_inimigo_visivel": 1.5,
+  "vida_baixa_fracao": 0.25,
+  "acelerar_mult": 2,
+  "numero_altura_px": 56,
+  "gamepad_limiar": 0.5,
+  "palco_meia_largura_tiles": 5,
+  "palco_meia_profundidade_tiles": 3
+}
