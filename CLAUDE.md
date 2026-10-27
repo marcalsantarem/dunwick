@@ -28,14 +28,18 @@ Cada arquivo em `agentes-rpg/` é a instrução completa de um papel. Ao receber
 |---|---|---|
 | 01 | Produtor | Plano, escopo, Bíblia do Projeto, briefings, marcos, localização/lançamento/legal. Não cria assets |
 | 02 | Roteirista | Mundo, personagens, missões, diálogos, textos |
-| 03 | Jogabilidade | Implementa gameplay (movimento, câmera, combate, IA, interação, HUD ligado ao estado) |
+| 03 | Combate por turnos e IA | Controlador de batalha (rodadas, comandos, ordem), IA dos inimigos e do chefe |
 | 04 | Sprites | Pixel art **gerada por código** (ex.: Python + Pillow) + normal map + metadados + preview |
 | 05 | Som | SFX e música **sintetizados por código**, mixagem, validação |
-| 06 | Sistemas e Níveis | Regras, números, fórmulas, balanceamento, layouts de mapa em dados |
-| 07 | Cenários e UI | Kit 3D modular, props, luz/atmosfera, telas de UI, controles, acessibilidade |
+| 06 | Design de Combate e Classes | Classes, habilidades, fórmulas, itens, bestiário, balanceamento com simulações |
+| 07 | Cenários | Kit isométrico, props, luz, montagem, cena de batalha |
 | 08 | Arquiteto Técnico | **Único que escolhe ferramentas/stack**; arquitetura, formatos, save, pipeline, desempenho, publicação |
 | 09 | QA | Encontra, reproduz, mede e recomenda passa/não passa; não corrige nem decide escopo |
 | 10 | Direção de Arte e VFX | Guia visual, paleta mestra, pós-processamento, itens-modelo, cena-modelo, efeitos; aprova arte do 04/07 |
+| 11 | Gestor de Backlog e Publicação | Backlog, quadro de tarefas, versões, README, publicação |
+| 13 | Exploração, Interação e Missões | Mapa explorável, diálogos, encontros aleatórios, missões, save |
+| 14 | Níveis e Mundo | Mapas, métricas isométricas, zonas de encontro |
+| 15 | UI/UX | Menus de batalha, HUD, diálogo, controles, acessibilidade |
 
 Regras transversais (valem para todos):
 - Fora do 08, agentes descrevem **o que** precisam, nunca **qual ferramenta**.

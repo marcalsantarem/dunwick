@@ -88,14 +88,18 @@ Dunwick é produzido por **uma pessoa e um time de agentes de IA**, cada um com 
 |---|---|---|
 | 01 | Produtor | plano, escopo, marcos, decisões |
 | 02 | Roteirista | mundo, personagens, missões, textos |
-| 03 | Jogabilidade | movimento, combate, IA, interação |
+| 03 | Combate por turnos e IA | Controlador de batalha (rodadas, comandos, ordem), IA dos inimigos e do chefe |
 | 04 | Sprites | pixel art gerada por código |
 | 05 | Som | efeitos e música sintetizados |
-| 06 | Sistemas e Níveis | regras, números, mapas |
-| 07 | Cenários e UI | kit isométrico, interface, acessibilidade |
+| 06 | Design de Combate e Classes | Classes, habilidades, fórmulas, itens, bestiário, balanceamento com simulações |
+| 07 | Cenários | Kit isométrico, props, luz, montagem, cena de batalha |
 | 08 | Arquiteto Técnico | arquitetura, dados, desempenho, publicação |
 | 09 | QA | testes e critérios por marco |
 | 10 | Direção de Arte e VFX | guia visual, paleta, efeitos |
+| 11 | Gestor de Backlog e Publicação | Backlog, quadro de tarefas, versões, README, publicação |
+| 13 | Exploração, Interação e Missões | Mapa explorável, diálogos, encontros aleatórios, missões, save |
+| 14 | Níveis e Mundo | Mapas, métricas isométricas, zonas de encontro |
+| 15 | UI/UX | Menus de batalha, HUD, diálogo, controles, acessibilidade |
 
 Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_decisoes.md). A fonte da verdade é a [Bíblia do Projeto](docs/00_biblia_projeto.md).
 

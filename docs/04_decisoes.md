@@ -222,3 +222,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Encontros B (usuário):** **encontro aleatório** (passos no mapa disparam a batalha). Inimigos visíveis no mapa não entram por ora.
 - **Grupo A (usuário):** a **Grace luta com o Edric** a partir da feira (volta à vila e luta final do slice), com cura como habilidade. Isso **substitui a parte da D-012** que dizia "só em cena, sem lutar". Grupo de 3 segue como meta futura.
 - **Pendente:** revisão da estrutura de agentes (criar/dividir), que o usuário pediu para confirmar antes de qualquer alteração nos arquivos dos agentes.
+
+## D-032 — Nova estrutura de agentes (2026-10-27)
+- **Decisão (usuário, fase 1 como proposta):** dividir e criar agentes: **03 Combate por turnos e IA** + novo **13 Exploração, Interação e Missões**; **06 Design de Combate e Classes** (especialista em RPG, com simulações) + novo **14 Níveis e Mundo**; **07 Cenários** (inclui a cena de batalha 3D) + novo **15 UI/UX**; novo **11 Gestor de Backlog e Publicação** (PO + scrum master + releases). **12 Designer de Personagens e Retratos** fica para a **fase 2** (caixas de diálogo); **animador separado** só se virar gargalo.
+- **Quadro de tarefas em arquivo** (`docs/05_quadro.md`) por ora; espelhar no GitHub Projects quando o plugin do GitHub funcionar.
+- **Arquivos:** novos `agentes-rpg/11_*.md`, `13_*.md`, `14_*.md`, `15_*.md`; blocos de "DIVISÃO DE ESCOPO" em `03`, `06` e `07`. Os arquivos antigos mantêm o texto completo (que serve de base para as duas metades).
+- **Sessões:** o usuário abre sessões novas para 11, 13, 14 e 15; as sessões Jogabilidade, Sistemas e Cenario continuam com o escopo reduzido.

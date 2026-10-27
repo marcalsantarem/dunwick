@@ -73,14 +73,18 @@ Proibido: personagens, criaturas, nomes, símbolos, músicas e UI dessas obras (
 |---|---|---|
 | 01 | Produtor | Plano, escopo, Bíblia, briefings, marcos, localização/lançamento/legal |
 | 02 | Roteirista | Mundo, personagens, missões, diálogos |
-| 03 | Jogabilidade | Implementação do gameplay |
+| 03 | Combate por turnos e IA | Controlador de batalha (rodadas, comandos, ordem), IA dos inimigos e do chefe |
 | 04 | Sprites | Pixel art gerada por código + normal map |
 | 05 | Som | SFX e música sintetizados por código |
-| 06 | Sistemas e Níveis | Regras, números, balanceamento, mapas em dados |
-| 07 | Cenários e UI | Kit 3D, props, luz, telas de UI, acessibilidade |
+| 06 | Design de Combate e Classes | Classes, habilidades, fórmulas, itens, bestiário, balanceamento com simulações |
+| 07 | Cenários | Kit isométrico, props, luz, montagem, cena de batalha |
 | 08 | Arquiteto Técnico | Stack, arquitetura, formatos, desempenho, publicação |
 | 09 | QA | Testes, medições, passa/não passa |
 | 10 | Direção de Arte e VFX | Guia visual, paleta, pós, efeitos; aprova arte |
+| 11 | Gestor de Backlog e Publicação | Backlog, quadro de tarefas, versões, README, publicação |
+| 13 | Exploração, Interação e Missões | Mapa explorável, diálogos, encontros aleatórios, missões, save |
+| 14 | Níveis e Mundo | Mapas, métricas isométricas, zonas de encontro |
+| 15 | UI/UX | Menus de batalha, HUD, diálogo, controles, acessibilidade |
 
 Equipe: 1 usuário + agentes de IA. Prazo por marcos, sem datas fixas.
 

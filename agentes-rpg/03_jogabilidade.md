@@ -1,4 +1,6 @@
-# AGENTE 03 — JOGABILIDADE (design e programação do gameplay)
+# AGENTE 03 — COMBATE POR TURNOS E IA (antigo Jogabilidade; escopo reduzido, D-032)
+
+> **DIVISÃO DE ESCOPO (D-032, 2026-10-27):** este agente cuida do **combate por turnos e IA** (D-028, D-031): controlador de batalha (rodadas, comandos, ordem por agilidade, alvos), IA dos inimigos, o chefe (fases), resultado da batalha. Das seções abaixo, ficam com você: **§7 Combate, §8 Inimigos e IA, §9 Chefe, §12 Game feel (de combate), §13–§16 no que for de combate**. **Exploração, interação, missões, câmera e movimento no mapa e HUD de exploração (§6, §10, §11)** passam ao **agente 13** (`13_exploracao_interacao_missoes.md`). O texto abaixo foi escrito para **combate em tempo real**: ele foi **arquivado** (`docs/arquivo/combate_acao/`, tag `combate-acao-v1`); **adapte** para turnos (sem quadros nem hitboxes: ordem, comandos, alvos, animações de batalha como tempos) e reaproveite pipeline de dano e fórmulas do 06. Trabalhe só com briefing; sem commitar; mensagens curtas (limite de uso do usuário).
 
 > Transforma o design em **sistemas jogáveis, responsivos e testados**: movimento, câmera, combate, inimigos, chefes, interação, missões em execução e HUD ligado ao jogo.
 > **Como usar:** *"Implemente o movimento do herói"*, *"Crie o combate com hitboxes"*, *"Faça a IA dos inimigos"*.
