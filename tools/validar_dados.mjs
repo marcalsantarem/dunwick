@@ -153,6 +153,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
       exigeTexto(arq, '/nome_txt', e.nome_txt);
       e.inimigos.forEach((id, i) => { if (!inimigosB[id]) erro(arq, `/inimigos/${i}`, `inimigo "${id}" não existe em data/combate`); });
     }
+    cb.debug.encontros.forEach((id, i) => { if (!por('encontro').some(([, e]) => e.id === id)) erro('combate/cfg_batalha.json', `/debug/encontros/${i}`, `encontro "${id}" não existe em data/combate`); });
     for (const id of Object.keys(cb.inventario_teste)) if (!itensB[id]) erro('combate/cfg_batalha.json', `/inventario_teste/${id}`, 'item não existe em data/combate');
   }
   const textos = por('textos');

@@ -80,11 +80,18 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
   function comandosDe(uid) {
     const a = porUid.get(uid), k = a.kit;
     const temAlvo = (acao) => (acao.alvo_tipo.startsWith('inimigo') ? vivos('inimigos').length : acao.alvo_tipo.startsWith('aliado') ? vivos('grupo').length : 1) > 0;
-    const hab = k.habilidades.map((id) => ({ id, nome_txt: acaoDe(id).nome_txt, custo: acaoDe(id).custo.mana, alvo_tipo: acaoDe(id).alvo_tipo, habilitada: a.mana >= acaoDe(id).custo.mana && temAlvo(acaoDe(id)) }));
-    const itens = k.itens.map((id) => ({ id, nome_txt: itemDe(id).nome_txt, qtd: estoque[id] ?? 0, alvo_tipo: itemDe(id).alvo_tipo, habilitado: itemDe(id).uso_batalha && (estoque[id] ?? 0) > 0 }));
+    const hab = k.habilidades.map((id) => {
+      const ac = acaoDe(id), semMana = a.mana < ac.custo.mana, semAlvo = !temAlvo(ac);
+      return { id, nome_txt: ac.nome_txt, custo: ac.custo.mana, alvo_tipo: ac.alvo_tipo, habilitada: !semMana && !semAlvo, motivo: semMana ? 'sem_mana' : semAlvo ? 'sem_alvo' : null };
+    });
+    const itens = k.itens.map((id) => {
+      const it = itemDe(id), qtd = estoque[id] ?? 0, ok = it.uso_batalha && qtd > 0;
+      return { id, nome_txt: it.nome_txt, qtd, alvo_tipo: it.alvo_tipo, habilitado: ok, motivo: ok ? null : !it.uso_batalha ? 'item_invalido' : 'sem_item' };
+    });
+    const atq = acaoDe(k.ataque), atqOk = temAlvo(atq);
     return {
-      atacar: { id: k.ataque, nome_txt: acaoDe(k.ataque).nome_txt, alvo_tipo: acaoDe(k.ataque).alvo_tipo, habilitado: temAlvo(acaoDe(k.ataque)) },
-      habilidade: hab, item: itens, defender: { habilitado: true }, fugir: { habilitado: enc.pode_fugir },
+      atacar: { id: k.ataque, nome_txt: atq.nome_txt, alvo_tipo: atq.alvo_tipo, habilitado: atqOk, motivo: atqOk ? null : 'sem_alvo' },
+      habilidade: hab, item: itens, defender: { habilitado: true, motivo: null }, fugir: { habilitado: enc.pode_fugir, motivo: enc.pode_fugir ? null : 'nao_pode_fugir' },
     };
   }
   function atorDaVez() { return vivos('grupo').find((a) => !escolhas.has(a.uid))?.uid ?? null; }
@@ -107,11 +114,23 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     pedir();
   }
 
-  function escolher(uid, cmd) {
-    if (fase !== 'comandos') throw new Error(`não dá para escolher na fase "${fase}"`);
-    if (atorDaVez() !== uid) throw new Error(`não é a vez de "${uid}" (vez de "${atorDaVez()}")`);
+  /** Motivo pelo qual o comando seria recusado (ou null): fase_invalida, nao_e_a_vez, comando_invalido, habilidade_invalida, item_invalido, sem_mana, sem_item, sem_alvo, nao_pode_fugir, alvo_invalido. Não muda nada. */
+  function motivoRecusa(uid, cmd) {
+    if (fase !== 'comandos') return 'fase_invalida';
+    if (atorDaVez() !== uid) return 'nao_e_a_vez';
     const a = porUid.get(uid), erro = validar(a, cmd);
-    if (erro) throw new Error(`comando recusado para "${uid}": ${erro}`);
+    if (erro) return erro;
+    if (cmd.alvo) {
+      const al = porUid.get(cmd.alvo), tipo = cmd.comando === 'item' ? itemDe(cmd.id).alvo_tipo : cmd.comando === 'defender' || cmd.comando === 'fugir' ? null : acaoDe(cmd.comando === 'atacar' ? a.kit.ataque : cmd.id).alvo_tipo;
+      if ((tipo === 'inimigo_1' || tipo === 'aliado_1') && (!al || al.caido || al.lado !== (tipo === 'inimigo_1' ? 'inimigos' : 'grupo'))) return 'alvo_invalido';
+    }
+    return null;
+  }
+  function escolher(uid, cmd) {
+    const m = motivoRecusa(uid, cmd);
+    if (m === 'fase_invalida') throw new Error(`não dá para escolher na fase "${fase}"`);
+    if (m === 'nao_e_a_vez') throw new Error(`não é a vez de "${uid}" (vez de "${atorDaVez()}")`);
+    if (m) throw new Error(`comando recusado para "${uid}": ${m}`);
     escolhas.set(uid, { ...cmd, alvo: cmd.alvo ?? null }); pilha.push(uid);
     emit('comando_escolhido', { ator: uid, comando: cmd.comando, id: cmd.id ?? null, alvo: cmd.alvo ?? null });
     if (atorDaVez()) { pedir(); return { pronto: false }; }
@@ -120,6 +139,15 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
   function voltar() {
     if (!pilha.length || (fase !== 'comandos' && fase !== 'pronto')) return false;
     escolhas.delete(pilha.pop()); fase = 'comandos'; pedir(); return true;
+  }
+
+  /** Ordem prevista da execução, para a UI (barra de ordem). Usa só o que o jogador já escolheu; os inimigos entram com prioridade 0 (não vaza a IA). */
+  function ordemPrevista() {
+    const itens = vivos('grupo').concat(vivos('inimigos')).map((a) => {
+      const cmd = a.lado === 'grupo' ? escolhas.get(a.uid) : null, ac = cmd && (cmd.comando === 'atacar' || cmd.comando === 'habilidade') ? acaoDe(cmd.id) : null;
+      return { uid: a.uid, prioridade: cmd ? cfg.prioridade_comando[cmd.comando] + (ac?.prioridade ?? 0) : 0, iniciativa: a.agilidade, lado: a.lado, pos: a.pos };
+    });
+    return F.ordenar(itens).map((i) => i.uid);
   }
 
   // ---------- ordem ----------
@@ -271,6 +299,9 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     return null;
   }
 
+  /** Encerra a batalha agora como `fugiu` (depuração e saída de emergência). */
+  function abandonar() { if (!resultado) terminar('fugiu'); return resultado; }
+
   function iniciar() {
     if (fase !== 'inicio') throw new Error('a batalha já começou');
     emit('batalha_iniciou', { encontro_id: encontro, grupo: lado('grupo').map((a) => a.uid), inimigos: lado('inimigos').map((a) => a.uid), semente });
@@ -279,7 +310,7 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
 
   const copia = (a) => ({ uid: a.uid, id: a.id, lado: a.lado, pos: a.pos, vida: a.vida, vida_max: a.vida_max, mana: a.mana, mana_max: a.mana_max, agilidade: a.agilidade, defesa: a.defesa, caido: a.caido, defendendo: a.defendendo, nivel: a.nivel, xp: a.xp });
   return {
-    eventos, log, iniciar, escolher, voltar, executar, comandosDe, atorDaVez,
+    eventos, log, iniciar, escolher, voltar, executar, comandosDe, atorDaVez, validarComando: motivoRecusa, ordemPrevista, abandonar,
     get rodada() { return rodada; }, get fase() { return fase; }, get pronto() { return fase === 'pronto'; }, get resultado() { return resultado; },
     ator: (uid) => porUid.get(uid), vivos, inventario: () => ({ ...estoque }),
     estado: () => ({ rodada, fase, atores: atores.map(copia), escolhas: Object.fromEntries(escolhas), inventario: { ...estoque } }),

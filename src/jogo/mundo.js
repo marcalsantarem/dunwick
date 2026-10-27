@@ -3,6 +3,7 @@
 import { criarMapa } from './mapa.js';
 import { criarHeroi } from './heroi.js';
 import { criarCameraJogo } from './camera_jogo.js';
+import { criarEstadoJogo } from './estado_jogo.js';
 
 export function criarMundo(dados, eventos, metasSprite) {
   const cfg = dados.config.jogo, kit = dados.config.kit, ciclo = dados.config.ciclo, mapaDados = Object.values(dados.mapas)[0];
@@ -24,6 +25,8 @@ export function criarMundo(dados, eventos, metasSprite) {
   const obstaculos = entidades.map((e) => ({ x: e.x, z: e.z, r: e.raioPush }));
   const mundo = { ticks: 0, dados, mapa, heroi, camera, entidades, eventos, dt: 1 / cfg.passo_logico_hz, hora: ciclo.hora_inicial, cicloLigado: ciclo.ligado };
   const alvos = entidades; // alvos do herói: todos os bonecos
+  // ponte mundo ↔ batalha (BL-008): modo mapa | batalha | cena | game_over. Fora do modo `mapa` a exploração fica congelada (só o relógio de ticks anda).
+  mundo.jogo = dados.combate && dados.config.batalha ? criarEstadoJogo(dados, eventos) : null;
 
   eventos.em('golpe_acertou', ({ alvo }) => { const e = entidades.find((x) => x.id === alvo); if (e) { e.contadores.acertos++; e.danoAte = mundo.ticks + 18; e.estado = 'DANO'; e.quadroEstado = 0; } });
 
@@ -46,6 +49,7 @@ export function criarMundo(dados, eventos, metasSprite) {
 
   /** Um passo lógico completo. `entrada` = instantâneo de entrada_logica.amostrar(tick); `buffer` = entrada.buffer. */
   mundo.passo = (entrada, buffer) => {
+    if (mundo.jogo && mundo.jogo.modo !== 'mapa') { mundo.ticks++; return; }
     heroi.passo(entrada, { obstaculos, alvos, eventos, buffer, tick: mundo.ticks });
     for (const e of entidades) passoEntidade(e);
     camera.passo(heroi, heroiDados.movimento.vel_correr, mundo.dt);

@@ -307,3 +307,71 @@ Os exemplos de ordem O1–O4 usam outras agilidades só para ilustrar a regra; o
 - **Dados:** `data/combate/` (`cfg_batalha`, `hero_*`, `enemy_*`, `enc_*`, `item_*`) e `data/attacks/` (`atk_*`, `skill_*`); esquemas `cfg_batalha`, `heroi_batalha`, `inimigo_batalha`, `encontro`, `item_batalha`, `acao_batalha`. Prefixo novo `enc_` aceito no validador.
 - **Ferramenta:** `node tools/simular_batalha.mjs enc_misto_1 --semente=7` (registro dos eventos) ou `--lote=1000` (resumo). Testes: `tests/batalha.test.mjs`.
 - **Fora da etapa 1:** ligação ao mapa, à cena e à UI (etapa 2); estados de status, chefe em fases e subida de atributos por nível (o motor só soma XP e avisa o nível).
+
+---
+
+## Integração (contrato) — BL-008 etapa 2a (2026-10-27)
+
+> Quem consome: 08 (cena e laço), 13 (gatilho no mapa), 15 (UI), 05 (som), 10 (efeitos). **Código:** `src/jogo/estado_jogo.js` (ponte mundo ↔ batalha) e `src/jogo/batalha/controlador.js` (apresentação ↔ batalha); simulação pura, sem three nem DOM. **Testes:** `tests/estado_jogo.test.mjs`. A apresentação **só lê** estado e eventos e **só escreve** pelos métodos abaixo.
+
+### A. Mundo ↔ batalha (`mundo.jogo`)
+`criarMundo` cria `mundo.jogo` (`criarEstadoJogo(dados, eventos)`). O modo é `mapa | batalha | cena | game_over`; **fora de `mapa` o mundo não simula** (só `mundo.ticks` anda; herói, bonecos, câmera e relógio dia/noite ficam parados).
+
+| Chamada | Quando | O que faz |
+|---|---|---|
+| `jogo.iniciarBatalha(encontroId, { semente? })` | modo `mapa` (o 13 chama no gatilho; ponto fixo no M1) | Cria o controlador com o grupo e o inventário atuais, passa a `batalha`, **já iniciado**; devolve o controlador. Sem `semente`, usa `sementeBase + contador` (a plataforma passa `sementeBase` aleatória; os testes, fixa) |
+| `jogo.encerrarBatalha()` | modo `batalha`, **depois** de `controlador.fim` | Aplica ao grupo vida, mana, XP e nível finais; inventário e moedas; volta a `mapa` (ou vai a `game_over` na derrota); devolve o resultado |
+| `jogo.tentarDeNovo()` | modo `game_over` | Restaura grupo, inventário e moedas do último `salvarPonto()` e volta a `mapa` |
+| `jogo.salvarPonto()` | o 13, nos pontos de salvamento (no M1 vale o estado inicial) | Guarda o retorno da derrota |
+| `jogo.entrarCena(id)` / `sairCena()` | o 13, nas cenas | Modo `cena` (mapa congelado) e volta |
+| `jogo.depurarEncontro(id?)` | só depuração (ver D) | Dispara o próximo de `cfg_batalha.debug.encontros` (ou `id`); fora do `mapa` devolve `null` |
+| `jogo.estado()` | sempre | `{ modo, grupo: { id: {vida, mana, nivel, xp} }, inventario, moedas, cena }` (cópia) |
+
+**Resultado** (`encerrarBatalha()` e `controlador.encerrar()`): `{ resultado: 'vitoria'|'derrota'|'fuga', motivo: null|'empate', xp, moedas, itens: {item: qtd}, niveis: [{ator, de, para}], semente, rodadas, tempo_animacao_s, grupo: [{id, vida, vida_max, mana, mana_max, caido, nivel, xp}], inventario }`. `empate` (passou de `rodadas_max`) volta como `fuga` com `motivo: 'empate'`. Vitória: caído volta com 1 de vida e não recebe XP. **Fuga e empate: sem XP, moedas nem drops**; vida e mana finais valem.
+**Eventos do mundo** (bus `eventos` do mundo): `modo_mudou {de, para, ...}` · `batalha_iniciada {encontro_id, semente}` · `batalha_encerrada {resultado, xp, moedas, itens, niveis, grupo}` · `ponto_restaurado {grupo, inventario, moedas}`.
+**Derrota no M1:** `game_over` simples. A UI mostra "Tentar de novo" (`tentarDeNovo()`); o estado visível no game over é o da derrota; sem perda de moedas por ora (regra de morte do 06 depois).
+
+### B. Apresentação ↔ batalha (`controlador`, devolvido por `iniciarBatalha`)
+Criar direto (testes, ferramentas): `criarControladorBatalha(dados, { encontro: 'enc_*', semente, grupo?: ['hero_edric','hero_grace'], estadoGrupo?, inventario?, velocidade? })` e `iniciar()`.
+
+| Chamada | Detalhe |
+|---|---|
+| `assinar(nome, fn) → cancelar()` | `nome` é um dos **25 eventos** (abaixo) ou `'*'`. Evento desconhecido lança erro. `fn` recebe `{ nome, rodada, ...campos }` |
+| `esvaziarFila() → eventos[]` | Eventos ainda não consumidos, **em ordem**. A UI/cena toca a fila no seu ritmo; a simulação já terminou o ato. Inclui os do `iniciar()` |
+| `enviarComando({ ator, comando, id?, alvo? })` | **Campos exatos:** `ator` = uid do herói da vez (`consultar().vez`); `comando` = `atacar` \| `habilidade` \| `item` \| `defender` \| `fugir`; `id` = `skill_*` ou `item_*` (em `atacar`, opcional: usa o ataque do kit); `alvo` = uid de um inimigo vivo (`inimigo_1`) ou de um aliado vivo (`aliado_1`); omitido, o motor escolhe o primeiro inimigo / o aliado de menor fração de vida. Devolve `{ ok: true, pronto, proximo }` ou **`{ ok: false, erro }`** (nunca lança por regra do jogo) |
+| `voltar() → bool` | Desfaz a última escolha e pede de novo ao herói anterior |
+| `executar() → { ok, eventos, resultado }` | Só com `pronto`; roda a rodada inteira. Sem `pronto`: `{ ok:false, erro:'comandos_incompletos' }`. `resultado` vem preenchido se a batalha acabou; senão a rodada seguinte já começou (novo `comando_pedido`) |
+| `consultar()` | Ver abaixo |
+| `definirVelocidade(1\|2) → bool`, `velocidade` | Opções de `cfg_batalha.velocidades_batalha`; só afeta `duracao_real_s`, `impacto_s` e `intervalo_s` dos eventos **novos** |
+| `fim`, `pronto`, `rodada` | Leitura |
+| `encerrar() → resultado\|null` | Resultado no formato do mundo (`null` antes do fim) |
+| `abandonar()` | Depuração: termina como `fuga` agora |
+
+**Erros de `enviarComando`:** `fase_invalida` · `nao_e_a_vez` · `comando_invalido` · `habilidade_invalida` · `item_invalido` · `sem_mana` · `sem_item` · `sem_alvo` · `nao_pode_fugir` · `alvo_invalido`. A UI deve **desabilitar** o que `consultar()` marca com `motivo`, e usar o `erro` só como rede de segurança.
+
+**`consultar()`** devolve (sem vazar a IA):
+```
+{ encontro, semente, rodada, fase ('comandos'|'pronto'|'execucao'|'fim'), velocidade, pode_fugir, fim,
+  vez: uid | null,                         // quem escolhe agora
+  comandos: { atacar:{id,nome_txt,alvo_tipo,habilitado,motivo}, habilidade:[{id,nome_txt,custo,alvo_tipo,habilitada,motivo}],
+              item:[{id,nome_txt,qtd,alvo_tipo,habilitado,motivo}], defender:{habilitado}, fugir:{habilitado,motivo} } | null,
+  ordem_prevista: [uid…],                  // ordem da execução com o que o grupo já escolheu (inimigos com prioridade 0)
+  escolhas: { uid: {comando,id,alvo} },    // só do grupo
+  atores: [{ uid,id,nome_txt,lado,slot,posicao_cena:[x,z],vida,vida_max,mana,mana_max,defendendo,caido,nivel }],
+  inventario: { item: qtd } }
+```
+`motivo` ∈ `sem_mana · sem_alvo · sem_item · item_invalido · nao_pode_fugir` (ou `null`). `posicao_cena` vem de `cfg_batalha.posicoes` (§10.1).
+
+**Eventos (25):** `batalha_iniciou · rodada_iniciou · comando_pedido · comando_escolhido · execucao_iniciou · turno_iniciou · ato_executado · dano · curou · mana_gasta · item_usado · defendeu · fuga_tentada · ato_falhou · ato_cancelado · caiu · vida_mudou · mana_mudou · fase_mudou · rodada_terminou · venceu · perdeu · fugiu · empate · batalha_terminou`. Campos como no §8. `ato_executado` ganha, para a apresentação: `duracao_real_s` (= `duracao_s` ÷ velocidade), `impacto_s` (= `duracao_real_s` × `fracao_impacto`, o instante em que tocam `dano`/`curou` do ato) e `intervalo_s` (respiro antes do próximo ato) e `pose` (a pose do ator). Os eventos de resultado (`dano`, `curou`, `vida_mudou`, `caiu`, `mana_*`) vêm **logo depois** do `ato_executado` que os causou e pertencem a ele.
+
+**Roteiro da apresentação (cada quadro):**
+1. `esvaziarFila()`; tocar os eventos em ordem (um ato por vez: pose do ator, esperar `impacto_s`, aplicar `dano`/`curou`/`vida_mudou`/`caiu`, esperar o resto de `duracao_real_s` + `intervalo_s`).
+2. Com a fila vazia e `consultar().vez` ≠ `null`: abrir o menu do herói; ao confirmar, `enviarComando`; `cancelar` chama `voltar()`.
+3. Quando `pronto`: `executar()`; voltar ao passo 1. Ao `fim`: tocar `venceu`/`perdeu`/`fugiu`, mostrar a recompensa e chamar `jogo.encerrarBatalha()`.
+A UI **não** chama `executar()` enquanto ainda toca a fila anterior (é ela que dá o ritmo; nos testes e na simulação a fila é consumida de uma vez).
+
+### C. Dados novos
+`cfg_batalha`: `fracao_impacto` (0,45) e `debug: { tecla_proximo_encontro: 'BracketRight', encontros: [enc_slime_1, enc_lobo_1, enc_misto_1] }`.
+
+### D. Gancho de depuração para o 08 (sem tocar o motor)
+Disparar um encontro por tecla, sem o gatilho do mapa: no tratamento das teclas de debug de `src/plataforma/principal.js`, quando `e.code === dados.config.batalha.debug.tecla_proximo_encontro` (`BracketRight`; só no build de desenvolvimento, como as demais teclas de debug), chamar `const c = mundo.jogo.depurarEncontro()`. Se `c` não for `null`, a cena de batalha liga ao controlador `c` (passos 1–3 acima). Ao `c.fim`, chamar `mundo.jogo.encerrarBatalha()`; na derrota, `mundo.jogo.tentarDeNovo()` depois do "Tentar de novo". Cada pressionar avança para o próximo encontro da lista. O laço do mundo já congela a exploração nos modos ≠ `mapa`; a plataforma só precisa **desenhar a cena de batalha quando `mundo.jogo.modo === 'batalha'`** e a de mapa nos demais.

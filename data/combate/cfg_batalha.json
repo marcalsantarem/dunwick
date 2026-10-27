@@ -98,5 +98,14 @@
   "dist_contato_tiles": 1.1,
   "inventario_teste": {
     "item_pocao_ervas": 2
+  },
+  "fracao_impacto": 0.45,
+  "debug": {
+    "tecla_proximo_encontro": "BracketRight",
+    "encontros": [
+      "enc_slime_1",
+      "enc_lobo_1",
+      "enc_misto_1"
+    ]
   }
 }
