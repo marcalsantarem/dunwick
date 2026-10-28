@@ -1,0 +1,20 @@
+{
+  "id": "skill_hollowpaw_desaba",
+  "versao": 1,
+  "nota": "Hollowpaw: golpe pesado em todo o grupo, sempre anunciado na rodada anterior por skill_hollowpaw_ergue. Defender corta o dano pela metade.",
+  "nome_txt": "txt_skill_hollowpaw_desaba_nome",
+  "tipo": "habilidade",
+  "efeito": "dano",
+  "alvo_tipo": "inimigos_todos",
+  "custo": {
+    "mana": 0
+  },
+  "dano_base": 30,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "impacto",
+  "tempo": "t_habilidade",
+  "pose": "bat_ataque_forte",
+  "fx": "fx_impacto_forte",
+  "sfx": "sfx_impacto_forte"
+}

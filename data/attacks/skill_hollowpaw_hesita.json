@@ -1,0 +1,14 @@
+{
+  "id": "skill_hollowpaw_hesita",
+  "versao": 1,
+  "nota": "Hollowpaw (fase 3): hesita e olha o sino; perde o turno. Dá respiro ao grupo e carrega o tom melancólico.",
+  "nome_txt": "txt_skill_hollowpaw_hesita_nome",
+  "tipo": "habilidade",
+  "efeito": "espera",
+  "alvo_tipo": "si",
+  "custo": {
+    "mana": 0
+  },
+  "tempo": "t_espera",
+  "pose": "bat_espera"
+}

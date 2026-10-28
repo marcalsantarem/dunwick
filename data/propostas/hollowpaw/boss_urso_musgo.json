@@ -1,0 +1,70 @@
+{
+  "id": "boss_urso_musgo",
+  "versao": 1,
+  "nota": "PROPOSTA (06, BL-021): Hollowpaw, chefe da caverna. Mesmo esquema de data/schemas/inimigo_batalha.schema.json, com `fases` no lugar de `ia` e condições novas de IA (ver chefe_batalha.schema.json). Ainda não carregada pelo jogo: o 08 registra o esquema e o 03 implementa fases. Ficha: docs/sistemas/ficha_hollowpaw.md.",
+  "nome_txt": "txt_boss_urso_musgo_nome",
+  "papel": "pesado",
+  "sprite": "boss_urso_musgo",
+  "vida_max": 420,
+  "forca": 12,
+  "defesa": 8,
+  "agilidade": 6,
+  "resistencias": {},
+  "xp": 120,
+  "moedas": 60,
+  "drops": [
+    {
+      "item": "item_pocao_ervas",
+      "chance": 1,
+      "qtd": 2
+    }
+  ],
+  "fases": [
+    {
+      "vida_fracao_max": 1,
+      "nome_txt": "txt_boss_hollowpaw_fase1_nome",
+      "ia": [
+        { "acao": "atk_hollowpaw_pancada", "peso": 55, "alvo_regra": "misto", "prob_menor_vida": 0.5 },
+        { "acao": "skill_hollowpaw_varrida", "peso": 25, "alvo_regra": "aleatorio" },
+        { "acao": "skill_hollowpaw_ergue", "peso": 20, "alvo_regra": "aleatorio", "condicao": { "rodada_min": 2, "nao_apos_acao": "skill_hollowpaw_desaba" }, "anuncio_txt": "txt_boss_hollowpaw_aviso_desaba" },
+        { "acao": "skill_hollowpaw_desaba", "peso": 1, "alvo_regra": "aleatorio", "condicao": { "apos_acao": "skill_hollowpaw_ergue" }, "forcar": true }
+      ]
+    },
+    {
+      "vida_fracao_max": 0.66,
+      "nome_txt": "txt_boss_hollowpaw_fase2_nome",
+      "transicao_txt": "txt_boss_hollowpaw_transicao_2",
+      "agilidade": 9,
+      "ia": [
+        { "acao": "atk_hollowpaw_pancada", "peso": 35, "alvo_regra": "misto", "prob_menor_vida": 0.5 },
+        { "acao": "skill_hollowpaw_estilhacos", "peso": 30, "alvo_regra": "aleatorio" },
+        { "acao": "skill_hollowpaw_varrida", "peso": 10, "alvo_regra": "aleatorio" },
+        { "acao": "skill_hollowpaw_ergue", "peso": 25, "alvo_regra": "aleatorio", "condicao": { "nao_apos_acao": "skill_hollowpaw_desaba" }, "anuncio_txt": "txt_boss_hollowpaw_aviso_desaba" },
+        { "acao": "skill_hollowpaw_desaba", "peso": 1, "alvo_regra": "aleatorio", "condicao": { "apos_acao": "skill_hollowpaw_ergue" }, "forcar": true }
+      ]
+    },
+    {
+      "vida_fracao_max": 0.33,
+      "nome_txt": "txt_boss_hollowpaw_fase3_nome",
+      "transicao_txt": "txt_boss_hollowpaw_transicao_3",
+      "agilidade": 9,
+      "defesa": 4,
+      "ia": [
+        { "acao": "atk_hollowpaw_pancada", "peso": 25, "alvo_regra": "menor_vida" },
+        { "acao": "skill_hollowpaw_estilhacos", "peso": 25, "alvo_regra": "aleatorio" },
+        { "acao": "skill_hollowpaw_hesita", "peso": 20, "alvo_regra": "aleatorio", "anuncio_txt": "txt_boss_hollowpaw_aviso_hesita" },
+        { "acao": "skill_hollowpaw_ergue", "peso": 30, "alvo_regra": "aleatorio", "condicao": { "nao_apos_acao": "skill_hollowpaw_desaba" }, "anuncio_txt": "txt_boss_hollowpaw_aviso_desaba" },
+        { "acao": "skill_hollowpaw_desaba", "peso": 1, "alvo_regra": "aleatorio", "condicao": { "apos_acao": "skill_hollowpaw_ergue" }, "forcar": true }
+      ]
+    }
+  ],
+  "poses": {
+    "parado": "bat_parado",
+    "avanca": "bat_avanca",
+    "ataque": "bat_ataque",
+    "ataque_forte": "bat_ataque_forte",
+    "espera": "bat_espera",
+    "dano": "bat_dano",
+    "morte": "bat_morte"
+  }
+}

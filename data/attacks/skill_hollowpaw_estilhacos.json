@@ -1,0 +1,20 @@
+{
+  "id": "skill_hollowpaw_estilhacos",
+  "versao": 1,
+  "nota": "Hollowpaw (fase 2 em diante): os cristais respondem ao sino e estouram em arco, atingindo todo o grupo.",
+  "nome_txt": "txt_skill_hollowpaw_estilhacos_nome",
+  "tipo": "habilidade",
+  "efeito": "dano",
+  "alvo_tipo": "inimigos_todos",
+  "custo": {
+    "mana": 0
+  },
+  "dano_base": 13,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "perfuracao",
+  "tempo": "t_habilidade",
+  "pose": "bat_habilidade",
+  "fx": "fx_impacto_medio",
+  "sfx": "sfx_impacto_medio"
+}
