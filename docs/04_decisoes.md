@@ -250,3 +250,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 ## D-037 — Arte final depois da demo; Hollowpaw pode ser poupado (2026-10-28)
 - **Arte final (M2):** entra **depois da demo v0.1.8**, antes do slice completo. A demo usa a arte atual do esqueleto.
 - **Hollowpaw:** fase 3 com "Hesita" (ficha do 06) e **o jogador pode poupá-lo**. **Altera a D-018** (que dizia que ele morre). A v0.1.8 precisa de duas cenas pós-batalha (matar ou poupar) e o desfecho muda o que a vila recebe. O 02 define as consequências.
+
+## D-038 — Vila 100% zona segura; encontros só fora dela (2026-10-28)
+- **Decisão (usuário, opção A):** a **vila de Baixo Orvalho inteira é zona segura**. As zonas de encontro (`z_enc_*`) saem da vila e passam para os **campos e a região além dos portais** (mapa ao redor, v0.1.3; encontros ativos na v0.1.5).
+- **Origem:** o esboço da vila v0.1.2 (`docs/niveis/esboco_vila_v012.png`, do 14) mostrou 8 prédios, as saídas e a estrada dentro de zonas de encontro.
+- **Consequência registrada:** da v0.1.2 até a v0.1.4 não há batalha andando; só pela tecla `]` no `npm run dev`. A v0.1.1 (batalha atual) segue com as zonas de hoje para o usuário validar.
+- **Não executado ainda:** o 14 atualiza o mapa e as zonas quando o usuário liberar os briefings da v0.1.2. Layout da vila ainda em análise do usuário.
