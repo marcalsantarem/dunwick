@@ -108,18 +108,35 @@ Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_d
 | Marco | Entrega | Situação |
 |---|---|---|
 | M0 Fundação | Bíblia, história, guia visual, especificações | ✅ |
-| M1 Protótipo | herói anda e ataca numa cena isométrica | 🔄 em andamento |
+| M1 Protótipo | batalha por turnos jogável no mapa isométrico | 🔄 validação (v0.1.1) |
+| Demo jogável | v0.1.1 a v0.1.8: vila, entorno, missões, bosque, caverna e o Hollowpaw (~30 min) | ⏳ ver roteiro abaixo |
 | M2 Cena-modelo | uma cena com arte final, luz e efeitos | ⏳ |
 | M3 Vertical slice | vila, caverna, estrada, chefe, som e história | ⏳ |
 | M4 Polimento | game feel, áudio final, tutorial, inglês | ⏳ |
 | M5 Beta | testes completos e balanceamento | ⏳ |
 | M6 Lançamento | versão publicada | ⏳ |
 
+## 🧭 Roteiro da demo
+
+| Versão | Entrega |
+|---|---|
+| v0.1.0 | esqueleto (na `main` hoje) |
+| v0.1.1 | batalha por turnos básica validada |
+| v0.1.2 | resto da vila e minimapa |
+| v0.1.3 | mapa ao redor (campos) e baús de tesouro |
+| v0.1.4 | NPCs, diálogos, lojas e moeda |
+| v0.1.5 | encontros aleatórios, classe, nível por XP, save e recompensas |
+| v0.1.6 | missões da vila e sistema de missões |
+| v0.1.7 | mapa do bosque e da caverna |
+| v0.1.8 | chefe Hollowpaw, cena final e volta à vila |
+
+Detalhes e requisitos técnicos em [`docs/02_roadmap.md`](docs/02_roadmap.md).
+
 ## 🌿 Branches e versões
 
 - **`main`:** versão oficial e estável. Só recebe pull request vindo da `dev`.
 - **`dev`:** a próxima versão. O trabalho do dia a dia acontece aqui.
-- Cada versão oficial recebe uma tag (`v0.1.0`, `v0.2.0`…).
+- Cada versão oficial recebe uma tag (`v0.1.0`, `v0.1.1`…) e um pull request da `dev` para a `main`.
 
 Detalhes em [`docs/tecnico/publicacao.md`](docs/tecnico/publicacao.md).
 

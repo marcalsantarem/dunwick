@@ -234,3 +234,19 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **M1:** **Fugir ligado** (desligado em chefe); **3 encontros** (`enc_slime_1`, `enc_lobo_1`, `enc_misto_1`), com **Slime e Lobo** como inimigos; **batalhas curtas aceitas** (20 s a 1 min, rebalancear no M3).
 - **Liberadas agora (em paralelo):** BL-005 UI de batalha (15), BL-006 cena de batalha (07, com o 10), BL-007 poses do Edric (04). **Depois:** BL-008 controlador e transição (03, 13, 08).
 - **Pendente do 06:** valores de `defesa` de Edric, Grace e Lobo.
+
+## D-034 — Mini marcos da demo (v0.1.1 a v0.1.8) (2026-10-28)
+- **Decisão (usuário):** antes do slice completo, entregar uma **demo jogável** (cerca de 30 minutos) em **versões pequenas v0.1.x**, cada uma com **um pull request `dev → main`** e tag. Roteiro em `docs/02_roadmap.md` (seção "Demo"). O slice oficial **continua** como combinado (D-007, Bíblia); a demo é um recorte dele.
+- **Escopo novo aceito pelo usuário (fora do slice original):** minimapa, baús de tesouro, lojas e moeda, missões de coleta e caça na vila. Registrados como BL-027 a BL-031.
+- **Substitui:** "uma PR por marco M" e "tag v0.2.0 após o M1": agora a tag é por versão v0.1.x.
+
+## D-035 — Dungeon: bosque que leva à caverna (2026-10-28)
+- **Decisão (usuário):** a região ao redor da vila é de **campos e planícies**; mais adiante há uma **parte de bosque**, e no fim dele a **caverna do Hollowpaw** (dungeon). Mantém a caverna da Bíblia e acrescenta o bosque. Nome da região e da caverna: a definir (02 + 14, v0.1.7).
+
+## D-036 — Progressão por nível de XP; evolução por uso adiada (2026-10-28)
+- **Decisão (usuário):** na v0.1.5, **subir de nível por XP** aumenta atributos e libera habilidades. **BL-001 (habilidades que evoluem pelo uso) segue adiada** para depois do slice.
+- **A definir na v0.1.5:** classe do Edric e suas habilidades; modo de salvar e de recuperar vida/mana no mapa; recompensas pós-batalha.
+
+## D-037 — Arte final depois da demo; Hollowpaw pode ser poupado (2026-10-28)
+- **Arte final (M2):** entra **depois da demo v0.1.8**, antes do slice completo. A demo usa a arte atual do esqueleto.
+- **Hollowpaw:** fase 3 com "Hesita" (ficha do 06) e **o jogador pode poupá-lo**. **Altera a D-018** (que dizia que ele morre). A v0.1.8 precisa de duas cenas pós-batalha (matar ou poupar) e o desfecho muda o que a vila recebe. O 02 define as consequências.

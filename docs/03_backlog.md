@@ -82,3 +82,14 @@ Objetivo da onda: Edric + Grace contra 1 inimigo comum, numa tela de batalha sep
 ## Fechados
 
 - **BL-002 · Combate em turnos estilo Breath of Fire** — decidido em D-028 e detalhado em D-031 (rodadas, encontro aleatório, Grace luta). Vira as tarefas BL-004 a BL-011.
+
+## Itens da demo v0.1.x (D-034, 2026-10-28)
+
+| ID | Tarefa | Donos | Versão |
+|---|---|---|---|
+| BL-027 | Minimapa no jogo | 15, 08 | v0.1.2 |
+| BL-028 | Baús de tesouro e estado do mundo serializável | 13, 14, 08 | v0.1.3 |
+| BL-029 | NPCs da vila, janelas de diálogo, inventário e menu | 02, 04, 13, 15 | v0.1.4 |
+| BL-030 | Lojas e moeda do jogo | 06, 02, 15 | v0.1.4 |
+| BL-031 | Sistema de missões e diário; missões de coleta e caça | 13, 02, 15, 06 | v0.1.6 |
+| BL-032 | Sistema de cenas (câmera e diálogo) e cena pós-batalha com final alternativo (poupar) | 08, 02, 07 | v0.1.8 |
