@@ -4,6 +4,7 @@
 // Ritmo: a UI é quem consome a fila; cada evento é repassado à cena (aoEvento) no seu instante, e a cena pode segurar o
 // próximo passo com definirEspera(() => ocupada). executar() só roda com a fila tocada e sem espera.
 import { criarReprodutor, alvosValidos, alvoInicial, posicionarRotulos } from './batalha_fila.js';
+import { criarTelas } from './telas.js';
 
 const COMANDOS = ['atacar', 'habilidade', 'item', 'defender', 'fugir'];
 // ícones provisórios (formas simples) até o 04 entregar os 16×16
@@ -17,7 +18,7 @@ function el(tag, classe, pai, texto) {
   return e;
 }
 
-export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
+export function criarBatalhaUi({ mundo, dados, t, debug = false, plataforma = {} }) {
   const cfg = dados.config.ui_batalha, cfgB = dados.config.batalha, tempos = cfgB.tempos;
   const nomeItem = (id) => t(dados.combate.itens[id]?.nome_txt ?? id);
 
@@ -42,6 +43,11 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
   const camada = el('div', 'bat-camada'); (document.getElementById('ui') ?? palco).appendChild(camada); camada.hidden = true;
   // os painéis também vão para #ui (depois da camada, ficando por cima): assim tudo cabe no retângulo do jogo e escala com --k (celular)
   document.getElementById('ui')?.appendChild(raiz);
+  // início, pausa, tela cheia e dica (telas.js): por cima da batalha, e com o teclado registrado antes do dela
+  const telas = criarTelas({
+    mundo, t, cfg, plataforma, podeCancelarBatalha: () => modo === 'sub' || modo === 'alvo' || (modo === 'menu' && Object.keys(snap?.escolhas ?? {}).length > 0),
+    aoMudar: (p) => { if (ctrl && ctrl.velocidade !== p.velocidade_batalha && ctrl.definirVelocidade(p.velocidade_batalha)) desenharOrdem(); },
+  });
   if (new URLSearchParams(location.search).get('reduzir') === '1') { raiz.classList.add('reduzir'); camada.classList.add('reduzir'); }
 
   // ---------- estado ----------
@@ -80,8 +86,9 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
   let sujo = true, tamanho = '';
   const pos = (e, x, y) => { e.style.left = `${x}px`; e.style.top = `${y}px`; };
   const escalaArte = () => Number(getComputedStyle(camada.parentElement).getPropertyValue('--k')) || 1;
+  const chaveLayout = () => `${camada.clientWidth}x${camada.clientHeight}x${escalaArte()}`;
   function layout() {
-    sujo = false; tamanho = `${camada.clientWidth}x${camada.clientHeight}`;
+    sujo = false; tamanho = chaveLayout();
     const corpos = [], rotulos = [];
     for (const a of exib.values()) {
       const pl = placas.get(a.uid), g = geometria(a), w = Math.max(cfg.largura_corpo_tiles * g.ppu, cfg.clique_min_px_arte * escalaArte(), cfg.toque_min_px_css);
@@ -106,6 +113,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
       const rotulo = el('div', `bat-rotulo-ator bat-rotulo-${a.lado}`, camada);
       const nome = el('span', 'bat-placa-nome', rotulo, t(a.nome_txt));
       const barra = a.lado === 'inimigos' ? criarBarra(rotulo, 'vida') : null;
+      const cheia = el('span', 'bat-rotulo-cheia', rotulo, t('ui_bat_rotulo_vida_cheia')); cheia.hidden = true;
       for (const alvoEl of [area, rotulo]) {
         alvoEl.addEventListener('pointerenter', () => {
           if (modo === 'alvo' && alvo.lista.some((x) => x.uid === a.uid)) { alvo.foco = a.uid; desenharAlvo(); }
@@ -113,7 +121,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
         });
         alvoEl.addEventListener('click', () => cliquePlaca(a.uid));
       }
-      placas.set(a.uid, { area, anel, cursor, rotulo, nome, barra, figura });
+      placas.set(a.uid, { area, anel, cursor, rotulo, nome, barra, figura, cheia });
       if (a.lado === 'grupo') {
         const c = el('div', 'bat-painel bat-caixa', grupoEl);
         const ret = el('span', 'bat-retrato bat-retrato-grupo', c); ret.setAttribute('aria-hidden', 'true');
@@ -136,7 +144,9 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
     if (pl) {
       // rótulo só no alvo em foco e por um instante depois do dano (docs/ui/batalha.md §1); sem cena, as figuras provisórias mostram todos
       const foco = (modo === 'alvo' && alvo?.foco === uid) || (modo === 'menu' && sobMouse === uid && !a.caido), valido = modo === 'alvo' && alvo.lista.some((x) => x.uid === uid);
-      const mostra = !(a.lado === 'inimigos' && a.caido) && (foco || figuras || performance.now() < (barraAte.get(uid) ?? 0));
+      const cheia = valido && alvo.cmd.alvo_tipo.startsWith('aliado') && !a.caido && a.vida >= a.vida_max;
+      const mostra = !(a.lado === 'inimigos' && a.caido) && (foco || cheia || figuras || performance.now() < (barraAte.get(uid) ?? 0));
+      if (pl.cheia.hidden === cheia) { pl.cheia.hidden = !cheia; sujo = true; }
       if (pl.rotulo.hidden === mostra) { pl.rotulo.hidden = !mostra; sujo = true; }
       pl.figura.hidden = !figuras; pl.area.classList.toggle('caido', a.caido); pl.area.hidden = a.lado === 'inimigos' && a.caido;
       pl.area.classList.toggle('valido', valido);
@@ -222,7 +232,8 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
         setTimeout(() => { if (exib.has(ev.alvo)) desenharAtor(ev.alvo); }, cfg.t_barra_inimigo_visivel * 1000 + 30);
         break;
       }
-      case 'curou': numero(ev.alvo, t('ui_bat_num_cura', { valor: ev.valor }), 'cura', '❦'); break;
+      // cura em quem já está com a vida cheia: "Vida cheia" no lugar de "+0" (gastar ou não o item/mana é regra do 03)
+      case 'curou': if (ev.valor > 0) numero(ev.alvo, t('ui_bat_num_cura', { valor: ev.valor }), 'cura', '❦'); else numero(ev.alvo, t('ui_bat_vida_cheia'), 'cheia'); break;
       case 'mana_gasta': { const cx = caixas.get(ev.ator); if (cx) { cx.numMana.textContent = t('ui_bat_num_mana', { valor: ev.valor }); setTimeout(() => { cx.numMana.textContent = ''; }, tempos.t_numero_dano * 1000); } break; }
       case 'vida_mudou': if (a) { a.vida = ev.vida; a.vida_max = ev.vida_max; } break;
       case 'mana_mudou': if (a) { a.mana = ev.mana; a.mana_max = ev.mana_max; } break;
@@ -342,7 +353,10 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
 
   function desenharAlvo() {
     // classes de foco: desenharAtor (via desenharTodos)
-    if (modo === 'alvo') { const a = exib.get(alvo.foco); mensagem(t(a.nome_txt), t('ui_bat_vida_alvo', { atual: a.vida, max: a.vida_max })); info.classList.remove('erro'); }
+    if (modo === 'alvo') {
+      const a = exib.get(alvo.foco);
+      mensagem(t(a.nome_txt), t('ui_bat_vida_alvo', { atual: a.vida, max: a.vida_max })); info.classList.remove('erro');
+    }
     desenharTodos();
   }
 
@@ -403,7 +417,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
   function acao(a) {
     if (!ctrl) return false;
     if (modo === 'resultado') { if (a === 'confirmar') confirmarResultado(); return a === 'confirmar'; }
-    if (a === 'velocidade') { const vs = cfgB.velocidades_batalha; ctrl.definirVelocidade(vs[(vs.indexOf(ctrl.velocidade) + 1) % vs.length]); desenharOrdem(); return true; }
+    if (a === 'velocidade') { const vs = cfgB.velocidades_batalha; ctrl.definirVelocidade(vs[(vs.indexOf(ctrl.velocidade) + 1) % vs.length]); telas.gravar({ velocidade_batalha: ctrl.velocidade }); desenharOrdem(); return true; }
     if (modo === 'menu') {
       if (a === 'cima' || a === 'baixo') { menuFoco = (menuFoco + (a === 'cima' ? -1 : 1) + COMANDOS.length) % COMANDOS.length; desenharMenu(); }
       else if (a === 'confirmar') confirmarMenu(); else if (a === 'cancelar') cancelar();
@@ -461,7 +475,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
 
   // ---------- ciclo ----------
   function ligar(c) {
-    ctrl = c; snap = c.consultar(); exib.clear(); fim = null; rodada = snap.rodada; ordemExec = null; atual = null; feitos.clear(); falhos.clear();
+    ctrl = c; ctrl.definirVelocidade(telas.preferencias().velocidade_batalha); snap = c.consultar(); exib.clear(); fim = null; rodada = snap.rodada; ordemExec = null; atual = null; feitos.clear(); falhos.clear();
     for (const a of snap.atores) exib.set(a.uid, { ...a });
     montarAtores(); modo = 'tocando'; menuEl.hidden = true; subEl.hidden = true; resultadoEl.hidden = true; raiz.hidden = false;
     rep.adicionar(c.esvaziarFila()); desenharOrdem();
@@ -469,9 +483,11 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
 
   /** Chamar a cada quadro (dt em segundos reais). */
   function atualizar(dt) {
+    telas.atualizar(dt);
     raiz.hidden = !(ctrl && mundo.jogo?.modo === 'batalha'); camada.hidden = raiz.hidden;
     if (raiz.hidden) return;
-    if (sujo || tamanho !== `${camada.clientWidth}x${camada.clientHeight}`) layout();
+    if (sujo || tamanho !== chaveLayout()) layout();
+    if (telas.pausado) return;
     lerGamepad();
     if (modo !== 'tocando') return;
     rep.avancar(dt * (acelerando ? cfg.acelerar_mult : 1));

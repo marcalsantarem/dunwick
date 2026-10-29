@@ -5,6 +5,10 @@
   "textos": {
     "txt_map_praca_nome": "Praça de Baixo Orvalho",
     "ui_gire_celular": "Gire o celular para jogar na horizontal",
+    "ui_inicio_titulo": "Dunwick",
+    "ui_inicio_clique": "Clique para começar",
+    "ui_inicio_toque": "Toque para começar",
+    "ui_versao": "v{versao}",
     "ui_comecar_toque": "Toque na tela para ativar o áudio",
     "ui_comecar": "Pressione qualquer tecla ou clique para ativar o áudio",
     "ui_perfil_alto": "Alto",
@@ -122,6 +126,23 @@
     "ui_bat_derrota_titulo": "O grupo caiu.",
     "ui_gameover_tentar": "Tentar de novo",
     "ui_bat_erro": "Comando recusado ({erro}).",
-    "ui_voltar": "Voltar"
+    "ui_voltar": "Voltar",
+    "ui_pausa_titulo": "Pausa",
+    "ui_pausa_abrir": "Pausar",
+    "ui_pausa_continuar": "Continuar",
+    "ui_pausa_volume": "Volume",
+    "ui_pausa_volume_valor": "{valor} %",
+    "ui_pausa_menos": "Diminuir o volume",
+    "ui_pausa_mais": "Aumentar o volume",
+    "ui_pausa_reduzir": "Reduzir movimento",
+    "ui_pausa_velocidade": "Velocidade da batalha",
+    "ui_pausa_vel_valor": "{vel}×",
+    "ui_pausa_tela_cheia": "Tela cheia",
+    "ui_ligado": "Ligado",
+    "ui_desligado": "Desligado",
+    "ui_dica_andar_pc": "Clique no chão ou use W A S D para andar",
+    "ui_dica_andar_toque": "Toque no chão para andar",
+    "ui_bat_vida_cheia": "Vida cheia",
+    "ui_bat_rotulo_vida_cheia": "VIDA CHEIA"
   }
 }

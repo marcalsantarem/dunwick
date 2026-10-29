@@ -7,8 +7,10 @@ import { criarToque } from '../motor/toque_batalha.js';
 import { decidirSimples } from '../jogo/batalha/politica.js';
 
 export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, opcoes = {} }) {
-  const jogo = mundo.jogo, cfgB = dados.config.batalha, T = cfgB.tempos.t_entrada_batalha, reduzir = !!opcoes.reduzirMovimento;
-  const tCobre = reduzir ? 0.15 : 0.35 * T, tRevela = reduzir ? 0.15 : 0.65 * T;
+  const jogo = mundo.jogo, cfgB = dados.config.batalha, T = cfgB.tempos.t_entrada_batalha;
+  // `opcoes.reduzirMovimento` pode ser função (preferência viva): vale a cada batalha/transição
+  const reduzir = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
+  let tCobre = 0.35 * T, tRevela = 0.65 * T; const tempos = () => { tCobre = reduzir() ? 0.15 : 0.35 * T; tRevela = reduzir() ? 0.15 : 0.65 * T; };
   const apr = {
     visao: 'mapa', trans: null, toque: null, ctrl: null, cobertura: 0, automatico: true, aoGameOver: null, ultimoResultado: null,
     /** A UI (15) chama isto ao assumir a escolha de comandos: a política automática se desliga. */
@@ -18,7 +20,7 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
 
   function trocarParaBatalha() {
     apr.ctrl = jogo.batalha; ren.definirArte(...cenaBatalha.arte);
-    apr.toque = criarToque(apr.ctrl, { cfg: cfgB, acoes: dados.combate.acoes, infoPose: cenaBatalha.infoPoseDe(apr.ctrl), reduzirMovimento: reduzir, reduzirFlashes: !!opcoes.reduzirFlashes, externo: !apr.automatico });
+    apr.toque = criarToque(apr.ctrl, { cfg: cfgB, acoes: dados.combate.acoes, infoPose: cenaBatalha.infoPoseDe(apr.ctrl), reduzirMovimento: reduzir(), reduzirFlashes: !!opcoes.reduzirFlashes, externo: !apr.automatico });
     cenaBatalha.ligar(apr.toque); apr.visao = 'batalha';
   }
   function trocarParaMapa() {
@@ -45,7 +47,7 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
       return;
     }
     if (apr.visao === 'mapa') {
-      if (jogo.modo === 'batalha') apr.trans = { tipo: 'entrar', fase: 'cobre', t: 0 };
+      if (jogo.modo === 'batalha') { tempos(); apr.trans = { tipo: 'entrar', fase: 'cobre', t: 0 }; }
       else if (jogo.modo === 'game_over') { // com UI (15): ela mostra "Tentar de novo"; sem UI, tenta de novo sozinho depois de 1,5 s
         if (apr.aoGameOver) { if (!avisouGameOver) { avisouGameOver = true; apr.aoGameOver(jogo); } } else if (apr.automatico) { esperaGameOver -= dt; if (esperaGameOver <= 0) jogo.tentarDeNovo(); }
       }

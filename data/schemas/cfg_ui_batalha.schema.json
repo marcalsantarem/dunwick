@@ -17,7 +17,8 @@
     "altura_cabeca_tiles",
     "largura_corpo_tiles",
     "clique_min_px_arte",
-    "toque_min_px_css"
+    "toque_min_px_css",
+    "t_dica_s"
   ],
   "properties": {
     "id": {
@@ -82,6 +83,11 @@
       "type": "integer",
       "minimum": 24,
       "maximum": 96
+    },
+    "t_dica_s": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 30
     }
   }
 }

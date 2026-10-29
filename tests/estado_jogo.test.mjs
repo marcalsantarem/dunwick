@@ -34,7 +34,7 @@ test('consultar(): vez, comandos com motivo, ordem prevista (Defender sobe), esc
   assert.deepEqual(q.ordem_prevista, ['enemy_lobo', 'hero_edric', 'hero_grace']);
   assert.deepEqual(q.escolhas, {}, 'a escolha do inimigo não aparece');
   const lobo = q.atores.find((a) => a.uid === 'enemy_lobo'), edric = q.atores.find((a) => a.uid === 'hero_edric');
-  assert.deepEqual(lobo.posicao_cena, [-2.6, -0.2]); assert.deepEqual(edric.posicao_cena, [2.6, -0.2]); assert.equal(lobo.lado, 'inimigos');
+  assert.deepEqual(lobo.posicao_cena, [-2.4, 0.2]); assert.deepEqual(edric.posicao_cena, [2.4, -0.6]); assert.equal(lobo.lado, 'inimigos');
   c.enviarComando(atacarEdric); c.enviarComando({ ator: 'hero_grace', comando: 'defender' });
   q = c.consultar();
   assert.deepEqual(q.ordem_prevista, ['hero_grace', 'enemy_lobo', 'hero_edric']);

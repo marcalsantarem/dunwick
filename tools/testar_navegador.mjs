@@ -153,10 +153,11 @@ checar('textos: nenhum ID ausente', (await pag.evaluate('__dunwick.textosFaltand
 for (const [nome, h] of [['manha', 9], ['meiodia', 13], ['entardecer', 17], ['noite', 21.5]]) { await pag.evaluate((h) => { __dunwick.mundo.hora = h; }, h); await dormir(700); await pag.screenshot({ path: join(dirQA, `praca_${nome}.png`) }); }
 { const lum = async (h) => { await pag.evaluate((h) => { __dunwick.mundo.hora = h; }, h); await dormir(500); const img = decodificarPng(await pag.screenshot({ type: 'png' })); let s = 0, n = 0; for (let i = 0; i < img.px.length; i += 4 * 97) { s += 0.2126 * img.px[i] + 0.7152 * img.px[i + 1] + 0.0722 * img.px[i + 2]; n++; } return s / n / 255; }; const dia = await lum(13), noite = await lum(22); checar('dia/noite: a noite é mais escura que o dia, mas legível (luminância ≥ 0,06)', noite < dia * 0.75 && noite >= 0.06, `dia ${dia.toFixed(3)} · noite ${noite.toFixed(3)}`); await pag.evaluate(() => { __dunwick.mundo.hora = 17; }); }
 
-// ---- escala inteira (modo arte 960×540) ----
+// ---- escala contínua: o jogo preenche a janela (maior 16:9 que cabe); múltiplos exatos continuam inteiros (modo arte 960×540) ----
 const escalas = {};
 for (const [w, h] of [[1280, 720], [1920, 1080], [2560, 1440], [3840, 2160], [900, 500]]) { await pag.setViewport({ width: w, height: h, deviceScaleFactor: 1 }); await dormir(300); escalas[`${w}x${h}`] = await pag.evaluate('__dunwick.escala()'); }
-checar('M1-06 escala inteira do pixel de arte: 720p→1, 1080p→2, 1440p→2, 2160p→4, janela menor→1', escalas['1280x720'] === 1 && escalas['1920x1080'] === 2 && escalas['2560x1440'] === 2 && escalas['3840x2160'] === 4 && escalas['900x500'] === 1, JSON.stringify(escalas));
+const perto = (a, b) => Math.abs(a - b) < 0.01;
+checar('escala contínua preenche a janela: 720p→1,333, 1080p→2 (inteira), 1440p→2,667, 2160p→4, 900×500→0,926', perto(escalas['1280x720'], 4 / 3) && escalas['1920x1080'] === 2 && perto(escalas['2560x1440'], 8 / 3) && escalas['3840x2160'] === 4 && perto(escalas['900x500'], 888.89 / 960), JSON.stringify(escalas));
 await pag.setViewport({ width: JW, height: JH, deviceScaleFactor: 1 }); await dormir(300);
 
 // ---- gamepad simulado ----

@@ -14,6 +14,9 @@ import { criarApresentacao } from './apresentacao.js';
 import { ligarEntradaDom } from './entrada_dom.js';
 import { criarAudio } from './audio.js';
 import { criarMovel } from './movel.js';
+import { criarPreferencias } from './preferencias.js';
+import { criarTelaCheia } from './tela_cheia.js';
+import { criarInicio, criarPausa } from './inicio.js';
 import { criarBatalhaUi } from '../ui/batalha_ui.js';
 
 async function iniciar() {
@@ -33,31 +36,45 @@ async function iniciar() {
   const canvas = document.getElementById('tela');
   let redimensionar = () => {}; // definido abaixo (o modo celular chama já na criação)
   const movel = criarMovel({ P, canvas, t, aoMudar: () => redimensionar() }); // celular/tablet de toque: viewport dinâmico, sem zoom, aviso em retrato; PC não muda
-  // celular: perfil Médio por padrão (se a URL não pedir) e modo "nativa" (encaixa 16:9 no máximo da tela, sem escala inteira)
+  // celular: perfil Médio por padrão (se a URL não pedir); o encaixe 16:9 em escala contínua é do renderizador (igual ao PC)
+  const preferencias = criarPreferencias(); // preferências persistentes
   let iPerfil = Math.max(0, perfis.findIndex((p) => p.id === (P.get('perfil') ?? (movel.ativo ? 'perfil_medio' : dados.config.perfis.padrao))));
 
   // ---------- renderização ----------
-  const ren = criarRenderizador(canvas, cfg, perfis[iPerfil], P.get('modo') ?? (movel.ativo ? 'nativa' : undefined));
+  const ren = criarRenderizador(canvas, cfg, perfis[iPerfil], P.get('modo') ?? undefined);
   redimensionar = () => { const a = movel.area(); ren.ajustar(a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); };
   redimensionar(); addEventListener('resize', redimensionar);
   const cena = criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest' } });
   // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
   const temBatalha = !!(mundo.jogo && dados.cenarios && dados.config.sprites_batalha);
   const cenaBat = temBatalha ? criarCenaBatalha({ dados, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64) } }) : null;
-  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { reduzirMovimento: P.get('reduzir') === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
+  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
   const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); cena.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
   aplicarPerfil(); marcas.cena = performance.now();
 
   // ---------- áudio desbloqueado por clique/tecla ----------
   const audio = criarAudio(recursos.sfxPing);
-  const aviso = document.getElementById('aviso'); aviso.textContent = t(movel.ativo ? 'ui_comecar_toque' : 'ui_comecar');
+  const aviso = document.getElementById('aviso');
+  // API de plataforma para a UI (15): preferências persistentes, tela cheia, pausa por motivos, volume e a tela de início
+  const telaCheia = criarTelaCheia(), pausa = criarPausa({ audio });
+  audio.definirVolume(preferencias.obter('volume')); preferencias.aoMudar((k, v) => { if (k === 'volume') audio.definirVolume(v); });
+  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null };
+  // tela de início: em produção sempre; em desenvolvimento só com ?inicio=1 (os testes automáticos já começam jogando)
+  if (!__DEV__ || P.get('inicio') === '1') {
+    pausa.pausar('inicio'); aviso.remove();
+    plataforma.inicio = criarInicio({ t, versao: __VERSAO__, movel: movel.ativo, aoComecar: () => {
+      audio.desbloquear(); // síncrono dentro do gesto (iOS)
+      if (movel.ativo || preferencias.obter('tela_cheia_pedida')) telaCheia.entrar(); // PC: só se o jogador já pediu tela cheia nas preferências
+      entrada.soltarTudo(); pausa.retomar('inicio');
+    } });
+  } else aviso.textContent = t(movel.ativo ? 'ui_comecar_toque' : 'ui_comecar');
   let desbloqueando = false;
   // cada gesto tenta de novo (o resume do iOS só vale dentro de touchend/click); no celular a mensagem some já no 1º toque, mesmo se o áudio falhar
   const aoGesto = () => { movel.aoGesto?.(); if (movel.ativo) aviso.remove(); if (audio.estado === 'running') { aviso.remove(); return; } audio.desbloquear().then((ok) => { if (ok) aviso.remove(); }); };
   const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMouse: () => !!mundo.jogo && mundo.jogo.modo !== 'mapa' });
   eventos.em('modo_mudou', () => entrada.soltarTudo()); // nada fica "apertado" ao entrar/sair da batalha
   // UI da batalha por turnos (15): só aparece com mundo.jogo.modo === 'batalha'; no desenvolvimento, ] dispara o próximo encontro de teste
-  const batalhaUi = mundo.jogo ? criarBatalhaUi({ mundo, dados, t, debug: __DEV__ }) : null;
+  const batalhaUi = mundo.jogo ? criarBatalhaUi({ mundo, dados, t, debug: __DEV__, plataforma }) : null;
   if (batalhaUi && apr) { apr.assumirComandos(); batalhaUi.definirProjecao((p) => { const q = cenaBat.projetarPonto(p); return { x: q.x * 100, y: q.y * 100 }; }); batalhaUi.aoEvento((ev) => apr.toque?.alimentar(ev)); /* a UI é o relógio: a animação começa no mesmo instante que o número e a barra */ } // a UI escolhe os comandos e fecha a batalha; a apresentação só toca as animações e troca a vista
 
   // ---------- debug (só desenvolvimento) ----------
@@ -97,18 +114,19 @@ async function iniciar() {
     if (oculto || movel.retrato) { ultimo = agora; return; } // aba oculta ou celular em pé (aviso "Gire o celular"): não simula
     const dtMs = agora - ultimo; ultimo = agora;
     ponte.amostrarGamepad(); if (apr?.visao !== 'batalha') cursor = atualizarCursor();
-    let passos, alfa;
+    let passos, alfa; const pausaUi = pausa.pausado;
     if (__DEV__) for (const a of entrada.drenarDebug()) debug.tratar(a);
-    if (__DEV__ && debug.pausado) { passos = debug.consumirPasso() ? 1 : 0; acum.resetar(); alfa = 1; }
+    if (pausaUi) { passos = 0; acum.resetar(); alfa = 1; }
+    else if (__DEV__ && debug.pausado) { passos = debug.consumirPasso() ? 1 : 0; acum.resetar(); alfa = 1; }
     else { passos = acum.avancar(dtMs / 1000, __DEV__ ? debug.fatorTempo() : 1); alfa = acum.alfa; tempoS += Math.min(dtMs, 100) / 1000; }
     for (let i = 0; i < passos; i++) { ultimoSnap = entrada.amostrar(mundo.ticks); mundo.passo(ultimoSnap, entrada.buffer); }
     // encontro natural (passos) e de depuração entram pelo mesmo caminho: jogo.batalha novo → a UI liga a ele (antes só a tecla ] ligava, e em produção a batalha ficava sem UI)
-    if (batalhaUi && mundo.jogo.modo === 'batalha' && mundo.jogo.batalha && batalhaUi.controlador !== mundo.jogo.batalha) batalhaUi.ligar(mundo.jogo.batalha);
-    batalhaUi?.atualizar(Math.min(dtMs, 100) / 1000);
-    const dtS = Math.min(dtMs, 100) / 1000;
+    if (batalhaUi && mundo.jogo.modo === 'batalha' && mundo.jogo.batalha && batalhaUi.controlador !== mundo.jogo.batalha) { mundo.jogo.batalha.definirVelocidade(preferencias.obter('velocidade_batalha')); /* preferência salva (a UI grava ao mudar) */ batalhaUi.ligar(mundo.jogo.batalha); }
+    const dtS = Math.min(dtMs, 100) / 1000, dtJ = pausaUi ? 0 : dtS; // dtJ: tempo de jogo (0 com a pausa da UI)
+    batalhaUi?.atualizar(dtJ);
     if (apr) {
       const pausado = __DEV__ && debug.pausado;
-      apr.atualizar(pausado ? (passos ? 1 / cfg.passo_logico_hz : 0) : dtS * (__DEV__ ? debug.fatorTempo() : 1));
+      apr.atualizar(pausaUi ? 0 : pausado ? (passos ? 1 / cfg.passo_logico_hz : 0) : dtS * (__DEV__ ? debug.fatorTempo() : 1));
       apr.layoutUi(canvas);
     }
     if (apr?.visao === 'batalha') {
@@ -131,7 +149,7 @@ async function iniciar() {
   if (__DEV__) {
     // Gancho para testes automáticos e medições (tools/testar_navegador.mjs). NÃO existe no build de produção.
     window.__dunwick = {
-      mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
+      plataforma, mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
       ticks: () => mundo.ticks, exportarTempos: () => debug.exportar(false), estatisticasGl: () => ren.estatisticas(), escala: () => ren.escala, perfilAtual: () => perfis[iPerfil].id,
       textosFaltando: () => [...t.faltando], redimensionar, modo: () => ren.modo, atualizarCursor,
       definirModo: (m) => { const a = movel.area(); ren.definirModo(m, a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); }, movel,

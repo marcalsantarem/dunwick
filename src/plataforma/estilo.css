@@ -2,6 +2,13 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
 canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; outline: none; }
 #aviso { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); padding: 6px 14px; color: #fff; background: rgba(0, 0, 0, 0.6); font: 14px/1.3 system-ui, sans-serif; pointer-events: none; }
 #aviso:empty { display: none; }
+/* tela de início (inicio.js): markup mínimo; a UI (15) pode refinar as classes .inicio-* */
+.inicio { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #120c07; color: #fdf0dc; font: 16px/1.3 ui-monospace, Consolas, monospace; cursor: pointer; text-align: center; padding: 24px; box-sizing: border-box; user-select: none; }
+.inicio-titulo { margin: 0; font-size: clamp(32px, 9vmin, 72px); letter-spacing: 0.08em; color: #fcd176; }
+.inicio-chamada { margin: 0; font-size: clamp(16px, 3.2vmin, 24px); animation: inicio-pulsa 1.6s ease-in-out infinite; }
+.inicio-versao { position: absolute; right: 12px; bottom: 8px; opacity: 0.55; font-size: 12px; }
+@keyframes inicio-pulsa { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .inicio-chamada { animation: none; } }
 /* modo celular/tablet de toque (movel.js): só com html.movel; o PC não é afetado */
 html.movel, html.movel body { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 html.movel canvas { position: fixed; width: auto; height: auto; touch-action: none; }
@@ -18,7 +25,7 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
 #debug { position: fixed; left: 6px; top: 6px; margin: 0; padding: 4px 6px; max-width: 96vw; color: #9f9; background: rgba(0, 0, 0, 0.55); font: 12px/1.35 ui-monospace, Consolas, monospace; white-space: pre-wrap; pointer-events: none; }
 
 /* ---------- UI de batalha (15, docs/ui/batalha.md): madeira escura + linho, cantos de latão; foco dourado (brilho_*); alerta só em alerta_ui. Sem magenta. ---------- */
-.bat, .bat-camada {
+.bat, .bat-camada, .tela {
   --u: calc(var(--k, 2) * 0.5px); --fonte-min: 11px;
   -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation;
   --ui-1: #211209; --ui-2: #886b56; --ui-3: #d3b89e; --ui-4: #fdf0dc; --madeira-2: #5c3120; --madeira-3: #875a3b; --latao: #ae8865;
@@ -151,3 +158,32 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
   .bat-caixa .bat-barra { min-width: 0; }
   .bat-resultado .bat-botao { min-height: 44px; }
 }
+
+/* ---------- telas da UI (15, telas.js): pausa, botões de canto (⏸ e tela cheia), dica de controles; refinamento do #inicio (08) ---------- */
+.tela { position: absolute; inset: 0; pointer-events: none; color: var(--ui-4); font-family: ui-monospace, Consolas, "Courier New", monospace; line-height: 1.3; font-size: max(var(--fonte-min), calc(16 * var(--u))); }
+.tela [hidden] { display: none !important; }
+.tela button { font: inherit; color: inherit; cursor: pointer; }
+.tela-canto { position: absolute; left: calc(8 * var(--u)); top: calc(8 * var(--u)); display: flex; gap: calc(6 * var(--u)); pointer-events: auto; }
+.tela-botao-canto { min-width: 44px; min-height: 44px; padding: 0; background: rgba(33, 18, 9, 0.8); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); font-size: max(22px, calc(24 * var(--u))); font-weight: bold; line-height: 1; opacity: 0.55; }
+.tela-botao-canto:hover, .tela-canto.toque .tela-botao-canto { opacity: 0.95; }
+.tela-botao-canto:hover { border-color: var(--brilho-1); }
+.tela-pausa { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: rgba(12, 7, 4, 0.62); pointer-events: auto; }
+.tela-painel { min-width: min(92%, 46ch); max-height: 94%; overflow: auto; box-sizing: border-box; padding: calc(12 * var(--u)) calc(18 * var(--u)); background: var(--ui-1); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); box-shadow: inset 0 0 0 max(1px, calc(2 * var(--u))) var(--madeira-2), 4px 4px 0 rgba(0, 0, 0, 0.5); }
+.tela-painel-titulo { margin: 0 0 calc(6 * var(--u)); text-align: center; font-size: max(14px, calc(24 * var(--u))); color: var(--brilho-2); }
+.tela-linha { display: flex; align-items: center; gap: calc(8 * var(--u)); min-height: 44px; padding: 2px calc(8 * var(--u)); border: max(1px, calc(2 * var(--u))) solid transparent; }
+.tela-linha.foco { border-color: var(--brilho-1); }
+.tela-rotulo { flex: 1; }
+.tela-controle { min-width: 44px; min-height: 40px; padding: 0 calc(10 * var(--u)); background: var(--madeira-2); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); }
+.tela-controle:hover { border-color: var(--brilho-1); color: var(--brilho-2); }
+.tela-continuar { flex: 1; }
+.tela-alterna { min-width: 11ch; }
+.tela-valor { min-width: 6ch; text-align: center; }
+.tela-dica { position: absolute; left: 50%; bottom: calc(28 * var(--u)); transform: translateX(-50%); max-width: 90%; padding: calc(6 * var(--u)) calc(14 * var(--u)); background: rgba(33, 18, 9, 0.88); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); text-align: center; animation: tela-dica-entra 0.25s ease-out 1; }
+.tela.reduzir * { animation: none !important; transition: none !important; }
+@keyframes tela-dica-entra { from { opacity: 0; translate: 0 8px; } }
+.inicio { background: radial-gradient(ellipse at 50% 40%, #3a2416 0%, #120c07 70%); }
+.inicio-titulo { text-shadow: 0 4px 0 #2c120e, 0 0 24px rgba(252, 209, 118, 0.25); }
+.inicio-chamada { color: #fdf0dc; }
+/* D-040: "VIDA CHEIA" sobre o aliado na escolha de alvo de cura (pode ser escolhido; a cura executa e gasta o recurso) */
+.bat-rotulo-cheia { padding: 0 calc(4 * var(--u)); background: var(--brilho-1); color: var(--ui-1); font-weight: bold; letter-spacing: 0.04em; text-align: center; font-size: max(var(--fonte-min), calc(12 * var(--u))); }
+.bat-rotulo-cheia[hidden] { display: none; }

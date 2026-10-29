@@ -16,6 +16,7 @@
         "type": "object", "additionalProperties": false,
         "properties": {
           "atlas": { "type": "string" },
+          "escala": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 },
           "provisorio": {
             "type": "object", "additionalProperties": false, "required": ["base", "tinta", "escala"],
             "properties": { "base": { "type": "string" }, "tinta": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }, "escala": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 } }

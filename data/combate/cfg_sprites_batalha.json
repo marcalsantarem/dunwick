@@ -13,7 +13,8 @@
       "atlas": "hero_grace_batalha"
     },
     "enemy_slime": {
-      "atlas": "enemy_slime_batalha"
+      "atlas": "enemy_slime_batalha",
+      "escala": 1.3
     },
     "enemy_lobo": {
       "atlas": "enemy_lobo_batalha"

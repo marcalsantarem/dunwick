@@ -12,5 +12,6 @@
   "altura_cabeca_tiles": 2,
   "largura_corpo_tiles": 0.9,
   "clique_min_px_arte": 32,
-  "toque_min_px_css": 44
+  "toque_min_px_css": 44,
+  "t_dica_s": 6
 }

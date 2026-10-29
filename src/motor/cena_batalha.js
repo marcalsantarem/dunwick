@@ -67,7 +67,7 @@ export function criarCenaBatalha({ dados, recursos, perfil, opcoes = {} }) {
       const e = cfgS.atores[id], prov = e.provisorio, at = recursos.atlasBatalha[e.atlas ?? prov.base];
       const sprite = fabrica.criar({ meta: normalizar(at.meta), textura: at.textura }, { msaa: perfil.msaa > 0 });
       const sombra = new THREE.Mesh(geoSombra, new THREE.MeshBasicMaterial({ map: texSombra, transparent: true, depthWrite: false })); sombra.renderOrder = 2;
-      const escala = prov?.escala ?? 1; sprite.malha.scale.setScalar(escala);
+      const escala = e.escala ?? prov?.escala ?? 1; // `escala` do dado (ex.: Slime maior perto do Lobo e dos heróis) sprite.malha.scale.setScalar(escala);
       if (prov) { sprite.malha.material.color.set(prov.tinta); sprite.malha.material.emissive.set(prov.tinta); }
       const corBase = prov ? prov.tinta : '#ffffff';
       sprite.malha.material.alphaToCoverage = perfil.msaa > 0; sprite.malha.material.alphaTest = perfil.msaa > 0 ? 0.01 : 0.45;

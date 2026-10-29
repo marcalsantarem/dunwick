@@ -86,8 +86,26 @@ try {
   // ---------- PC inalterado ----------
   for (const [w, h] of [[1280, 720], [1920, 1080]]) {
     const p = await abrir({ ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w, h, dpr: 1, touch: false }); const m = await medir(p);
-    checar(`PC ${w}×${h}: sem modo celular, modo "arte", canvas cobre a janela, escala inteira`, !m.classe.includes('movel') && m.modo === 'arte' && m.canvas[2] === w && m.canvas[3] === h && m.vw % 960 === 0, JSON.stringify({ classe: m.classe, modo: m.modo, canvas: m.canvas, vw: m.vw, vh: m.vh }));
+    checar(`PC ${w}×${h}: sem modo celular, modo "arte", canvas cobre a janela, retângulo 16:9 preenche a janela (escala ${w === 1920 ? 'inteira 2×' : 'contínua 1,333×'})`, !m.classe.includes('movel') && m.modo === 'arte' && m.canvas[2] === w && m.canvas[3] === h && m.vw === w && m.vh === h, JSON.stringify({ classe: m.classe, modo: m.modo, canvas: m.canvas, vw: m.vw, vh: m.vh }));
     await p.screenshot({ path: join(DIR, `pc_${w}x${h}.png`) }); await p.close();
+  }
+  // PC com janela "estranha" (950×510): o jogo preenche (16:9 que cabe), sem a enorme margem preta; mouse mapeado no retângulo novo
+  { const p = await abrir({ ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w: 950, h: 510, dpr: 1, touch: false }); const m = await medir(p);
+    checar('PC 950×510: o jogo preenche a janela (≥ 99 % da altura, retângulo 16:9), escala contínua', m.vh >= 505 && Math.abs(m.vw / m.vh - 16 / 9) < 0.01, JSON.stringify({ vw: m.vw, vh: m.vh }));
+    const h0 = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]), alvo = await p.evaluate((x, z) => __dunwick.mundoParaTela(x, 0, z), h0[0] + 3, h0[1] - 3);
+    await p.mouse.click(alvo.x, alvo.y); await dormir(1500); const h1 = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+    checar('PC 950×510: clique no chão anda até o ponto clicado (mouse mapeado no retângulo contínuo)', Math.hypot(h1[0] - (h0[0] + 3), h1[1] - (h0[1] - 3)) < 0.8, 'de ' + h0.map((v) => v.toFixed(1)) + ' para ' + h1.map((v) => v.toFixed(1)));
+    await p.screenshot({ path: join(DIR, 'pc_950x510_depois.png') }); await p.setViewport({ width: 700, height: 900 }); await dormir(400);
+    const r = await medir(p); checar('redimensiona ao vivo (janela 700×900): retângulo 16:9 largura total', r.vw >= 699 && Math.abs(r.vw / r.vh - 16 / 9) < 0.01, JSON.stringify({ vw: r.vw, vh: r.vh })); await p.close(); }
+  // tela de início (?inicio=1): simulação pausada até o gesto; o gesto destrava áudio e começa; versão mostrada
+  for (const [rotulo, op] of [['PC', { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w: 1280, h: 720, dpr: 1, touch: false, consulta: '&inicio=1' }], ['iPhone deitado', { ua: UA_IOS, w: 844, h: 390, dpr: 3, movel: true, consulta: '&inicio=1' }]]) {
+    const p = await abrir(op), t0 = await p.evaluate(() => __dunwick.mundo.ticks); await dormir(700); const t1 = await p.evaluate(() => __dunwick.mundo.ticks);
+    const tela = await p.evaluate(() => ({ existe: !!document.getElementById('inicio'), chamada: document.querySelector('.inicio-chamada')?.textContent, versao: document.querySelector('.inicio-versao')?.textContent }));
+    checar(rotulo + ': tela de início visível, simulação parada, versão pequena', tela.existe && t1 === t0 && /^v\d/.test(tela.versao ?? '') && /começar/.test(tela.chamada ?? ''), JSON.stringify({ tela, t0, t1 }));
+    await p.screenshot({ path: join(DIR, 'inicio_' + rotulo.replace(' ', '_') + '.png') });
+    if (op.movel) await p.touchscreen.tap(400, 200); else await p.mouse.click(400, 300); await dormir(800);
+    const dep = await p.evaluate(() => ({ existe: !!document.getElementById('inicio'), ticks: __dunwick.mundo.ticks, audio: __dunwick.audio.estado }));
+    checar(rotulo + ': o gesto remove a tela, destrava o áudio e inicia a simulação', !dep.existe && dep.ticks > t1 + 10 && dep.audio === 'running', JSON.stringify(dep)); await p.close();
   }
   checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 4).join(' | '));
 } finally { await nav.close(); srv.kill(); }

@@ -1,14 +1,14 @@
 // Áudio: contexto criado e desbloqueado SÓ após clique/tecla (política de autoplay do navegador). Canais (mestre, sfx, música),
 // pausa com a aba oculta. No M1 só há um SFX de teste (som real é do 05).
 export function criarAudio(bytesPing) {
-  let ctx = null, ping = null, mestre = null, sfx = null, musica = null, pedidoDeDecodificacao = null;
+  let ctx = null, ping = null, mestre = null, sfx = null, musica = null, pedidoDeDecodificacao = null, volume = 0.8;
 
   function criarContexto() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return false;
     ctx = new Ctx({ latencyHint: 'interactive' });
     mestre = ctx.createGain(); sfx = ctx.createGain(); musica = ctx.createGain();
-    sfx.connect(mestre); musica.connect(mestre); mestre.connect(ctx.destination);
+    sfx.connect(mestre); musica.connect(mestre); mestre.connect(ctx.destination); mestre.gain.value = volume;
     pedidoDeDecodificacao = ctx.decodeAudioData(bytesPing.slice(0)).then((b) => { ping = b; }).catch(() => {});
     return true;
   }
@@ -25,6 +25,9 @@ export function criarAudio(bytesPing) {
       if (ctx.state === 'running') { await pedidoDeDecodificacao; tocar(ping); return true; }
       return false;
     },
+    /** Volume mestre 0..1 (vale também antes de o contexto existir). */
+    definirVolume(v) { volume = Math.min(1, Math.max(0, v)); if (mestre) mestre.gain.value = volume; },
+    get volume() { return volume; },
     suspender() { if (ctx && ctx.state === 'running') ctx.suspend(); },
     retomar() { if (ctx && ctx.state === 'suspended') ctx.resume(); },
     tocarSfx: (nome) => { if (nome === 'sfx_teste_ping') tocar(ping); },
