@@ -273,3 +273,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 
 ## D-042 — v0.1.2 em duas etapas: mapa da vila, depois minimapa (2026-10-29)
 - **Decisão (usuário):** o **minimapa continua na v0.1.2**, mas em **duas etapas** para concentrar o trabalho em algo visível e testável: **etapa 1 = mapa da vila completo** (interiores, portais, props, colisão, vila segura); **etapa 2 = minimapa** (girado com a tela, D-041), só depois de o usuário ver o mapa. O PR da v0.1.2 sai ao fim das duas.
+
+## D-043 — Casa do Edric, mochila infinita e boneco de treino (2026-10-29)
+- **Decisão (usuário):** o **Edric mora sozinho** numa casinha **pequena e rudimentar por fora e detalhada por dentro** (armas simples nas paredes, livros, **baú de tesouro**), perto da **Maren** e do **Torvan**. A **mochila é infinita**: não há baú de armazenar, só baús de tesouro.
+- **Pátio do Torvan:** só **1 boneco de treino** (o oposto ao poço). Novo inimigo **`enemy_boneco_treino`** (~200 PV, não ataca, sem XP/moedas/drops, `treino: true`); clicar nele inicia `enc_boneco_treino`, **repetível sem limite**, com o grupo restaurado ao fim.
+- **Interiores:** sem porta desenhada nem rótulo "Sair"; ficam **só a marcação no chão e o portal**.
+- Detalhes por agente: `docs/briefings/BRF-v012b_casa_edric_boneco_treino.md`.
