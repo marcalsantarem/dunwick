@@ -279,3 +279,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Pátio do Torvan:** só **1 boneco de treino** (o oposto ao poço). Novo inimigo **`enemy_boneco_treino`** (~200 PV, não ataca, sem XP/moedas/drops, `treino: true`); clicar nele inicia `enc_boneco_treino`, **repetível sem limite**, com o grupo restaurado ao fim.
 - **Interiores:** sem porta desenhada nem rótulo "Sair"; ficam **só a marcação no chão e o portal**.
 - Detalhes por agente: `docs/briefings/BRF-v012b_casa_edric_boneco_treino.md`.
+
+## D-044 — Mundo aberto simples + locais ricos; geração por regras só depois do slice (2026-10-29)
+- **Decisão (usuário):** o jogo adota o modelo **mundo aberto simples + locais ricos** (estilo Final Fantasy antigo/RPG Maker): o **mapa aberto** (campos, planícies, entorno) é **simplificado** — terreno leve, vegetação rala, personagem **menor e mais lento**, sem props detalhados — e as **áreas exploráveis** (vila, bosque, caverna, interiores) são **locais ricos**, no estilo atual da vila, **acessados por portal** que teleporta para o mapa expandido. Motivo: custo em tokens e tempo.
+- **Efeito no roteiro:** **v0.1.3** (entorno) passa a ser o **mapa aberto simplificado** com a vila como ponto de entrada; **v0.1.7** (bosque e caverna) são **locais ricos acessados por portal**, com corredores e salas estreitas (mais baratos que céu aberto). Escopo e versões não mudam; só o custo por mapa cai.
+- **Registro de desejo (usuário):** depois do slice, **gerar campos e masmorras por regras** (densidade de vegetação, caminhos, salas, sementes) para expandir o jogo com facilidade. **Fora do slice e da demo**; entra no backlog como BL-033.
+- **Processo:** pedir uma coisa por vez, a menos agentes, e juntar os ajustes de playtest num briefing só.
