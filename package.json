@@ -15,7 +15,9 @@
     "build": "node tools/build.mjs",
     "test:navegador": "node tools/testar_navegador.mjs",
     "assets": "node tools/gerar_placeholders.mjs",
-    "test:batalha-mouse": "node tools/testar_batalha_mouse.mjs"
+    "test:batalha-mouse": "node tools/testar_batalha_mouse.mjs",
+    "test:movel": "node tools/testar_movel.mjs",
+    "test:ui-mobile": "node tools/testar_ui_mobile.mjs"
   },
   "dependencies": {
     "three": "0.186.1"

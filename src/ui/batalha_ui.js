@@ -40,6 +40,8 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
   // rótulos, setas, anéis, áreas de clique e números ficam sobre a CENA: dentro de #ui (o 08 o mantém do tamanho do jogo na tela),
   // com a projeção da cena em %. Sem #ui (teste sem cena), no palco.
   const camada = el('div', 'bat-camada'); (document.getElementById('ui') ?? palco).appendChild(camada); camada.hidden = true;
+  // os painéis também vão para #ui (depois da camada, ficando por cima): assim tudo cabe no retângulo do jogo e escala com --k (celular)
+  document.getElementById('ui')?.appendChild(raiz);
   if (new URLSearchParams(location.search).get('reduzir') === '1') { raiz.classList.add('reduzir'); camada.classList.add('reduzir'); }
 
   // ---------- estado ----------
@@ -82,14 +84,14 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
     sujo = false; tamanho = `${camada.clientWidth}x${camada.clientHeight}`;
     const corpos = [], rotulos = [];
     for (const a of exib.values()) {
-      const pl = placas.get(a.uid), g = geometria(a), w = Math.max(cfg.largura_corpo_tiles * g.ppu, cfg.clique_min_px_arte * escalaArte());
+      const pl = placas.get(a.uid), g = geometria(a), w = Math.max(cfg.largura_corpo_tiles * g.ppu, cfg.clique_min_px_arte * escalaArte(), cfg.toque_min_px_css);
       corpos.push({ uid: a.uid, x: g.pes.x, y0: g.cabeca.y, y1: g.pes.y, w, lado: a.lado === 'inimigos' ? -1 : 1 });
-      pos(pl.area, g.pes.x - w / 2, g.cabeca.y); pl.area.style.width = `${w}px`; pl.area.style.height = `${g.pes.y - g.cabeca.y}px`;
+      pos(pl.area, g.pes.x - w / 2, g.cabeca.y); pl.area.style.width = `${w}px`; pl.area.style.height = `${Math.max(g.pes.y - g.cabeca.y, cfg.toque_min_px_css)}px`;
       pos(pl.anel, g.pes.x, g.pes.y); pl.anel.style.width = `${g.ppu * 1.1}px`; pl.anel.style.height = `${g.ppu * 0.55}px`;
       pos(pl.cursor, g.cabeca.x, g.cabeca.y);
       if (!pl.rotulo.hidden) rotulos.push({ uid: a.uid, w: pl.rotulo.offsetWidth, h: pl.rotulo.offsetHeight });
     }
-    const lugar = posicionarRotulos(corpos, rotulos, { w: camada.clientWidth, h: camada.clientHeight });
+    const u = escalaArte() / 2, lugar = posicionarRotulos(corpos, rotulos, { w: camada.clientWidth, h: camada.clientHeight }, { reserva: 16 * u, folga: 4 * u });
     for (const [uid, p] of Object.entries(lugar)) pos(placas.get(uid).rotulo, p.x, p.y);
   }
 
@@ -186,7 +188,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false }) {
   function numero(uid, texto, tipo, icone = '') {
     const a = exib.get(uid), g = geometria(a), n = el('div', `bat-numero bat-numero-${tipo}`, camada);
     const pilha = camada.querySelectorAll(`.bat-numero[data-uid="${uid}"]`).length; n.dataset.uid = uid;
-    pos(n, g.cabeca.x, g.cabeca.y + g.ppu * 0.4 - pilha * 18); n.style.animationDuration = `${tempos.t_numero_dano}s`;
+    pos(n, g.cabeca.x, g.cabeca.y + g.ppu * 0.4 - pilha * 9 * escalaArte()); n.style.animationDuration = `${tempos.t_numero_dano}s`;
     if (icone) el('span', 'bat-icone', n, icone);
     el('span', '', n, texto);
     setTimeout(() => n.remove(), tempos.t_numero_dano * 1000);

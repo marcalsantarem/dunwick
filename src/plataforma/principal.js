@@ -13,6 +13,7 @@ import { criarCenaBatalha } from '../motor/cena_batalha.js';
 import { criarApresentacao } from './apresentacao.js';
 import { ligarEntradaDom } from './entrada_dom.js';
 import { criarAudio } from './audio.js';
+import { criarMovel } from './movel.js';
 import { criarBatalhaUi } from '../ui/batalha_ui.js';
 
 async function iniciar() {
@@ -29,12 +30,15 @@ async function iniciar() {
 
   // ---------- perfil de qualidade (dados): padrão do arquivo, ?perfil=perfil_baixo na URL ou F12 no debug ----------
   const perfis = dados.config.perfis.perfis;
-  let iPerfil = Math.max(0, perfis.findIndex((p) => p.id === (P.get('perfil') ?? dados.config.perfis.padrao)));
+  const canvas = document.getElementById('tela');
+  let redimensionar = () => {}; // definido abaixo (o modo celular chama já na criação)
+  const movel = criarMovel({ P, canvas, t, aoMudar: () => redimensionar() }); // celular/tablet de toque: viewport dinâmico, sem zoom, aviso em retrato; PC não muda
+  // celular: perfil Médio por padrão (se a URL não pedir) e modo "nativa" (encaixa 16:9 no máximo da tela, sem escala inteira)
+  let iPerfil = Math.max(0, perfis.findIndex((p) => p.id === (P.get('perfil') ?? (movel.ativo ? 'perfil_medio' : dados.config.perfis.padrao))));
 
   // ---------- renderização ----------
-  const canvas = document.getElementById('tela');
-  const ren = criarRenderizador(canvas, cfg, perfis[iPerfil], P.get('modo') ?? undefined);
-  const redimensionar = () => ren.ajustar(innerWidth, innerHeight, window.devicePixelRatio || 1);
+  const ren = criarRenderizador(canvas, cfg, perfis[iPerfil], P.get('modo') ?? (movel.ativo ? 'nativa' : undefined));
+  redimensionar = () => { const a = movel.area(); ren.ajustar(a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); };
   redimensionar(); addEventListener('resize', redimensionar);
   const cena = criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest' } });
   // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
@@ -48,7 +52,7 @@ async function iniciar() {
   const audio = criarAudio(recursos.sfxPing);
   const aviso = document.getElementById('aviso'); aviso.textContent = t('ui_comecar');
   let desbloqueando = false;
-  const aoGesto = () => { if (desbloqueando || audio.estado === 'running') return; desbloqueando = true; audio.desbloquear().then((ok) => { desbloqueando = false; if (ok) aviso.remove(); }); };
+  const aoGesto = () => { movel.aoGesto?.(); if (desbloqueando || audio.estado === 'running') return; desbloqueando = true; audio.desbloquear().then((ok) => { desbloqueando = false; if (ok) aviso.remove(); }); };
   const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMouse: () => !!mundo.jogo && mundo.jogo.modo !== 'mapa' });
   eventos.em('modo_mudou', () => entrada.soltarTudo()); // nada fica "apertado" ao entrar/sair da batalha
   // UI da batalha por turnos (15): só aparece com mundo.jogo.modo === 'batalha'; no desenvolvimento, ] dispara o próximo encontro de teste
@@ -89,7 +93,7 @@ async function iniciar() {
 
   function quadro(agora) {
     requestAnimationFrame(quadro);
-    if (oculto) return;
+    if (oculto || movel.retrato) { ultimo = agora; return; } // aba oculta ou celular em pé (aviso "Gire o celular"): não simula
     const dtMs = agora - ultimo; ultimo = agora;
     ponte.amostrarGamepad(); if (apr?.visao !== 'batalha') cursor = atualizarCursor();
     let passos, alfa;
@@ -129,7 +133,7 @@ async function iniciar() {
       mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
       ticks: () => mundo.ticks, exportarTempos: () => debug.exportar(false), estatisticasGl: () => ren.estatisticas(), escala: () => ren.escala, perfilAtual: () => perfis[iPerfil].id,
       textosFaltando: () => [...t.faltando], redimensionar, modo: () => ren.modo, atualizarCursor,
-      definirModo: (m) => ren.definirModo(m, innerWidth, innerHeight, window.devicePixelRatio || 1),
+      definirModo: (m) => { const a = movel.area(); ren.definirModo(m, a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); }, movel,
       /** Converte um ponto do mundo em coordenadas de tela (px CSS) para os testes clicarem em lugares exatos. */
       mundoParaTela(x, y, z) {
         const v = new THREE.Vector3(x, y, z).project(cena.camera), e = ren.estado, r = canvas.getBoundingClientRect(), topo = e.altura - e.vy - e.vh;

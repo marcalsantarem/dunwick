@@ -9,6 +9,14 @@ export function ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMous
   addEventListener('mouseup', (e) => entrada.teclaAcima(`mouse:${e.button}`));
   addEventListener('mousemove', (e) => { ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = e.target === canvas; });
   canvas.addEventListener('mouseleave', () => { ponteiro.dentro = false; });
+  // toque: um dedo no canvas = botão esquerdo do mouse (tocar no chão anda; segurar segue o dedo). preventDefault evita os eventos de mouse sintéticos (clique duplo)
+  canvas.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return; aoGesto(); e.preventDefault(); if (ignorarMouse()) return;
+    ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = true; entrada.teclaAbaixo('mouse:0'); canvas.setPointerCapture?.(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') { ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = true; } });
+  for (const n of ['pointerup', 'pointercancel']) canvas.addEventListener(n, (e) => { if (e.pointerType === 'touch') entrada.teclaAcima('mouse:0'); });
+  addEventListener('touchend', aoGesto, { capture: true, passive: true }); // iOS só libera o áudio dentro de touchend/click
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   canvas.addEventListener('wheel', (e) => e.preventDefault(), { passive: false }); // a câmera é fixa: a roda não rola a página sobre o jogo
   canvas.addEventListener('dragstart', (e) => e.preventDefault());

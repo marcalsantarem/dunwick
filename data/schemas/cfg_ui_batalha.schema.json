@@ -16,7 +16,8 @@
     "palco_meia_profundidade_tiles",
     "altura_cabeca_tiles",
     "largura_corpo_tiles",
-    "clique_min_px_arte"
+    "clique_min_px_arte",
+    "toque_min_px_css"
   ],
   "properties": {
     "id": {
@@ -75,6 +76,11 @@
     "clique_min_px_arte": {
       "type": "integer",
       "minimum": 16,
+      "maximum": 96
+    },
+    "toque_min_px_css": {
+      "type": "integer",
+      "minimum": 24,
       "maximum": 96
     }
   }
