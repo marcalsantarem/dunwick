@@ -3,8 +3,11 @@
 import { criarMapa } from './mapa.js';
 import { criarHeroi } from './heroi.js';
 import { criarCameraJogo } from './camera_jogo.js';
+import { criarEstadoJogo } from './estado_jogo.js';
+import { criarGatilhoEncontros } from './exploracao/encontros.js';
 
-export function criarMundo(dados, eventos, metasSprite) {
+/** `opcoes.sementeEncontros`: semente do encontro aleatório (a plataforma passa uma aleatória; os testes, fixa). */
+export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1 } = {}) {
   const cfg = dados.config.jogo, kit = dados.config.kit, ciclo = dados.config.ciclo, mapaDados = Object.values(dados.mapas)[0];
   const mapa = criarMapa(mapaDados, kit, cfg.mundo);
   const heroiDados = Object.values(dados.personagens)[0];
@@ -24,6 +27,13 @@ export function criarMundo(dados, eventos, metasSprite) {
   const obstaculos = entidades.map((e) => ({ x: e.x, z: e.z, r: e.raioPush }));
   const mundo = { ticks: 0, dados, mapa, heroi, camera, entidades, eventos, dt: 1 / cfg.passo_logico_hz, hora: ciclo.hora_inicial, cicloLigado: ciclo.ligado };
   const alvos = entidades; // alvos do herói: todos os bonecos
+  // ponte mundo ↔ batalha (BL-008): modo mapa | batalha | cena | game_over. Fora do modo `mapa` a exploração fica congelada (só o relógio de ticks anda).
+  mundo.jogo = dados.combate && dados.config.batalha ? criarEstadoJogo(dados, eventos) : null;
+  // encontro aleatório por passos (13): só existe com a ponte de batalha e com data/exploracao/z_enc_<mapa>.json
+  const cfgEnc = dados.exploracao?.encontros?.[mapaDados.id];
+  mundo.encontros = mundo.jogo && cfgEnc ? criarGatilhoEncontros(cfgEnc, mundo.jogo, eventos, { semente: sementeEncontros }) : null;
+  // volta da batalha no mesmo ponto, parado (clique antigo esquecido; tecla ainda segurada volta a mover no passo seguinte)
+  eventos.em('modo_mudou', ({ para }) => { if (para === 'mapa') { heroi.vx = heroi.vz = 0; heroi.destino = null; heroi.alvoId = null; heroi.ox = heroi.x; heroi.oz = heroi.z; } });
 
   eventos.em('golpe_acertou', ({ alvo }) => { const e = entidades.find((x) => x.id === alvo); if (e) { e.contadores.acertos++; e.danoAte = mundo.ticks + 18; e.estado = 'DANO'; e.quadroEstado = 0; } });
 
@@ -46,7 +56,9 @@ export function criarMundo(dados, eventos, metasSprite) {
 
   /** Um passo lógico completo. `entrada` = instantâneo de entrada_logica.amostrar(tick); `buffer` = entrada.buffer. */
   mundo.passo = (entrada, buffer) => {
+    if (mundo.jogo && mundo.jogo.modo !== 'mapa') { mundo.ticks++; return; }
     heroi.passo(entrada, { obstaculos, alvos, eventos, buffer, tick: mundo.ticks });
+    if (mundo.encontros) mundo.encontros.passo(heroi);
     for (const e of entidades) passoEntidade(e);
     camera.passo(heroi, heroiDados.movimento.vel_correr, mundo.dt);
     if (mundo.cicloLigado) mundo.hora = (mundo.hora + (mundo.dt * 24) / ciclo.duracao_dia_s) % 24;

@@ -1,0 +1,20 @@
+{
+  "id": "skill_hollowpaw_varrida",
+  "versao": 1,
+  "nota": "Hollowpaw: varrida de garras em todo o grupo (dano menor que a pancada, sem aviso).",
+  "nome_txt": "txt_skill_hollowpaw_varrida_nome",
+  "tipo": "habilidade",
+  "efeito": "dano",
+  "alvo_tipo": "inimigos_todos",
+  "custo": {
+    "mana": 0
+  },
+  "dano_base": 12,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "corte",
+  "tempo": "t_habilidade",
+  "pose": "bat_habilidade",
+  "fx": "fx_impacto_medio",
+  "sfx": "sfx_impacto_medio"
+}

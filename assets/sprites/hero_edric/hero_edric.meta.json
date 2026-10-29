@@ -2,15 +2,15 @@
   "id": "hero_edric",
   "tipo": "sprite_humanoide",
   "celula": [
-    192,
-    192
+    96,
+    96
   ],
   "ancora": [
-    96,
-    168
+    48,
+    80
   ],
-  "arte_escala": 1.5,
-  "ref_celula": 128,
+  "arte_escala": 1,
+  "ref_celula": 96,
   "direcoes": [
     "s",
     "se",
@@ -33,7 +33,7 @@
     },
     "andar": {
       "quadros": 8,
-      "fps": 10,
+      "fps": 18,
       "loop": true,
       "eventos": [
         {
@@ -49,7 +49,7 @@
     },
     "correr": {
       "quadros": 8,
-      "fps": 14,
+      "fps": 24,
       "loop": true,
       "eventos": [
         {
@@ -123,5 +123,6 @@
       "loop": false,
       "inicio": 220
     }
-  }
+  },
+  "nota": "Visual v2 (pixel art HD-2D, célula 96). idle (4q), andar (8q, 18 fps) e correr (8q, 24 fps) animados nas 5 direções; ataque1-3, rolar e dano ainda apontam o quadro estático. fps de andar/correr casam o passo com 3,5 e 6,0 tiles/s (pés sem patinar)."
 }

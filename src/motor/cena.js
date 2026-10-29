@@ -6,6 +6,7 @@ import { criarSolo } from './solo.js';
 import { construirKit } from './kit.js';
 import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
+import { criarMateriais } from './materiais.js';
 import { estadoCiclo, lanternaAcesa } from '../jogo/ciclo.js';
 
 const COR_AVISO = 0xd01a8f, COR_AVISO_BORDA = 0xffa0e6; // magenta reservado a perigo
@@ -32,21 +33,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   // ---------- chão e kit ----------
   const solo = criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest); cena.add(solo.malha);
   const kit = construirKit(mapaDados, kitDados, texelsPorTile);
-  const aj = (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = perfil.aniso; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.needsUpdate = true; return t; };
-  const T = recursos.texturas, uniformesVento = { uTempo: { value: 0 }, uVento: { value: 1 } };
-  const std = (map, extra = {}) => new THREE.MeshStandardMaterial({ map: aj(map), roughness: 0.9, metalness: 0, ...extra });
-  const materiais = {
-    reboco: std(T.reboco), madeira: std(T.madeira), telha_laranja: std(T.telha_laranja), telha_musgo: std(T.telha_musgo), ardosia: std(T.ardosia), pedra: std(T.pedra), casca: std(T.casca), tabuas: std(T.tabuas),
-    folhagem: std(T.folhagem, { vertexColors: true, roughness: 1 }), metal: new THREE.MeshStandardMaterial({ color: 0x3a3a40, roughness: 0.45, metalness: 0.7 }),
-    janela: new THREE.MeshStandardMaterial({ color: 0x1c2230, emissive: 0xffc070, emissiveIntensity: 0, roughness: 0.2 }), lampada: new THREE.MeshStandardMaterial({ color: 0xffe0a0, emissive: 0xffb050, emissiveIntensity: 0, roughness: 0.4 }),
-    agua: new THREE.MeshStandardMaterial({ color: 0x1d2c3a, roughness: 0.15, metalness: 0.2 }),
-  };
-  materiais.folhagem.color.setRGB(1.75, 1.7, 1.55);
-  materiais.folhagem.onBeforeCompile = (sh) => { // vento: balanço da copa pelo peso do vértice
-    Object.assign(sh.uniforms, uniformesVento);
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float balanco; uniform float uTempo, uVento;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.xz += vec2(sin(uTempo * 1.3 + position.x * 0.8 + position.z * 0.4), cos(uTempo * 1.1 + position.z * 0.7)) * balanco * 0.07 * uVento;');
-  };
+  const T = recursos.texturas, { materiais, uniformesVento } = criarMateriais(T, perfil);
   for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = true; m.receiveShadow = true; m.name = `kit_${nome}`; cena.add(m); }
 
   // ---------- luz: hemisférica + sol com sombra (direção fixa na tela; a hora muda cor/altura/intensidade) + lanternas ----------
@@ -110,7 +97,8 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
       const brilho = !a.ehHeroi && e.estado === 'DANO' ? 1 : 0, realce = a.entidade.id === alvoSobId ? 0.25 : 0; a.sprite.malha.material.emissiveIntensity = 0.3 + brilho * 0.8 + realce;
       if (a.aviso) { const ativo = e.estado === 'AVISO' || e.estado === 'ATIVO', p = e.estado === 'ATIVO' ? 1 : e.aviso; a.aviso.disco.visible = a.aviso.anel.visible = ativo; if (ativo) { a.aviso.disco.scale.set(Math.max(0.01, p), 1, Math.max(0.01, p)); a.aviso.disco.position.set(x, 0.04, z); a.aviso.anel.position.set(x, 0.045, z); } }
     }
-    luzHeroi.position.set(lerp(heroi.ox, heroi.x, alfa), heroiDados.luz.altura_tiles, lerp(heroi.oz, heroi.z, alfa)).addScaledVector(eixoZ, -1.6); // um pouco à frente (lado da câmera): ilumina o corpo, não a testa luzHeroi.intensity = heroiDados.luz.intensidade * ec.luzArtificial * ec.luzArtificial; // só acende ao escurecer
+    luzHeroi.position.set(lerp(heroi.ox, heroi.x, alfa), heroiDados.luz.altura_tiles, lerp(heroi.oz, heroi.z, alfa)).addScaledVector(eixoZ, -1.6); // um pouco à frente (lado da câmera): ilumina o corpo, não a testa
+    luzHeroi.intensity = heroiDados.luz.intensidade * ec.luzArtificial * ec.luzArtificial; // só acende ao escurecer
     // marcadores no chão
     const d = heroi.destino; if (d && (!destinoAnterior || destinoAnterior.x !== d.x || destinoAnterior.z !== d.z)) destinoT = 0; destinoAnterior = d ? { x: d.x, z: d.z } : null; destinoT += dtS;
     marcadorDestino.visible = !!d; if (d) { marcadorDestino.position.set(d.x, 0.05, d.z); const k = 1 + 0.15 * Math.sin(destinoT * 8); marcadorDestino.scale.set(k, 1, k); }

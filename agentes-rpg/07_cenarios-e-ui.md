@@ -1,4 +1,6 @@
-# AGENTE 07 — CENÁRIOS E UI (mundo 3D em pixel art, interface e acessibilidade)
+# AGENTE 07 — CENÁRIOS (antigo Cenários e UI; escopo reduzido, D-032)
+
+> **DIVISÃO DE ESCOPO (D-032, 2026-10-27):** este agente cuida dos **cenários** (**Parte A, §3**): kit isométrico modular, props, luz e atmosfera, montagem das áreas, as **3 variantes da vila**, e agora também a **cena de batalha** (o fundo é o próprio **diorama 3D HD-2D**, reaproveitando o kit, com a câmera de batalha definida com o 10 e o 08; **sem fundos pintados**, regra de arte por código D-029). A **interface (Parte B, §4)** passa ao **agente 15** (`15_ui_ux.md`). Trabalhe só com briefing; sem commitar; mensagens curtas.
 
 > Constrói o **diorama**: cenários 3D com texturas em pixel art, props, vegetação, água e posição das luzes — e a **interface**: HUD, menus, inventário, diálogo, mapa, controles e acessibilidade.
 > **Como usar:** *"Crie o kit de cenário da vila"*, *"Monte a praça da vila a partir do layout"*, *"Desenhe o HUD"*, *"Crie o inventário"*.

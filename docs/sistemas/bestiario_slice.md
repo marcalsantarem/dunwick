@@ -1,5 +1,6 @@
 # Bestiário do slice — 5 inimigos comuns (D-023) e referência do Hollowpaw
 
+> **Combate por turnos (D-028):** os números de slime e lobo para o M1 estão em `formulas_turnos.md` §9; esta tabela (tempo real) fica como base de um modo de ação.
 > **Dono:** 06 Sistemas e Níveis · **Status:** RASCUNHO v0.1 (D-025, 2026-10-24)
 > Escala dos sistemas combinados: herói nível 1 com vida 140, combo 13 / 13 / 20 (destreza 5), `formulas.md` v0.1 e D-007/D-009. Valores **de referência**: servem para a primeira versão e para a simulação, que ajusta uma alavanca por vez.
 > Fichas completas (ataques por quadro, IA, drops) saem no briefing de bestiário; aqui estão papel, números e contra-jogo.

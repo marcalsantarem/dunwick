@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/acao_batalha",
+  "title": "Ataque (atk_*) ou habilidade (skill_*) de batalha: alvo, custo, efeito e tempo (docs/combate_turnos.md §2, §5)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "tipo",
+    "efeito",
+    "alvo_tipo",
+    "custo",
+    "tempo",
+    "pose"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(atk|skill)_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "tipo": {
+      "enum": [
+        "ataque",
+        "habilidade"
+      ]
+    },
+    "efeito": {
+      "enum": [
+        "dano",
+        "cura",
+        "espera"
+      ]
+    },
+    "alvo_tipo": {
+      "enum": [
+        "inimigo_1",
+        "inimigos_todos",
+        "aliado_1",
+        "aliados_todos",
+        "si"
+      ]
+    },
+    "custo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mana"
+      ],
+      "properties": {
+        "mana": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "mult_dano": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 10
+    },
+    "dano_base": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 9999
+    },
+    "atributo": {
+      "enum": [
+        "forca",
+        "mente"
+      ]
+    },
+    "escala": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "tipo_dano": {
+      "enum": [
+        "corte",
+        "perfuracao",
+        "impacto",
+        "elem_1",
+        "elem_2",
+        "elem_3",
+        "elem_4"
+      ]
+    },
+    "cura_base": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 9999
+    },
+    "prioridade": {
+      "type": "integer",
+      "minimum": -5,
+      "maximum": 5
+    },
+    "tempo": {
+      "type": "string",
+      "pattern": "^t_[a-z_]+$"
+    },
+    "pose": {
+      "type": "string",
+      "pattern": "^bat_[a-z_]+$"
+    },
+    "fx": {
+      "type": "string",
+      "pattern": "^fx_[a-z0-9_]+$"
+    },
+    "sfx": {
+      "type": "string",
+      "pattern": "^sfx_[a-z0-9_]+$"
+    }
+  }
+}

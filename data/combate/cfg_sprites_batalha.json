@@ -1,0 +1,41 @@
+{
+  "id": "cfg_sprites_batalha",
+  "versao": 1,
+  "nota": "Qual atlas de batalha cada ator usa (formato do hero_edric_batalha: 1 direção, voltado à direita, poses bat_*). `atlas` = id da pasta em assets/sprites. Os atlas próprios de Grace, Slime e Lobo estão em uso (BL-009/BL-010); `provisorio` fica como recurso para atores sem atlas.",
+  "alinhamento": {
+    "grupo_espelha": true
+  },
+  "atores": {
+    "hero_edric": {
+      "atlas": "hero_edric_batalha"
+    },
+    "hero_grace": {
+      "atlas": "hero_grace_batalha"
+    },
+    "enemy_slime": {
+      "atlas": "enemy_slime_batalha",
+      "escala": 1.3
+    },
+    "enemy_lobo": {
+      "atlas": "enemy_lobo_batalha"
+    }
+  },
+  "poses_alias": {
+    "bat_cura": [
+      "bat_habilidade",
+      "bat_ataque"
+    ],
+    "bat_ataque_forte": [
+      "bat_ataque"
+    ],
+    "bat_espera": [
+      "bat_parado"
+    ],
+    "bat_morte": [
+      "bat_caido"
+    ],
+    "bat_fugir": [
+      "bat_avanca"
+    ]
+  }
+}

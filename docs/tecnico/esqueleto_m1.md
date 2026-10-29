@@ -133,6 +133,23 @@ motor/ (apresentação)    → lê o estado com interpolação; nunca altera a s
 - **Pixel/mixels e snap**: câmera e sprites colados à grade interna; a **avaliação visual** de tremor em movimento (M1-17) é do QA.
 - `spikes/` permanece no repositório como evidência (ignora `node_modules`, `dist` e `assets` regeneráveis).
 
+## 8b. Cena de batalha (BL-008 etapa 2b)
+
+Quando `mundo.jogo.modo === 'batalha'` a plataforma desenha a arena em vez do mapa. Peças (todas em `src/motor/` e `src/plataforma/`; a simulação continua pura):
+
+| Arquivo | Papel |
+|---|---|
+| `data/cenarios/cen_praca.json` (+ esquema `cenario`) | arena: câmera (giro 0°, 25°, arte 640×360, alvo), palco elíptico, peças do kit em coordenadas locais, luz (sombra ±14, preenchimento), névoa por z (0 → −30), foco. Encontros cujo `cenario` não existe caem no cenário `padrao` |
+| `data/combate/cfg_sprites_batalha.json` | qual atlas de batalha cada ator usa; `provisorio` = atlas do Edric com tinta e escala (Grace, Slime, Lobo) até o 04 entregar; `poses_alias` (ex.: `bat_cura` → `bat_habilidade`). **Trocar o provisório por `atlas` própria é só editar esta entrada** (o atlas mora em `assets/sprites/<personagem>/<id>_batalha.*`) |
+| `motor/arena.js` | puro: monta o mapa sintético do palco e confere a faixa de combate limpa |
+| `motor/cena_batalha.js` | cena 3D da arena, vistas dos atores (pool, sem criar nada por quadro), `projetarSlot`/`slots`, pós (foco por faixa, vinheta +0,05) |
+| `motor/toque_batalha.js` | **reprodução da fila**: um ato por vez, `impacto_s` → dano/cura, queda, vitória; mantém o estado VISUAL dos atores (pose, deslocamento, brilho, vida mostrada). Puro e testado |
+| `plataforma/apresentacao.js` | decide a vista, transição por névoa (cobre 0,35 s → troca → revela 0,65 s; sem flash; "reduzir movimento": 0,15 s), liga o toque, fecha com `jogo.encerrarBatalha()`; sem UI registrada joga com a política automática |
+
+**Para a UI (15):** (1) monte DOM em `#ui` (id fixo, `pointer-events: none`): ele acompanha o retângulo do jogo e define `--arte-w/--arte-h` (px de arte: 640×360 na batalha) e `--k` (px CSS por px de arte); `data-visao` = `mapa|batalha`. (2) o toque **assina** o controlador (`ctrl.log` + `assinar('*')`) e **não** chama `esvaziarFila()`, então a UI continua dona da fila dela; `batalha_ui.js` hoje reproduz a fila por conta própria e ainda calcula a posição dos rótulos sozinha — para alinhar com os sprites, use `apr.slots()` e `toque.atores`. Com a UI montada, `principal.js` chama `apr.assumirComandos()` (política automática desligada; a UI fecha a batalha). `window.__dunwick.apr` (só dev): `assumirComandos()` desliga a política automática; `toque` (existe só na batalha): `toque.eventos.em(nome, fn)` recebe os eventos do controlador **no instante da apresentação** (`dano`/`curou`/`vida_mudou`/`caiu` no impacto) mais `ato_inicio`/`ato_fim`/`toque_terminou`; `toque.atores.get(uid)` traz `vida/mana/pose/caido` visuais; **só chame `ctrl.executar()` / abra o menu com `toque.ocioso === true`**; `apr.slots()` → posição dos 6 slots em px de arte e CSS (pés e cabeça); `apr.aoGameOver = fn` para mostrar "Tentar de novo". (3) Em produção o acesso é por injeção (`criarApresentacao` devolve o objeto); o `window.__dunwick` não existe.
+**Depuração:** `]` (`BracketRight`, só dev) dispara o próximo encontro de `cfg_batalha.debug.encontros`.
+**Medido (Chrome real, 1080p, 1920×1080 de janela, teto 56,6 fps):** arena a 57 fps, pior 1 % 18,5 ms nos 3 perfis; 48/45/29 chamadas de desenho (Alto/Médio/Baixo).
+
 ## 9. Trecho sugerido para o `CLAUDE.md` (seção "Estado atual do repositório")
 
 > Há código: esqueleto M1 (Three.js, ADR-001). `npm install`; `npm run dev` (http://localhost:5173, debug ligado); `npm test` (node:test; um arquivo: `node --test tests/heroi.test.mjs`; um teste: `--test-name-pattern`); `npm run validar`; `npm run build` (validar → testes → empacotar → peso, saída em `build/prod`); `npm run test:navegador` (Chrome real; `-- --medir=60`). Detalhes em `docs/tecnico/esqueleto_m1.md`. `src/jogo/` é simulação pura (sem three/DOM); `src/motor/` é a única camada que importa `three`.

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/encontro",
+  "title": "Encontro de batalha: quem aparece, se dá para fugir, cenário e música (docs/combate_turnos.md §11)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "inimigos",
+    "pode_fugir",
+    "cenario",
+    "musica"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^enc_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "inimigos": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "pattern": "^enemy_"
+      }
+    },
+    "pode_fugir": {
+      "type": "boolean"
+    },
+    "cenario": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "musica": {
+      "type": "string",
+      "pattern": "^mus_[a-z0-9_]+$"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "enc_hollowpaw",
+  "versao": 1,
+  "nota": "PROPOSTA (06, BL-021): encontro do chefe na caverna. Não aleatório: disparado pelo mapa/cena (13). O esquema encontro precisa aceitar IDs boss_ em `inimigos`.",
+  "nome_txt": "txt_enc_hollowpaw_nome",
+  "inimigos": [
+    "boss_urso_musgo"
+  ],
+  "pode_fugir": false,
+  "cenario": "cen_covil_hollowpaw",
+  "musica": "mus_batalha_chefe"
+}

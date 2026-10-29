@@ -1,0 +1,142 @@
+{
+  "id": "enemy_lobo",
+  "tipo": "sprite_batalha",
+  "celula": [
+    112,
+    80
+  ],
+  "ancora": [
+    44,
+    66
+  ],
+  "arte_escala": 1,
+  "ref_celula": 112,
+  "direcoes": [
+    "l"
+  ],
+  "espelhar": {
+    "o": "l"
+  },
+  "colunas": 8,
+  "anims": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 3,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 10,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_ataque_forte": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 15,
+      "eventos": [
+        {
+          "quadro": 4,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 21
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 23
+    }
+  },
+  "poses": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 3,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 10,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_ataque_forte": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 15,
+      "eventos": [
+        {
+          "quadro": 4,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 21
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 23
+    }
+  },
+  "nota": "Lobo: poses de batalha numa só direção (L); o motor espelha. Sem normal map."
+}

@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'">
 <title>Dunwick</title>
 <link rel="icon" href="data:,">
@@ -11,6 +15,7 @@
 <body>
 <canvas id="tela"></canvas>
 <div id="aviso" role="status"></div>
+<div id="ui"></div>
 <script type="application/json" id="manifesto">%MANIFESTO%</script>
 <script type="module" src="%JS%"></script>
 </body>

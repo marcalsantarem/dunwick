@@ -7,6 +7,9 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { codificarWav } from './lib/wav.mjs';
+import { codificarPng } from './lib/png.mjs';
+import { gerarEdric, validarEdric } from './arte/edric.mjs';
+import { gerarBatalha } from './arte/edric_batalha.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..'), SAIDA = join(RAIZ, 'assets');
 const arg = (n, p) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? `--${n}=${p}`).split('=')[1];
@@ -24,6 +27,16 @@ try {
   for (const [rel, dados] of Object.entries(arquivos)) { const destino = join(SAIDA, rel), buf = rel.endsWith('.json') ? Buffer.from(dados) : Buffer.from(dados, 'base64'); mkdirSync(dirname(destino), { recursive: true }); writeFileSync(destino, buf); bytes += buf.length; }
   console.log(`arte gerada em ${total_ms} ms (${JSON.stringify(tempos)}): ${Object.keys(arquivos).length} arquivos, ${(bytes / 1024).toFixed(0)} KB → assets/`);
 } finally { await navegador.close(); }
+
+// Edric (pixel art, Node puro): valida paleta/alpha/tamanho antes de gravar
+{
+  const e = gerarEdric(), v = validarEdric(e); if (v.erros.length) { console.error('hero_edric inválido:\n' + v.erros.join('\n')); process.exit(1); }
+  const dir = join(SAIDA, 'sprites', 'hero_edric'); mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'hero_edric.png'), codificarPng(e.img)); writeFileSync(join(dir, 'hero_edric.meta.json'), JSON.stringify(e.meta, null, 2) + '\n');
+  console.log(`hero_edric: ${e.img.w}×${e.img.h}, ${v.cores} cores`);
+  const b = gerarBatalha(); writeFileSync(join(dir, 'hero_edric_batalha.png'), codificarPng(b.img)); writeFileSync(join(dir, 'hero_edric_batalha.meta.json'), JSON.stringify(b.meta, null, 2) + '\n');
+  console.log(`hero_edric_batalha: ${b.frames.length} quadros`);
+}
 
 // SFX de teste (prova o desbloqueio do áudio por gesto): 0,15 s, mono, 24 kHz, sem dependências. Áudio real é do 05.
 {

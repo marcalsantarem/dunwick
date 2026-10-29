@@ -1,0 +1,228 @@
+{
+  "id": "hero_grace",
+  "tipo": "sprite_batalha",
+  "celula": [
+    96,
+    96
+  ],
+  "ancora": [
+    48,
+    88
+  ],
+  "arte_escala": 1,
+  "ref_celula": 96,
+  "direcoes": [
+    "l"
+  ],
+  "espelhar": {
+    "o": "l"
+  },
+  "colunas": 8,
+  "anims": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 3,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 10,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_habilidade": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 15,
+      "eventos": [
+        {
+          "quadro": 4,
+          "tipo": "solta_efeito"
+        }
+      ]
+    },
+    "bat_cura": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 21,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "solta_efeito"
+        }
+      ]
+    },
+    "bat_item": {
+      "quadros": 4,
+      "fps": 8,
+      "loop": false,
+      "inicio": 27,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "usa"
+        }
+      ]
+    },
+    "bat_defender": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 31,
+      "manter_ultimo": true
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 33
+    },
+    "bat_caido": {
+      "quadros": 1,
+      "fps": 1,
+      "loop": false,
+      "inicio": 35
+    },
+    "bat_levanta": {
+      "quadros": 3,
+      "fps": 8,
+      "loop": false,
+      "inicio": 36
+    },
+    "bat_vitoria": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 39
+    }
+  },
+  "poses": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_avanca": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": true,
+      "inicio": 4,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 3,
+          "tipo": "passo"
+        }
+      ]
+    },
+    "bat_ataque": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 10,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "impacto"
+        }
+      ]
+    },
+    "bat_habilidade": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 15,
+      "eventos": [
+        {
+          "quadro": 4,
+          "tipo": "solta_efeito"
+        }
+      ]
+    },
+    "bat_cura": {
+      "quadros": 6,
+      "fps": 10,
+      "loop": false,
+      "inicio": 21,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "solta_efeito"
+        }
+      ]
+    },
+    "bat_item": {
+      "quadros": 4,
+      "fps": 8,
+      "loop": false,
+      "inicio": 27,
+      "eventos": [
+        {
+          "quadro": 3,
+          "tipo": "usa"
+        }
+      ]
+    },
+    "bat_defender": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 31,
+      "manter_ultimo": true
+    },
+    "bat_dano": {
+      "quadros": 2,
+      "fps": 8,
+      "loop": false,
+      "inicio": 33
+    },
+    "bat_caido": {
+      "quadros": 1,
+      "fps": 1,
+      "loop": false,
+      "inicio": 35
+    },
+    "bat_levanta": {
+      "quadros": 3,
+      "fps": 8,
+      "loop": false,
+      "inicio": 36
+    },
+    "bat_vitoria": {
+      "quadros": 4,
+      "fps": 6,
+      "loop": true,
+      "inicio": 39
+    }
+  },
+  "nota": "Grace: poses de batalha numa só direção (L, voltada para a direita); o motor espelha. Sem normal map."
+}

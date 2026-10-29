@@ -1,5 +1,7 @@
 # Fórmulas, atributos, recursos, dano e estados
 
+> **Combate de ação (arquivo, D-028):** no combate por turnos valem as fórmulas de `docs/sistemas/formulas_turnos.md`. Daqui caem fôlego, esquiva, quadros, postura e golpe forte; ficam atributos, mana, resistências, estados (em rodadas) e XP. Este texto serve de base a um futuro modo de ação.
+
 
 > **Dono:** 06 Sistemas e Níveis · **Status:** RASCUNHO v0.1 (BRF-004, onda 0) · 2026-10-24
 > **Fonte única** de toda fórmula do jogo. O 03 implementa daqui; o 09 transforma os exemplos resolvidos em testes.

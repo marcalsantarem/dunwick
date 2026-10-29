@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_ui_batalha",
+  "title": "UI da batalha por turnos (15)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "t_mensagem",
+    "t_barra_inimigo_visivel",
+    "vida_baixa_fracao",
+    "acelerar_mult",
+    "gamepad_limiar",
+    "palco_meia_largura_tiles",
+    "palco_meia_profundidade_tiles",
+    "altura_cabeca_tiles",
+    "largura_corpo_tiles",
+    "clique_min_px_arte",
+    "toque_min_px_css",
+    "t_dica_s"
+  ],
+  "properties": {
+    "id": {
+      "const": "cfg_ui_batalha"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "t_mensagem": {
+      "type": "number",
+      "minimum": 0.6,
+      "maximum": 5
+    },
+    "t_barra_inimigo_visivel": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "vida_baixa_fracao": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "acelerar_mult": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 4
+    },
+    "gamepad_limiar": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "palco_meia_largura_tiles": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "palco_meia_profundidade_tiles": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "altura_cabeca_tiles": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 6
+    },
+    "largura_corpo_tiles": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 4
+    },
+    "clique_min_px_arte": {
+      "type": "integer",
+      "minimum": 16,
+      "maximum": 96
+    },
+    "toque_min_px_css": {
+      "type": "integer",
+      "minimum": 24,
+      "maximum": 96
+    },
+    "t_dica_s": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 30
+    }
+  }
+}

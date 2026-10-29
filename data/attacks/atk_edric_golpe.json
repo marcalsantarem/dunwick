@@ -1,0 +1,19 @@
+{
+  "id": "atk_edric_golpe",
+  "versao": 1,
+  "nome_txt": "txt_atk_edric_golpe_nome",
+  "tipo": "ataque",
+  "efeito": "dano",
+  "alvo_tipo": "inimigo_1",
+  "custo": {
+    "mana": 0
+  },
+  "mult_dano": 1,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "corte",
+  "tempo": "t_atacar",
+  "pose": "bat_ataque",
+  "fx": "fx_impacto_leve",
+  "sfx": "sfx_impacto_leve"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "skill_golpe_firme",
+  "versao": 1,
+  "nome_txt": "txt_skill_golpe_firme_nome",
+  "tipo": "habilidade",
+  "efeito": "dano",
+  "alvo_tipo": "inimigo_1",
+  "custo": {
+    "mana": 4
+  },
+  "mult_dano": 1.8,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "corte",
+  "tempo": "t_habilidade",
+  "pose": "bat_habilidade",
+  "fx": "fx_impacto_medio",
+  "sfx": "sfx_impacto_medio"
+}

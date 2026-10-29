@@ -153,10 +153,11 @@ checar('textos: nenhum ID ausente', (await pag.evaluate('__dunwick.textosFaltand
 for (const [nome, h] of [['manha', 9], ['meiodia', 13], ['entardecer', 17], ['noite', 21.5]]) { await pag.evaluate((h) => { __dunwick.mundo.hora = h; }, h); await dormir(700); await pag.screenshot({ path: join(dirQA, `praca_${nome}.png`) }); }
 { const lum = async (h) => { await pag.evaluate((h) => { __dunwick.mundo.hora = h; }, h); await dormir(500); const img = decodificarPng(await pag.screenshot({ type: 'png' })); let s = 0, n = 0; for (let i = 0; i < img.px.length; i += 4 * 97) { s += 0.2126 * img.px[i] + 0.7152 * img.px[i + 1] + 0.0722 * img.px[i + 2]; n++; } return s / n / 255; }; const dia = await lum(13), noite = await lum(22); checar('dia/noite: a noite é mais escura que o dia, mas legível (luminância ≥ 0,06)', noite < dia * 0.75 && noite >= 0.06, `dia ${dia.toFixed(3)} · noite ${noite.toFixed(3)}`); await pag.evaluate(() => { __dunwick.mundo.hora = 17; }); }
 
-// ---- escala inteira (modo arte 960×540) ----
+// ---- escala contínua: o jogo preenche a janela (maior 16:9 que cabe); múltiplos exatos continuam inteiros (modo arte 960×540) ----
 const escalas = {};
 for (const [w, h] of [[1280, 720], [1920, 1080], [2560, 1440], [3840, 2160], [900, 500]]) { await pag.setViewport({ width: w, height: h, deviceScaleFactor: 1 }); await dormir(300); escalas[`${w}x${h}`] = await pag.evaluate('__dunwick.escala()'); }
-checar('M1-06 escala inteira do pixel de arte: 720p→1, 1080p→2, 1440p→2, 2160p→4, janela menor→1', escalas['1280x720'] === 1 && escalas['1920x1080'] === 2 && escalas['2560x1440'] === 2 && escalas['3840x2160'] === 4 && escalas['900x500'] === 1, JSON.stringify(escalas));
+const perto = (a, b) => Math.abs(a - b) < 0.01;
+checar('escala contínua preenche a janela: 720p→1,333, 1080p→2 (inteira), 1440p→2,667, 2160p→4, 900×500→0,926', perto(escalas['1280x720'], 4 / 3) && escalas['1920x1080'] === 2 && perto(escalas['2560x1440'], 8 / 3) && escalas['3840x2160'] === 4 && perto(escalas['900x500'], 888.89 / 960), JSON.stringify(escalas));
 await pag.setViewport({ width: JW, height: JH, deviceScaleFactor: 1 }); await dormir(300);
 
 // ---- gamepad simulado ----
@@ -188,6 +189,29 @@ if (SEG_MEDIR > 0) {
   else { const branca = await navegador.newPage(); await branca.goto('data:text/html,<canvas></canvas>'); const base = await branca.evaluate(() => new Promise((ok) => { const a = []; let u = performance.now(); const f = (x) => { a.push(x - u); u = x; if (a.length < 240) requestAnimationFrame(f); else { a.shift(); ok(1000 / (a.reduce((s, y) => s + y, 0) / a.length)); } }; requestAnimationFrame(f); })); await branca.close(); await pag.bringToFront(); medicao.teto_pagina_em_branco_fps = +base.toFixed(1);
     checar('M1-02 média ≥ 58 fps (ou ≥ 98 % do teto do monitor)', medicao.fps_medio >= 58 || medicao.fps_medio >= 0.98 * base, `${medicao.fps_medio} fps · teto ${base.toFixed(1)} fps · ${(100 * medicao.fps_medio / base).toFixed(1)} %`); checar('M1-02 pior 1 % ≥ 45 fps', medicao.fps_pior_1pct >= 45, `${medicao.fps_pior_1pct} fps`); }
   checar('M1-03 nenhum quadro > 250 ms', medicao.maior_ms <= 250, `maior ${medicao.maior_ms} ms`);
+}
+{ // encontro SEM a tecla ] (mesmo caminho do gatilho por passos): a UI liga ao controlador, mostra o menu e a vista é a da batalha
+  await pag.evaluate(() => { __dunwick.jogo.iniciarBatalha('enc_slime_1'); }); await dormir(4000);
+  const b = await pag.evaluate(() => ({ modo: __dunwick.jogo.modo, visao: document.getElementById('ui').dataset.visao, ligada: !!__dunwick.batalhaUi.controlador, menu: !!document.querySelector('.bat:not([hidden])') }));
+  checar('batalha por encontro natural: UI ligada, menu visível e vista de batalha', b.modo === 'batalha' && b.visao === 'batalha' && b.ligada && b.menu, JSON.stringify(b));
+}
+{ // mouse-only (cliques reais): Atacar → inimigo → ... → resultado → Continuar; o clique no canvas não move o herói; depois a fuga
+  const hx = await pag.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+  const centroDe = (sel, texto) => pag.evaluate((s, t) => { const e = [...document.querySelectorAll(s)].filter((x) => x.getBoundingClientRect().width > 0 && !x.hidden && (!t || x.textContent.includes(t))).sort((a, b) => a.textContent.length - b.textContent.length)[0]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, sel, texto);
+  const jogarComMouse = async (enc, comando) => {
+    await pag.evaluate((e) => { const j = __dunwick.jogo; if (j.modo === 'mapa') j.depurarEncontro(e); }, enc); await dormir(3500);
+    await pag.mouse.click(960, 200); await pag.mouse.click(960, 200, { button: 'right' }); // cliques no canvas durante a batalha: inofensivos
+    for (let i = 0; i < 240; i++) {
+      const m = await pag.evaluate(() => [__dunwick.jogo.modo, __dunwick.batalhaUi.modo]); if (m[0] !== 'batalha') break;
+      const c = m[1] === 'menu' ? await centroDe('.bat li', comando) : m[1] === 'alvo' ? await centroDe('.bat-alvo-area-inimigos.valido') : m[1] === 'resultado' ? (await centroDe('.bat button', 'Continuar')) ?? (await centroDe('.bat button', 'Tentar')) : null;
+      if (c) await pag.mouse.click(c.x, c.y); await dormir(m[1] === 'tocando' ? 250 : 350);
+    }
+    await dormir(1500); return pag.evaluate(() => ({ modo: __dunwick.jogo.modo, res: __dunwick.jogo.ultimoResultado?.resultado ?? null }));
+  };
+  const v = await jogarComMouse('enc_slime_1', 'Atacar'); const hy = await pag.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+  checar('batalha só com o mouse: Atacar → inimigo → vitória → Continuar volta ao mapa', v.modo === 'mapa' && v.res === 'vitoria', JSON.stringify(v));
+  checar('clique no canvas durante a batalha não move o herói', Math.hypot(hy[0] - hx[0], hy[1] - hx[1]) < 0.05, JSON.stringify({ antes: hx, depois: hy }));
+  const f = await jogarComMouse('enc_lobo_1', 'Fugir'); checar('batalha só com o mouse: Fugir volta ao mapa', f.modo === 'mapa' && f.res === 'fuga', JSON.stringify(f));
 }
 checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 5).join(' | '));
 if (avisos.length) console.log(`  avisos do console (${avisos.length}): ${avisos.slice(0, 3).join(' | ')}`);

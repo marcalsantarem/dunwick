@@ -1,0 +1,19 @@
+{
+  "id": "skill_lobo_investida",
+  "versao": 1,
+  "nome_txt": "txt_skill_lobo_investida_nome",
+  "tipo": "habilidade",
+  "efeito": "dano",
+  "alvo_tipo": "inimigo_1",
+  "custo": {
+    "mana": 0
+  },
+  "dano_base": 22.5,
+  "atributo": "forca",
+  "escala": 5,
+  "tipo_dano": "corte",
+  "tempo": "t_atacar",
+  "pose": "bat_ataque_forte",
+  "fx": "fx_impacto_medio",
+  "sfx": "sfx_impacto_medio"
+}

@@ -200,3 +200,67 @@ Respostas do usuário às perguntas t, u, v do 02:
 ## D-027 — Esqueleto isométrico aprovado como primeira versão (2026-10-25)
 - **Usuário (testou em casa, no Chrome):** gostou bastante do esqueleto isométrico HD-2D como **versão inicial**. **Pendências de qualidade:** **melhorar a animação** e **refinar os gráficos**. Para uma primeira versão do slice, "está bem válido".
 - **Efeito:** o rumo visual (isométrico, HD-2D, praça de Baixo Orvalho) está **aprovado**; o ADR-002 (medições comparativas) segue adiado; a polimento de animação e gráfico entra no backlog P1 para antes do M2.
+
+## D-028 — Combate por turnos (2026-10-26)
+- **Decisão (usuário):** o jogo segue com **combate por turnos**, no estilo **Breath of Fire** (cena de batalha com personagens e inimigos em sprite sobre o cenário, caixas de vida e habilidade embaixo), mundo **isométrico** para exploração. Grupo de **3** (herói + 2 aliados) como ideia de longo prazo.
+- **Preservado:** tudo o que foi projetado para o combate de ação fica em `docs/arquivo/combate_acao/` e na **tag `combate-acao-v1`** (modo de ação futuro, seções em ação ou híbrido).
+- **Substitui:** D-007, D-009 (partes de tempo real), D-010 e D-019 (partes de aviso/esquiva em tempo real), BRF-003/BRF-010 no que for de tempo real. **Segue:** história, nomes, direção de arte, inimigos (D-023), vila em 3 estados (D-019), esqueleto técnico (render, câmera, dados, testes).
+- **Em aberto (a decidir com o usuário):** como o inimigo aparece (visível no mapa ou encontro aleatório), turnos por rodada ou barra de tempo (ATB), quantos no grupo no slice (companheira entra em cena, D-012), evolução de habilidades por uso (BL-001), classe do Edric.
+- **Próximo passo:** o Produtor monta a comparação curta de formatos de turno quando o limite de uso do usuário permitir; só então os agentes (03, 06, 07, 04, 09) revisam seus documentos.
+
+## D-029 — Arte segue 100 % por código (2026-10-27)
+- **Decisão (usuário):** manter **todos os assets gerados por código** (sem editor externo, sem IA de imagem), por simplificação. Nenhuma conexão (MCP) de arte será adotada agora. Uma **versão remaster** com arte refeita (editor de pixel art ou IA de imagem local, com registro de origem e termos) fica como ideia futura (BL-003).
+- **Para melhorar a qualidade dentro da regra:** moldes de pixels desenhados à mão em texto (como o rosto do Edric) e, se o usuário quiser, imagens de referência de estilo para o 04 desenhar olhando.
+
+## D-030 — Visual do Edric aprovado (2026-10-27)
+- **Aprovado pelo usuário:** o sprite do Edric (pose parada, 5 direções, célula 96, rosto em molde de pixels desenhado à mão, pescoço encurtado). Gerado por `tools/arte/edric.mjs` e `tools/arte/rostos.mjs`.
+- **Pendências do Edric (não bloqueiam):** o lado oeste sai espelhado (ombreira e faixa trocam de lado); animações e poses de batalha por turnos ainda não existem; mapa de relevo para a luz não foi feito; o Diretor de Arte ainda precisa aprovar 5 cores novas (rampa verde-musgo e um tom de linho).
+- **Item-modelo:** serve de referência de estilo para os demais personagens (Torvan, Maren, Grace, inimigos, Hollowpaw).
+
+## D-031 — Combate por turnos: formato, encontros e grupo (2026-10-27)
+- **Formato A (usuário):** **rodadas, estilo Breath of Fire**: a cada rodada escolhem-se os comandos de todo o grupo e todos agem em ordem de agilidade; tela de batalha separada, com personagens e inimigos em sprite sobre o cenário.
+- **Encontros B (usuário):** **encontro aleatório** (passos no mapa disparam a batalha). Inimigos visíveis no mapa não entram por ora.
+- **Grupo A (usuário):** a **Grace luta com o Edric** a partir da feira (volta à vila e luta final do slice), com cura como habilidade. Isso **substitui a parte da D-012** que dizia "só em cena, sem lutar". Grupo de 3 segue como meta futura.
+- **Pendente:** revisão da estrutura de agentes (criar/dividir), que o usuário pediu para confirmar antes de qualquer alteração nos arquivos dos agentes.
+
+## D-032 — Nova estrutura de agentes (2026-10-27)
+- **Decisão (usuário, fase 1 como proposta):** dividir e criar agentes: **03 Combate por turnos e IA** + novo **13 Exploração, Interação e Missões**; **06 Design de Combate e Classes** (especialista em RPG, com simulações) + novo **14 Níveis e Mundo**; **07 Cenários** (inclui a cena de batalha 3D) + novo **15 UI/UX**; novo **11 Gestor de Backlog e Publicação** (PO + scrum master + releases). **12 Designer de Personagens e Retratos** fica para a **fase 2** (caixas de diálogo); **animador separado** só se virar gargalo.
+- **Quadro de tarefas em arquivo** (`docs/05_quadro.md`) por ora; espelhar no GitHub Projects quando o plugin do GitHub funcionar.
+- **Arquivos:** novos `agentes-rpg/11_*.md`, `13_*.md`, `14_*.md`, `15_*.md`; blocos de "DIVISÃO DE ESCOPO" em `03`, `06` e `07`. Os arquivos antigos mantêm o texto completo (que serve de base para as duas metades).
+- **Sessões:** o usuário abre sessões novas para 11, 13, 14 e 15; as sessões Jogabilidade, Sistemas e Cenario continuam com o escopo reduzido.
+
+## D-033 — Onda 1 aprovada e parâmetros do M1 (2026-10-27)
+- **Onda 1 aprovada** (BL-004 a BL-008). **BL-004** (especificação do combate por turnos, `docs/combate_turnos.md` v0.2 e `docs/sistemas/formulas_turnos.md`) **concluída**.
+- **M1:** **Fugir ligado** (desligado em chefe); **3 encontros** (`enc_slime_1`, `enc_lobo_1`, `enc_misto_1`), com **Slime e Lobo** como inimigos; **batalhas curtas aceitas** (20 s a 1 min, rebalancear no M3).
+- **Liberadas agora (em paralelo):** BL-005 UI de batalha (15), BL-006 cena de batalha (07, com o 10), BL-007 poses do Edric (04). **Depois:** BL-008 controlador e transição (03, 13, 08).
+- **Pendente do 06:** valores de `defesa` de Edric, Grace e Lobo.
+
+## D-034 — Mini marcos da demo (v0.1.1 a v0.1.8) (2026-10-28)
+- **Decisão (usuário):** antes do slice completo, entregar uma **demo jogável** (cerca de 30 minutos) em **versões pequenas v0.1.x**, cada uma com **um pull request `dev → main`** e tag. Roteiro em `docs/02_roadmap.md` (seção "Demo"). O slice oficial **continua** como combinado (D-007, Bíblia); a demo é um recorte dele.
+- **Escopo novo aceito pelo usuário (fora do slice original):** minimapa, baús de tesouro, lojas e moeda, missões de coleta e caça na vila. Registrados como BL-027 a BL-031.
+- **Substitui:** "uma PR por marco M" e "tag v0.2.0 após o M1": agora a tag é por versão v0.1.x.
+
+## D-035 — Dungeon: bosque que leva à caverna (2026-10-28)
+- **Decisão (usuário):** a região ao redor da vila é de **campos e planícies**; mais adiante há uma **parte de bosque**, e no fim dele a **caverna do Hollowpaw** (dungeon). Mantém a caverna da Bíblia e acrescenta o bosque. Nome da região e da caverna: a definir (02 + 14, v0.1.7).
+
+## D-036 — Progressão por nível de XP; evolução por uso adiada (2026-10-28)
+- **Decisão (usuário):** na v0.1.5, **subir de nível por XP** aumenta atributos e libera habilidades. **BL-001 (habilidades que evoluem pelo uso) segue adiada** para depois do slice.
+- **A definir na v0.1.5:** classe do Edric e suas habilidades; modo de salvar e de recuperar vida/mana no mapa; recompensas pós-batalha.
+
+## D-037 — Arte final depois da demo; Hollowpaw pode ser poupado (2026-10-28)
+- **Arte final (M2):** entra **depois da demo v0.1.8**, antes do slice completo. A demo usa a arte atual do esqueleto.
+- **Hollowpaw:** fase 3 com "Hesita" (ficha do 06) e **o jogador pode poupá-lo**. **Altera a D-018** (que dizia que ele morre). A v0.1.8 precisa de duas cenas pós-batalha (matar ou poupar) e o desfecho muda o que a vila recebe. O 02 define as consequências.
+
+## D-038 — Vila 100% zona segura; encontros só fora dela (2026-10-28)
+- **Decisão (usuário, opção A):** a **vila de Baixo Orvalho inteira é zona segura**. As zonas de encontro (`z_enc_*`) saem da vila e passam para os **campos e a região além dos portais** (mapa ao redor, v0.1.3; encontros ativos na v0.1.5).
+- **Origem:** o esboço da vila v0.1.2 (`docs/niveis/esboco_vila_v012.png`, do 14) mostrou 8 prédios, as saídas e a estrada dentro de zonas de encontro.
+- **Consequência registrada:** da v0.1.2 até a v0.1.4 não há batalha andando; só pela tecla `]` no `npm run dev`. A v0.1.1 (batalha atual) segue com as zonas de hoje para o usuário validar.
+- **Não executado ainda:** o 14 atualiza o mapa e as zonas quando o usuário liberar os briefings da v0.1.2. Layout da vila ainda em análise do usuário.
+
+## D-039 — Jogo preenche a janela (escala contínua) (2026-10-29)
+- **Decisão (usuário):** o jogo **cresce proporcionalmente (16:9) até tocar a borda lateral ou a vertical** da janela, em vez de escalar só por números inteiros. A cena é desenhada na resolução real da janela; sprites mantêm contorno nítido (sem suavização).
+- **Altera** a convenção "escala inteira" do CLAUDE.md/guia visual para o **tamanho de apresentação** (a arte base e os sprites continuam desenhados em múltiplos inteiros). Risco aceito: alguns pixels podem ficar levemente desiguais em escalas fracionadas.
+- **Pacote v0.1.1 (usuário aprovou as 6 sugestões + esta):** tela de início "Toque para começar", ajuste dos inimigos na batalha (+ cura "+0"), menu de pausa, dica de controles, botão de tela cheia, preferências lembradas e preencher a janela.
+
+## D-040 — Cura e poção funcionam com a vida cheia (2026-10-29)
+- **Decisão (usuário):** poção e magia de cura **executam e gastam o recurso mesmo com o alvo de vida cheia** (nenhuma recusa nem redirecionamento). Na **escolha de alvo**, aparece **"VIDA CHEIA"** sobre o sprite do personagem que está com a vida cheia, como aviso; o jogador pode escolher mesmo assim. Só apresentação; sem mudança de regra no motor.

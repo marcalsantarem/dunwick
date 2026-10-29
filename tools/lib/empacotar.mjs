@@ -1,12 +1,13 @@
 // Opções do esbuild e geração do index.html, compartilhadas pelo build (produção) e pelo servidor (desenvolvimento).
 import { readFileSync } from 'node:fs';
+const VERSAO = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
 import { join } from 'node:path';
 
 export function opcoesEsbuild(raiz, { dev, saida, nomeJs }) {
   return {
     entryPoints: [join(raiz, 'src/plataforma/principal.js')], bundle: true, format: 'esm', platform: 'browser', target: 'es2022',
     outfile: join(saida, nomeJs), minify: !dev, sourcemap: dev ? 'inline' : false, legalComments: 'none', treeShaking: true,
-    define: { __DEV__: dev ? 'true' : 'false' }, logLevel: 'warning',
+    define: { __DEV__: dev ? 'true' : 'false', __VERSAO__: JSON.stringify(VERSAO) }, logLevel: 'warning',
   };
 }
 

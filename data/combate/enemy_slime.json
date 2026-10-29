@@ -1,0 +1,35 @@
+{
+  "id": "enemy_slime",
+  "versao": 1,
+  "nota": "D-023, Emboscador. Ficha do 06 §9; IA do 03 §7.",
+  "nome_txt": "txt_enemy_slime_nome",
+  "papel": "emboscador",
+  "sprite": "enemy_slime",
+  "vida_max": 70,
+  "forca": 4,
+  "defesa": 3,
+  "agilidade": 3,
+  "resistencias": {},
+  "xp": 12,
+  "moedas": 4,
+  "drops": [],
+  "ia": [
+    {
+      "acao": "atk_slime_golpe",
+      "peso": 70,
+      "alvo_regra": "aleatorio"
+    },
+    {
+      "acao": "skill_slime_balanco",
+      "peso": 30,
+      "alvo_regra": "aleatorio"
+    }
+  ],
+  "poses": {
+    "parado": "bat_parado",
+    "ataque": "bat_ataque",
+    "espera": "bat_espera",
+    "dano": "bat_dano",
+    "morte": "bat_morte"
+  }
+}

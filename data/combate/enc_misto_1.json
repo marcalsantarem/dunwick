@@ -1,0 +1,12 @@
+{
+  "id": "enc_misto_1",
+  "versao": 1,
+  "nome_txt": "txt_enc_misto_1_nome",
+  "inimigos": [
+    "enemy_lobo",
+    "enemy_slime"
+  ],
+  "pode_fugir": true,
+  "cenario": "cen_campo_baixo_orvalho",
+  "musica": "mus_batalha_comum"
+}

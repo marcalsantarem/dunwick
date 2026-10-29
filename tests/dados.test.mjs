@@ -16,7 +16,7 @@ function copiaComEdicao(arquivoRel, editar) {
 }
 
 test('dados reais: 0 erros', () => { const r = validarDados(RAIZ); assert.deepEqual(r.erros, []); assert.ok(r.arquivos >= 11); });
-test('assets reais: 0 erros', () => { const r = validarAssets(RAIZ); assert.deepEqual(r.erros, []); assert.equal(r.sprites, 3); });
+test('assets reais: 0 erros', () => { const r = validarAssets(RAIZ); assert.deepEqual(r.erros, []); assert.equal(r.sprites, 6); });
 
 test('texto no lugar de número: erro com arquivo e campo (M1-21)', () => {
   const tmp = copiaComEdicao('characters/hero_edric.json', (o) => { o.movimento.vel_andar = 'rápido'; });

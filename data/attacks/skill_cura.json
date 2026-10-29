@@ -1,0 +1,18 @@
+{
+  "id": "skill_cura",
+  "versao": 1,
+  "nome_txt": "txt_skill_cura_nome",
+  "tipo": "habilidade",
+  "efeito": "cura",
+  "alvo_tipo": "aliado_1",
+  "custo": {
+    "mana": 5
+  },
+  "atributo": "mente",
+  "escala": 5,
+  "cura_base": 14,
+  "tempo": "t_cura",
+  "pose": "bat_cura",
+  "fx": "fx_cura",
+  "sfx": "sfx_cura"
+}

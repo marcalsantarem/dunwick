@@ -2,13 +2,13 @@
 
 # 🔔 Dunwick
 
-**Um RPG de ação isométrico, em tempo real, direto no navegador.**
+**Um RPG isométrico de combate por turnos, direto no navegador.**
 Fantasia medieval original, humor ácido e um sino que nunca devia ter voltado para casa.
 
 [**▶ Jogar a versão estável**](https://dunwick.netlify.app) · [**🧪 Versão em desenvolvimento**](https://dev--dunwick.netlify.app)
 
 ![status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)
-![versão](https://img.shields.io/badge/versão-v0.1.0-blue)
+![versão](https://img.shields.io/badge/versão-v0.1.1-blue)
 ![classificação](https://img.shields.io/badge/classificação-16%2B-red)
 ![plataforma](https://img.shields.io/badge/plataforma-navegador-brightgreen)
 
@@ -27,8 +27,8 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 ## ✨ O jogo
 
 - **Visão isométrica HD-2D:** sprites de pixel art nítidos dentro de um cenário 3D com luz, sombras, névoa e profundidade.
-- **Ação à moda de hack'n'slash:** clique para andar e atacar, esquiva, fôlego, mana, combo e habilidades.
-- **Combate justo:** todo golpe inimigo tem **aviso** antes de acertar. Esquiva e tempo valem mais que números.
+- **Combate por turnos** no estilo de RPGs clássicos: cena de batalha com o grupo e os inimigos em sprite, comandos e habilidades. *(em definição; o design de ação em tempo real está arquivado em `docs/arquivo/combate_acao/`)*
+- **Exploração isométrica:** clique para andar pelo mundo.
 - **Tudo gerado por código:** sprites, texturas, cenário e sons são produzidos por scripts, sem arte externa.
 - **Acessível:** tremor, flashes, partículas e desfoque podem ser desligados.
 
@@ -39,9 +39,9 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 | Estável (`main`) | https://dunwick.netlify.app |
 | Em desenvolvimento (`dev`) | https://dev--dunwick.netlify.app |
 
-**Controles atuais do esqueleto:** clique no chão para andar, clique em um alvo para atacar, `W A S D` também movem. `F1`–`F12` abrem o modo debug (`F3` mostra o fps, `F12` troca o perfil de qualidade).
+**Controles:** clique ou toque no chão para andar (`W A S D` também). Na batalha, tudo funciona só com o mouse ou o toque: menu, alvos e botões. `Esc` (ou o botão ⏸) pausa. No celular, deite o aparelho: o jogo ocupa a tela toda. `F1`–`F12` abrem o modo debug (só em desenvolvimento).
 
-> O jogo ainda está no começo. O que existe hoje é a praça de Baixo Orvalho, o herói andando e atacando, e a base técnica. Combate completo, inimigos, chefe e missões estão a caminho.
+> O jogo ainda está no começo. O que existe hoje é a praça de Baixo Orvalho, o Edric andando, e uma batalha por turnos com a Grace contra Slime e Lobo, jogável no PC e no celular. Mais mapa, missões e o chefe estão a caminho (roteiro abaixo).
 
 ## 🛠️ Rodar localmente
 
@@ -88,14 +88,18 @@ Dunwick é produzido por **uma pessoa e um time de agentes de IA**, cada um com 
 |---|---|---|
 | 01 | Produtor | plano, escopo, marcos, decisões |
 | 02 | Roteirista | mundo, personagens, missões, textos |
-| 03 | Jogabilidade | movimento, combate, IA, interação |
+| 03 | Combate por turnos e IA | Controlador de batalha (rodadas, comandos, ordem), IA dos inimigos e do chefe |
 | 04 | Sprites | pixel art gerada por código |
 | 05 | Som | efeitos e música sintetizados |
-| 06 | Sistemas e Níveis | regras, números, mapas |
-| 07 | Cenários e UI | kit isométrico, interface, acessibilidade |
+| 06 | Design de Combate e Classes | Classes, habilidades, fórmulas, itens, bestiário, balanceamento com simulações |
+| 07 | Cenários | Kit isométrico, props, luz, montagem, cena de batalha |
 | 08 | Arquiteto Técnico | arquitetura, dados, desempenho, publicação |
 | 09 | QA | testes e critérios por marco |
 | 10 | Direção de Arte e VFX | guia visual, paleta, efeitos |
+| 11 | Gestor de Backlog e Publicação | Backlog, quadro de tarefas, versões, README, publicação |
+| 13 | Exploração, Interação e Missões | Mapa explorável, diálogos, encontros aleatórios, missões, save |
+| 14 | Níveis e Mundo | Mapas, métricas isométricas, zonas de encontro |
+| 15 | UI/UX | Menus de batalha, HUD, diálogo, controles, acessibilidade |
 
 Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_decisoes.md). A fonte da verdade é a [Bíblia do Projeto](docs/00_biblia_projeto.md).
 
@@ -104,18 +108,35 @@ Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_d
 | Marco | Entrega | Situação |
 |---|---|---|
 | M0 Fundação | Bíblia, história, guia visual, especificações | ✅ |
-| M1 Protótipo | herói anda e ataca numa cena isométrica | 🔄 em andamento |
+| M1 Protótipo | batalha por turnos jogável no mapa isométrico (v0.1.1) | ✅ |
+| Demo jogável | v0.1.1 a v0.1.8: vila, entorno, missões, bosque, caverna e o Hollowpaw (~30 min) | ⏳ ver roteiro abaixo |
 | M2 Cena-modelo | uma cena com arte final, luz e efeitos | ⏳ |
 | M3 Vertical slice | vila, caverna, estrada, chefe, som e história | ⏳ |
 | M4 Polimento | game feel, áudio final, tutorial, inglês | ⏳ |
 | M5 Beta | testes completos e balanceamento | ⏳ |
 | M6 Lançamento | versão publicada | ⏳ |
 
+## 🧭 Roteiro da demo
+
+| Versão | Entrega |
+|---|---|
+| v0.1.0 | esqueleto (na `main` hoje) |
+| v0.1.1 | batalha por turnos básica validada |
+| v0.1.2 | resto da vila e minimapa |
+| v0.1.3 | mapa ao redor (campos) e baús de tesouro |
+| v0.1.4 | NPCs, diálogos, lojas e moeda |
+| v0.1.5 | encontros aleatórios, classe, nível por XP, save e recompensas |
+| v0.1.6 | missões da vila e sistema de missões |
+| v0.1.7 | mapa do bosque e da caverna |
+| v0.1.8 | chefe Hollowpaw, cena final e volta à vila |
+
+Detalhes e requisitos técnicos em [`docs/02_roadmap.md`](docs/02_roadmap.md).
+
 ## 🌿 Branches e versões
 
 - **`main`:** versão oficial e estável. Só recebe pull request vindo da `dev`.
 - **`dev`:** a próxima versão. O trabalho do dia a dia acontece aqui.
-- Cada versão oficial recebe uma tag (`v0.1.0`, `v0.2.0`…).
+- Cada versão oficial recebe uma tag (`v0.1.0`, `v0.1.1`…) e um pull request da `dev` para a `main`.
 
 Detalhes em [`docs/tecnico/publicacao.md`](docs/tecnico/publicacao.md).
 

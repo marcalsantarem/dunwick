@@ -1,0 +1,111 @@
+{
+  "id": "cfg_batalha",
+  "versao": 1,
+  "nota": "Regras da batalha por turnos (03) com fórmulas do 06 (docs/sistemas/formulas_turnos.md). Tempos em segundos; posições em tiles do palco.",
+  "rodadas_max": 50,
+  "defender_mult_dano": 0.5,
+  "prioridade_comando": {
+    "atacar": 0,
+    "habilidade": 0,
+    "item": 0,
+    "defender": 1,
+    "fugir": 0
+  },
+  "iniciativa_variacao": 0,
+  "caido_pos_batalha_vida": 1,
+  "xp_caido_fracao": 0,
+  "dificuldade": {
+    "mult_dano_causado": 1,
+    "mult_dano_recebido": 1,
+    "mult_cura": 1
+  },
+  "formulas": {
+    "defesa_constante": 100,
+    "vida_base": 30,
+    "vida_por_vigor": 10,
+    "mana_base": 5,
+    "mana_por_mente": 3,
+    "resistencia_min": -0.5,
+    "resistencia_max": 0.75,
+    "dano_minimo": 1
+  },
+  "fuga": {
+    "base": 0.5,
+    "por_ponto": 0.05,
+    "bonus_falha": 0.1,
+    "min": 0.1,
+    "max": 0.9
+  },
+  "regen_mana": {
+    "base": 1,
+    "divisor_mente": 4
+  },
+  "xp": {
+    "base": 100,
+    "expoente": 1.6
+  },
+  "tempos": {
+    "t_entrada_batalha": 1,
+    "t_intervalo_ato": 0.2,
+    "t_atacar": 0.9,
+    "t_habilidade": 1.2,
+    "t_cura": 1.1,
+    "t_item": 0.9,
+    "t_defender": 0.4,
+    "t_espera": 0.5,
+    "t_dano": 0.3,
+    "t_cair": 0.6,
+    "t_numero_dano": 0.8,
+    "t_barra_vida": 0.4,
+    "t_pausa_impacto": 0.06,
+    "t_fuga": 0.8,
+    "t_vitoria": 1.6
+  },
+  "velocidades_batalha": [
+    1,
+    2
+  ],
+  "posicoes": {
+    "grupo": [
+      [
+        2.4,
+        -0.6
+      ],
+      [
+        4.6,
+        1.6
+      ],
+      [
+        4.6,
+        -2.4
+      ]
+    ],
+    "inimigos": [
+      [
+        -2.4,
+        0.2
+      ],
+      [
+        -5.6,
+        -1.8
+      ],
+      [
+        -5.6,
+        2.2
+      ]
+    ]
+  },
+  "dist_contato_tiles": 1.1,
+  "inventario_teste": {
+    "item_pocao_ervas": 2
+  },
+  "fracao_impacto": 0.45,
+  "debug": {
+    "tecla_proximo_encontro": "BracketRight",
+    "encontros": [
+      "enc_slime_1",
+      "enc_lobo_1",
+      "enc_misto_1"
+    ]
+  }
+}

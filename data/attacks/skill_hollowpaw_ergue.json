@@ -1,0 +1,14 @@
+{
+  "id": "skill_hollowpaw_ergue",
+  "versao": 1,
+  "nota": "Hollowpaw: AVISO do golpe pesado. Gasta o turno erguendo a pata sobre o sino; na rodada seguinte vem skill_hollowpaw_desaba, sempre. O jogador reage com Defender ou cura.",
+  "nome_txt": "txt_skill_hollowpaw_ergue_nome",
+  "tipo": "habilidade",
+  "efeito": "espera",
+  "alvo_tipo": "si",
+  "custo": {
+    "mana": 0
+  },
+  "tempo": "t_espera",
+  "pose": "bat_espera"
+}

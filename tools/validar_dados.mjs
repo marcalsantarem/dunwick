@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { listarArquivos, carregarEsquemas, lerJson } from './lib/dados.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop'];
+const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc', 'z', 'cen'];
 
 function mensagemAjv(e) {
   const extra = e.params?.additionalProperty ? ` (campo "${e.params.additionalProperty}")` : e.params?.allowedValues ? ` (${e.params.allowedValues.join(' | ')})` : e.params?.missingProperty ? ` ("${e.params.missingProperty}")` : '';
@@ -110,6 +110,70 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     });
     const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
     if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
+  }
+  // ---- combate por turnos (regras cruzadas; esquemas em data/schemas/*_batalha, encontro, cfg_batalha) ----
+  const cb = um('cfg_batalha');
+  if (por('cfg_batalha').length === 0 && por('encontro').length) erros.push('data/combate: falta cfg_batalha.json (ou ele é inválido)');
+  const acoes = Object.fromEntries(por('acao_batalha').map(([a, x]) => [x.id, [a, x]]));
+  const itensB = Object.fromEntries(por('item_batalha').map(([a, x]) => [x.id, [a, x]]));
+  const heroisB = Object.fromEntries(por('heroi_batalha').map(([a, x]) => [x.id, [a, x]]));
+  const inimigosB = Object.fromEntries(por('inimigo_batalha').map(([a, x]) => [x.id, [a, x]]));
+  if (cb) {
+    const f = cb.fuga; if (f.min > f.max) erro('combate/cfg_batalha.json', '/fuga/min', 'deve ser ≤ max');
+    for (const [k, [a, x]] of Object.entries(acoes)) {
+      exigeTexto(a, '/nome_txt', x.nome_txt);
+      if (!cb.tempos[x.tempo]) erro(a, '/tempo', `tempo "${x.tempo}" não existe em cfg_batalha.tempos`);
+      if (x.efeito === 'dano') {
+        if ((x.dano_base === undefined) === (x.mult_dano === undefined)) erro(a, '/', 'ação de dano exige exatamente um entre "dano_base" (inimigo) e "mult_dano" (herói, sobre poder_arma)');
+        for (const c of ['atributo', 'escala', 'tipo_dano']) if (x[c] === undefined) erro(a, `/${c}`, 'ação de dano exige este campo');
+      }
+      if (x.efeito === 'cura') for (const c of ['atributo', 'escala', 'cura_base']) if (x[c] === undefined) erro(a, `/${c}`, 'ação de cura exige este campo');
+      if (x.efeito === 'cura' && !x.alvo_tipo.startsWith('aliado') && x.alvo_tipo !== 'si') erro(a, '/alvo_tipo', 'cura deve mirar aliado ou si');
+      if (x.tipo === 'ataque' && x.custo.mana !== 0) erro(a, '/custo/mana', 'ataque básico não custa mana');
+    }
+    for (const [, [a, x]] of Object.entries(itensB)) { exigeTexto(a, '/nome_txt', x.nome_txt); if (!cb.tempos[x.tempo]) erro(a, '/tempo', `tempo "${x.tempo}" não existe em cfg_batalha.tempos`); }
+    for (const [, [a, h]] of Object.entries(heroisB)) {
+      exigeTexto(a, '/nome_txt', h.nome_txt);
+      const ref = (campo, id) => { if (!acoes[id]) erro(a, campo, `ação "${id}" não existe em data/attacks`); };
+      ref('/kit/ataque', h.kit.ataque); h.kit.habilidades.forEach((id, i) => ref(`/kit/habilidades/${i}`, id));
+      h.kit.itens.forEach((id, i) => { if (!itensB[id]) erro(a, `/kit/itens/${i}`, `item "${id}" não existe em data/combate`); });
+      if (acoes[h.kit.ataque] && acoes[h.kit.ataque][1].efeito !== 'dano') erro(a, '/kit/ataque', 'o ataque básico deve ser de dano');
+      for (const id of [h.kit.ataque, ...h.kit.habilidades]) if (acoes[id] && acoes[id][1].dano_base !== undefined) erro(a, '/kit', `"${id}" usa dano_base (de inimigo); herói usa mult_dano`);
+    }
+    for (const [, [a, e]] of Object.entries(inimigosB)) {
+      exigeTexto(a, '/nome_txt', e.nome_txt);
+      e.ia.forEach((o, i) => {
+        if (!acoes[o.acao]) erro(a, `/ia/${i}/acao`, `ação "${o.acao}" não existe em data/attacks`);
+        else if (acoes[o.acao][1].dano_base === undefined && acoes[o.acao][1].efeito === 'dano') erro(a, `/ia/${i}/acao`, `"${o.acao}" usa mult_dano; inimigo usa dano_base`);
+        if (o.alvo_regra === 'misto' && o.prob_menor_vida === undefined) erro(a, `/ia/${i}/prob_menor_vida`, 'regra "misto" exige prob_menor_vida');
+      });
+      e.drops.forEach((d, i) => { if (!itensB[d.item]) erro(a, `/drops/${i}/item`, `item "${d.item}" não existe em data/combate`); });
+    }
+    for (const [arq, e] of por('encontro')) {
+      exigeTexto(arq, '/nome_txt', e.nome_txt);
+      e.inimigos.forEach((id, i) => { if (!inimigosB[id]) erro(arq, `/inimigos/${i}`, `inimigo "${id}" não existe em data/combate`); });
+    }
+    cb.debug.encontros.forEach((id, i) => { if (!por('encontro').some(([, e]) => e.id === id)) erro('combate/cfg_batalha.json', `/debug/encontros/${i}`, `encontro "${id}" não existe em data/combate`); });
+    for (const id of Object.keys(cb.inventario_teste)) if (!itensB[id]) erro('combate/cfg_batalha.json', `/inventario_teste/${id}`, 'item não existe em data/combate');
+  }
+  // ---- exploração: encontro aleatório por passos (13) ----
+  for (const [arq, z] of por('zonas_encontro')) {
+    const mapa = por('mapa').find(([, m]) => m.id === z.mapa)?.[1];
+    if (!mapa) { erro(arq, '/mapa', `mapa "${z.mapa}" não existe em data/maps`); continue; }
+    if (por('zonas_encontro').filter(([, o]) => o.mapa === z.mapa).length > 1) erro(arq, '/mapa', `mais de um arquivo de encontros para "${z.mapa}"`);
+    const [L, A] = mapa.tamanho, ids = new Set();
+    const ret = (campo, r, id) => {
+      if (ids.has(id)) erro(arq, campo, `zona "${id}" repetida`); ids.add(id);
+      if (r[0] > r[2] || r[1] > r[3]) erro(arq, campo + '/ret', 'x0 ≤ x1 e z0 ≤ z1');
+      if (r[2] >= L || r[3] >= A) erro(arq, campo + '/ret', `fora do mapa (${L} × ${A} tiles)`);
+    };
+    z.zonas_seguras.forEach((s, i) => ret(`/zonas_seguras/${i}`, s.ret, s.id));
+    z.zonas_encontro.forEach((s, i) => {
+      ret(`/zonas_encontro/${i}`, s.ret, s.id);
+      s.tabela.forEach((t, j) => { if (!por('encontro').some(([, e]) => e.id === t.encontro)) erro(arq, `/zonas_encontro/${i}/tabela/${j}/encontro`, `encontro "${t.encontro}" não existe em data/combate`); });
+    });
+    const [ix, iz] = mapa.inicio_jogador.tile;
+    if (z.zonas_encontro.some((s) => ix >= s.ret[0] && ix <= s.ret[2] && iz >= s.ret[1] && iz <= s.ret[3]) && !z.zonas_seguras.some((s) => ix >= s.ret[0] && ix <= s.ret[2] && iz >= s.ret[1] && iz <= s.ret[3])) avisos.push(`data/${arq}: o início do jogador está numa zona de encontro`);
   }
   const textos = por('textos');
   if (textos.length > 1) for (const [arq, t] of textos.slice(1)) for (const k of Object.keys(textos[0][1].textos)) if (!(k in t.textos)) erro(arq, '/textos', `falta "${k}" (existe em ${textos[0][0]})`);

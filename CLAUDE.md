@@ -6,11 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Há código: **esqueleto M1** (Three.js, ADR-001 aceito em D-016). Comandos: `npm install`; `npm run dev` (http://localhost:5173, debug ligado); `npm test` (node:test; um arquivo: `node --test tests/heroi.test.mjs`; um teste: `--test-name-pattern`); `npm run validar` (dados + assets); `npm run build` (validar → testes → empacotar → peso, saída em `build/prod`); `npm run test:navegador` (Chrome real; `-- --medir=60`). Detalhes em `docs/tecnico/esqueleto_m1.md`. `src/jogo/` é simulação pura (sem three/DOM); `src/motor/` é a única camada que importa `three`. Geradores de assets em JavaScript/Node (sem Python). Documentos dos agentes em `agentes-rpg/`; decisões em `docs/04_decisoes.md`; a Bíblia aprovada em `docs/00_biblia_projeto.md`. O repositório é git.
 
+**Atenção (D-028):** o combate de ação em tempo real foi arquivado em `docs/arquivo/combate_acao/` e na tag `combate-acao-v1`. Trechos abaixo sobre passo fixo de 60 Hz, quadros, telegraph e esquiva valem para a exploração e para um possível modo de ação futuro; o combate por turnos será especificado depois.
+
 Idioma do projeto: **português do Brasil** (documentos, textos e comunicação).
 
 ## O projeto
 
-RPG de ação em tempo real, fantasia medieval **original**, single-player, **no navegador**. Sprites em pixel art 16-bit (compactos, cabeça grande) dentro de cenários 3D com luz dinâmica, sombras, profundidade de campo, névoa e partículas (estilo "diorama"/HD-2D). Câmera 3/4 fixa (≈30–45°); movimento de câmera só em cenas e golpes especiais.
+RPG **de combate por turnos** (D-028, estilo Breath of Fire; mundo isométrico), fantasia medieval **original**, single-player, **no navegador**. Sprites em pixel art 16-bit (compactos, cabeça grande) dentro de cenários 3D com luz dinâmica, sombras, profundidade de campo, névoa e partículas (estilo "diorama"/HD-2D). Câmera 3/4 fixa (≈30–45°); movimento de câmera só em cenas e golpes especiais.
 
 **Meta atual (vertical slice):** 1 vila, 1 região aberta, 1 masmorra, 1 herói, 5 inimigos, 1 chefe, 3–5 missões, save. Nada de P2/P3 antes do slice.
 
@@ -26,14 +28,18 @@ Cada arquivo em `agentes-rpg/` é a instrução completa de um papel. Ao receber
 |---|---|---|
 | 01 | Produtor | Plano, escopo, Bíblia do Projeto, briefings, marcos, localização/lançamento/legal. Não cria assets |
 | 02 | Roteirista | Mundo, personagens, missões, diálogos, textos |
-| 03 | Jogabilidade | Implementa gameplay (movimento, câmera, combate, IA, interação, HUD ligado ao estado) |
+| 03 | Combate por turnos e IA | Controlador de batalha (rodadas, comandos, ordem), IA dos inimigos e do chefe |
 | 04 | Sprites | Pixel art **gerada por código** (ex.: Python + Pillow) + normal map + metadados + preview |
 | 05 | Som | SFX e música **sintetizados por código**, mixagem, validação |
-| 06 | Sistemas e Níveis | Regras, números, fórmulas, balanceamento, layouts de mapa em dados |
-| 07 | Cenários e UI | Kit 3D modular, props, luz/atmosfera, telas de UI, controles, acessibilidade |
+| 06 | Design de Combate e Classes | Classes, habilidades, fórmulas, itens, bestiário, balanceamento com simulações |
+| 07 | Cenários | Kit isométrico, props, luz, montagem, cena de batalha |
 | 08 | Arquiteto Técnico | **Único que escolhe ferramentas/stack**; arquitetura, formatos, save, pipeline, desempenho, publicação |
 | 09 | QA | Encontra, reproduz, mede e recomenda passa/não passa; não corrige nem decide escopo |
 | 10 | Direção de Arte e VFX | Guia visual, paleta mestra, pós-processamento, itens-modelo, cena-modelo, efeitos; aprova arte do 04/07 |
+| 11 | Gestor de Backlog e Publicação | Backlog, quadro de tarefas, versões, README, publicação |
+| 13 | Exploração, Interação e Missões | Mapa explorável, diálogos, encontros aleatórios, missões, save |
+| 14 | Níveis e Mundo | Mapas, métricas isométricas, zonas de encontro |
+| 15 | UI/UX | Menus de batalha, HUD, diálogo, controles, acessibilidade |
 
 Regras transversais (valem para todos):
 - Fora do 08, agentes descrevem **o que** precisam, nunca **qual ferramenta**.
@@ -48,7 +54,7 @@ Ordem de dependências: Produtor (Bíblia + escopo) → 08 (spec + esqueleto) / 
 
 ## Convenções compartilhadas
 
-- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`, `atk_`, `cfg_`, `perfil_`, `z_`).
+- **IDs** em minúsculas, idênticos em arte, texto, dados, código e áudio, com prefixos: `hero_`, `npc_`, `enemy_`, `boss_`, `item_`, `skill_`, `quest_`, `map_`, `fx_`, `sfx_`, `mus_` (também `txt_`, `ui_`, `amb_`, `atk_`, `cfg_`, `enc_`, `perfil_`, `z_`, `cen_`).
 - **Densidade única:** 1 tile = 1 unidade do mundo = 32×32 px de arte, em sprites, texturas, UI e efeitos. Escala inteira, sem filtro/suavização.
 - Sprites: célula 64×64 (herói/NPC), âncora nos pés (ex.: 32,60), 4 direções (S, N, L desenhadas; O espelhada), 8–12 fps, alpha só 0/255, pouca sombra pintada (a luz vem da cena via normal map).
 - Distâncias em **tiles** e **segundos**; tempos de combate em **quadros a 60 Hz**.

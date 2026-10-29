@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/heroi_batalha",
+  "title": "Herói no combate por turnos: atributos, arma, kit e poses (fórmulas do 06: docs/sistemas/formulas_turnos.md)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "sprite",
+    "nivel",
+    "xp",
+    "atributos",
+    "armadura",
+    "bonus_itens",
+    "arma",
+    "resistencias",
+    "kit",
+    "posicao",
+    "poses"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^hero_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "sprite": {
+      "type": "string",
+      "pattern": "^[a-z]+_[a-z0-9_]+$"
+    },
+    "nivel": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "xp": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "atributos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vigor",
+        "forca",
+        "destreza",
+        "mente"
+      ],
+      "properties": {
+        "vigor": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "forca": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "destreza": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "mente": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      }
+    },
+    "armadura": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bonus_itens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vida",
+        "mana",
+        "agilidade"
+      ],
+      "properties": {
+        "vida": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mana": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "agilidade": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "arma": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "poder",
+        "tipo_dano"
+      ],
+      "properties": {
+        "poder": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tipo_dano": {
+          "enum": [
+            "corte",
+            "perfuracao",
+            "impacto",
+            "elem_1",
+            "elem_2",
+            "elem_3",
+            "elem_4"
+          ]
+        }
+      }
+    },
+    "resistencias": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "corte",
+          "perfuracao",
+          "impacto",
+          "elem_1",
+          "elem_2",
+          "elem_3",
+          "elem_4"
+        ]
+      },
+      "additionalProperties": {
+        "type": "number",
+        "minimum": -0.5,
+        "maximum": 0.75
+      }
+    },
+    "imunidades": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "corte",
+          "perfuracao",
+          "impacto",
+          "elem_1",
+          "elem_2",
+          "elem_3",
+          "elem_4"
+        ]
+      }
+    },
+    "kit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ataque",
+        "habilidades",
+        "itens"
+      ],
+      "properties": {
+        "ataque": {
+          "type": "string",
+          "pattern": "^atk_"
+        },
+        "habilidades": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "pattern": "^skill_"
+          }
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^item_"
+          }
+        }
+      }
+    },
+    "posicao": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "poses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parado",
+        "ataque",
+        "habilidade",
+        "item",
+        "defender",
+        "dano",
+        "caido",
+        "levanta",
+        "vitoria"
+      ],
+      "properties": {
+        "parado": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "avanca": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "ataque": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "habilidade": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "cura": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "item": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "defender": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "dano": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "caido": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "levanta": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        },
+        "vitoria": {
+          "type": "string",
+          "pattern": "^bat_[a-z_]+$"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "enemy_lobo",
+  "versao": 1,
+  "nota": "D-023, Combatente. Ficha do 06 §9; IA do 03 §7.",
+  "nome_txt": "txt_enemy_lobo_nome",
+  "papel": "combatente",
+  "sprite": "enemy_lobo",
+  "vida_max": 90,
+  "forca": 6,
+  "defesa": 4,
+  "agilidade": 9,
+  "resistencias": {},
+  "xp": 20,
+  "moedas": 7,
+  "drops": [
+    {
+      "item": "item_pocao_ervas",
+      "chance": 0.15,
+      "qtd": 1
+    }
+  ],
+  "ia": [
+    {
+      "acao": "atk_lobo_mordida",
+      "peso": 70,
+      "alvo_regra": "misto",
+      "prob_menor_vida": 0.5
+    },
+    {
+      "acao": "skill_lobo_investida",
+      "peso": 30,
+      "alvo_regra": "aleatorio",
+      "condicao": {
+        "rodada_min": 2
+      }
+    }
+  ],
+  "poses": {
+    "parado": "bat_parado",
+    "avanca": "bat_avanca",
+    "ataque": "bat_ataque",
+    "ataque_forte": "bat_ataque_forte",
+    "dano": "bat_dano",
+    "morte": "bat_morte"
+  }
+}

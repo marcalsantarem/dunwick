@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_sprites_batalha",
+  "title": "Atlas de batalha de cada ator (com provisórios)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "atores", "poses_alias"],
+  "properties": {
+    "id": { "const": "cfg_sprites_batalha" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "alinhamento": { "type": "object", "additionalProperties": false, "properties": { "grupo_espelha": { "type": "boolean" } } },
+    "atores": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "atlas": { "type": "string" },
+          "escala": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 },
+          "provisorio": {
+            "type": "object", "additionalProperties": false, "required": ["base", "tinta", "escala"],
+            "properties": { "base": { "type": "string" }, "tinta": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }, "escala": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 } }
+          }
+        },
+        "oneOf": [{ "required": ["atlas"], "properties": { "atlas": {} } }, { "required": ["provisorio"], "properties": { "provisorio": {} } }]
+      }
+    },
+    "poses_alias": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
+  }
+}
