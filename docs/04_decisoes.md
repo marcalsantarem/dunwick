@@ -264,3 +264,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 
 ## D-040 — Cura e poção funcionam com a vida cheia (2026-10-29)
 - **Decisão (usuário):** poção e magia de cura **executam e gastam o recurso mesmo com o alvo de vida cheia** (nenhuma recusa nem redirecionamento). Na **escolha de alvo**, aparece **"VIDA CHEIA"** sobre o sprite do personagem que está com a vida cheia, como aviso; o jogador pode escolher mesmo assim. Só apresentação; sem mudança de regra no motor.
+
+## D-041 — v0.1.2: vila completa, com interiores e minimapa girado (2026-10-29)
+- **Decisão (usuário):** (1) o **minimapa gira junto com a tela** (cima do minimapa = cima da tela); (2) **os interiores entram**: "vila completinha"; (3) o **esboço da vila está aprovado**, mas o usuário quer **vê-lo implementado** para confirmar.
+- **Escopo assumido pelo Produtor (declarado):** interiores simples (um cômodo cada, sem NPCs até a v0.1.4) para a **casa da Maren, a taverna, a forja, o pátio/casa do Torvan e o posto do escrivão**; as casas de moradores do sul ficam **fechadas** (fachada, sem interior). Cada interior é um **mapa pequeno** ligado ao exterior por **porta (portal)**.
+- **Consequência técnica:** a **troca de mapa por portal**, antes prevista na v0.1.3, **entra na v0.1.2**. A v0.1.3 passa a reusar o mecanismo para a saída da vila.
+- **Aplica a D-038:** a vila inteira vira zona segura nesta versão (as zonas `z_enc_*` saem da vila).
