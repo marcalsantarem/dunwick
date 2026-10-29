@@ -20,62 +20,79 @@
   ],
   "objetos": [
     {
-      "id": "caixote_1",
-      "tipo": "caixote",
-      "x": 1.1,
-      "z": 6.5,
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 3.2,
+      "z": 0,
       "rot": 0,
       "seed": 1
     },
     {
-      "id": "caixote_2",
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 4,
+      "rot": 90,
+      "seed": 2
+    },
+    {
+      "id": "castical_3",
+      "tipo": "castical",
+      "x": 4.2,
+      "z": 3,
+      "rot": 0,
+      "seed": 3,
+      "alt": 1.04
+    },
+    {
+      "id": "caixote_4",
+      "tipo": "caixote",
+      "x": 1.1,
+      "z": 6.5,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "caixote_5",
       "tipo": "caixote",
       "x": 8.9,
       "z": 6.5,
       "rot": 0,
-      "seed": 2
+      "seed": 5
     },
     {
-      "id": "lanterna_3",
-      "tipo": "lanterna",
-      "x": 8.8,
-      "z": 3.5,
-      "rot": 0,
-      "seed": 3
-    },
-    {
-      "id": "balcao_4",
+      "id": "balcao_6",
       "tipo": "balcao",
       "x": 5,
       "z": 3,
       "w": 4,
       "d": 0.7,
       "rot": 0,
-      "seed": 4
+      "seed": 6
     },
     {
-      "id": "arquivo_5",
+      "id": "arquivo_7",
       "tipo": "arquivo",
       "x": 1.5,
       "z": 0.6,
       "rot": 0,
-      "seed": 5
+      "seed": 7
     },
     {
-      "id": "arquivo_6",
+      "id": "arquivo_8",
       "tipo": "arquivo",
       "x": 8.5,
       "z": 0.6,
       "rot": 0,
-      "seed": 6
+      "seed": 8
     },
     {
-      "id": "quadro_avisos_7",
+      "id": "quadro_avisos_9",
       "tipo": "quadro_avisos",
       "x": 5,
       "z": 0.4,
       "rot": 0,
-      "seed": 7
+      "seed": 9
     }
   ],
   "portais": [

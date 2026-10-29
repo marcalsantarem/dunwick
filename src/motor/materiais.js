@@ -25,6 +25,16 @@ export function criarMateriais(T, perfil) {
     tapete_vinho: cor(0x7a3a30), tapete_ocre: cor(0xa8772f), tapete_verde: cor(0x3f5d3a), lareira_vao: cor(0x0d0a09), fundo_int: cor(0x16120f),
     brasa: emi(0x4a1408, 0xff5a1a, 1.8), chama: emi(0xffe9a0, 0xffc060, 2.6), janela_vela: emi(0x2a1c10, 0xffb050, 1.7, { roughness: 0.2 }), janela_dia: emi(0xaec6dc, 0x9fc0e0, 0.55, { roughness: 0.2 }),
   });
+  { // luz de fora entrando pela porta de saída: mancha no chão, forte junto à porta e sumindo para dentro do cômodo (aditiva, sem sombra); em Node (testes) sem textura
+    let t = null;
+    if (typeof document !== 'undefined') {
+      const cv = document.createElement('canvas'); cv.width = 32; cv.height = 64; const c = cv.getContext('2d'), g = c.createLinearGradient(0, 0, 0, 64);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,1)'); c.fillStyle = g; c.fillRect(0, 0, 32, 64);
+      c.globalCompositeOperation = 'destination-in'; const h = c.createLinearGradient(0, 0, 32, 0); h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(0.3, 'rgba(0,0,0,1)'); h.addColorStop(0.7, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = h; c.fillRect(0, 0, 32, 64);
+      t = new THREE.CanvasTexture(cv);
+    }
+    materiais.brilho_saida = new THREE.MeshBasicMaterial({ map: t, color: 0xffe6a8, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
+  }
   materiais.folhagem.color.setRGB(1.75, 1.7, 1.55);
   materiais.folhagem.onBeforeCompile = (sh) => { // vento: balanço da copa pelo peso do vértice
     Object.assign(sh.uniforms, uniformesVento);

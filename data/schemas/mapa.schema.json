@@ -248,6 +248,12 @@
         "fundo": {
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "particulas": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60,
+          "description": "partículas de poeira do cômodo (0 = nenhuma; padrão dos interiores)"
         }
       }
     },

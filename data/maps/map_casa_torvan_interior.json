@@ -20,55 +20,63 @@
   ],
   "objetos": [
     {
-      "id": "caixote_1",
-      "tipo": "caixote",
-      "x": 8.6,
-      "z": 6.4,
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 3,
+      "z": 0,
       "rot": 0,
       "seed": 1
     },
     {
-      "id": "lanterna_2",
-      "tipo": "lanterna",
-      "x": 1.2,
-      "z": 6.6,
-      "rot": 0,
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 4,
+      "rot": 90,
       "seed": 2
     },
     {
-      "id": "cama_3",
-      "tipo": "cama",
-      "x": 1,
-      "z": 1.6,
+      "id": "caixote_3",
+      "tipo": "caixote",
+      "x": 8.6,
+      "z": 6.4,
       "rot": 0,
       "seed": 3
     },
     {
-      "id": "rack_armas_4",
-      "tipo": "rack_armas",
-      "x": 5,
-      "z": 0.5,
+      "id": "cama_4",
+      "tipo": "cama",
+      "x": 1,
+      "z": 1.6,
       "rot": 0,
       "seed": 4
     },
     {
-      "id": "mesa_5",
+      "id": "rack_armas_5",
+      "tipo": "rack_armas",
+      "x": 5,
+      "z": 0.5,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "mesa_6",
       "tipo": "mesa",
       "x": 7.5,
       "z": 3.5,
       "w": 1.6,
       "d": 0.9,
       "rot": 0,
-      "seed": 5,
+      "seed": 6,
       "itens": "papeis"
     },
     {
-      "id": "cadeira_6",
+      "id": "cadeira_7",
       "tipo": "cadeira",
       "x": 7.5,
       "z": 4.4,
       "rot": 0,
-      "seed": 6
+      "seed": 7
     }
   ],
   "portais": [

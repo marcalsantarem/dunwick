@@ -20,60 +20,76 @@
   ],
   "objetos": [
     {
-      "id": "barril_1",
-      "tipo": "barril",
-      "x": 8.8,
-      "z": 6.6,
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 5,
+      "z": 0,
       "rot": 0,
       "seed": 1
     },
     {
-      "id": "caixote_2",
-      "tipo": "caixote",
-      "x": 1.1,
-      "z": 6.6,
-      "rot": 0,
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 4,
+      "rot": 90,
       "seed": 2
     },
     {
-      "id": "caixote_3",
-      "tipo": "caixote",
-      "x": 2.1,
-      "z": 6.7,
+      "id": "barril_3",
+      "tipo": "barril",
+      "x": 8.8,
+      "z": 6.6,
       "rot": 0,
       "seed": 3
     },
     {
-      "id": "fornalha_4",
-      "tipo": "fornalha",
-      "x": 2,
-      "z": 1,
+      "id": "caixote_4",
+      "tipo": "caixote",
+      "x": 1.1,
+      "z": 6.6,
       "rot": 0,
       "seed": 4
     },
     {
-      "id": "bigorna_5",
-      "tipo": "bigorna",
-      "x": 4.5,
-      "z": 3.2,
+      "id": "caixote_5",
+      "tipo": "caixote",
+      "x": 2.1,
+      "z": 6.7,
       "rot": 0,
       "seed": 5
     },
     {
-      "id": "bancada_6",
-      "tipo": "bancada",
-      "x": 7.5,
-      "z": 0.6,
+      "id": "fornalha_6",
+      "tipo": "fornalha",
+      "x": 2,
+      "z": 1,
       "rot": 0,
       "seed": 6
     },
     {
-      "id": "rack_armas_7",
+      "id": "bigorna_7",
+      "tipo": "bigorna",
+      "x": 4.5,
+      "z": 3.2,
+      "rot": 0,
+      "seed": 7
+    },
+    {
+      "id": "bancada_8",
+      "tipo": "bancada",
+      "x": 7.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 8
+    },
+    {
+      "id": "rack_armas_9",
       "tipo": "rack_armas",
       "x": 9,
       "z": 3,
       "rot": 0,
-      "seed": 7
+      "seed": 9
     }
   ],
   "portais": [

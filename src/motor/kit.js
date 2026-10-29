@@ -149,7 +149,7 @@ function cerca(col, o) {
 
 /** Constrói o kit do mapa. Devolve { grupos: Map(mat → geometria fundida), luzes, janelas, chamines }. */
 export function construirKit(mapaDados, kit, texelsPorTile = 64) {
-  const col = criarColetor(texelsPorTile), saida = { luzes: [], janelas: [], chamines: [] };
+  const col = criarColetor(texelsPorTile), saida = { luzes: [], janelas: [], chamines: [], saidas: [] };
   for (const o of mapaDados.objetos) {
     switch (o.tipo) {
       case 'casa': { const j0 = saida.janelas.length; casa(col, o, kit, saida); decorarCasa(col, o, kit, saida, saida.janelas.slice(j0)); break; } case 'arvore': arvore(col, o, kit); break; case 'pinheiro': pinheiro(col, o, kit); break; case 'arbusto': arbusto(col, o); break;
@@ -158,5 +158,7 @@ export function construirKit(mapaDados, kit, texelsPorTile = 64) {
       default: (PECAS_VILA[o.tipo] ?? PECAS_INTERIOR[o.tipo])?.(col, o, kit, saida);
     }
   }
+  // interior: a PORTA DE SAÍDA é desenhada no ponto do portal `saida` (borda sul), com capacho, luz de fora e fonte de luz (v0.1.2)
+  if (mapaDados.tipo_mapa === 'interior') for (const p of mapaDados.portais ?? []) if (p.id === 'saida') PECAS_INTERIOR.porta_saida(col, { id: 'saida', x: p.x, z: mapaDados.tamanho[1], w: 1.4 }, kit, saida);
   saida.grupos = col.fundir(); return saida;
 }

@@ -20,73 +20,81 @@
   ],
   "objetos": [
     {
-      "id": "caixote_1",
-      "tipo": "caixote",
-      "x": 1,
-      "z": 6.2,
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 5,
+      "z": 0,
       "rot": 0,
       "seed": 1
     },
     {
-      "id": "lanterna_2",
-      "tipo": "lanterna",
-      "x": 8.8,
-      "z": 5.2,
-      "rot": 0,
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 4,
+      "rot": 90,
       "seed": 2
     },
     {
-      "id": "estante_3",
-      "tipo": "estante",
-      "x": 1.6,
-      "z": 0.6,
+      "id": "caixote_3",
+      "tipo": "caixote",
+      "x": 1,
+      "z": 6.2,
       "rot": 0,
       "seed": 3
     },
     {
       "id": "estante_4",
       "tipo": "estante",
-      "x": 3.2,
+      "x": 1.6,
       "z": 0.6,
       "rot": 0,
       "seed": 4
     },
     {
-      "id": "canteiro_5",
+      "id": "estante_5",
+      "tipo": "estante",
+      "x": 3.2,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "canteiro_6",
       "tipo": "canteiro",
       "x": 6.5,
       "z": 0.6,
       "w": 1.6,
       "d": 0.6,
       "rot": 0,
-      "seed": 5
+      "seed": 6
     },
     {
-      "id": "mesa_6",
+      "id": "mesa_7",
       "tipo": "mesa",
       "x": 5,
       "z": 3,
       "w": 1.6,
       "d": 0.9,
       "rot": 0,
-      "seed": 6,
+      "seed": 7,
       "itens": "vela"
     },
     {
-      "id": "cadeira_7",
+      "id": "cadeira_8",
       "tipo": "cadeira",
       "x": 5,
       "z": 3.9,
       "rot": 0,
-      "seed": 7
+      "seed": 8
     },
     {
-      "id": "cama_8",
+      "id": "cama_9",
       "tipo": "cama",
       "x": 8.8,
       "z": 1.6,
       "rot": 0,
-      "seed": 8
+      "seed": 9
     }
   ],
   "portais": [

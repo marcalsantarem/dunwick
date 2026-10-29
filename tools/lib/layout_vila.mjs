@@ -28,16 +28,16 @@ export const PROPS_VILA = [
   { id: 'pedra_enegrecida', tipo: 'pedra_enegrecida', x: 33, z: 41, w: 2, d: 4 },
 ];
 
-// obj: [tipo, x, z, w?, d?]; tipos ainda fora do kit ficam de fora até o 07 entregá-los (mesma regra dos props da vila)
+// obj: [tipo, x, z, w?, d?, {extra}?]; `aplique` = vela na parede de trás (rot 0 = norte, 90 = oeste); a porta de saída é desenhada pelo kit no portal `saida`; tipos ainda fora do kit ficam de fora até o 07 entregá-los (mesma regra dos props da vila)
 export const SALAS = {
-  casa_maren: { piso: 'calcada', parede: 'madeira', luz: ['#ffd9a0', 0.9, '#1c140e'], obj: [['caixote', 1, 6.2], ['lanterna', 8.8, 5.2],
+  casa_maren: { piso: 'calcada', parede: 'madeira', luz: ['#ffd9a0', 0.9, '#1c140e'], obj: [['aplique', 5, 0, null, null, { rot: 0 }], ['aplique', 0, 4, null, null, { rot: 90 }], ['caixote', 1, 6.2],
     ['estante', 1.6, 0.6], ['estante', 3.2, 0.6], ['canteiro', 6.5, 0.6, 1.6, 0.6], ['mesa', 5, 3, 1.6, 0.9, { itens: 'vela' }], ['cadeira', 5, 3.9], ['cama', 8.8, 1.6]] },
-  taverna: { piso: 'calcada', parede: 'madeira', luz: ['#ffc27a', 1.0, '#1a110a'], obj: [['barril', 0.9, 1], ['barril', 0.9, 2], ['barril', 1.9, 1], ['caixote', 12.8, 8.6], ['lanterna', 7, 4.6],
+  taverna: { piso: 'calcada', parede: 'madeira', luz: ['#ffc27a', 1.0, '#1a110a'], obj: [['aplique', 7, 0, null, null, { rot: 0 }], ['aplique', 0, 5, null, null, { rot: 90 }], ['castical', 4, 2, null, null, { alt: 1.04 }], ['barril', 0.9, 1], ['barril', 0.9, 2], ['barril', 1.9, 1], ['caixote', 12.8, 8.6],
     ['balcao', 5, 2, 4, 0.7], ['lareira', 11.5, 0.6], ['mesa', 3.5, 6, 1.6, 0.9, { itens: 'taverna' }], ['cadeira', 3.5, 6.9], ['mesa', 10, 6, 1.6, 0.9, { itens: 'taverna' }], ['cadeira', 10, 6.9], ['mesa', 11.8, 3.6, 1.6, 0.9, { itens: 'taverna' }], ['banco', 11.8, 4.5]] },
-  forja: { piso: 'terra', parede: 'pedra', luz: ['#ff9a5a', 1.1, '#140c08'], obj: [['barril', 8.8, 6.6], ['caixote', 1.1, 6.6], ['caixote', 2.1, 6.7],
+  forja: { piso: 'terra', parede: 'pedra', luz: ['#ff9a5a', 1.1, '#140c08'], obj: [['aplique', 5, 0, null, null, { rot: 0 }], ['aplique', 0, 4, null, null, { rot: 90 }], ['barril', 8.8, 6.6], ['caixote', 1.1, 6.6], ['caixote', 2.1, 6.7],
     ['fornalha', 2, 1], ['bigorna', 4.5, 3.2], ['bancada', 7.5, 0.6], ['rack_armas', 9, 3]] },
-  casa_torvan: { piso: 'calcada', parede: 'reboco', luz: ['#f2dcb0', 0.85, '#16120e'], obj: [['caixote', 8.6, 6.4], ['lanterna', 1.2, 6.6],
+  casa_torvan: { piso: 'calcada', parede: 'reboco', luz: ['#f2dcb0', 0.85, '#16120e'], obj: [['aplique', 3, 0, null, null, { rot: 0 }], ['aplique', 0, 4, null, null, { rot: 90 }], ['caixote', 8.6, 6.4],
     ['cama', 1, 1.6], ['rack_armas', 5, 0.5], ['mesa', 7.5, 3.5, 1.6, 0.9, { itens: 'papeis' }], ['cadeira', 7.5, 4.4]] },
-  posto_escrivao: { piso: 'calcada', parede: 'pedra', luz: ['#e8e2c8', 0.9, '#121214'], obj: [['caixote', 1.1, 6.5], ['caixote', 8.9, 6.5], ['lanterna', 8.8, 3.5],
+  posto_escrivao: { piso: 'calcada', parede: 'pedra', luz: ['#e8e2c8', 0.9, '#121214'], obj: [['aplique', 3.2, 0, null, null, { rot: 0 }], ['aplique', 0, 4, null, null, { rot: 90 }], ['castical', 4.2, 3, null, null, { alt: 1.04 }], ['caixote', 1.1, 6.5], ['caixote', 8.9, 6.5],
     ['balcao', 5, 3, 4, 0.7], ['arquivo', 1.5, 0.6], ['arquivo', 8.5, 0.6], ['quadro_avisos', 5, 0.4]] },
 };

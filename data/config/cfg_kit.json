@@ -135,6 +135,12 @@
     },
     "castical": {
       "forma": "nenhuma"
+    },
+    "porta_saida": {
+      "forma": "nenhuma"
+    },
+    "aplique": {
+      "forma": "nenhuma"
     }
   },
   "visual": {
@@ -189,6 +195,13 @@
       "alcance_tiles": 9,
       "sempre": true,
       "oscila": 0.28
+    },
+    "porta": {
+      "cor": "#ffeec8",
+      "intensidade": 3.5,
+      "alcance_tiles": 5,
+      "sempre": true,
+      "oscila": 0.04
     }
   }
 }

@@ -168,6 +168,7 @@
     "ui_minimapa_leg_passagem": "Passagem",
     "ui_minimapa_leg_fechada": "Fechada",
     "ui_minimapa_leg_local": "Local",
-    "ui_minimapa_leg_voce": "Você"
+    "ui_minimapa_leg_voce": "Você",
+    "ui_sair": "Sair"
   }
 }

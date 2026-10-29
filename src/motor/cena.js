@@ -8,6 +8,7 @@ import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
 import { criarMateriais } from './materiais.js';
 import { paredesInterior, ambienteInterior } from './interior.js';
+import { criarRotuloSaida } from './rotulo_saida.js';
 import { estadoCiclo, lanternaAcesa } from '../jogo/ciclo.js';
 
 const COR_AVISO = 0xd01a8f, COR_AVISO_BORDA = 0xffa0e6; // magenta reservado a perigo
@@ -37,7 +38,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const solo = criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha);
   const kit = construirKit(mapaDados, kitDados, texelsPorTile);
   const T = recursos.texturas, { materiais, uniformesVento } = criarMateriais(T, perfil);
-  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = true; m.receiveShadow = true; m.name = `kit_${nome}`; cena.add(m); }
+  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = nome !== 'brilho_saida'; m.receiveShadow = nome !== 'brilho_saida'; m.name = `kit_${nome}`; cena.add(m); }
   if (interior) for (const m of paredesInterior(mapaDados, materiais, texelsPorTile)) cena.add(m); // paredes de trás inteiras; as da frente somem (rodapé)
 
   // ---------- luz: hemisférica + sol com sombra (direção fixa na tela; a hora muda cor/altura/intensidade) + lanternas ----------
@@ -72,7 +73,10 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   let alvoSobId = null, destinoAnterior = null, destinoT = 0;
 
   // ---------- partículas (pólen/vaga-lumes e fumaça das chaminés) ----------
-  const particulas = criarParticulas(cena, kit.chamines, perfil);
+  const particulas = criarParticulas(cena, kit.chamines, perfil), maxPart = (p) => (interior ? mapaDados.ambiente?.particulas ?? 0 : p.particulas_max); // interior: sem pólen nem vaga-lumes (cômodo fechado); `ambiente.particulas` liga poeira
+  particulas.definirMax(maxPart(perfil));
+  const reduzirMov = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
+  const textoSair = dados.textos?.['pt-BR']?.textos?.ui_sair ?? 'Sair', rotulos = (kit.saidas ?? []).map((q) => criarRotuloSaida(cena, { ...q, texto: textoSair }));
 
   // ---------- estado visual do ciclo (lido pelo pós) ----------
   const visual = { tom: [1, 1, 1], luzArtificial: 0, fundo: [0, 0, 0], ciclo: null };
@@ -86,6 +90,8 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     sol.color.setRGB(...ec.solCor); sol.intensity = ec.solInt; posicionarSol(cx, cz, ec.solElev); hemi.color.setRGB(...ec.hemiCeu); hemi.groundColor.setRGB(...ec.hemiChao); hemi.intensity = ec.hemiInt;
     cena.background.setRGB(...ec.fundo); cena.fog.color.setRGB(...ec.nevoa);
     materiais.janela.emissiveIntensity = ec.luzArtificial * 1.6; materiais.lampada.emissiveIntensity = Math.max(0.15, ec.luzArtificial) * 2.4; uniformesVento.uTempo.value = tempoS;
+    if (materiais.brilho_saida) materiais.brilho_saida.opacity = reduzirMov() ? 0.5 : 0.42 + 0.14 * Math.sin(tempoS * 2.4); // luz de fora pulsa de leve (parada com reduzir movimento)
+    for (const r of rotulos) r.atualizar(mundo.heroi.x, mundo.heroi.z, tempoS, reduzirMov());
     // lanternas: as N mais próximas do foco ganham PointLight real (N do perfil); todas brilham pelo material emissivo
     const acesa = lanternaAcesa(kitDados, mundo.hora) || ec.luzArtificial > 0.3, n = Math.min(POOL, perfil.luzes_pontuais_max);
     const ordem = reuniao.map((p, i) => [Math.hypot(p.x - cx, p.z - cz), i]).sort((a, b) => a[0] - b[0]);
@@ -130,7 +136,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     for (const m of Object.values(materiais)) if (m.map) m.map.anisotropy = p.aniso; for (const t of Object.values(T)) t.anisotropy = p.aniso;
     for (const a of atores) { a.sprite.malha.material.alphaToCoverage = p.msaa > 0; a.sprite.malha.material.alphaTest = p.msaa > 0 ? 0.01 : 0.45; a.sprite.malha.material.needsUpdate = true; }
     cena.traverse((o) => { if (o.material && !o.material.isShaderMaterial) { for (const m of Array.isArray(o.material) ? o.material : [o.material]) m.needsUpdate = true; } });
-    particulas.definirMax(p.particulas_max);
+    particulas.definirMax(maxPart(p));
   }
   return { cena, camera, atualizar, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
 }

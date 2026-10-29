@@ -89,4 +89,28 @@ function vela(col, o, kit, saida) { // castiçal com vela acesa: luz de ambiente
   saida.luzes.push({ x: o.x, y: y + 0.45, z: o.z, tipo: 'vela', id: o.id }); void kit;
 }
 
-export const PECAS_INTERIOR = { mesa, cadeira, banco, cama, estante, balcao, lareira, bancada, fornalha, arquivo, tapete, castical: vela };
+/** Porta de SAÍDA do cômodo (v0.1.2): batente alto, verga e folha de madeira ABERTA para dentro (assim não tapa o herói), maçaneta, soleira, capacho com seta
+ *  e a mancha de luz de fora no chão; `porta` é a fonte de luz. Fica no ponto do portal `saida`, na borda sul do mapa (parede da frente, cortada ao rodapé). */
+function portaSaida(col, o, kit, saida) {
+  const a = ajudantes(col, { x: o.x, z: o.z, rot: o.rot ?? 0 }), hw = (o.w ?? 1.4) / 2 + 0.08, ang = (72 * Math.PI) / 180, c = Math.cos(ang), sn = Math.sin(ang), comp = hw * 2 - 0.2, hx = -hw + 0.09;
+  for (const s of [-1, 1]) a.b('madeira', s * hw, 1.17, 0.06, 0.18, 2.34, 0.26);
+  a.b('madeira', 0, 2.38, 0.06, hw * 2 + 0.18, 0.2, 0.26); a.b('madeira_clara', 0, 2.52, 0.06, hw * 2 + 0.34, 0.07, 0.34); a.b('pedra', 0, 0.04, 0.06, hw * 2, 0.08, 0.5);
+  a.b('tabuas', hx + (c * comp) / 2, 1.07, (-sn * comp) / 2, comp, 2.1, 0.07, ang); // folha aberta, articulada no batente esquerdo
+  for (const k of [0.25, 0.5, 0.75]) a.b('madeira', hx + c * comp * k, 1.07, -sn * comp * k, 0.035, 2.1, 0.1, ang);
+  for (const y of [0.4, 1.7]) a.b('metal', hx + (c * comp) / 2, y, (-sn * comp) / 2, comp * 0.9, 0.09, 0.1, ang);
+  for (const lado of [-1, 1]) a.g('latao', new THREE.SphereGeometry(0.055, 7, 6), hx + c * comp * 0.88 + lado * 0.07 * sn, 1.05, -sn * comp * 0.88 + lado * 0.07 * c);
+  a.b('tapete_ocre', 0, 0.02, -0.75, 1.3, 0.012, 0.9); a.b('tecido_ocre', 0, 0.028, -0.75, 1.1, 0.008, 0.7); // capacho
+  for (const s of [-1, 1]) a.b('latao', s * 0.17, 0.036, -0.78, 0.4, 0.01, 0.07, s * (Math.PI / 4)); // seta (V apontando para a porta)
+  a.g('brilho_saida', new THREE.PlaneGeometry(1.9, 2.8).rotateX(-Math.PI / 2), 0, 0.05, -1.45, 0, 0, 0, { uv: false }); // luz de fora entrando
+  const [wx, wz] = a.L(0, -0.6), [lx, lz] = a.L(0, 0.06); saida.luzes.push({ x: wx, y: 1.3, z: wz, tipo: 'porta', id: o.id ?? 'saida' }); saida.saidas.push({ x: lx, y: 3.35, z: lz }); void kit;
+}
+
+/** Aplique de parede com vela (no lugar da lanterna de poste, que não combina com cômodo fechado): `x`, `z` na face de dentro da parede, `rot` 0 (parede norte) ou 90 (oeste). */
+function aplique(col, o, kit, saida) {
+  const a = ajudantes(col, o), y = o.alt ?? 1.8;
+  a.b('metal', 0, y, 0.025, 0.16, 0.34, 0.05); a.v('latao', [0, y - 0.1, 0.05], [0, y - 0.1, 0.24], 0.05);
+  a.g('latao', new THREE.CylinderGeometry(0.085, 0.05, 0.07, 8), 0, y - 0.1, 0.26); a.g('cera', new THREE.CylinderGeometry(0.035, 0.035, 0.16, 7), 0, y, 0.26); a.g('chama', new THREE.SphereGeometry(0.032, 6, 5), 0, y + 0.1, 0.26);
+  const [wx, wz] = a.L(0, 0.4); saida.luzes.push({ x: wx, y: y + 0.15, z: wz, tipo: 'vela', id: o.id }); void kit;
+}
+
+export const PECAS_INTERIOR = { porta_saida: portaSaida, aplique, mesa, cadeira, banco, cama, estante, balcao, lareira, bancada, fornalha, arquivo, tapete, castical: vela };

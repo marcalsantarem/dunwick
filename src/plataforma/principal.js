@@ -46,7 +46,7 @@ async function iniciar() {
   redimensionar(); addEventListener('resize', redimensionar);
   // uma cena por mapa (exteriores e interiores), todas montadas no início (troca por portal sem engasgo); `cena` aponta para a do mapa ativo
   const idMapa = () => mundo.mapaId ?? mundo.mapa.dados.id, cenas = new Map();
-  for (const id of Object.keys(dados.mapas)) cenas.set(id, criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest', mapaDados: dados.mapas[id], entidades: id === idMapa() ? mundo.entidades : [] } }));
+  for (const id of Object.keys(dados.mapas)) cenas.set(id, criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest', mapaDados: dados.mapas[id], entidades: id === idMapa() ? mundo.entidades : [], reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') } }));
   let cena = cenas.get(idMapa());
   // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
   const temBatalha = !!(mundo.jogo && dados.cenarios && dados.config.sprites_batalha);

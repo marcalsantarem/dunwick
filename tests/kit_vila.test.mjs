@@ -58,3 +58,13 @@ test('a porta da casa fica no MEIO da parede do `lado` (s = +z, l = +x), onde o 
 test('peso: a vila e cada interior ficam dentro do teto de vértices e de grupos (poucas chamadas de desenho)', () => {
   for (const m of mapas) { const k = construirKit(m, kit), v = vertices(k); assert.ok(v < (m.tipo_mapa === 'interior' ? 120000 : 600000), `${m.id}: ${v} vértices`); assert.ok(k.grupos.size <= 40, `${m.id}: ${k.grupos.size} grupos`); }
 });
+
+test('interiores: porta de saída desenhada no portal `saida` (luz `porta` + rótulo), sem lanterna de poste, com apliques de vela', () => {
+  for (const m of mapas.filter((x) => x.tipo_mapa === 'interior')) {
+    const k = construirKit(m, kit), saida = m.portais.find((p) => p.id === 'saida'), tipos = k.luzes.map((l) => l.tipo);
+    assert.equal(k.saidas.length, 1, `${m.id}: uma porta de saída`); assert.ok(Math.abs(k.saidas[0].x - saida.x) < 0.01 && Math.abs(k.saidas[0].z - m.tamanho[1]) < 0.2, `${m.id}: a porta fica no portal`);
+    assert.ok(tipos.includes('porta') && kit.fontes.porta, `${m.id}: luz de fora`); assert.ok(!tipos.includes('lanterna'), `${m.id}: sem lanterna de poste`);
+    assert.ok(tipos.filter((t) => t === 'vela').length >= 2, `${m.id}: apliques de vela`); assert.ok(k.grupos.has('brilho_saida') && k.grupos.has('latao'), `${m.id}: capacho e maçaneta`);
+  }
+  assert.equal(construirKit(mapas.find((x) => x.tipo_mapa === 'exterior'), kit).saidas.length, 0, 'a vila não tem porta de saída');
+});
