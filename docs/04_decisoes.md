@@ -270,3 +270,6 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Escopo assumido pelo Produtor (declarado):** interiores simples (um cômodo cada, sem NPCs até a v0.1.4) para a **casa da Maren, a taverna, a forja, o pátio/casa do Torvan e o posto do escrivão**; as casas de moradores do sul ficam **fechadas** (fachada, sem interior). Cada interior é um **mapa pequeno** ligado ao exterior por **porta (portal)**.
 - **Consequência técnica:** a **troca de mapa por portal**, antes prevista na v0.1.3, **entra na v0.1.2**. A v0.1.3 passa a reusar o mecanismo para a saída da vila.
 - **Aplica a D-038:** a vila inteira vira zona segura nesta versão (as zonas `z_enc_*` saem da vila).
+
+## D-042 — Minimapa adiado para a rodada seguinte (2026-10-29)
+- **Decisão (usuário):** a v0.1.2 entrega **só o mapa da vila completo** (com interiores e troca por portal). O **minimapa** (girado com a tela, D-041) fica para a **versão seguinte**; o briefing do 15 foi cancelado e o restante do pacote D-041 segue.
