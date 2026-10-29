@@ -261,3 +261,6 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Decisão (usuário):** o jogo **cresce proporcionalmente (16:9) até tocar a borda lateral ou a vertical** da janela, em vez de escalar só por números inteiros. A cena é desenhada na resolução real da janela; sprites mantêm contorno nítido (sem suavização).
 - **Altera** a convenção "escala inteira" do CLAUDE.md/guia visual para o **tamanho de apresentação** (a arte base e os sprites continuam desenhados em múltiplos inteiros). Risco aceito: alguns pixels podem ficar levemente desiguais em escalas fracionadas.
 - **Pacote v0.1.1 (usuário aprovou as 6 sugestões + esta):** tela de início "Toque para começar", ajuste dos inimigos na batalha (+ cura "+0"), menu de pausa, dica de controles, botão de tela cheia, preferências lembradas e preencher a janela.
+
+## D-040 — Cura e poção funcionam com a vida cheia (2026-10-29)
+- **Decisão (usuário):** poção e magia de cura **executam e gastam o recurso mesmo com o alvo de vida cheia** (nenhuma recusa nem redirecionamento). Na **escolha de alvo**, aparece **"VIDA CHEIA"** sobre o sprite do personagem que está com a vida cheia, como aviso; o jogador pode escolher mesmo assim. Só apresentação; sem mudança de regra no motor.
