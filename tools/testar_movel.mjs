@@ -131,6 +131,28 @@ try {
     await dormir(800); const ainda = await p.evaluate(() => __dunwick.mundo.mapaId); checar(rotulo + ': continua na vila depois de 0,8 s (portal rearma só ao sair)', ainda === info.ext, ainda);
     await p.close();
   }
+  // aviso do nome do mapa: ao começar e ao entrar na casa do Edric, o evento mapa_entrou traz o nome; o banner (UI) mostra "Casa do Edric" e some sozinho
+  {
+    const p = await abrir({ ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w: 1280, h: 720, dpr: 1, touch: false });
+    await p.evaluate(() => { window.__nomes = []; __dunwick.mundo.eventos.em('mapa_trocado', (e) => window.__nomes.push({ mapa: e.mapa })); });
+    const info = await p.evaluate(() => { const d = __dunwick.mundo.dados.mapas, ext = __dunwick.mundo.mapaId, ed = d[ext].edificios.find((e) => e.interior === 'map_casa_edric_interior'); if (!ed) return null; return { pe: d[ext].portais.find((q) => q.destino.mapa === ed.interior), nome_txt: d[ed.interior].nome_txt, texto: __dunwick.mundo.dados.textos?.['pt-BR']?.[d[ed.interior].nome_txt] ?? null }; });
+    checar('casa do Edric existe na vila', !!info);
+    if (info) {
+      const ir = (x, z) => p.evaluate((x, z) => { const h = __dunwick.mundo.heroi; h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; }, x, z);
+      await ir(info.pe.x, info.pe.z + info.pe.d + 0.2); await dormir(300); await ir(info.pe.x, info.pe.z);
+      await p.waitForFunction(() => __dunwick.mundo.mapaId === 'map_casa_edric_interior' && !__dunwick.apr.trans, { timeout: 8000 }).catch(() => {});
+      const ev = await p.evaluate(() => window.__nomes);
+      checar('entrar na casa do Edric emite mapa_trocado para o interior', ev.length === 1 && ev[0].mapa === 'map_casa_edric_interior', JSON.stringify(ev));
+      const texto = (info.texto ?? 'Casa do Edric');
+      const visivel = () => p.evaluate((tx) => [...document.querySelectorAll('#ui *')].some((n) => n.children.length === 0 && n.textContent.trim() === tx && n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && +getComputedStyle(n).opacity > 0.05), texto);
+      await dormir(400); const v1 = await visivel();
+      checar('o banner mostra "' + texto + '" ao entrar', v1, 'banner não encontrado em #ui');
+      await p.screenshot({ path: join(DIR, 'banner_casa_edric.png') });
+      let sumiu = false; for (let i = 0; i < 16 && !sumiu; i++) { await dormir(500); sumiu = !(await visivel()); }
+      checar('o banner some sozinho', v1 && sumiu, v1 ? '' : 'banner nunca apareceu');
+    }
+    await p.close();
+  }
   checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 4).join(' | '));
 } finally { await nav.close(); srv.kill(); }
 const f = resultados.filter((x) => !x.ok); console.log(`\n${f.length ? '✗' : '✓'} ${resultados.length - f.length}/${resultados.length} verificações do modo celular passaram`); process.exit(f.length ? 1 : 0);

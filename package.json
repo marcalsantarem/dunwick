@@ -18,7 +18,8 @@
     "test:batalha-mouse": "node tools/testar_batalha_mouse.mjs",
     "test:movel": "node tools/testar_movel.mjs",
     "test:ui-mobile": "node tools/testar_ui_mobile.mjs",
-    "test:telas": "node tools/testar_telas.mjs"
+    "test:telas": "node tools/testar_telas.mjs",
+    "test:banner-mapa": "node tools/testar_banner_mapa.mjs"
   },
   "dependencies": {
     "three": "0.186.1"

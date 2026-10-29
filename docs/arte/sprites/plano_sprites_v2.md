@@ -63,6 +63,7 @@ Todas em 5 direções (S, SE, E, NE, N; demais espelhadas). Quadros por direçã
 | `enemy_slime` | Emboscador | idle 4 · mover 4 · aviso 4 · pulo 4 · hurt 2 · morte 5 | 23 |
 | `enemy_besouro` | Pesado | idle 2 · andar 6 · aviso 5 · investida 4 · hurt 2 · morte 5 | 24 |
 | `enemy_lobo` | Combatente | idle 4 · andar 6 · correr 6 · aviso 4 · bote 5 · hurt 2 · morte 5 | 32 |
+| `enemy_boneco_treino` | Alvo de treino (D-043; não ataca, sem XP/drops) | batalha: bat_parado 4 · bat_dano 5 (balanço) · bat_morte 4 (tomba, perde a cabeça; volta ao normal na próxima batalha) | 13 |
 | `enemy_goblin_arqueiro` | Atirador | idle 4 · andar 6 · aviso 5 · disparo 3 · hurt 2 · morte 5 | 25 |
 | `boss_urso_musgo` (Hollowpaw) | Chefe, 2 fases | idle 4 · andar 6 · 4 ataques com aviso longo 6–8 · hurt 2 · transição 8 · morte 12 · entrada 8 | ~80 |
 

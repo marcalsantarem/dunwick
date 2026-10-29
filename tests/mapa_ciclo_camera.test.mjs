@@ -1,16 +1,17 @@
 // Mapa (colisores do kit), ciclo dia/noite, câmera isométrica e textos por ID.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { novoMundo, entrada, rodar, colocar, carregarDados } from './_util.mjs';
+import { novoMundo, entrada, rodar, colocar, carregarDados, DV } from './_util.mjs';
 import { colisorDe } from '../src/jogo/mapa.js';
 import { estadoCiclo, lanternaAcesa } from '../src/jogo/ciclo.js';
 import { criarCameraJogo } from '../src/jogo/camera_jogo.js';
 import { criarTextos } from '../src/jogo/textos.js';
 
-test('vila: 48 × 48, início livre, 3 tipos de chão, objetos do kit e os dois bonecos', () => {
+test('vila: 94 × 94 (núcleo 48 × 48 + mata), início livre, 3 tipos de chão, objetos do kit e um só boneco de treino (interativo)', () => {
   const { mundo } = novoMundo(); const { mapa, heroi, entidades } = mundo, d = mapa.dados;
-  assert.deepEqual(d.tamanho, [48, 48]); assert.ok(mapa.livre(heroi.x, heroi.z, heroi.raioPush), 'início livre');
-  assert.deepEqual(entidades.map((e) => e.id).sort(), ['enemy_boneco_alvo', 'enemy_boneco_golpe']);
+  assert.deepEqual(d.tamanho, [94, 94]); assert.ok(mapa.livre(heroi.x, heroi.z, heroi.raioPush), 'início livre');
+  assert.deepEqual(entidades.map((e) => e.id), ['enemy_boneco_alvo'], 'só o boneco oposto ao poço (D-043)');
+  const poi = d.pois.find((p) => p.id === 'boneco_treino'); assert.deepEqual([poi.x, poi.z, poi.encontro], [11.5 + DV, 24 + DV, 'enc_boneco_treino'], 'interativo no mesmo ponto');
   const tipos = new Set(d.objetos.map((o) => o.tipo)); for (const t of ['casa', 'arvore', 'poco', 'lanterna', 'cerca']) assert.ok(tipos.has(t), `falta ${t}`);
   assert.ok(new Set(d.planta.join('')).size >= 3, 'chão com materiais diferentes'); assert.ok(d.objetos.filter((o) => o.tipo === 'casa').length >= 6, 'pelo menos 6 casas');
 });
@@ -24,7 +25,7 @@ test('colisor = pegada do kit (mesmo dado do visual): casa gira com rot 90, árv
 });
 
 test('o herói não atravessa casa, poço, cerca nem sai do mapa (4000 passos correndo em direções fixas)', () => {
-  const ctx = novoMundo(); const { mapa, heroi } = ctx.mundo; colocar(ctx.mundo, 24.5, 28.5);
+  const ctx = novoMundo(); const { mapa, heroi } = ctx.mundo; colocar(ctx.mundo, 24.5 + DV, 28.5 + DV);
   const dirs = [[1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0]]; let s = 7;
   for (let i = 0; i < 4000; i++) { if (i % 40 === 0) { s = (s * 1664525 + 1013904223) >>> 0; var d = dirs[s % 8]; } ctx.mundo.passo(entrada({ x: d[0], z: d[1], correr: true }), ctx.buffer); assert.ok(mapa.livre(heroi.x, heroi.z, heroi.raioPush - 0.02), `preso dentro de colisor em (${heroi.x.toFixed(2)}, ${heroi.z.toFixed(2)}) no passo ${i}`); }
 });

@@ -38,13 +38,15 @@ function desenharMapa(m, ox, oy, t, rotulos) {
   for (const o of m.objetos) {
     const p = kit.pegadas[o.tipo], e = o.escala ?? 1, cor = SAQUE.has(o.tipo) ? COR.saque : COR.prop;
     if (o.tipo === 'casa') continue; // edifícios abaixo
-    if (o.tipo === 'arvore' || o.tipo === 'arbusto') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${(o.tipo === 'arvore' ? 0.55 : 0.4) * e * t}" fill="${o.tipo === 'arvore' ? COR.arvore : '#4f8a45'}" stroke="#123" stroke-width="1"/>`);
+    if (o.tipo === 'moita') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${0.6 * e * t}" fill="#3f7a3c" stroke="#123" stroke-width="1"/>`);
+    else if (o.tipo === 'tronco_caido') { const g = (o.rot ?? 0) % 180 === 90, hw = (g ? 0.25 : 1.1) * t, hd = (g ? 1.1 : 0.25) * t; add(`<rect x="${px(o.x) - hw}" y="${pz(o.z) - hd}" width="${2 * hw}" height="${2 * hd}" fill="#6b4a2a" stroke="#2a1a0c" stroke-width="1"/>`); }
+    else if (o.tipo === 'arvore' || o.tipo === 'arbusto') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${(o.tipo === 'arvore' ? 0.55 : 0.4) * e * t}" fill="${o.tipo === 'arvore' ? COR.arvore : '#4f8a45'}" stroke="#123" stroke-width="1"/>`);
     else if (o.tipo === 'pinheiro') { const r = 0.55 * e * t; add(`<polygon points="${px(o.x)},${pz(o.z) - r} ${px(o.x) - r * 0.85},${pz(o.z) + r * 0.7} ${px(o.x) + r * 0.85},${pz(o.z) + r * 0.7}" fill="${COR.pinheiro}" stroke="#012" stroke-width="1"/>`); }
     else if (o.tipo === 'pedra') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${0.4 * e * t}" fill="#8d8d86" stroke="#333" stroke-width="1"/>`);
     else if (o.tipo === 'lanterna') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${t * 0.75}" fill="${COR.lanterna}33"/><circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${Math.max(3, t * 0.3)}" fill="${COR.lanterna}" stroke="#5a4300" stroke-width="1.5"/>`);
     else if (o.tipo === 'poco') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${p.raio * t}" fill="#3d6f9e" stroke="#222" stroke-width="3"/>`);
     else if (o.tipo === 'inimigo') add(`<circle cx="${px(o.x)}" cy="${pz(o.z) - 6}" r="5" fill="#7a5230"/><rect x="${px(o.x) - 9}" y="${pz(o.z)}" width="18" height="3" fill="#7a5230"/>`);
-    else if (p?.forma === 'linha') add(`<line x1="${px(o.x0)}" y1="${pz(o.z0)}" x2="${px(o.x1)}" y2="${pz(o.z1)}" stroke="${o.tipo === 'cerca' ? '#7a5230' : cor}" stroke-width="${Math.max(3, p.espessura * t)}" stroke-linecap="square"/>`);
+    else if (p?.forma === 'linha') add(`<line x1="${px(o.x0)}" y1="${pz(o.z0)}" x2="${px(o.x1)}" y2="${pz(o.z1)}" stroke="${o.tipo === 'cerca' || o.tipo === 'estacada' ? '#7a5230' : o.tipo === 'muralha_baixa' ? '#8d8d86' : cor}" stroke-width="${Math.max(3, p.espessura * t)}" stroke-linecap="square"/>`);
     else if (p?.forma === 'dupla') { const w = o.w * t / 2; add(`<rect x="${px(o.x) - w}" y="${pz(o.z) - 3}" width="${2 * w}" height="6" fill="${cor}"/><circle cx="${px(o.x) - w}" cy="${pz(o.z)}" r="${p.raio * t}" fill="${cor}"/><circle cx="${px(o.x) + w}" cy="${pz(o.z)}" r="${p.raio * t}" fill="${cor}"/><circle cx="${px(o.x)}" cy="${pz(o.z) + 8}" r="4" fill="none" stroke="#222" stroke-width="2"/>`); }
     else if (p?.forma === 'circ') add(`<circle cx="${px(o.x)}" cy="${pz(o.z)}" r="${Math.max(2.5, p.raio * e * t)}" fill="${cor}" stroke="#111" stroke-width="1"/>`);
     else if (p?.forma === 'ret') ret(o.x, o.z, p.w ?? o.w, p.d ?? o.d, `fill="${o.tipo === 'quadro_avisos' ? '#d9c79a' : cor}" stroke="#111" stroke-width="1"`);
@@ -119,7 +121,7 @@ ly = topo + alt + 16;
 linha('Mudanças em relação ao esboço aprovado', { peso: 700 });
 for (const t of ['Forja 1 tile mais ao sul (36–40 × 12–16): a chegada', '  da porta ficava num canto colado à taverna.',
   'Torre do sino substituída pelo pórtico; árvores', '  regeradas longe de prédios, caminhos e saídas.',
-  'Encontros removidos da vila (D-038).']) linha(t, { tam: 12 });
+  'Encontros removidos da vila (D-038).', 'Casa do Edric isolada no canto noroeste (29/10);', '  mapa 94×94: estacada no perímetro, vãos N/S com', '  muralha e troncos (saídas interditadas), mata densa', '  fora do muro até a borda.']) linha(t, { tam: 12 });
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" font-family="Segoe UI, Arial, sans-serif">${s.join('')}</svg>`;
 const nav = await puppeteer.launch({ executablePath: CROMO, headless: 'new' });

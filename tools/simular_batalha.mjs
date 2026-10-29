@@ -31,7 +31,7 @@ if (lote > 0) {
   const campos = (ev) => Object.entries(ev).filter(([k]) => !['nome', 'rodada', 'comandos', 'grupo', 'inventario'].includes(k)).map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' ');
   if (!args.includes('--resumo')) for (const ev of b.log) console.log(`r${String(ev.rodada).padStart(2, '0')}  ${ev.nome.padEnd(18)} ${campos(ev)}`);
   const r = b.resultado;
-  console.log(`\n=> ${r.resultado} em ${r.rodadas} rodada(s), semente ${r.semente}, ${r.tempo_animacao_s.toFixed(1)} s de animação a 1×`);
+  console.log(`\n=> ${r.resultado} em ${r.rodadas} rodada(s), semente ${r.semente}, ${r.tempo_animacao_s.toFixed(1)} s de animação a 1×${r.treino ? ' · TREINO (sem recompensa; grupo restaurado)' : ''}`);
   console.log(`   xp ${r.xp} · moedas ${r.moedas} · itens ${JSON.stringify(r.itens)} · níveis ${JSON.stringify(r.niveis)}`);
   console.log(`   grupo: ${r.grupo.map((g) => `${nome(g.id)} ${g.vida}/${g.vida_max} PV ${g.mana}/${g.mana_max} PM${g.caido ? ' (caído)' : ''}`).join(' · ')}`);
 }

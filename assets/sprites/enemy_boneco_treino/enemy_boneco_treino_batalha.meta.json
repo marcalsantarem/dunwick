@@ -1,0 +1,62 @@
+{
+  "id": "enemy_boneco_treino",
+  "tipo": "sprite_batalha",
+  "celula": [
+    120,
+    88
+  ],
+  "ancora": [
+    74,
+    78
+  ],
+  "arte_escala": 1,
+  "ref_celula": 120,
+  "direcoes": [
+    "l"
+  ],
+  "espelhar": {
+    "o": "l"
+  },
+  "colunas": 8,
+  "anims": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 4,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_dano": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 4
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 9
+    }
+  },
+  "poses": {
+    "bat_parado": {
+      "quadros": 4,
+      "fps": 4,
+      "loop": true,
+      "inicio": 0
+    },
+    "bat_dano": {
+      "quadros": 5,
+      "fps": 12,
+      "loop": false,
+      "inicio": 4
+    },
+    "bat_morte": {
+      "quadros": 4,
+      "fps": 7,
+      "loop": false,
+      "inicio": 9
+    }
+  },
+  "nota": "Boneco de treino: poses de batalha numa só direção (L); o motor espelha. Não ataca; bat_morte tomba, quebra e perde a cabeça (volta ao normal na próxima batalha). Sem normal map."
+}

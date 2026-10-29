@@ -31,7 +31,7 @@ function novoGatilho(ajustar, semente = 1) {
 
 test('dados reais: a vila inteira é segura e sem encontros (D-038); interiores não têm arquivo de zonas', () => {
   const d = carregarDados(), z = d.exploracao.encontros[MAPA];
-  assert.equal(z.ligado, false); assert.deepEqual(z.zonas_encontro, []); assert.deepEqual(z.zonas_seguras.map((s) => s.ret), [[0, 0, 47, 47]]);
+  assert.equal(z.ligado, false); assert.deepEqual(z.zonas_encontro, []); assert.deepEqual(z.zonas_seguras.map((s) => s.ret), [[0, 0, 93, 93]]);
   for (const m of Object.values(d.mapas)) if (m.tipo_mapa === 'interior') assert.equal(d.exploracao.encontros[m.id], undefined, m.id);
 });
 

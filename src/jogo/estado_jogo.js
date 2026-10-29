@@ -40,7 +40,7 @@ export function criarEstadoJogo(dados, eventos, { sementeBase = 1, grupoIds = GR
       inventario = { ...r.inventario }; moedas += r.moedas;
       jogo.ultimoResultado = r; jogo.batalha = null;
       mudar(r.resultado === 'derrota' ? 'game_over' : 'mapa', { resultado: r.resultado });
-      eventos.emitir('batalha_encerrada', { resultado: r.resultado, xp: r.xp, moedas: r.moedas, itens: r.itens, niveis: r.niveis, grupo: r.grupo });
+      eventos.emitir('batalha_encerrada', { resultado: r.resultado, treino: r.treino, xp: r.xp, moedas: r.moedas, itens: r.itens, niveis: r.niveis, grupo: r.grupo });
       return r;
     },
     /** Game over simples (M1): "tentar de novo" volta ao último ponto salvo, com grupo, inventário e moedas daquele momento. */
@@ -53,6 +53,12 @@ export function criarEstadoJogo(dados, eventos, { sementeBase = 1, grupoIds = GR
     /** Cenas (13): enquanto durar, o mapa não simula. */
     entrarCena(id) { exigir('mapa', 'entrarCena'); jogo.cena = id; mudar('cena', { cena: id }); },
     sairCena() { exigir('cena', 'sairCena'); jogo.cena = null; mudar('mapa', { motivo: 'fim_da_cena' }); },
+    /** Achado do mapa (baú, coletável): soma `qtd` do item na mochila (infinita) e emite `inventario_mudou`. */
+    adicionarItem(id, qtd = 1) {
+      if (typeof id !== 'string' || !Number.isInteger(qtd) || qtd < 1) throw new Error(`adicionarItem: item "${id}" × ${qtd} inválido`);
+      inventario[id] = (inventario[id] ?? 0) + qtd;
+      eventos.emitir('inventario_mudou', { item: id, qtd: inventario[id] });
+    },
     /** Depuração: dispara o próximo encontro da lista de cfg_batalha.debug.encontros (ou o `encontroId` dado). Ignora se não está no mapa. */
     depurarEncontro(encontroId) {
       if (jogo.modo !== 'mapa') return null;

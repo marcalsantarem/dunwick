@@ -7,6 +7,15 @@
 // - Ao chegar num mapa, os portais ficam desarmados até o herói sair de todos os retângulos (sem ida e volta imediata).
 const retDe = (p) => ({ x0: p.x - p.w / 2, z0: p.z - p.d / 2, x1: p.x + p.w / 2, z1: p.z + p.d / 2 });
 const dentro = (r, x, z, folga = 0) => x >= r.x0 - folga && x <= r.x1 + folga && z >= r.z0 - folga && z <= r.z1 + folga;
+/** Objetos com que se interage: os `pois` do mapa e os `objetos` de tipo interativo (boneco, baú). Poi e objeto com o mesmo id são
+ * um só (contrato do 14: o objeto traz `encontro`/`item`, o poi traz `nome_txt`). */
+export const TIPOS_INTERATIVOS = ['boneco_treino', 'bau_tesouro'];
+export function interativosDe(md) {
+  const porId = new Map();
+  for (const o of md.objetos) if (TIPOS_INTERATIVOS.includes(o.tipo)) porId.set(o.id, o);
+  for (const p of md.pois ?? []) porId.set(p.id, porId.has(p.id) ? { ...porId.get(p.id), ...p } : p);
+  return [...porId.values()];
+}
 const distRet = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
 
 export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, cfg }) {
@@ -15,7 +24,7 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
   const P = { pendente: null, retorno: null, intencao: null, armado: false };
   const heroi = () => mundo.heroi;
   const portais = () => mundo.mapa.dados.portais ?? [];
-  const pois = () => mundo.mapa.dados.pois ?? [];
+  const pois = () => interativosDe(mundo.mapa.dados);
 
   function alvoDoClique(x, z) {
     for (const p of portais()) if (dentro(retDe(p), x, z, cfg.folga_clique_portal_tiles)) return { tipo: 'portal', id: p.id, x: p.x, z: p.z };

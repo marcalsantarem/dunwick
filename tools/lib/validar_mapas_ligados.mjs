@@ -7,11 +7,24 @@ const retDe = (o) => ({ x0: o.x - o.w / 2, z0: o.z - o.d / 2, x1: o.x + o.w / 2,
 const sobrepoe = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.z0 < b.z1 && a.z1 > b.z0;
 
 /** entradas = [[arquivo, mapa]]; erro(arq, campo, msg). */
-export function validarMapasLigados(entradas, kit, cfgMundo, erro, textoOk) {
+export function validarMapasLigados(entradas, kit, cfgMundo, erro, textoOk, refs = null) {
   const porId = new Map(entradas.map(([arq, m]) => [m.id, { arq, m }]));
   const logicas = new Map(entradas.map(([, m]) => [m.id, criarMapa(m, kit, cfgMundo)]));
   for (const [arq, m] of entradas) {
     const mapa = logicas.get(m.id), [L, A] = m.tamanho, dentro = (x, z) => x >= 0 && z >= 0 && x <= L && z <= A;
+    // ---- referências dos objetos: boneco_treino → encontro existente; bau_tesouro → item existente (e cada baú/boneco com o campo) ----
+    if (refs) m.objetos.forEach((o, i) => {
+      if (o.encontro !== undefined && !refs.encontros.has(o.encontro)) erro(arq, `/objetos/${i}/encontro`, `encontro "${o.encontro}" não existe em data/combate`);
+      if (o.item !== undefined && !refs.itens.has(o.item)) erro(arq, `/objetos/${i}/item`, `item "${o.item}" não existe`);
+      if (o.tipo === 'boneco_treino' && o.encontro === undefined) erro(arq, `/objetos/${i}`, 'boneco_treino exige o campo encontro');
+      if (o.tipo === 'bau_tesouro' && o.item === undefined) erro(arq, `/objetos/${i}`, 'bau_tesouro exige o campo item');
+    });
+    if (refs) (m.pois ?? []).forEach((p, i) => { // o mesmo contrato nos POIs interativos (boneco de treino e baú)
+      if (p.encontro !== undefined && !refs.encontros.has(p.encontro)) erro(arq, `/pois/${i}/encontro`, `encontro "${p.encontro}" não existe em data/combate`);
+      if (p.item !== undefined && !refs.itens.has(p.item)) erro(arq, `/pois/${i}/item`, `item "${p.item}" não existe`);
+      if (p.tipo === 'boneco_treino' && p.encontro === undefined) erro(arq, `/pois/${i}`, 'boneco_treino exige o campo encontro');
+      if (p.tipo === 'bau_tesouro' && p.item === undefined) erro(arq, `/pois/${i}`, 'bau_tesouro exige o campo item');
+    });
     // ---- edifícios ----
     const edif = m.edificios ?? [], idsEd = new Set();
     edif.forEach((e, i) => {

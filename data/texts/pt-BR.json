@@ -103,7 +103,7 @@
     "ui_bat_msg_usa_habilidade": "{nome_ator} usa {nome_habilidade}.",
     "ui_bat_msg_usa_item": "{nome_ator} usa {nome_item}.",
     "ui_bat_msg_defende": "{nome_ator} se protege.",
-    "ui_bat_msg_espera": "{nome_ator} balança e não faz nada.",
+    "ui_bat_msg_espera": "{nome_ator} não faz nada.",
     "ui_bat_msg_fuga_ok": "{nome_ator} achou uma saída!",
     "ui_bat_msg_fuga_falhou": "{nome_ator} não conseguiu fugir.",
     "ui_bat_msg_falhou_sem_mana": "{nome_ator} está sem mana.",
@@ -169,6 +169,22 @@
     "ui_minimapa_leg_fechada": "Fechada",
     "ui_minimapa_leg_local": "Local",
     "ui_minimapa_leg_voce": "Você",
-    "ui_sair": "Sair"
+    "ui_achado_encontrou": "Você encontrou {nome_item}!",
+    "ui_achado_encontrou_qtd": "Você encontrou {nome_item} ×{qtd}!",
+    "ui_achado_vazio": "O baú está vazio.",
+    "ui_achado_ok": "OK",
+    "txt_skill_slime_balanco_msg": "{nome_ator} balança e não faz nada.",
+    "ui_batalha_nao_faz_nada": "{nome} não faz nada.",
+    "txt_enemy_boneco_treino_nome": "Boneco de Treino",
+    "txt_enemy_boneco_treino_desc": "Palha, corda e remendos. Aguenta tudo e não revida.",
+    "txt_item_lembranca_edric_nome": "Pião Entalhado",
+    "txt_item_lembranca_edric_desc": "Entalhado pelo pai do Edric numa tarde de chuva. A ponta está lascada de tanto girar.",
+    "txt_enc_boneco_treino_nome": "Treino com o boneco",
+    "txt_map_casa_edric_interior_nome": "Casa do Edric",
+    "txt_poi_casa_edric": "Casa do Edric",
+    "txt_poi_boneco_treino": "Boneco de treino",
+    "txt_poi_bau_casa_edric": "Baú",
+    "ui_bat_treino_concluido": "Treino concluído",
+    "ui_bat_treino_sem_recompensa": "Vida e mana do grupo restauradas. Treino não dá experiência."
   }
 }

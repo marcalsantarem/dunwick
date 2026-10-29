@@ -24,10 +24,30 @@ function cadeira(col, o) {
 
 function banco(col, o) { const a = ajudantes(col, o); a.b('madeira', 0, 0.46, 0, 1.4, 0.06, 0.38); for (const sx of [-1, 1]) a.b('madeira', sx * 0.6, 0.22, 0, 0.07, 0.44, 0.34); }
 
-function cama(col, o) {
-  const a = ajudantes(col, o);
-  a.b('madeira', 0, 0.2, 0, 1.0, 0.24, 2.0); a.b('linho', 0, 0.38, 0, 0.9, 0.14, 1.9); a.b('linho', 0, 0.48, -0.74, 0.62, 0.1, 0.36); a.b('tecido_vinho', 0, 0.47, 0.3, 0.94, 0.05, 1.2);
+function cama(col, o) { // `cor`: cobertor (vinho, ocre, verde); `itens: 'remendada'` = cama simples com cobertor remendado
+  const a = ajudantes(col, o), r = rng(o.seed ?? 1), cob = { vinho: 'tecido_vinho', ocre: 'tecido_ocre', verde: 'tapete_verde' }[o.cor ?? 'vinho'];
+  a.b('madeira', 0, 0.2, 0, 1.0, 0.24, 2.0); a.b('linho', 0, 0.38, 0, 0.9, 0.14, 1.9); a.b('linho', 0, 0.48, -0.74, 0.62, 0.1, 0.36); a.b(cob, 0, 0.47, 0.3, 0.94, 0.05, 1.2);
   a.b('madeira', 0, 0.65, -0.98, 1.0, 0.75, 0.07); a.b('madeira', 0, 0.38, 0.98, 1.0, 0.4, 0.06);
+  if (o.itens === 'remendada') for (const [x, z, m, w, d] of [[-0.2, 0.1, 'tecido_ocre', 0.3, 0.28], [0.22, 0.55, 'tecido_azul', 0.28, 0.3], [-0.15, 0.85, 'tecido_vinho', 0.26, 0.22]]) a.b(m, x, 0.5, z, w, 0.012, d, (r() - 0.5) * 0.3);
+}
+
+/** Armas e escudo simples pendurados na parede de trás (`rot` 0 = parede norte, 90 = oeste): espada de treino, escudo velho e arco. */
+function armasParede(col, o) {
+  const a = ajudantes(col, o);
+  a.g('madeira', new THREE.CylinderGeometry(0.3, 0.3, 0.05, 12), -0.7, 1.7, 0.04, Math.PI / 2); a.g('metal', new THREE.SphereGeometry(0.07, 7, 5), -0.7, 1.7, 0.08); a.g('tecido_ocre', new THREE.CylinderGeometry(0.2, 0.2, 0.055, 12), -0.7, 1.7, 0.045, Math.PI / 2); // escudo velho
+  a.v('madeira_clara', [0.0, 1.15, 0.05], [0.12, 2.15, 0.05], 0.07); a.b('madeira', 0.05, 1.45, 0.06, 0.4, 0.05, 0.04); // espada de treino
+  a.g('madeira', new THREE.TorusGeometry(0.5, 0.025, 5, 14, Math.PI).rotateZ(-Math.PI / 2), 0.75, 1.7, 0.05); a.v('papel', [0.75, 1.2, 0.05], [0.75, 2.2, 0.05], 0.012); // arco e corda
+}
+
+/** Prateleira de parede com lembranças: canecas, livros, um cavalinho entalhado e uma vela (luz). */
+function prateleira(col, o, kit, saida) {
+  const a = ajudantes(col, o), w = o.w ?? 1.4, y = o.alt ?? 1.5;
+  a.b('madeira', 0, y, 0.15, w, 0.05, 0.3); for (const s of [-1, 1]) a.v('madeira', [s * (w / 2 - 0.1), y - 0.04, 0.02], [s * (w / 2 - 0.1), y - 0.3, 0.2], 0.04);
+  a.g('ceramica', new THREE.CylinderGeometry(0.06, 0.05, 0.11, 8), -w / 2 + 0.2, y + 0.08, 0.15); a.g('ceramica', new THREE.CylinderGeometry(0.05, 0.045, 0.09, 8), -w / 2 + 0.38, y + 0.07, 0.2);
+  a.b('livro_a', -0.05, y + 0.08, 0.15, 0.16, 0.12, 0.2); a.b('livro_b', 0.09, y + 0.07, 0.15, 0.12, 0.1, 0.2);
+  a.b('madeira_clara', 0.3, y + 0.07, 0.15, 0.18, 0.08, 0.06); a.b('madeira_clara', 0.36, y + 0.16, 0.15, 0.06, 0.1, 0.05); a.b('madeira_clara', 0.4, y + 0.2, 0.15, 0.08, 0.04, 0.04); // cavalinho
+  a.g('cera', new THREE.CylinderGeometry(0.03, 0.03, 0.12, 6), w / 2 - 0.16, y + 0.08, 0.15); a.g('chama', new THREE.SphereGeometry(0.028, 6, 5), w / 2 - 0.16, y + 0.17, 0.15);
+  const [wx, wz] = a.L(w / 2 - 0.16, 0.3); saida.luzes.push({ x: wx, y: y + 0.25, z: wz, tipo: 'vela', id: o.id }); void kit;
 }
 
 const LIVROS = ['livro_a', 'livro_b', 'livro_c', 'livro_d'];
@@ -89,20 +109,14 @@ function vela(col, o, kit, saida) { // castiçal com vela acesa: luz de ambiente
   saida.luzes.push({ x: o.x, y: y + 0.45, z: o.z, tipo: 'vela', id: o.id }); void kit;
 }
 
-/** Porta de SAÍDA do cômodo (v0.1.2): batente alto, verga e folha de madeira ABERTA para dentro (assim não tapa o herói), maçaneta, soleira, capacho com seta
- *  e a mancha de luz de fora no chão; `porta` é a fonte de luz. Fica no ponto do portal `saida`, na borda sul do mapa (parede da frente, cortada ao rodapé). */
-function portaSaida(col, o, kit, saida) {
-  const a = ajudantes(col, { x: o.x, z: o.z, rot: o.rot ?? 0 }), hw = (o.w ?? 1.4) / 2 + 0.08, ang = (72 * Math.PI) / 180, c = Math.cos(ang), sn = Math.sin(ang), comp = hw * 2 - 0.2, hx = -hw + 0.09;
-  for (const s of [-1, 1]) a.b('madeira', s * hw, 1.17, 0.06, 0.18, 2.34, 0.26);
-  a.b('madeira', 0, 2.38, 0.06, hw * 2 + 0.18, 0.2, 0.26); a.b('madeira_clara', 0, 2.52, 0.06, hw * 2 + 0.34, 0.07, 0.34); a.b('pedra', 0, 0.04, 0.06, hw * 2, 0.08, 0.5);
-  a.b('tabuas', hx + (c * comp) / 2, 1.07, (-sn * comp) / 2, comp, 2.1, 0.07, ang); // folha aberta, articulada no batente esquerdo
-  for (const k of [0.25, 0.5, 0.75]) a.b('madeira', hx + c * comp * k, 1.07, -sn * comp * k, 0.035, 2.1, 0.1, ang);
-  for (const y of [0.4, 1.7]) a.b('metal', hx + (c * comp) / 2, y, (-sn * comp) / 2, comp * 0.9, 0.09, 0.1, ang);
-  for (const lado of [-1, 1]) a.g('latao', new THREE.SphereGeometry(0.055, 7, 6), hx + c * comp * 0.88 + lado * 0.07 * sn, 1.05, -sn * comp * 0.88 + lado * 0.07 * c);
+/** Marcação de SAÍDA do cômodo (v0.1.2): capacho com seta apontando para a saída, mancha de luz de fora no chão (pulsa de leve) e a fonte de luz `porta`.
+ *  Fica no ponto do portal `saida`, na borda sul do mapa. Sem porta desenhada nem rótulo (o usuário achou que poluía casinhas pequenas). */
+function capachoSaida(col, o, kit, saida) {
+  const a = ajudantes(col, { x: o.x, z: o.z, rot: o.rot ?? 0 });
   a.b('tapete_ocre', 0, 0.02, -0.75, 1.3, 0.012, 0.9); a.b('tecido_ocre', 0, 0.028, -0.75, 1.1, 0.008, 0.7); // capacho
-  for (const s of [-1, 1]) a.b('latao', s * 0.17, 0.036, -0.78, 0.4, 0.01, 0.07, s * (Math.PI / 4)); // seta (V apontando para a porta)
+  for (const s of [-1, 1]) a.b('latao', s * 0.17, 0.036, -0.78, 0.4, 0.01, 0.07, s * (Math.PI / 4)); // seta (V apontando para a saída)
   a.g('brilho_saida', new THREE.PlaneGeometry(1.9, 2.8).rotateX(-Math.PI / 2), 0, 0.05, -1.45, 0, 0, 0, { uv: false }); // luz de fora entrando
-  const [wx, wz] = a.L(0, -0.6), [lx, lz] = a.L(0, 0.06); saida.luzes.push({ x: wx, y: 1.3, z: wz, tipo: 'porta', id: o.id ?? 'saida' }); saida.saidas.push({ x: lx, y: 3.35, z: lz }); void kit;
+  const [wx, wz] = a.L(0, -0.6); saida.luzes.push({ x: wx, y: 1.3, z: wz, tipo: 'porta', id: o.id ?? 'saida' }); void kit;
 }
 
 /** Aplique de parede com vela (no lugar da lanterna de poste, que não combina com cômodo fechado): `x`, `z` na face de dentro da parede, `rot` 0 (parede norte) ou 90 (oeste). */
@@ -113,4 +127,4 @@ function aplique(col, o, kit, saida) {
   const [wx, wz] = a.L(0, 0.4); saida.luzes.push({ x: wx, y: y + 0.15, z: wz, tipo: 'vela', id: o.id }); void kit;
 }
 
-export const PECAS_INTERIOR = { porta_saida: portaSaida, aplique, mesa, cadeira, banco, cama, estante, balcao, lareira, bancada, fornalha, arquivo, tapete, castical: vela };
+export const PECAS_INTERIOR = { capacho_saida: capachoSaida, aplique, armas_parede: armasParede, prateleira, mesa, cadeira, banco, cama, estante, balcao, lareira, bancada, fornalha, arquivo, tapete, castical: vela };

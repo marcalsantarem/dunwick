@@ -181,6 +181,11 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
 .tela-dica { position: absolute; left: 50%; bottom: calc(28 * var(--u)); transform: translateX(-50%); max-width: 90%; padding: calc(6 * var(--u)) calc(14 * var(--u)); background: rgba(33, 18, 9, 0.88); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); text-align: center; animation: tela-dica-entra 0.25s ease-out 1; }
 .tela.reduzir * { animation: none !important; transition: none !important; }
 @keyframes tela-dica-entra { from { opacity: 0; translate: 0 8px; } }
+/* nome do mapa ao entrar (15): faixa de madeira no topo, centrada, sem clique; opacidade e deslize vêm do JS (--entra 0..1) */
+.tela-banner-mapa { position: absolute; left: 50%; top: calc(14 * var(--u)); max-width: min(70%, 60ch); padding: calc(5 * var(--u)) calc(22 * var(--u)); background: rgba(33, 18, 9, 0.88); border-top: max(1px, calc(2 * var(--u))) solid var(--latao); border-bottom: max(1px, calc(2 * var(--u))) solid var(--latao); color: var(--brilho-2); font-size: max(14px, calc(22 * var(--u))); letter-spacing: 0.06em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: max(1px, calc(2 * var(--u))) max(1px, calc(2 * var(--u))) 0 #000; pointer-events: none; transform: translate(-50%, calc((1 - var(--entra, 1)) * -8 * var(--u))); }
+.tela-banner-mapa::before, .tela-banner-mapa::after { content: "◆"; color: var(--latao); font-size: 0.6em; vertical-align: middle; margin: 0 0.8em; }
+.tela.reduzir .tela-banner-mapa { transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .tela-banner-mapa { transform: translate(-50%, 0); } }
 .inicio { background: radial-gradient(ellipse at 50% 40%, #3a2416 0%, #120c07 70%); }
 .inicio-titulo { text-shadow: 0 4px 0 #2c120e, 0 0 24px rgba(252, 209, 118, 0.25); }
 .inicio-chamada { color: #fdf0dc; }
@@ -198,3 +203,10 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
 .minimapa.contraste .minimapa-legenda { display: block; }
 .minimapa.contraste .minimapa-tela { border-color: #fff; }
 .minimapa-simbolo { display: inline-block; width: 1.4em; }
+/* janela de achado (baú de tesouro): reaproveita o fundo da pausa; ícone provisório até o 04 entregar os ícones de item */
+.tela-painel-achado { min-width: min(80%, 34ch); display: flex; flex-direction: column; align-items: center; gap: calc(8 * var(--u)); text-align: center; }
+.tela-achado-icone { display: grid; place-items: center; width: max(44px, calc(48 * var(--u))); aspect-ratio: 1; border: max(1px, calc(2 * var(--u))) solid var(--brilho-1); background: var(--madeira-2); color: var(--brilho-2); font-size: max(22px, calc(28 * var(--u))); animation: tela-dica-entra 0.25s ease-out 1; }
+.tela-painel-achado.vazio .tela-achado-icone { border-color: var(--ui-2); color: var(--ui-3); }
+.tela-achado-texto { margin: 0; font-size: max(13px, calc(18 * var(--u))); color: var(--ui-4); }
+.tela-ok { min-width: 8ch; min-height: 44px; flex: none; }
+.bat-res-treino { margin: 0 0 calc(10 * var(--u)); color: var(--ui-3); }

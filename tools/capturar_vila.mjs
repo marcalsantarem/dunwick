@@ -26,29 +26,34 @@ async function abrir(query, ajustar) {
     await p.setRequestInterception(true);
     p.on('request', async (r) => { if (r.url().endsWith('/dados.json')) { const d = await (await fetch(r.url())).json(); ajustar(d); r.respond({ contentType: 'application/json', body: JSON.stringify(d) }); } else r.continue(); });
   } p.on('pageerror', (e) => erros.push(String(e))); p.on('console', (m) => { if (m.type() === 'error') erros.push(m.text()); });
-  await p.goto(`http://localhost:${PORTA}/?${query}`); await p.waitForFunction('window.__dunwick && window.__dunwick.mundo', { timeout: 60000 }); await p.keyboard.press('Shift'); await p.evaluate(() => { const d = document.getElementById('debug'); if (d) d.style.display = 'none'; }); await dormir(1200); return p;
+  await p.goto(`http://localhost:${PORTA}/?${query}`); try { await p.waitForFunction('window.__dunwick && window.__dunwick.mundo', { timeout: 60000 }); } catch (e) { console.error('a página não iniciou; erros: ' + [...new Set(erros)].slice(0, 6).join(' | ')); throw e; } await p.keyboard.press('Shift'); await p.evaluate(() => { const d = document.getElementById('debug'); if (d) d.style.display = 'none'; }); await dormir(1200); return p;
 }
 /** Leva o herói e a câmera a (x, z) no mapa atual, sem passar pelo jogo. */
 const ir = (p, x, z, hora) => p.evaluate(([x, z, hora]) => {
   const m = __dunwick.mundo, h = m.heroi, c = m.camera; h.x = h.ox = x; h.z = h.oz = z; h.destino = null; c.x = c.ox = x; c.z = c.oz = z; if (hora !== undefined) { m.hora = hora; m.cicloLigado = false; }
 }, [x, z, hora]);
-const foto = async (p, nome, x, z, hora = 17) => { await ir(p, x, z, hora); await dormir(900); await p.screenshot({ path: join(SAIDA, `${nome}.png`) }); console.log('✓', nome); };
+// posições do exterior em coordenadas LOCAIS da vila (layout_vila.mjs); o mapa as desloca para dentro da faixa de mata (14): p.dv = início − 24
+const foto = async (p, nome, x, z, hora = 17) => { await ir(p, x + (p.dv ?? 0), z + (p.dv ?? 0), hora); await dormir(900); await p.screenshot({ path: join(SAIDA, `${nome}.png`) }); console.log('✓', nome); };
 
 if (SO !== 'interiores') {
-  const p = await abrir('hora=17&perfil=perfil_alto');
+  const p = await abrir('hora=17&perfil=perfil_alto'); p.dv = await p.evaluate(() => __dunwick.mundo.mapa.dados.inicio_jogador.tile[0] - 24);
   await foto(p, 'ext_01_portico_quadro', 25, 23); // pórtico (24; 19,5) com o gancho vazio e o quadro de avisos (28,5; 21)
   await foto(p, 'ext_02_maren_canteiro', 18, 13.8); await foto(p, 'ext_03_taverna', 32, 15);
   await foto(p, 'ext_04_forja_brasa_noite', 45, 16.2, 21.5); // forno de brasa em (43,5; 14,6), a leste da forja await foto(p, 'ext_05_posto_escrivao', 40, 29, 17);
   await foto(p, 'ext_06_torvan_patio', 12, 21, 17); await foto(p, 'ext_07_marcas_do_saque', 30.5, 39.2, 17); await foto(p, 'ext_08_muro_fuligem_sul', 13, 40, 17);
-  await foto(p, 'ext_09_praca_entardecer', 24, 26, 18.5); await p.close();
+  await foto(p, 'ext_09_praca_entardecer', 24, 26, 18.5); await foto(p, 'ext_11_casa_edric', 1.5, -1, 17);
+  // perímetro (14): estacada com o vão da estrada norte (muralha e troncos), o canto sudeste e a borda oeste — a mata fecha a vista
+  await foto(p, 'ext_12_portao_norte', 24, -4.5, 17); await foto(p, 'ext_13_canto_sudeste', 50, 50, 17); await foto(p, 'ext_14_estacada_oeste', -3, 30, 17); await p.close();
 }
 if (SO !== 'exterior') {
   // cada interior: abre a vila, põe o herói na porta (o portal troca o mapa) e fotografa já dentro
-  const nomes = ['casa_maren', 'taverna', 'forja', 'casa_torvan', 'posto_escrivao'];
+  const nomes = ['casa_maren', 'taverna', 'forja', 'casa_torvan', 'posto_escrivao', 'casa_edric'];
   for (const nome of nomes) {
-    const p = await abrir('hora=17&perfil=perfil_alto'); const [x, z] = await p.evaluate((n) => { const q = __dunwick.mundo.mapa.dados.portais.find((o) => o.destino.mapa === `map_${n}_interior`); return [q.x, q.z]; }, nome); await ir(p, x, z, 17); await dormir(1500);
+    const p = await abrir('hora=17&perfil=perfil_alto', nome === 'casa_edric' ? (d) => { const m = d.mapas.map_casa_edric_interior; if (!m.objetos.some((o) => o.tipo === 'bau_tesouro')) m.objetos.push({ id: 'bau_casa_edric', tipo: 'bau_tesouro', x: 1.4, z: 5, rot: 0, seed: 3 }); } : undefined); const [x, z] = await p.evaluate((n) => { const q = __dunwick.mundo.mapa.dados.portais.find((o) => o.destino.mapa === `map_${n}_interior`); return [q.x, q.z]; }, nome); await ir(p, x, z, 17); await dormir(1500);
     const mapa = await p.evaluate(() => __dunwick.mundo.mapaId); console.log(nome, '→', mapa);
-    await p.screenshot({ path: join(SAIDA, `int_${nome}.png`) }); await p.close();
+    await p.screenshot({ path: join(SAIDA, `int_${nome}.png`) });
+    if (nome === 'casa_edric') { await p.evaluate(() => __dunwick.cena.definirBau('bau_casa_edric', true, true)); await dormir(500); await p.screenshot({ path: join(SAIDA, 'int_casa_edric_bau_aberto.png') }); }
+    await p.close();
   }
 }
 console.log(erros.length ? `erros no console (${erros.length}):\n` + [...new Set(erros)].slice(0, 8).join('\n') : 'console limpo');

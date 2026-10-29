@@ -68,7 +68,7 @@
     },
     "agilidade": {
       "type": "number",
-      "exclusiveMinimum": 0
+      "minimum": 0
     },
     "resistencias": {
       "type": "object",
@@ -140,7 +140,6 @@
     },
     "ia": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -189,7 +188,6 @@
       "additionalProperties": false,
       "required": [
         "parado",
-        "ataque",
         "dano",
         "morte"
       ],
@@ -223,6 +221,9 @@
           "pattern": "^bat_[a-z_]+$"
         }
       }
+    },
+    "treino": {
+      "type": "boolean"
     }
   }
 }

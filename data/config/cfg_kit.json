@@ -136,11 +136,52 @@
     "castical": {
       "forma": "nenhuma"
     },
-    "porta_saida": {
-      "forma": "nenhuma"
-    },
     "aplique": {
       "forma": "nenhuma"
+    },
+    "capacho_saida": {
+      "forma": "nenhuma"
+    },
+    "lenha": {
+      "forma": "ret",
+      "w": 1.4,
+      "d": 0.6
+    },
+    "varal": {
+      "forma": "dupla",
+      "raio": 0.1
+    },
+    "balde": {
+      "forma": "circ",
+      "raio": 0.2
+    },
+    "bau_tesouro": {
+      "forma": "ret",
+      "w": 1.0,
+      "d": 0.66
+    },
+    "armas_parede": {
+      "forma": "nenhuma"
+    },
+    "prateleira": {
+      "forma": "nenhuma"
+    },
+    "muralha_baixa": {
+      "forma": "linha",
+      "espessura": 0.5
+    },
+    "estacada": {
+      "forma": "linha",
+      "espessura": 0.3
+    },
+    "tronco_caido": {
+      "forma": "ret",
+      "w": 2.2,
+      "d": 0.5
+    },
+    "moita": {
+      "forma": "circ",
+      "raio": 0.7
     }
   },
   "visual": {

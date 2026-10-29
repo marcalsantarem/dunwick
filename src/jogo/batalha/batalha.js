@@ -21,6 +21,8 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
   const cfg = dados.config.batalha, C = dados.combate, enc = C.encontros[encontro];
   if (!enc) throw new Error(`encontro "${encontro}" não existe`);
   const prng = criarPrng(semente), log = [], estoque = { ...(inventario ?? cfg.inventario_teste) };
+  // encontro de treino (`treino: true`): sem XP, moedas nem drops; vida, mana e estoque do grupo voltam ao que eram ao fim; repetível
+  const treino = !!enc.treino, estoqueInicial = { ...estoque };
   const dif = cfg.dificuldade;
 
   // ---------- atores ----------
@@ -67,6 +69,7 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     return aleatorio();
   }
   function escolherIA(ator) {
+    if (!ator.ia.length) return { comando: 'passar', id: null, alvo: null }; // inimigo sem ações (ex.: boneco de treino): passa a vez
     const ops = ator.ia.filter((o) => !o.condicao || (o.condicao.rodada_min ?? 1) <= rodada);
     const total = ops.reduce((s, o) => s + o.peso, 0);
     let r = prng.proximo() * total, esc = ops[ops.length - 1];
@@ -156,7 +159,7 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     for (const [uid, cmd] of escolhas) {
       const a = porUid.get(uid); if (a.caido) continue;
       const acao = cmd.comando === 'atacar' || cmd.comando === 'habilidade' ? acaoDe(cmd.id) : null;
-      const prioridade = cfg.prioridade_comando[cmd.comando] + (acao?.prioridade ?? 0);
+      const prioridade = (cfg.prioridade_comando[cmd.comando] ?? 0) + (acao?.prioridade ?? 0);
       const variacao = cfg.iniciativa_variacao > 0 ? 1 + (prng.proximo() * 2 - 1) * cfg.iniciativa_variacao : 1;
       itens.push({ uid, prioridade, iniciativa: a.agilidade * variacao, lado: a.lado, pos: a.pos });
     }
@@ -208,12 +211,13 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     ator.mana -= custo; emit('mana_gasta', { ator: ator.uid, valor: custo }); emit('mana_mudou', { ator: ator.uid, mana: ator.mana, mana_max: ator.mana_max, delta: -custo });
   }
   const falhou = (ator, motivo, extra = {}) => emit('ato_falhou', { ator: ator.uid, motivo, ...extra });
-  const registrar = (ator, tipo, id, alvos, chaveTempo) => { const d = duracao(chaveTempo); tempoAnim += d + duracao('t_intervalo_ato'); emit('ato_executado', { ator: ator.uid, tipo, id, alvos: alvos.map((a) => a.uid), duracao_s: d, pose: (id && (acaoDe(id) ?? itemDe(id))?.pose) || ({ defender: 'bat_defender', fugir: 'bat_avanca' }[tipo] ?? null) }); };
+  const registrar = (ator, tipo, id, alvos, chaveTempo, extra = {}) => { const d = duracao(chaveTempo); tempoAnim += d + duracao('t_intervalo_ato'); emit('ato_executado', { ator: ator.uid, tipo, id, alvos: alvos.map((a) => a.uid), duracao_s: d, pose: (id && (acaoDe(id) ?? itemDe(id))?.pose) || ({ defender: 'bat_defender', fugir: 'bat_avanca' }[tipo] ?? null), ...extra }); };
 
   function executarAto(uid) {
     const ator = porUid.get(uid), cmd = escolhas.get(uid);
     if (ator.caido) { emit('ato_cancelado', { ator: uid, motivo: 'caido' }); return; }
     emit('turno_iniciou', { ator: uid });
+    if (cmd.comando === 'passar') { registrar(ator, 'passar', null, [], 't_intervalo_ato', { motivo: 'sem_acoes', nome_txt: ator.nome_txt, msg_txt: cfg.msg_nao_faz_nada_txt }); return; }
     if (cmd.comando === 'defender') { ator.defendendo = true; registrar(ator, 'defender', null, [ator], 't_defender'); emit('defendeu', { ator: uid }); return; }
     if (cmd.comando === 'fugir') { tentarFuga(ator); return; }
     if (cmd.comando === 'item') {
@@ -258,10 +262,20 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
     if (!vivos('inimigos').length) terminar('vitoria');
     else if (!vivos('grupo').length) terminar('derrota');
   }
+  function restaurarTreino() {
+    for (const a of lado('grupo')) {
+      if (a.vida !== a.vida_max) { const d = a.vida_max - a.vida; a.vida = a.vida_max; emit('vida_mudou', { ator: a.uid, vida: a.vida, vida_max: a.vida_max, delta: d }); }
+      if (a.mana !== a.mana_max) { const d = a.mana_max - a.mana; a.mana = a.mana_max; emit('mana_mudou', { ator: a.uid, mana: a.mana, mana_max: a.mana_max, delta: d }); }
+      a.caido = false;
+    }
+    for (const k of Object.keys(estoque)) delete estoque[k];
+    Object.assign(estoque, estoqueInicial);
+  }
   function terminar(res) {
     if (resultado) return;
+    if (treino && res === 'derrota') res = 'fugiu'; // o grupo não perde para o treino: nunca vai a game over
     let xp = 0, moedas = 0; const itens = {}, niveis = [];
-    if (res === 'vitoria') {
+    if (res === 'vitoria' && !treino) {
       for (const e of lado('inimigos')) {
         xp += e.xp_dado; moedas += e.moedas;
         for (const d of e.drops) if (prng.proximo() < d.chance) itens[d.item] = (itens[d.item] ?? 0) + d.qtd;
@@ -275,12 +289,14 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
       for (const [k, q] of Object.entries(itens)) estoque[k] = (estoque[k] ?? 0) + q;
       tempoAnim += duracao('t_vitoria');
       emit('venceu', { xp, moedas, itens, niveis });
+    } else if (res === 'vitoria') { tempoAnim += duracao('t_vitoria'); emit('venceu', { xp: 0, moedas: 0, itens: {}, niveis: [], treino: true });
     } else if (res === 'derrota') emit('perdeu');
     else if (res === 'fugiu') emit('fugiu');
     else emit('empate');
+    if (treino) restaurarTreino();
     fase = 'fim';
     resultado = {
-      resultado: res, semente, rodadas: rodada, xp: res === 'vitoria' ? xp : 0, moedas: res === 'vitoria' ? moedas : 0, itens, niveis,
+      resultado: res, treino, semente, rodadas: rodada, xp: res === 'vitoria' ? xp : 0, moedas: res === 'vitoria' ? moedas : 0, itens, niveis,
       tempo_animacao_s: tempoAnim + duracao('t_entrada_batalha'),
       grupo: lado('grupo').map((a) => ({ id: a.uid, vida: a.vida, vida_max: a.vida_max, mana: a.mana, mana_max: a.mana_max, caido: a.caido, nivel: a.nivel, xp: a.xp })),
       inventario: { ...estoque },

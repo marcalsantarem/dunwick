@@ -52,7 +52,7 @@ function casa(col, o, kit, saida) {
   const M = materiaisCasa(o);
   const v = kit.visual.casa, giro = (((o.rot ?? 0) % 180) + 180) % 180 === 90, w = giro ? o.d : o.w, d = giro ? o.w : o.d;
   const h = v.parede_altura, base = v.base_pedra, rh = v.telhado_altura, bei = v.beiral, cx = o.x, cz = o.z, r = rng(o.seed ?? 1);
-  const mTelha = { telha: 'telha_laranja', ardosia: 'ardosia', musgo: 'telha_musgo' }[o.telhado];
+  const mTelha = { telha: 'telha_laranja', ardosia: 'ardosia', musgo: 'telha_musgo', palha: 'palha_telha' }[o.telhado];
   col.caixa(M.pedra, cx, base / 2, cz, w + 0.18, base, d + 0.18);
   col.caixa(M.reboco, cx, base + (h - base) / 2, cz, w, h - base, d);
   const zf = cz + d / 2 + 0.035, xf = cx + w / 2 + 0.035, esp = 0.13, yTopo = h - 0.06;
@@ -149,7 +149,7 @@ function cerca(col, o) {
 
 /** Constrói o kit do mapa. Devolve { grupos: Map(mat → geometria fundida), luzes, janelas, chamines }. */
 export function construirKit(mapaDados, kit, texelsPorTile = 64) {
-  const col = criarColetor(texelsPorTile), saida = { luzes: [], janelas: [], chamines: [], saidas: [] };
+  const col = criarColetor(texelsPorTile), saida = { luzes: [], janelas: [], chamines: [] };
   for (const o of mapaDados.objetos) {
     switch (o.tipo) {
       case 'casa': { const j0 = saida.janelas.length; casa(col, o, kit, saida); decorarCasa(col, o, kit, saida, saida.janelas.slice(j0)); break; } case 'arvore': arvore(col, o, kit); break; case 'pinheiro': pinheiro(col, o, kit); break; case 'arbusto': arbusto(col, o); break;
@@ -158,7 +158,7 @@ export function construirKit(mapaDados, kit, texelsPorTile = 64) {
       default: (PECAS_VILA[o.tipo] ?? PECAS_INTERIOR[o.tipo])?.(col, o, kit, saida);
     }
   }
-  // interior: a PORTA DE SAÍDA é desenhada no ponto do portal `saida` (borda sul), com capacho, luz de fora e fonte de luz (v0.1.2)
-  if (mapaDados.tipo_mapa === 'interior') for (const p of mapaDados.portais ?? []) if (p.id === 'saida') PECAS_INTERIOR.porta_saida(col, { id: 'saida', x: p.x, z: mapaDados.tamanho[1], w: 1.4 }, kit, saida);
+  // interior: a marcação de SAÍDA (capacho, luz de fora e fonte de luz) é desenhada no ponto do portal `saida` (borda sul)
+  if (mapaDados.tipo_mapa === 'interior') for (const p of mapaDados.portais ?? []) if (p.id === 'saida') PECAS_INTERIOR.capacho_saida(col, { id: 'saida', x: p.x, z: mapaDados.tamanho[1], w: 1.4 }, kit, saida);
   saida.grupos = col.fundir(); return saida;
 }

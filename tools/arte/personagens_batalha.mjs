@@ -145,6 +145,45 @@ const LOBO = [
     { lift: -8, jaw: 0.3, olhoFechado: true, orelha: -1, tail: -2, paws: [[12, 1], [-12, 1], [9, 1], [-14, 1]] }, { lift: -8.5, jaw: 0.3, olhoFechado: true, orelha: -1, tail: -4, paws: [[12.5, 1], [-12.5, 1], [9.5, 1], [-14.5, 1]] }] },
 ];
 
+// =====================================================================  BONECO DE TREINO  (poste, travessa, tronco de palha e cabeça de saco; não ataca)
+const CEL_BONECO = [120, 88], ANC_BONECO = [74, 78];
+function montarBoneco(P = {}) {
+  prims.length = 0;
+  const a = P.ang ?? 0, ca = Math.cos(a), sa = Math.sin(a), aa = Math.abs(a), c2 = Math.cos(aa) ** 2, s2 = Math.sin(aa) ** 2, sh = P.shift ?? [0, 0];
+  const T = (f, l, u) => [f * ca + u * sa + sh[0], l, -f * sa + u * ca + sh[1]];
+  const Ee = (c, r, m, id, dec, off) => elip(T(...c), [r[0] * c2 + r[2] * s2, r[1], r[2] * c2 + r[0] * s2], m, id, aa > 0.6 ? null : dec, off);
+  const olhos = (c) => (p) => {
+    if (Math.abs(p[1]) < 2.6) return null;
+    for (const dx of [-2.4, 2.4]) { const x = (p[0] - c[0] - dx) / 1.2, y = (p[2] - c[2] - 0.8) / 1.5; if (x * x + y * y <= 1) return { m: 'aco', t: 0 }; }
+    if (Math.abs(p[2] - c[2] + 2.6) < 0.45 && Math.abs(p[0] - c[0]) < 3.6) return { m: 'aco', t: 0 };                       // boca costurada
+    if (Math.abs(p[0] - c[0]) < 0.4 && Math.abs(p[2] - c[2] + 2.6) < 1.4) return { m: 'aco', t: 1 };                       // ponto da costura
+    return null;
+  };
+  elip([0, 0, 1.4], [10.5, 10.5, 2.3], 'couro', 'base'); elip([0, 0, 2.6], [8, 8, 1.2], 'couro', 'base2');
+  if (P.queb) { cadeia(T(0, 0, 2), T(0, 0, 17), 2.3, 2.1, 'couro', 'poste_a'); cadeia(T(0.5, 0, 17), T(2.2, 0, 24), 2.1, 1.0, 'couro', 'poste_b'); }
+  else cadeia(T(0, 0, 2), T(0, 0, P.poste ?? 37), 2.3, 2.1, 'couro', 'poste');
+  const bar = P.barra ?? [[-12, 27], [12, 27]];
+  cadeia(T(bar[0][0], 0, bar[0][1]), T(bar[1][0], 0, bar[1][1]), 1.6, 1.6, 'couro', 'travessa');
+  for (const s of [-1, 1]) Ee([s * 12.4, 0, bar[s < 0 ? 0 : 1][1] - 1.5], [1.1, 1.1, 2.4], 'latao', 'palha_mao' + s);
+  Ee([0, 0, 23.5], [6.6, 6.4, 9.2], 'latao', 'tronco'); Ee([0, 0, 22.5], [6.9, 6.7, 1.5], 'musgo', 'faixa');
+  for (const [f, u, r] of [[-5.5, 14.5, 1.4], [4.8, 15.2, 1.2], [0.5, 13.6, 1.3]]) Ee([f, 0, u], [r * 1.2, r, r * 1.5], 'latao', 'fio' + f);
+  const h = P.cabeca ?? [0, 41]; const c = P.cabeca ? [h[0], 0, h[1]] : T(0, 0, 41);
+  esfera(c, 6.1, 'linho', 'cabeca', P.cabeca ? olhos(c) : olhos(c));
+  elip([c[0], 0, c[2] + 5.8], [2.8, 2.8, 1.5], 'latao', 'tufo'); elip([c[0], 0, c[2] + 3.4], [6.5, 6.5, 1.0], 'musgo', 'testeira');
+  for (const [f, u, r] of P.palha ?? []) elip([f, 0, u], [r * 1.4, r * 1.1, r * 0.6], 'latao', 'palha' + f);
+  return {};
+}
+const quadroBoneco = (P) => { montarBoneco(P); return acabar(renderizar(PHI, CEL_BONECO, ANC_BONECO)); };
+const BONECO = [
+  { id: 'bat_parado', fps: 4, loop: true, q: [0, 0.012, 0, -0.012].map((ang) => ({ ang })) },
+  { id: 'bat_dano', fps: 12, loop: false, q: [{ ang: -0.3, shift: [-1, 0] }, { ang: 0.17 }, { ang: -0.09 }, { ang: 0.035 }, { ang: 0 }] },
+  { id: 'bat_morte', fps: 7, loop: false, q: [
+    { ang: -0.45, shift: [-1, 0] },
+    { ang: -0.95, queb: true, cabeca: [-14, 40], barra: [[-12, 27], [12, 27]], shift: [-3, 0] },
+    { ang: -1.45, queb: true, cabeca: [-38, 11], barra: [[-12, 27], [12, 27]], shift: [-3, 4.5], palha: [[-14, 4, 1.3], [-20, 2.5, 1.1], [-3, 3, 1.2]] },
+    { ang: -1.45, queb: true, cabeca: [-39, 6.2], barra: [[-12, 27], [12, 27]], shift: [-3, 4.5], palha: [[-14, 3, 1.5], [-20, 2.2, 1.3], [-3, 3, 1.4], [-26, 2, 1.2], [-9, 2.4, 1.1], [4, 2.2, 1.2]] }] },
+];
+
 // =====================================================================  atlas, meta, prévia, validação
 const COL = 8;
 function montar(id, cel, anc, poses, quadro, nota) {
@@ -185,6 +224,7 @@ export function gerarTodos() {
   return [
     { ...mk('hero_grace', [CELULA, CELULA], ANCORA, GRACE, quadroGrace, 'Grace: poses de batalha numa só direção (L, voltada para a direita); o motor espelha. Sem normal map.'), esc: 3 },
     { ...mk('enemy_slime', CEL_SLIME, ANC_SLIME, SLIME, quadroSlime, 'Slime: poses de batalha numa só direção (L); o motor espelha. Sem normal map.'), esc: 4 },
+    { ...mk('enemy_boneco_treino', CEL_BONECO, ANC_BONECO, BONECO, quadroBoneco, 'Boneco de treino: poses de batalha numa só direção (L); o motor espelha. Não ataca; bat_morte tomba, quebra e perde a cabeça (volta ao normal na próxima batalha). Sem normal map.'), esc: 4 },
     { ...mk('enemy_lobo', CEL_LOBO, ANC_LOBO, LOBO, quadroLobo, 'Lobo: poses de batalha numa só direção (L); o motor espelha. Sem normal map.'), esc: 3 },
   ];
 }

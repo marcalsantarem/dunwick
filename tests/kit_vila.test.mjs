@@ -3,9 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { carregarDados } from './_util.mjs';
+import { carregarDados, DV } from './_util.mjs';
 import { construirKit } from '../src/motor/kit.js';
 import { criarMateriais } from '../src/motor/materiais.js';
+import { criarTampaBau } from '../src/motor/bau_tesouro.js';
 import { colisorDe, criarMapa } from '../src/jogo/mapa.js';
 
 const dados = carregarDados(), kit = dados.config.kit, mapas = Object.values(dados.mapas);
@@ -44,7 +45,7 @@ test('pórtico: dois postes com o vão livre no meio (a trilha passa por baixo);
   const c = colisorDe({ id: 'p', tipo: 'portico', x: 24, z: 19.5, w: 4 }, kit);
   assert.equal(c.length, 2); assert.deepEqual(c.map((q) => [q.x, q.z, q.r]), [[22, 19.5, 0.3], [26, 19.5, 0.3]]);
   const vila = mapas.find((m) => m.tipo_mapa === 'exterior'), mapa = criarMapa(vila, kit, dados.config.jogo.mundo);
-  assert.ok(mapa.livre(24, 19.5, 0.3), 'o meio do pórtico é livre'); assert.ok(!mapa.livre(22, 19.5, 0.3), 'o poste bloqueia'); assert.ok(!mapa.livre(26, 19.5, 0.3));
+  assert.ok(mapa.livre(24 + DV, 19.5 + DV, 0.3), 'o meio do pórtico é livre'); assert.ok(!mapa.livre(22 + DV, 19.5 + DV, 0.3), 'o poste bloqueia'); assert.ok(!mapa.livre(26 + DV, 19.5 + DV, 0.3));
 });
 
 test('a porta da casa fica no MEIO da parede do `lado` (s = +z, l = +x), onde o gatilho do portal está colado', () => {
@@ -59,12 +60,37 @@ test('peso: a vila e cada interior ficam dentro do teto de vértices e de grupos
   for (const m of mapas) { const k = construirKit(m, kit), v = vertices(k); assert.ok(v < (m.tipo_mapa === 'interior' ? 120000 : 600000), `${m.id}: ${v} vértices`); assert.ok(k.grupos.size <= 40, `${m.id}: ${k.grupos.size} grupos`); }
 });
 
-test('interiores: porta de saída desenhada no portal `saida` (luz `porta` + rótulo), sem lanterna de poste, com apliques de vela', () => {
+test('interiores: só a MARCAÇÃO de saída no chão (capacho, luz de fora, fonte `porta`), sem lanterna de poste e com apliques de vela', () => {
   for (const m of mapas.filter((x) => x.tipo_mapa === 'interior')) {
-    const k = construirKit(m, kit), saida = m.portais.find((p) => p.id === 'saida'), tipos = k.luzes.map((l) => l.tipo);
-    assert.equal(k.saidas.length, 1, `${m.id}: uma porta de saída`); assert.ok(Math.abs(k.saidas[0].x - saida.x) < 0.01 && Math.abs(k.saidas[0].z - m.tamanho[1]) < 0.2, `${m.id}: a porta fica no portal`);
+    const k = construirKit(m, kit), tipos = k.luzes.map((l) => l.tipo);
     assert.ok(tipos.includes('porta') && kit.fontes.porta, `${m.id}: luz de fora`); assert.ok(!tipos.includes('lanterna'), `${m.id}: sem lanterna de poste`);
-    assert.ok(tipos.filter((t) => t === 'vela').length >= 2, `${m.id}: apliques de vela`); assert.ok(k.grupos.has('brilho_saida') && k.grupos.has('latao'), `${m.id}: capacho e maçaneta`);
+    assert.ok(tipos.filter((t) => t === 'vela').length >= 2, `${m.id}: apliques de vela`); assert.ok(k.grupos.has('brilho_saida') && k.grupos.has('latao'), `${m.id}: capacho com seta e mancha de luz`);
+    assert.equal(k.saidas, undefined, 'sem rótulo nem porta desenhada');
   }
-  assert.equal(construirKit(mapas.find((x) => x.tipo_mapa === 'exterior'), kit).saidas.length, 0, 'a vila não tem porta de saída');
+});
+
+test('baú de tesouro: corpo no kit com tesouro dentro, tampa separada que abre 112° e volta; pegada do cfg_kit', () => {
+  const o = { id: 'bau_t', tipo: 'bau_tesouro', x: 5, z: 6, rot: 0, seed: 2 }, k = construirKit({ objetos: [o] }, kit);
+  assert.ok(k.grupos.has('tabuas') && k.grupos.has('latao') && k.grupos.has('tecido_azul'), 'corpo, cintas de latão, moedas e gemas');
+  const b = criarTampaBau(o, materiais); assert.equal(b.grupo.children[0].children.length, 5, 'meia-cana + 2 cintas + 2 tampas laterais');
+  b.definir(0); assert.ok(b.grupo.children[0].rotation.x === 0); b.definir(1); assert.ok(Math.abs(b.grupo.children[0].rotation.x + (112 * Math.PI) / 180) < 1e-6);
+  assert.deepEqual(colisorDe(o, kit), { forma: 'ret', x0: 4.5, z0: 5.67, x1: 5.5, z1: 6.33, id: 'bau_t' }, 'colisão = pegada');
+  assert.ok(Math.abs(b.grupo.position.z - (6 - 0.33)) < 1e-9 && b.grupo.position.y === 0.5, 'dobradiça na borda de trás, na altura do corpo');
+});
+
+test('casa rústica do Edric: paredes de tábuas, telhado de palha, remendos; peças do entorno e da mobília entram no kit', () => {
+  const casa = { id: 'casa_edric', tipo: 'casa', x: 4.8, z: 7.2, w: 3, d: 3, rot: 0, telhado: 'palha', estilo: 'rustica', deco: 'edric', janelas: 1, chamine: true, seed: 5, lado: 's' };
+  const k = construirKit({ objetos: [casa, { id: 'l', tipo: 'lenha', x: 8, z: 8, rot: 0 }, { id: 'v', tipo: 'varal', x: 2, z: 11, w: 2.4, rot: 0 }, { id: 'b', tipo: 'balde', x: 7, z: 9 }] }, kit);
+  for (const g of ['palha_telha', 'tabuas', 'madeira_clara', 'tecido_ocre', 'casca']) assert.ok(k.grupos.has(g), `sem ${g}`);
+  const mob = construirKit({ objetos: [{ id: 'a', tipo: 'armas_parede', x: 3, z: 0, rot: 0 }, { id: 'p', tipo: 'prateleira', x: 6, z: 0, rot: 0 }, { id: 'c', tipo: 'cama', x: 2, z: 2, rot: 0, itens: 'remendada', cor: 'verde' }] }, kit);
+  assert.ok(mob.grupos.has('tapete_verde') && mob.grupos.has('livro_a'), 'cobertor verde remendado e livros da prateleira'); assert.ok(mob.luzes.some((l) => l.tipo === 'vela'), 'vela da prateleira');
+  assert.equal(colisorDe({ id: 'v', tipo: 'varal', x: 2, z: 11, w: 2.4 }, kit).length, 2);
+});
+
+test('perímetro e mata (v0.1.2b): muralha baixa, estacada, tronco caído e moita entram no kit; trechos viram linha de colisão; árvores aceitam escala e seed', () => {
+  const objs = [{ id: 'm', tipo: 'muralha_baixa', x0: 0, z0: 0, x1: 6, z1: 0, seed: 2 }, { id: 'e', tipo: 'estacada', x0: 0, z0: 3, x1: 0, z1: 9 }, { id: 't', tipo: 'tronco_caido', x: 3, z: 3, rot: 30 }, { id: 'mo', tipo: 'moita', x: 5, z: 5, escala: 1.3 }, { id: 'a', tipo: 'pinheiro', x: 8, z: 8, escala: 1.4, seed: 9 }];
+  const k = construirKit({ objetos: objs }, kit);
+  for (const g of ['pedra', 'casca', 'madeira', 'folhagem']) assert.ok(k.grupos.has(g), `sem ${g}`);
+  assert.equal(colisorDe(objs[0], kit).forma, 'linha'); assert.equal(colisorDe(objs[1], kit).forma, 'linha'); assert.equal(colisorDe(objs[2], kit).forma, 'ret'); assert.ok(Math.abs(colisorDe(objs[3], kit).r - 0.91) < 1e-9);
+  assert.ok(vertices(construirKit({ objetos: [objs[0]] }, kit)) < 3000, 'muralha de 6 tiles leve');
 });

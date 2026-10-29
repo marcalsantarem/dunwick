@@ -8,8 +8,9 @@ import { criarCameraJogo } from './camera_jogo.js';
 import { criarEstadoJogo } from './estado_jogo.js';
 import { criarGatilhoEncontros } from './exploracao/encontros.js';
 import { criarPortais } from './exploracao/portais.js';
+import { criarObjetos } from './exploracao/objetos.js';
 
-export const VERSAO_ESTADO_EXPLORACAO = 1;
+export const VERSAO_ESTADO_EXPLORACAO = 2; // 2: + objetos (baús abertos); a 1 ainda é aceita
 const DIRECOES = ['s', 'n', 'l', 'o'];
 
 /**
@@ -65,6 +66,7 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
     camera.definirLimites(p.mapa.dados.limites_camera); camera.encaixar(heroi);
     if (mundo.encontros) mundo.encontros.definirConfig(cfgEncDe(id));
   }
+  mundo.objetos = criarObjetos({ mundo, eventos }); // boneco de treino, baús (depois do gatilho: a volta do treino desfaz a carência)
   mundo.portais = criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, cfg: dados.config.exploracao });
   /** Com `trocaManual`: faz a troca pendente (depois de cobrir a tela) e emite `mapa_trocado`. */
   mundo.concluirPortal = () => mundo.portais.concluir();
@@ -106,15 +108,17 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
     versao: VERSAO_ESTADO_EXPLORACAO, mapa: mundo.mapaId, x: heroi.x, z: heroi.z, direcao: heroi.direcao(),
     portal_retorno: mundo.portais.retorno ? { ...mundo.portais.retorno } : null,
     encontros: mundo.encontros ? mundo.encontros.salvar() : null,
+    objetos: mundo.objetos.salvar(),
   });
   /** Restaura um estado de estadoExploracao() com validação rígida; inválido lança erro e não muda nada. Posição bloqueada vira o início do mapa. */
   mundo.restaurarExploracao = (e) => {
     const num = (v) => typeof v === 'number' && Number.isFinite(v);
-    if (!e || typeof e !== 'object' || e.versao !== VERSAO_ESTADO_EXPLORACAO) throw new Error('estado de exploração: versão inválida');
+    if (!e || typeof e !== 'object' || (e.versao !== VERSAO_ESTADO_EXPLORACAO && e.versao !== 1)) throw new Error('estado de exploração: versão inválida');
     if (typeof e.mapa !== 'string' || !Object.hasOwn(dados.mapas, e.mapa)) throw new Error(`estado de exploração: mapa "${e.mapa}" não existe`);
     if (!num(e.x) || !num(e.z) || !DIRECOES.includes(e.direcao)) throw new Error('estado de exploração: posição ou direção inválida');
     const r = e.portal_retorno;
     if (r !== null && r !== undefined && (typeof r !== 'object' || typeof r.mapa !== 'string' || typeof r.portal !== 'string' || !Object.hasOwn(dados.mapas, r.mapa))) throw new Error('estado de exploração: portal_retorno inválido');
+    if (e.versao >= 2) { const teste = criarObjetos({ mundo, eventos: { em() {} } }); teste.carregar(e.objetos); } // valida antes de mudar qualquer coisa
     const m = preparar(e.mapa).mapa;
     let { x, z } = e, direcao = e.direcao;
     if (!m.livre(x, z, heroi.raioPush)) { const [ix, iz] = m.dados.inicio_jogador.tile; x = ix + 0.5; z = iz + 0.5; direcao = m.dados.inicio_jogador.direcao; }
@@ -123,6 +127,7 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
     mundo.portais.retorno = r ? { mapa: r.mapa, portal: r.portal } : null;
     mundo.portais.rearmar();
     if (mundo.encontros && e.encontros) mundo.encontros.carregar(e.encontros);
+    mundo.objetos.carregar(e.versao >= 2 ? e.objetos : { baus_abertos: [] });
   };
   return mundo;
 }

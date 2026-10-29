@@ -68,8 +68,7 @@ async function iniciar() {
     plataforma.inicio = criarInicio({ t, versao: __VERSAO__, movel: movel.ativo, aoComecar: () => {
       audio.desbloquear(); // síncrono dentro do gesto (iOS)
       if (movel.ativo || preferencias.obter('tela_cheia_pedida')) telaCheia.entrar(); // PC: só se o jogador já pediu tela cheia nas preferências
-      entrada.soltarTudo(); pausa.retomar('inicio');
-    } });
+      entrada.soltarTudo(); pausa.retomar('inicio');    } });
   } else aviso.textContent = t(movel.ativo ? 'ui_comecar_toque' : 'ui_comecar');
   let desbloqueando = false;
   // cada gesto tenta de novo (o resume do iOS só vale dentro de touchend/click); no celular a mensagem some já no 1º toque, mesmo se o áudio falhar

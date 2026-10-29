@@ -8,7 +8,7 @@ import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
 import { criarMateriais } from './materiais.js';
 import { paredesInterior, ambienteInterior } from './interior.js';
-import { criarRotuloSaida } from './rotulo_saida.js';
+import { criarTampaBau } from './bau_tesouro.js';
 import { estadoCiclo, lanternaAcesa } from '../jogo/ciclo.js';
 
 const COR_AVISO = 0xd01a8f, COR_AVISO_BORDA = 0xffa0e6; // magenta reservado a perigo
@@ -67,6 +67,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     atores.push(ator); return ator;
   }
   const atorHeroi = novoAtor(mundo.heroi, recursos.atlas[heroiDados.sprite], true);
+  { const k = heroiDados.escala_mapa ?? 1; atorHeroi.sprite.malha.scale.setScalar(k); atorHeroi.sprite.silhueta?.scale.setScalar(k); atorHeroi.sombra.scale.setScalar(k); } // escala só na exploração (a batalha usa o atlas próprio); a âncora nos pés é a origem da malha
   for (const e of entidades) novoAtor(e, recursos.atlas[e.dados.sprite], false);
   const mkAnel = (r0, r1, cor, op) => { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: cor, transparent: true, opacity: op, depthWrite: false, depthTest: false })); m.renderOrder = 25; m.visible = false; cena.add(m); return m; };
   const marcadorDestino = mkAnel(0.32, 0.42, 0xfff0d0, 0.9), anelAlvo = mkAnel(0.62, 0.72, 0xd8ecff, 0.9);
@@ -75,8 +76,9 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   // ---------- partículas (pólen/vaga-lumes e fumaça das chaminés) ----------
   const particulas = criarParticulas(cena, kit.chamines, perfil), maxPart = (p) => (interior ? mapaDados.ambiente?.particulas ?? 0 : p.particulas_max); // interior: sem pólen nem vaga-lumes (cômodo fechado); `ambiente.particulas` liga poeira
   particulas.definirMax(maxPart(perfil));
+  // baús de tesouro: o corpo está no kit; a TAMPA é um objeto à parte que abre/fecha (cena.definirBau(id, aberto)); estado inicial = `aberto` do objeto
+  const baus = new Map(); for (const o of mapaDados.objetos) if (o.tipo === 'bau_tesouro') { const b = criarTampaBau(o, materiais), t = o.aberto ? 1 : 0; b.definir(t); cena.add(b.grupo); baus.set(o.id, { b, t, alvo: t }); }
   const reduzirMov = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
-  const textoSair = dados.textos?.['pt-BR']?.textos?.ui_sair ?? 'Sair', rotulos = (kit.saidas ?? []).map((q) => criarRotuloSaida(cena, { ...q, texto: textoSair }));
 
   // ---------- estado visual do ciclo (lido pelo pós) ----------
   const visual = { tom: [1, 1, 1], luzArtificial: 0, fundo: [0, 0, 0], ciclo: null };
@@ -90,8 +92,8 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     sol.color.setRGB(...ec.solCor); sol.intensity = ec.solInt; posicionarSol(cx, cz, ec.solElev); hemi.color.setRGB(...ec.hemiCeu); hemi.groundColor.setRGB(...ec.hemiChao); hemi.intensity = ec.hemiInt;
     cena.background.setRGB(...ec.fundo); cena.fog.color.setRGB(...ec.nevoa);
     materiais.janela.emissiveIntensity = ec.luzArtificial * 1.6; materiais.lampada.emissiveIntensity = Math.max(0.15, ec.luzArtificial) * 2.4; uniformesVento.uTempo.value = tempoS;
+    for (const q of baus.values()) if (q.t !== q.alvo) { q.t = reduzirMov() ? q.alvo : q.alvo > q.t ? Math.min(q.alvo, q.t + dtS / 0.45) : Math.max(q.alvo, q.t - dtS / 0.45); q.b.definir(q.t * q.t * (3 - 2 * q.t)); } // tampa: 0,45 s, com suavização
     if (materiais.brilho_saida) materiais.brilho_saida.opacity = reduzirMov() ? 0.5 : 0.42 + 0.14 * Math.sin(tempoS * 2.4); // luz de fora pulsa de leve (parada com reduzir movimento)
-    for (const r of rotulos) r.atualizar(mundo.heroi.x, mundo.heroi.z, tempoS, reduzirMov());
     // lanternas: as N mais próximas do foco ganham PointLight real (N do perfil); todas brilham pelo material emissivo
     const acesa = lanternaAcesa(kitDados, mundo.hora) || ec.luzArtificial > 0.3, n = Math.min(POOL, perfil.luzes_pontuais_max);
     const ordem = reuniao.map((p, i) => [Math.hypot(p.x - cx, p.z - cz), i]).sort((a, b) => a[0] - b[0]);
@@ -138,5 +140,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     cena.traverse((o) => { if (o.material && !o.material.isShaderMaterial) { for (const m of Array.isArray(o.material) ? o.material : [o.material]) m.needsUpdate = true; } });
     particulas.definirMax(maxPart(p));
   }
-  return { cena, camera, atualizar, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
+  /** Abre/fecha a tampa do baú de tesouro `id`; `instantaneo` pula a animação. Devolve false se não existe nesta cena. */
+  const definirBau = (id, aberto, instantaneo = false) => { const q = baus.get(id); if (!q) return false; q.alvo = aberto ? 1 : 0; if (instantaneo) { q.t = q.alvo; q.b.definir(q.t); } return true; };
+  return { cena, camera, atualizar, definirBau, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
 }

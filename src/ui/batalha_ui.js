@@ -45,7 +45,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false, plataforma = {}
   document.getElementById('ui')?.appendChild(raiz);
   // início, pausa, tela cheia e dica (telas.js): por cima da batalha, e com o teclado registrado antes do dela
   const telas = criarTelas({
-    mundo, t, cfg, plataforma, podeCancelarBatalha: () => modo === 'sub' || modo === 'alvo' || (modo === 'menu' && Object.keys(snap?.escolhas ?? {}).length > 0),
+    mundo, t, cfg, dados, plataforma, podeCancelarBatalha: () => modo === 'sub' || modo === 'alvo' || (modo === 'menu' && Object.keys(snap?.escolhas ?? {}).length > 0),
     aoMudar: (p) => { if (ctrl && ctrl.velocidade !== p.velocidade_batalha && ctrl.definirVelocidade(p.velocidade_batalha)) desenharOrdem(); },
   });
   if (new URLSearchParams(location.search).get('reduzir') === '1') { raiz.classList.add('reduzir'); camada.classList.add('reduzir'); }
@@ -220,7 +220,10 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false, plataforma = {}
         if (ev.tipo === 'habilidade') mensagem(t('ui_bat_msg_usa_habilidade', { nome_ator: nome(ev.ator), nome_habilidade: t(dados.combate.acoes[ev.id]?.nome_txt ?? ev.id) }));
         else if (ev.tipo === 'item') mensagem(t('ui_bat_msg_usa_item', { nome_ator: nome(ev.ator), nome_item: nomeItem(ev.id) }));
         else if (ev.tipo === 'defender') mensagem(t('ui_bat_msg_defende', { nome_ator: nome(ev.ator) }));
-        else if (ev.tipo === 'espera') mensagem(t('ui_bat_msg_espera', { nome_ator: nome(ev.ator) }));
+        // inimigo que não age (boneco de treino) ou ação de espera: a mensagem da própria ação, se houver; senão "{nome} não faz nada."
+        // inimigo sem ações (03): tipo 'passar' com msg_txt ("{nome} não faz nada.")
+        else if (ev.tipo === 'passar') mensagem(t(ev.msg_txt ?? 'ui_bat_msg_espera', { nome: nome(ev.ator), nome_ator: nome(ev.ator) }));
+        else if (ev.tipo === 'espera') mensagem(t(ev.id && dados.textos?.['pt-BR']?.[`txt_${ev.id}_msg`] ? `txt_${ev.id}_msg` : 'ui_bat_msg_espera', { nome_ator: nome(ev.ator) }));
         else mensagem('');
         break;
       case 'dano': {
@@ -389,6 +392,13 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false, plataforma = {}
   // ---------- resultado ----------
   function abrirResultado() {
     modo = 'resultado'; menuEl.hidden = true; subEl.hidden = true;
+    if (ctrl.consultar().treino) {
+      resultadoEl.replaceChildren(); resultadoEl.hidden = false;
+      el('h2', 'bat-res-titulo', resultadoEl, t('ui_bat_treino_concluido'));
+      el('p', 'bat-res-treino', resultadoEl, t('ui_bat_treino_sem_recompensa'));
+      const b = el('button', 'bat-item foco bat-botao', resultadoEl); b.type = 'button'; el('span', 'bat-seta', b, '▶'); el('span', '', b, t('ui_bat_continuar')); b.addEventListener('click', encerrar);
+      return;
+    }
     if (fim.tipo === 'fuga' || fim.tipo === 'empate') { encerrar(); return; }
     resultadoEl.replaceChildren(); resultadoEl.hidden = false;
     const botao = (id, acao) => { const b = el('button', 'bat-item foco bat-botao', resultadoEl); b.type = 'button'; el('span', 'bat-seta', b, '▶'); el('span', '', b, t(id)); b.addEventListener('click', acao); return b; };

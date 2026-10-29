@@ -2,7 +2,6 @@
 // da 1ª vez. DOM dentro de #ui (retângulo do jogo, escala com --k); texto só por ID e por textContent. A tela de início é do 08
 // (plataforma.inicio, #inicio); aqui só se espera ela acabar. API da plataforma (08, principal.js): preferencias.obter/definir/todas,
 // telaCheia.suportada/ativa/alternar/aoMudar, pausa.pausar('ui')/retomar('ui'), movel.ativo. Sem ela (testes), há substitutos locais.
-import { criarMinimapa } from './minimapa.js';
 
 function el(tag, classe, pai, texto) {
   const e = document.createElement(tag);
@@ -23,13 +22,11 @@ const SEM_TELA_CHEIA = { suportada: false, ativa: () => false, alternar: async (
  * @param podeCancelarBatalha () → true quando o Esc ainda tem o que desfazer na batalha (submenu, alvo, escolha anterior)
  * @param aoMudar (prefs) → a batalha aplica velocidade e reduzir movimento
  */
-export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha = () => false, aoMudar = () => {} }) {
+export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCancelarBatalha = () => false, aoMudar = () => {} }) {
   const P = plataforma.preferencias ?? preferenciasNaMemoria(), tela = plataforma.telaCheia ?? SEM_TELA_CHEIA, pausa = plataforma.pausa ?? null;
   const toque = plataforma.movel?.ativo ?? !!globalThis.matchMedia?.('(pointer: coarse)').matches;
   const iniciou = () => !plataforma.inicio?.pendente;
   let pausado = false, foco = 0, dica = null;
-  const obterPref = (k) => { try { return P.obter(k); } catch { return k === 'minimapa'; } };
-  const minimapa = criarMinimapa({ mundo, t, cfg, plataforma, preferencia: obterPref, visivel: () => iniciou() && !pausado && (!mundo.jogo || mundo.jogo.modo === 'mapa') });
 
   const pai = document.getElementById('ui') ?? document.body, raiz = el('div', 'tela', pai);
   // ---------- canto: ⏸ e tela cheia ----------
@@ -47,11 +44,37 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
   const lReduzir = linha('ui_pausa_reduzir'), bReduzir = botao('tela-controle tela-alterna', lReduzir);
   const lVel = linha('ui_pausa_velocidade'), bVel = botao('tela-controle tela-alterna', lVel);
   const lCheia = linha('ui_pausa_tela_cheia'), bCheiaPainel = botao('tela-controle tela-alterna', lCheia);
-  const lMini = linha('ui_pausa_minimapa'), bMini = botao('tela-controle tela-alterna', lMini);
-  const lMiniC = linha('ui_pausa_minimapa_contraste'), bMiniC = botao('tela-controle tela-alterna', lMiniC);
-  const linhas = [lContinuar, lVolume, lReduzir, lVel, lCheia, lMini, lMiniC];
+  const linhas = [lContinuar, lVolume, lReduzir, lVel, lCheia];
+  // ---------- janela de achado (baú de tesouro; eventos do 13: bau_aberto {mapa, id, item, quantidade} e bau_vazio {mapa, id}) ----------
+  // O item já está na mochila: a janela só informa. Fila se vierem vários; enquanto aberta, plataforma.pausa('achado') para o mundo.
+  const fundoAchado = el('div', 'tela-pausa tela-achado', raiz); fundoAchado.hidden = true;
+  const painelAchado = el('div', 'tela-painel tela-painel-achado', fundoAchado); painelAchado.setAttribute('role', 'alertdialog');
+  const iconeAchado = el('div', 'tela-achado-icone', painelAchado); iconeAchado.setAttribute('aria-hidden', 'true');
+  const textoAchado = el('p', 'tela-achado-texto', painelAchado), bOk = botao('tela-controle tela-continuar tela-ok', painelAchado, t('ui_achado_ok'));
+  const filaAchados = []; let achado = null;
+  const nomeTxtItem = (id) => dados.combate?.itens?.[id]?.nome_txt ?? dados.itens?.[id]?.nome_txt ?? `txt_${id}_nome`;
+  function mostrarAchado() {
+    if (achado || !filaAchados.length) return;
+    achado = filaAchados.shift(); fundoAchado.hidden = false; pausa?.pausar('achado'); esconderDica(false);
+    painelAchado.classList.toggle('vazio', achado.vazio);
+    iconeAchado.textContent = achado.vazio ? '∅' : '✦';
+    textoAchado.textContent = achado.vazio ? t('ui_achado_vazio')
+      : t(achado.quantidade > 1 ? 'ui_achado_encontrou_qtd' : 'ui_achado_encontrou', { nome_item: t(nomeTxtItem(achado.item)), qtd: achado.quantidade });
+    painelAchado.setAttribute('aria-label', textoAchado.textContent);
+  }
+  function fecharAchado() { if (!achado) return; achado = null; fundoAchado.hidden = true; pausa?.retomar('achado'); mostrarAchado(); }
+  bOk.addEventListener('click', fecharAchado);
+  // (o 13 também emite 'achado' para o mesmo baú: escutamos só bau_aberto, uma janela por baú)
+  mundo.eventos?.em('bau_aberto', (ev) => { filaAchados.push({ item: ev.item, quantidade: ev.quantidade ?? 1, vazio: !ev.item }); mostrarAchado(); });
+  mundo.eventos?.em('bau_vazio', () => { filaAchados.push({ vazio: true }); mostrarAchado(); });
+
   // ---------- dica ----------
   const dicaEl = el('div', 'tela-dica', raiz); dicaEl.hidden = true; dicaEl.setAttribute('role', 'status');
+  // ---------- nome do mapa ao entrar (início do jogo e cada troca por portal: evento 'mapa_trocado' da simulação) ----------
+  const bannerEl = el('div', 'tela-banner-mapa', raiz); bannerEl.hidden = true; bannerEl.setAttribute('role', 'status');
+  const pedirBanner = (id) => ({ id, nomeTxt: dados.mapas?.[id]?.nome_txt, t: 0 });
+  let banner = pedirBanner(mundo.mapaId ?? null); // pendente desde o começo: aparece quando o jogo começa de fato
+  mundo.eventos?.em('mapa_trocado', (ev) => { banner = pedirBanner(ev.mapa); });
 
   const prefs = () => P.todas();
   function gravar(parcial) { for (const [k, v] of Object.entries(parcial)) P.definir(k, v); desenhar(); aoMudar(prefs()); }
@@ -62,7 +85,6 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
     bReduzir.textContent = t(p.reduzir_movimento ? 'ui_ligado' : 'ui_desligado'); bReduzir.setAttribute('aria-pressed', String(p.reduzir_movimento));
     bVel.textContent = t('ui_pausa_vel_valor', { vel: p.velocidade_batalha });
     bCheiaPainel.textContent = t(tela.ativa() ? 'ui_ligado' : 'ui_desligado'); lCheia.hidden = !cheia;
-    bMini.textContent = t(p.minimapa === false ? 'ui_desligado' : 'ui_ligado'); bMiniC.textContent = t(p.minimapa_contraste ? 'ui_ligado' : 'ui_desligado');
     fundo.hidden = !pausado;
     linhas.forEach((l, i) => l.classList.toggle('foco', pausado && i === foco));
     for (const e of [raiz, document.getElementById('batalha'), ...document.querySelectorAll('.bat-camada')]) e?.classList.toggle('reduzir', p.reduzir_movimento);
@@ -76,16 +98,13 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
   const alternarVel = () => gravar({ velocidade_batalha: prefs().velocidade_batalha === 1 ? 2 : 1 });
   // dentro do gesto (clique/toque/tecla); guarda o pedido para o 08 repetir na próxima abertura do jogo
   const alternarCheia = () => Promise.resolve(tela.alternar()).then((ativa) => gravar({ tela_cheia_pedida: !!ativa })).finally(desenhar);
-  const alternarMini = () => gravar({ minimapa: prefs().minimapa === false });
-  const alternarMiniC = () => gravar({ minimapa_contraste: !prefs().minimapa_contraste });
-  const ativar = [fecharPausa, () => volume(0.1), alternarReduzir, alternarVel, alternarCheia, alternarMini, alternarMiniC];
-  const ajustar = [null, (d) => volume(d * 0.1), alternarReduzir, alternarVel, alternarCheia, alternarMini, alternarMiniC];
+  const ativar = [fecharPausa, () => volume(0.1), alternarReduzir, alternarVel, alternarCheia];
+  const ajustar = [null, (d) => volume(d * 0.1), alternarReduzir, alternarVel, alternarCheia];
   function mover(d) { const vis = linhas.map((l, i) => (l.hidden ? -1 : i)).filter((i) => i >= 0); foco = vis[(vis.indexOf(foco) + d + vis.length) % vis.length]; desenhar(); }
 
   bPausa.addEventListener('click', abrirPausa); bCheia.addEventListener('click', alternarCheia);
   bContinuar.addEventListener('click', fecharPausa); bMenos.addEventListener('click', () => volume(-0.1)); bMais.addEventListener('click', () => volume(0.1));
   bReduzir.addEventListener('click', alternarReduzir); bVel.addEventListener('click', alternarVel); bCheiaPainel.addEventListener('click', alternarCheia);
-  bMini.addEventListener('click', alternarMini); bMiniC.addEventListener('click', alternarMiniC);
   linhas.forEach((l, i) => l.addEventListener('pointerenter', () => { if (pausado && foco !== i) { foco = i; desenhar(); } }));
   fundo.addEventListener('pointerdown', (e) => { if (e.target === fundo) fecharPausa(); }); // tocar fora do painel fecha
   fundo.addEventListener('contextmenu', (e) => { e.preventDefault(); fecharPausa(); });
@@ -94,8 +113,8 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
   // teclado: registrado ANTES do da batalha (criarTelas roda primeiro), então com a pausa aberta a batalha não recebe tecla nenhuma
   addEventListener('keydown', (e) => {
     if (!iniciou()) return; // a tela de início (08) cuida da tecla
+    if (achado) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && ['Enter', 'NumpadEnter', 'Space', 'Escape', 'KeyE', 'Backspace'].includes(e.code)) fecharAchado(); return; }
     const pausa = e.code === 'Escape' || e.code === 'KeyP';
-    if (!pausado && e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); e.stopImmediatePropagation(); alternarMini(); return; }
     if (!pausado) {
       if (!pausa || (e.code === 'Escape' && mundo.jogo?.modo === 'batalha' && podeCancelarBatalha())) return;
       e.preventDefault(); e.stopImmediatePropagation(); abrirPausa(); return;
@@ -112,11 +131,11 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
   function lerGamepad() {
     const gp = [...(navigator.getGamepads?.() ?? [])].find((g) => g && g.mapping === 'standard'); if (!gp) return;
     const b = (i) => !!gp.buttons[i]?.pressed, ay = gp.axes[1] ?? 0, ax = gp.axes[0] ?? 0;
-    const agora = { select: b(8), start: b(9), sul: b(0), leste: b(1), cima: b(12) || ay < -0.5, baixo: b(13) || ay > 0.5, esq: b(14) || ax < -0.5, dir: b(15) || ax > 0.5 };
+    const agora = { start: b(9), sul: b(0), leste: b(1), cima: b(12) || ay < -0.5, baixo: b(13) || ay > 0.5, esq: b(14) || ax < -0.5, dir: b(15) || ax > 0.5 };
     const borda = (k) => agora[k] && !antes[k]; antes = agora;
     if (!iniciou()) return;
+    if (achado) { if (borda('sul') || borda('leste') || borda('start')) fecharAchado(); return; }
     if (borda('start')) { if (pausado) fecharPausa(); else abrirPausa(); return; }
-    if (borda('select') && !pausado) { alternarMini(); return; }
     if (!pausado) return;
     if (borda('cima')) mover(-1); if (borda('baixo')) mover(1); if (borda('esq')) ajustar[foco]?.(-1); if (borda('dir')) ajustar[foco]?.(1);
     if (borda('sul')) ativar[foco](); if (borda('leste')) fecharPausa();
@@ -125,7 +144,7 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
   // ---------- dica de controles (1ª vez no mapa) ----------
   function esconderDica(marcar = true) { if (!dica) return; dica = null; dicaEl.hidden = true; if (marcar) gravar({ dica_vista: true }); }
   function cuidarDica(dt) {
-    if (!iniciou() || pausado) return;
+    if (!iniciou() || pausado || achado) return;
     const h = mundo.heroi;
     if (!dica) {
       if (prefs().dica_vista || mundo.jogo?.modo !== 'mapa' || !h) return;
@@ -135,11 +154,23 @@ export function criarTelas({ mundo, t, cfg, plataforma = {}, podeCancelarBatalha
     if (dica.t >= cfg.t_dica_s || mundo.jogo?.modo !== 'mapa' || (h && Math.hypot(h.x - dica.x, h.z - dica.z) > 0.05)) esconderDica();
   }
 
+  // não bloqueia nada (sem clique, sem pausa); some na batalha; congela sob pausa/achado; reduzir movimento: só esmaece, sem deslizar
+  function cuidarBanner(dt) {
+    if (!banner.id || !iniciou()) return;
+    if (mundo.jogo && mundo.jogo.modo !== 'mapa') { banner.id = null; bannerEl.hidden = true; return; }
+    if (pausado || achado) { bannerEl.hidden = true; return; }
+    const B = cfg.banner_mapa, nomeTxt = banner.nomeTxt;
+    if (!nomeTxt || banner.t >= B.t_total_s) { banner.id = null; bannerEl.hidden = true; return; }
+    if (bannerEl.hidden || bannerEl.dataset.mapa !== banner.id) { bannerEl.textContent = t(nomeTxt); bannerEl.dataset.mapa = banner.id; bannerEl.hidden = false; }
+    const a = Math.min(1, banner.t / B.t_entra_s, (B.t_total_s - banner.t) / B.t_sai_s);
+    bannerEl.style.opacity = String(Math.max(0, a)); bannerEl.style.setProperty('--entra', String(Math.max(0, a)));
+    banner.t += dt;
+  }
+
   desenhar();
   return {
-    get pausado() { return pausado; }, preferencias: prefs,
-    minimapa,
-    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); minimapa.atualizar(); },
+    get pausado() { return pausado || !!achado; }, get achadoAberto() { return !!achado; }, preferencias: prefs,
+    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); cuidarBanner(dt); },
     abrirPausa, fecharPausa, gravar,
   };
 }

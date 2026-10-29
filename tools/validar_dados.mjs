@@ -104,7 +104,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
       if (ids.has(o.id)) erro(arq, `/objetos/${i}/id`, `ID "${o.id}" repetido`); ids.add(o.id);
       const pegada = o.tipo === 'inimigo' ? true : kit?.pegadas[o.tipo];
       if (!pegada) erro(arq, `/objetos/${i}/tipo`, `tipo "${o.tipo}" não tem pegada em cfg_kit`);
-      if (o.tipo === 'cerca' || o.tipo === 'muro_fuligem') { for (const c of ['x0', 'z0', 'x1', 'z1']) if (o[c] === undefined) erro(arq, `/objetos/${i}/${c}`, `${o.tipo} exige x0, z0, x1, z1`); }
+      if (['cerca', 'muro_fuligem', 'muralha_baixa', 'estacada'].includes(o.tipo)) { for (const c of ['x0', 'z0', 'x1', 'z1']) if (o[c] === undefined) erro(arq, `/objetos/${i}/${c}`, `${o.tipo} exige x0, z0, x1, z1`); }
       else { if (o.x === undefined || o.z === undefined) erro(arq, `/objetos/${i}`, 'objeto exige x e z'); else if (o.x < 0 || o.z < 0 || o.x > L || o.z > A) erro(arq, `/objetos/${i}`, `objeto "${o.id}" fora do mapa`); }
       if (o.tipo === 'casa' && (!o.w || !o.d || o.telhado === undefined)) erro(arq, `/objetos/${i}`, 'casa exige w, d e telhado');
       if (pegada && pegada.forma === 'ret' && o.tipo !== 'casa' && ((pegada.w === undefined && !o.w) || (pegada.d === undefined && !o.d))) erro(arq, `/objetos/${i}`, `"${o.tipo}" tem pegada sem tamanho em cfg_kit: exige w e d no objeto`);
@@ -114,7 +114,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
     if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
   }
-  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
+  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto, { encontros: new Set(por('encontro').map(([, e]) => e.id)), itens: new Set(por('item_batalha').map(([, x]) => x.id)) }); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
   // ---- combate por turnos (regras cruzadas; esquemas em data/schemas/*_batalha, encontro, cfg_batalha) ----
   const cb = um('cfg_batalha');
   if (por('cfg_batalha').length === 0 && por('encontro').length) erros.push('data/combate: falta cfg_batalha.json (ou ele é inválido)');
@@ -123,6 +123,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
   const heroisB = Object.fromEntries(por('heroi_batalha').map(([a, x]) => [x.id, [a, x]]));
   const inimigosB = Object.fromEntries(por('inimigo_batalha').map(([a, x]) => [x.id, [a, x]]));
   if (cb) {
+    exigeTexto('combate/cfg_batalha.json', '/msg_nao_faz_nada_txt', cb.msg_nao_faz_nada_txt);
     const f = cb.fuga; if (f.min > f.max) erro('combate/cfg_batalha.json', '/fuga/min', 'deve ser ≤ max');
     for (const [k, [a, x]] of Object.entries(acoes)) {
       exigeTexto(a, '/nome_txt', x.nome_txt);
@@ -135,7 +136,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
       if (x.efeito === 'cura' && !x.alvo_tipo.startsWith('aliado') && x.alvo_tipo !== 'si') erro(a, '/alvo_tipo', 'cura deve mirar aliado ou si');
       if (x.tipo === 'ataque' && x.custo.mana !== 0) erro(a, '/custo/mana', 'ataque básico não custa mana');
     }
-    for (const [, [a, x]] of Object.entries(itensB)) { exigeTexto(a, '/nome_txt', x.nome_txt); if (!cb.tempos[x.tempo]) erro(a, '/tempo', `tempo "${x.tempo}" não existe em cfg_batalha.tempos`); }
+    for (const [, [a, x]] of Object.entries(itensB)) { exigeTexto(a, '/nome_txt', x.nome_txt); if (x.efeito === 'cura' && !cb.tempos[x.tempo]) erro(a, '/tempo', `tempo "${x.tempo}" não existe em cfg_batalha.tempos`); if (x.desc_txt) exigeTexto(a, '/desc_txt', x.desc_txt); }
     for (const [, [a, h]] of Object.entries(heroisB)) {
       exigeTexto(a, '/nome_txt', h.nome_txt);
       const ref = (campo, id) => { if (!acoes[id]) erro(a, campo, `ação "${id}" não existe em data/attacks`); };
@@ -146,6 +147,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     }
     for (const [, [a, e]] of Object.entries(inimigosB)) {
       exigeTexto(a, '/nome_txt', e.nome_txt);
+      if (e.treino && (e.xp || e.moedas || e.drops.length || e.ia.length)) erro(a, '/treino', 'inimigo de treino deve ter xp, moedas, drops e ia zerados (não dá recompensa nem age)');
       e.ia.forEach((o, i) => {
         if (!acoes[o.acao]) erro(a, `/ia/${i}/acao`, `ação "${o.acao}" não existe em data/attacks`);
         else if (acoes[o.acao][1].dano_base === undefined && acoes[o.acao][1].efeito === 'dano') erro(a, `/ia/${i}/acao`, `"${o.acao}" usa mult_dano; inimigo usa dano_base`);
@@ -155,6 +157,7 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     }
     for (const [arq, e] of por('encontro')) {
       exigeTexto(arq, '/nome_txt', e.nome_txt);
+      if (!e.treino && e.inimigos.some((id) => inimigosB[id]?.[1].treino)) erro(arq, '/treino', 'encontro com inimigo de treino deve ter "treino": true');
       e.inimigos.forEach((id, i) => { if (!inimigosB[id]) erro(arq, `/inimigos/${i}`, `inimigo "${id}" não existe em data/combate`); });
     }
     cb.debug.encontros.forEach((id, i) => { if (!por('encontro').some(([, e]) => e.id === id)) erro('combate/cfg_batalha.json', `/debug/encontros/${i}`, `encontro "${id}" não existe em data/combate`); });

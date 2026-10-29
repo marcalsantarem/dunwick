@@ -1,0 +1,11 @@
+{
+  "id": "item_lembranca_edric",
+  "versao": 1,
+  "nota": "Tesouro do baú da casa do Edric (BRF v0.1.2b): lembrança de infância, sem efeito, não vende. ID combinado com o 14 (layout_vila.mjs).",
+  "nome_txt": "txt_item_lembranca_edric_nome",
+  "desc_txt": "txt_item_lembranca_edric_desc",
+  "categoria": "lembranca",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "valor": 0
+}

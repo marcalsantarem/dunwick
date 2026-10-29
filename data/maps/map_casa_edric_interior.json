@@ -1,0 +1,165 @@
+{
+  "id": "map_casa_edric_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_casa_edric_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [8, 6],
+  "legenda": {
+    "c": "calcada"
+  },
+  "planta": [
+    "cccccccc",
+    "cccccccc",
+    "cccccccc",
+    "cccccccc",
+    "cccccccc",
+    "cccccccc"
+  ],
+  "objetos": [
+    {
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 4,
+      "z": 0,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 3,
+      "rot": 90,
+      "seed": 2
+    },
+    {
+      "id": "cama_3",
+      "tipo": "cama",
+      "x": 0.8,
+      "z": 1.6,
+      "rot": 0,
+      "seed": 3,
+      "itens": "remendada",
+      "cor": "ocre"
+    },
+    {
+      "id": "armas_parede_4",
+      "tipo": "armas_parede",
+      "x": 2.9,
+      "z": 0,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "prateleira_5",
+      "tipo": "prateleira",
+      "x": 0,
+      "z": 3.6,
+      "w": 1.4,
+      "rot": 90,
+      "seed": 5,
+      "alt": 1.5
+    },
+    {
+      "id": "estante_6",
+      "tipo": "estante",
+      "x": 4.8,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 6
+    },
+    {
+      "id": "bau_casa_edric",
+      "tipo": "bau_tesouro",
+      "x": 7,
+      "z": 0.7,
+      "rot": 0,
+      "seed": 7,
+      "item": "item_lembranca_edric",
+      "aberto": false
+    },
+    {
+      "id": "mesa_8",
+      "tipo": "mesa",
+      "x": 5.8,
+      "z": 1.9,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 8,
+      "itens": "vela"
+    },
+    {
+      "id": "banco_9",
+      "tipo": "banco",
+      "x": 5.8,
+      "z": 2.7,
+      "rot": 0,
+      "seed": 9
+    },
+    {
+      "id": "tapete_10",
+      "tipo": "tapete",
+      "x": 3.4,
+      "z": 3.4,
+      "w": 2,
+      "d": 1.4,
+      "rot": 0,
+      "seed": 10,
+      "cor": "verde"
+    },
+    {
+      "id": "caixote_11",
+      "tipo": "caixote",
+      "x": 7.3,
+      "z": 4.6,
+      "rot": 0,
+      "seed": 11
+    }
+  ],
+  "pois": [
+    {
+      "id": "bau_casa_edric",
+      "tipo": "bau_tesouro",
+      "x": 7,
+      "z": 0.7,
+      "nome_txt": "txt_poi_bau_casa_edric",
+      "item": "item_lembranca_edric"
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 4,
+      "z": 5.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_casa_edric"
+      },
+      "chegada": {
+        "x": 4,
+        "z": 3.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "madeira",
+    "piso": "calcada"
+  },
+  "ambiente": {
+    "cor_luz": "#ffd29a",
+    "intensidade": 0.85,
+    "fundo": "#18120c"
+  },
+  "inicio_jogador": {
+    "tile": [4, 3],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 8, 6]
+}

@@ -147,7 +147,8 @@
             "enum": [
               "telha",
               "ardosia",
-              "musgo"
+              "musgo",
+              "palha"
             ]
           },
           "janelas": {
@@ -162,7 +163,8 @@
             "enum": [
               "padrao",
               "nova",
-              "enegrecida"
+              "enegrecida",
+              "rustica"
             ]
           },
           "deco": {
@@ -171,7 +173,8 @@
               "taverna",
               "forja",
               "escrivao",
-              "torvan"
+              "torvan",
+              "edric"
             ]
           },
           "fechada": {
@@ -190,7 +193,8 @@
             "enum": [
               "taverna",
               "papeis",
-              "vela"
+              "vela",
+              "remendada"
             ]
           },
           "cor": {
@@ -203,6 +207,22 @@
           "alt": {
             "type": "number",
             "minimum": 0
+          },
+          "encontro": {
+            "type": "string",
+            "pattern": "^enc_[a-z0-9_]+$"
+          },
+          "item": {
+            "type": "string",
+            "pattern": "^item_[a-z0-9_]+$"
+          },
+          "quantidade": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "aberto": {
+            "type": "boolean",
+            "description": "bau_tesouro: já aberto (tampa levantada)"
           }
         }
       }
@@ -478,6 +498,18 @@
           "nome_txt": {
             "type": "string",
             "pattern": "^txt_[a-z0-9_]+$"
+          },
+          "encontro": {
+            "type": "string",
+            "pattern": "^enc_[a-z0-9_]+$"
+          },
+          "item": {
+            "type": "string",
+            "pattern": "^item_[a-z0-9_]+$"
+          },
+          "quantidade": {
+            "type": "integer",
+            "minimum": 1
           }
         }
       }

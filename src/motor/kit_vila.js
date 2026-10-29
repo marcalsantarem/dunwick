@@ -6,6 +6,7 @@
 // Cada peça solta tem pegada em data/config/cfg_kit.json (mesmo dado do visual). Aleatório sempre por semente.
 import * as THREE from 'three';
 import { rng, blobIco, folhagemGeo } from './kit.js';
+import { corpoBau } from './bau_tesouro.js';
 
 const RAD = Math.PI / 180, M4 = new THREE.Matrix4(), EU = new THREE.Euler(), QU = new THREE.Quaternion(), UM = new THREE.Vector3(1, 1, 1), PV = new THREE.Vector3();
 
@@ -43,6 +44,7 @@ export function telhadinho(col, matTelha, matEmpena, x, y0, z, L, S, rh, ry = 0)
 // ---------------------------------------------------------------- casas: variantes e decoração
 /** Materiais da casa por `estilo`: `nova` = reconstruída (reboco claro, madeira clara); `enegrecida` = sobrevivente do saque (pedra e vigas queimadas, reboco sujo). */
 export function materiaisCasa(o) {
+  if (o.estilo === 'rustica') return { pedra: 'pedra', reboco: 'tabuas', madeira: 'madeira', tabuas: 'tabuas' }; // casinha de tábuas: base de pedra baixa, paredes de madeira
   if (o.estilo === 'nova') return { pedra: 'pedra', reboco: 'reboco_novo', madeira: 'madeira_clara', tabuas: 'tabuas' };
   if (o.estilo === 'enegrecida') return { pedra: 'pedra_negra', reboco: 'reboco_sujo', madeira: 'carvao', tabuas: 'tabuas' };
   return { pedra: 'pedra', reboco: 'reboco', madeira: 'madeira', tabuas: 'tabuas' };
@@ -97,6 +99,10 @@ export function decorarCasa(col, o, kit, saida, janelas) {
     W.b('pedra', qx, top / 2 - 0.05, qz, 0.9, top + 0.1, 0.9); W.b('pedra', qx, top + 0.12, qz, 1.1, 0.2, 1.1);
     for (const y of [h * 0.5, h + rh * 0.4]) W.b('pedra_negra', qx, y, qz + 0.46, 0.8, 0.5, 0.02); // fuligem na face da frente
     saida.chamines.push({ x: qx, y: top + 0.3, z: qz });
+  }
+  if (o.deco === 'edric') { // remendos no telhado de palha: tábuas novas e um pano sobre a água da frente (a casa é rústica e foi consertada aos poucos)
+    const S = Math.min(w, d), e = S / 2 + kit.visual.casa.beiral, th = Math.atan2(rh, e);
+    if (d <= w) for (const [px, pz, mat, ww, dd] of [[-0.6, 0.55, 'madeira_clara', 0.9, 0.55], [0.5, 0.3, 'tecido_ocre', 0.7, 0.6], [-0.1, 0.85, 'madeira_clara', 0.5, 0.4]]) { const zz = e * pz; W.g(mat, new THREE.BoxGeometry(ww, 0.04, dd), cx + px, h + ((e - zz) / e) * rh + 0.035, cz + zz, th); }
   }
   if (!vis) return;
   switch (o.deco) {
@@ -181,6 +187,39 @@ function muroFuligem(col, o) {
   }
 }
 
+/** Muralha baixa de pedra seca (perímetro da vila): trecho reto de (x0,z0) a (x1,z1), repetível; blocos de altura variada e capa de pedra. Cantos: encoste dois trechos no mesmo ponto. */
+function muralhaBaixa(col, o) {
+  const dx = o.x1 - o.x0, dz = o.z1 - o.z0, len = Math.hypot(dx, dz), n = Math.max(1, Math.round(len / 0.9)), r = rng(o.seed ?? 1), ry = -Math.atan2(dz, dx), seg = len / n;
+  for (let i = 0; i < n; i++) {
+    const t = (i + 0.5) / n, x = o.x0 + dx * t, z = o.z0 + dz * t, hh = 0.85 + (r() - 0.5) * 0.16, esp = 0.46 + r() * 0.06;
+    col.caixa(r() < 0.25 ? 'pedra_negra' : 'pedra', x, hh / 2, z, seg + 0.03, hh, esp, ry); col.caixa('pedra', x, hh + 0.05, z, seg + 0.05, 0.1, esp + 0.1, ry + (r() - 0.5) * 0.06);
+  }
+}
+
+/** Estacada rústica de toras pontudas (mata e fundos): trecho reto repetível, toras de altura irregular presas por duas travessas. */
+function estacada(col, o) {
+  const dx = o.x1 - o.x0, dz = o.z1 - o.z0, len = Math.hypot(dx, dz), n = Math.max(2, Math.round(len / 0.34)), r = rng(o.seed ?? 1);
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, h = 1.55 + (r() - 0.5) * 0.4, x = o.x0 + dx * t, z = o.z0 + dz * t;
+    col.geo('casca', new THREE.CylinderGeometry(0.02, 0.085, h, 5), new THREE.Matrix4().makeTranslation(x, h / 2, z));
+  }
+  for (const y of [0.45, 1.0]) col.viga('madeira', [o.x0, y, o.z0], [o.x1, y, o.z1], 0.08);
+}
+
+/** Tronco caído (borda da mata): `rot` em graus, comprimento `w` (padrão 2,2), com toco de galho e musgo. */
+function troncoCaido(col, o) {
+  const a = ajudantes(col, o), w = o.w ?? 2.2, r = rng(o.seed ?? 1), rad = 0.22;
+  a.g('casca', new THREE.CylinderGeometry(rad, rad * 1.1, w, 7).rotateZ(Math.PI / 2), 0, rad, 0);
+  a.b('telha_musgo', (r() - 0.5) * w * 0.4, rad * 2 - 0.02, 0, w * 0.35, 0.07, rad * 1.1);
+  a.v('casca', [w * 0.2, rad, 0], [w * 0.35, rad + 0.35, 0.18], 0.07);
+}
+
+/** Moita de borda: bolsão denso e largo de folhagem (mais cheia que o arbusto), para fechar vãos entre árvores. */
+function moita(col, o) {
+  const r = rng(o.seed ?? 1), esc = o.escala ?? 1;
+  for (let i = 0; i < 5; i++) { const rad = (0.42 + r() * 0.3) * esc, g = folhagemGeo(blobIco(rad, 1, Math.floor(r() * 1e6)), null, 0, 1.2 * esc, Math.floor(r() * 1e6), 0.2 + r() * 0.5); col.geo('folhagem', g, new THREE.Matrix4().makeTranslation(o.x + (r() - 0.5) * 1.1 * esc, rad * 0.8, o.z + (r() - 0.5) * 1.1 * esc), { escala: col.escalaUV * 0.5 }); }
+}
+
 function pedraEnegrecida(col, o) {
   const a = ajudantes(col, o), r = rng(o.seed ?? 1), w = o.w ?? 2, d = o.d ?? 4, ao = d >= w, L = ao ? d : w, esp = Math.min(ao ? w : d, 0.8), n = Math.max(2, Math.round(L / 0.75));
   for (let i = 0; i < n; i++) { // paredão queimado: blocos de alturas decrescentes, topo quebrado
@@ -228,4 +267,22 @@ function bigorna(col, o) {
   a.g('metal', new THREE.ConeGeometry(0.14, 0.4, 6), 0.55, 0.87, 0, 0, 0, -Math.PI / 2);
 }
 
-export const PECAS_VILA = { portico, quadro_avisos: quadroAvisos, arvore_queimada: arvoreQueimada, muro_fuligem: muroFuligem, pedra_enegrecida: pedraEnegrecida, canteiro, rack_armas: rackArmas, forja_brasa: forjaBrasa, bigorna };
+function lenha(col, o) { // pilha de lenha com o toco de rachar e o machado fincado
+  const a = ajudantes(col, o), r = rng(o.seed ?? 1);
+  for (const [n, y] of [[5, 0.11], [4, 0.31], [3, 0.5]]) for (let i = 0; i < n; i++) a.g('casca', new THREE.CylinderGeometry(0.1, 0.1, 0.55 + (r() - 0.5) * 0.06, 7), -0.1 + (i - (n - 1) / 2) * 0.21, y, 0, Math.PI / 2);
+  a.g('casca', new THREE.CylinderGeometry(0.2, 0.22, 0.38, 8), 0.85, 0.19, 0.1); a.v('madeira', [0.85, 0.4, 0.1], [1.0, 0.85, 0.05], 0.05); a.b('metal', 0.83, 0.4, 0.1, 0.16, 0.12, 0.04); // toco e machado
+}
+
+function varal(col, o) { // dois postes, corda e roupas penduradas (a vão `w`, em x local; os postes bloqueiam, o meio é livre)
+  const a = ajudantes(col, o), w = o.w ?? 2.4, r = rng(o.seed ?? 1), hw = w / 2, mats = ['papel', 'tecido_azul', 'tecido_ocre', 'tecido_vinho'];
+  for (const s of [-1, 1]) a.b('madeira', s * hw, 0.95, 0, 0.1, 1.9, 0.1);
+  a.v('tecido_ocre', [-hw, 1.8, 0], [hw, 1.76, 0], 0.025);
+  for (let i = 0; i < 4; i++) { const x = -hw + 0.45 + i * ((w - 0.9) / 3), l = 0.45 + r() * 0.2; a.b(mats[i], x, 1.76 - l / 2, 0.01, 0.34 + r() * 0.1, l, 0.02); if (i % 2 === 0) { a.b(mats[i], x - 0.22, 1.76 - 0.2, 0.01, 0.14, 0.3, 0.02, 0.3); a.b(mats[i], x + 0.22, 1.76 - 0.2, 0.01, 0.14, 0.3, 0.02, -0.3); } }
+}
+
+function balde(col, o) {
+  const a = ajudantes(col, o); a.g('madeira', new THREE.CylinderGeometry(0.2, 0.15, 0.32, 9), 0, 0.16, 0); a.g('metal', new THREE.CylinderGeometry(0.205, 0.205, 0.04, 9), 0, 0.28, 0); a.g('metal', new THREE.CylinderGeometry(0.16, 0.16, 0.04, 9), 0, 0.06, 0);
+  a.g('agua', new THREE.CircleGeometry(0.17, 9).rotateX(-Math.PI / 2), 0, 0.3, 0, 0, 0, 0, { uv: false }); a.g('metal', new THREE.TorusGeometry(0.19, 0.012, 4, 10, Math.PI), 0, 0.3, 0, 0, 0, 0);
+}
+
+export const PECAS_VILA = { lenha, varal, balde, bau_tesouro: (col, o) => corpoBau(col, o), portico, quadro_avisos: quadroAvisos, arvore_queimada: arvoreQueimada, muro_fuligem: muroFuligem, muralha_baixa: muralhaBaixa, estacada, tronco_caido: troncoCaido, moita, pedra_enegrecida: pedraEnegrecida, canteiro, rack_armas: rackArmas, forja_brasa: forjaBrasa, bigorna };

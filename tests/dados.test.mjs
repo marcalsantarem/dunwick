@@ -16,7 +16,7 @@ function copiaComEdicao(arquivoRel, editar) {
 }
 
 test('dados reais: 0 erros', () => { const r = validarDados(RAIZ); assert.deepEqual(r.erros, []); assert.ok(r.arquivos >= 11); });
-test('assets reais: 0 erros', () => { const r = validarAssets(RAIZ); assert.deepEqual(r.erros, []); assert.equal(r.sprites, 6); });
+test('assets reais: 0 erros', () => { const r = validarAssets(RAIZ); assert.deepEqual(r.erros, []); assert.equal(r.sprites, 7); });
 
 test('texto no lugar de número: erro com arquivo e campo (M1-21)', () => {
   const tmp = copiaComEdicao('characters/hero_edric.json', (o) => { o.movimento.vel_andar = 'rápido'; });
@@ -56,5 +56,5 @@ test('tecla repetida no mesmo contexto e F5/F11 no debug são recusadas', () => 
 test('planta com caractere fora da legenda ou tamanho errado é recusada', () => {
   const tmp = copiaComEdicao('maps/map_baixo_orvalho.json', (o) => { o.planta[5] = o.planta[5].slice(0, 10) + '?' + o.planta[5].slice(11); o.planta.pop(); });
   const e = validarDados(tmp).erros.join('\n'); rmSync(tmp, { recursive: true });
-  assert.ok(e.includes('"?"') && e.includes('47 linhas'), e);
+  assert.ok(e.includes('"?"') && e.includes('93 linhas'), e);
 });
