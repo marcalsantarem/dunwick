@@ -77,9 +77,19 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
   /** Antes do herói: clique numa porta, num edifício com interior, num portal ou num poi vira destino (o centro) + intenção. */
   P.antesDoHeroi = (entrada) => {
     if (entrada.mover.x || entrada.mover.z) { P.intencao = null; return entrada; }
-    if (!entrada.apertou.includes('clique_principal') || !entrada.cursor.valido || entrada.alvoSob) return entrada;
-    const a = alvoDoClique(entrada.cursor.x, entrada.cursor.z); P.intencao = a;
-    return a ? { ...entrada, cursor: { ...entrada.cursor, x: a.x, z: a.z } } : entrada;
+    if (!entrada.apertou.includes('clique_principal') || !entrada.cursor.valido) return entrada;
+    const a = alvoDoClique(entrada.cursor.x, entrada.cursor.z);
+    // o boneco de treino tem o visual de um inimigo no mesmo ponto: o objeto interativo vale mais que o inimigo-cenário sob o cursor
+    if (entrada.alvoSob && a?.tipo !== 'poi') return entrada;
+    P.intencao = a;
+    if (!a) return entrada;
+    if (entrada.alvoSob) entrada = { ...entrada, alvoSob: null };
+    let { x, z } = a;
+    if (a.tipo === 'poi') { // objetos sólidos (boneco, baú): anda até ficar ao alcance, de frente para o herói, em vez de mirar o centro (sem rota até dentro do sólido)
+      const h = heroi(), d = Math.hypot(a.x - h.x, a.z - h.z), recuo = 0.6;
+      if (d > recuo) { x = a.x - ((a.x - h.x) / d) * recuo; z = a.z - ((a.z - h.z) / d) * recuo; }
+    }
+    return { ...entrada, cursor: { ...entrada.cursor, x, z } };
   };
 
   /** Depois do herói: entrar em portal ativo, aviso de portal inativo, intenção do clique e tecla interagir. */
@@ -96,7 +106,8 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
       else if (d > cfg.soltar_contato_portal_tiles) contato.delete(p.id);
     }
     const it = P.intencao;
-    if (it && !h.destino) { // chegou (ou desistiu): cumpre a intenção se está ao alcance
+    const aindaAndando = it?.tipo === 'poi' && h.velocidade() > 0.05 && !(Math.hypot(it.x - h.x, it.z - h.z) <= cfg.alcance_interagir_tiles); // chegou ao último ponto da rota mas ainda desliza até parar
+    if (it && !h.destino && !aindaAndando) { // chegou (ou desistiu): cumpre a intenção se está ao alcance
       P.intencao = null;
       if (it.tipo === 'poi') { const o = pois().find((q) => q.id === it.id); if (o && Math.hypot(o.x - h.x, o.z - h.z) <= cfg.alcance_interagir_tiles) interagir(o); }
       else { const p = portais().find((q) => q.id === it.id); if (p && p.ativo === false && distRet(retDe(p), h.x, h.z) - r <= cfg.alcance_interagir_tiles && !contato.has(p.id)) avisarBloqueado(p); }

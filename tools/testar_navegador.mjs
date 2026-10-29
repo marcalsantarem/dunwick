@@ -123,13 +123,13 @@ await colocar(IX, IZ);
   checar('mouse: clique no chão define o destino e o herói corre (> 5 tiles)', !!a.destino && a.v > 2, `destino ${a.destino ? a.destino.x.toFixed(2) + ',' + a.destino.z.toFixed(2) : 'nenhum'}, v ${a.v.toFixed(2)}`);
   await dormir(2500); const b = await estado(); checar('mouse: chega ao ponto clicado e para', Math.hypot(b.x - alvo[0], b.z - alvo[1]) < 0.4 && b.v < 0.1, `a ${Math.hypot(b.x - alvo[0], b.z - alvo[1]).toFixed(2)} tiles do alvo`); }
 await pag.screenshot({ path: join(dirQA, 'praca_clique_mover.png') });
-{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.entidades[0]; return { x: e.x, z: e.z }; }); await colocar(al.x - 4, al.z); const alvoTela = await por(al.x, 1.0, al.z);
+{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.entidades[0]; return { x: e.x, z: e.z }; }); await colocar(al.x - 2.8, al.z); const alvoTela = await por(al.x, 1.0, al.z);
   await pag.mouse.move(alvoTela.x, alvoTela.y); await dormir(300); const sob = await pag.evaluate('document.getElementById("debug").textContent.includes("alvo enemy_boneco_alvo")');
   checar('mouse: cursor sobre o boneco → alvo sob o cursor detectado', sob);
-  const antes = (await estado()).acertos; await pag.mouse.click(alvoTela.x, alvoTela.y); await dormir(2500); const d = await estado();
-  checar('mouse: clique no boneco → aproxima, ataca e acerta (contador de acertos sobe)', d.acertos > antes, `acertos ${antes} → ${d.acertos}`); await pag.screenshot({ path: join(dirQA, 'praca_ataque.png') });
-  const antes2 = d.acertos; await colocar(al.x - 1.3, al.z); await pag.mouse.move(alvoTela.x, alvoTela.y); await pag.mouse.click(alvoTela.x, alvoTela.y, { button: 'right' }); await dormir(900); const e = await estado();
-  checar('mouse: botão direito = golpe forte (sem abrir o menu de contexto)', e.acertos > antes2, `acertos ${antes2} → ${e.acertos}`); }
+  await pag.evaluate(() => { window.__treinoId = null; const j = __dunwick.jogo, orig = j.iniciarBatalha; j.iniciarBatalha = (id, o) => { window.__treinoId = id; j.iniciarBatalha = orig; }; }); // só observa o disparo (não entra na batalha)
+  await pag.mouse.click(alvoTela.x, alvoTela.y); const entrou = await pag.waitForFunction('window.__treinoId', { timeout: 8000 }).then(() => true, () => false);
+  checar('mouse: clique no boneco de treino → anda até ele e dispara a batalha de treino (D-043)', entrou && (await pag.evaluate('window.__treinoId')) === 'enc_boneco_treino'); await pag.screenshot({ path: join(dirQA, 'praca_ataque.png') });
+  }
 { await colocar(IX, IZ); const pt = await por(IX + 6, 0, IZ); await pag.mouse.move(pt.x, pt.y); await dormir(100); const a = await estado(); await pag.keyboard.press('Space'); await dormir(120); const meio = await estado(); await dormir(600); const b = await estado(); const dist = Math.hypot(b.x - a.x, b.z - a.z);
   checar('Espaço: rolamento de ~3 tiles na direção do cursor', Math.abs(dist - 3) / 3 < 0.12, `${dist.toFixed(2)} tiles; ação ${meio.acao?.tipo}`); }
 
