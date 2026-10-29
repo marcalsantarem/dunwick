@@ -50,9 +50,10 @@ async function iniciar() {
 
   // ---------- áudio desbloqueado por clique/tecla ----------
   const audio = criarAudio(recursos.sfxPing);
-  const aviso = document.getElementById('aviso'); aviso.textContent = t('ui_comecar');
+  const aviso = document.getElementById('aviso'); aviso.textContent = t(movel.ativo ? 'ui_comecar_toque' : 'ui_comecar');
   let desbloqueando = false;
-  const aoGesto = () => { movel.aoGesto?.(); if (desbloqueando || audio.estado === 'running') return; desbloqueando = true; audio.desbloquear().then((ok) => { desbloqueando = false; if (ok) aviso.remove(); }); };
+  // cada gesto tenta de novo (o resume do iOS só vale dentro de touchend/click); no celular a mensagem some já no 1º toque, mesmo se o áudio falhar
+  const aoGesto = () => { movel.aoGesto?.(); if (movel.ativo) aviso.remove(); if (audio.estado === 'running') { aviso.remove(); return; } audio.desbloquear().then((ok) => { if (ok) aviso.remove(); }); };
   const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMouse: () => !!mundo.jogo && mundo.jogo.modo !== 'mapa' });
   eventos.em('modo_mudou', () => entrada.soltarTudo()); // nada fica "apertado" ao entrar/sair da batalha
   // UI da batalha por turnos (15): só aparece com mundo.jogo.modo === 'batalha'; no desenvolvimento, ] dispara o próximo encontro de teste

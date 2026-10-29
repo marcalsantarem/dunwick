@@ -67,6 +67,20 @@ try {
     checar(`${nome} retrato ${Math.min(W, H)}×${Math.max(W, H)}: aviso "Gire o celular" visível e jogo pausado`, m.classe.includes('retrato') && m.gire === 'flex' && t1 === t0, `gire=${m.gire} ticks ${t0}→${t1}`);
     await q.screenshot({ path: join(DIR, `${nome}_retrato.png`) }); await q.close();
   }
+  // iPhone 11 deitado (896×414) com safe-area simulada de 44 px à esquerda e à direita (notch) + aviso de áudio
+  for (const dpr of [2, 3]) {
+    const p = await abrir({ ua: UA_IOS, w: 896, h: 414, dpr, movel: true });
+    const txt = await p.evaluate(() => document.getElementById('aviso')?.textContent ?? null);
+    checar(`iPhone 11 dpr ${dpr}: aviso de áudio pede "Toque na tela" (texto por ID)`, txt === 'Toque na tela para ativar o áudio', String(txt));
+    await p.evaluate(() => { document.getElementById('seguro').style.padding = '0 44px 0 44px'; dispatchEvent(new Event('resize')); }); await dormir(400);
+    await p.evaluate(() => __dunwick.jogo.iniciarBatalha('enc_misto_1', { semente: 2 })); await dormir(3800);
+    const g = await p.evaluate(() => { const c = document.getElementById('tela').getBoundingClientRect(), u = document.getElementById('ui').getBoundingClientRect(), fora = [...document.querySelectorAll('.bat *')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && getComputedStyle(e).visibility !== 'hidden' && (b.left < u.left - 2 || b.right > u.right + 2 || b.top < u.top - 2 || b.bottom > u.bottom + 2); }).length; return { cx: c.left, cr: innerWidth - c.right, cw: c.width, ux: u.left, ur: innerWidth - u.right, uw: u.width, fora, iw: innerWidth }; });
+    checar(`iPhone 11 dpr ${dpr}: jogo dentro da área segura (≥ 44 px de cada lado), centralizado, UI inteira dentro do #ui`, g.cx >= 43.5 && g.cr >= 43.5 && Math.abs(g.cx - g.cr) <= 2 && Math.abs(g.ux - g.ur) <= 2 && g.ux >= g.cx - 1 && g.uw <= g.cw + 1 && g.fora === 0, JSON.stringify(g));
+    await p.screenshot({ path: join(DIR, `iphone11_dpr${dpr}_notch_batalha.png`) });
+    await p.touchscreen.tap(450, 100); await dormir(400);
+    const sumiu = await p.evaluate(() => document.getElementById('aviso') === null); checar(`iPhone 11 dpr ${dpr}: a mensagem de áudio some no primeiro toque`, sumiu);
+    await p.close();
+  }
   // detecção automática (sem ?mobile): iPhone deitado com toque emulado
   { const p = await abrir({ ua: UA_IOS, w: 844, h: 390, dpr: 3 }); const m = await medir(p); checar('detecção automática: toque + sem hover + tela pequena liga o modo celular', m.classe.includes('movel'), m.classe); await p.close(); }
   // ---------- PC inalterado ----------

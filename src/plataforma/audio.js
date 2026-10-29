@@ -18,7 +18,10 @@ export function criarAudio(bytesPing) {
     /** Chamar de dentro de um evento de clique/tecla. Resolve true quando o contexto está "running". */
     async desbloquear() {
       if (!ctx && !criarContexto()) return false;
-      if (ctx.state !== 'running') { try { await ctx.resume(); } catch { /* bloqueado: tenta no próximo gesto */ } }
+      // iOS/Safari: resume() e um som (mudo) precisam sair SÍNCRONOS de dentro do gesto (touchend/click), antes de qualquer await
+      let retomada = null;
+      if (ctx.state !== 'running') { try { retomada = ctx.resume(); const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); } catch { /* bloqueado: tenta no próximo gesto */ } }
+      if (retomada) { try { await retomada; } catch { /* idem */ } }
       if (ctx.state === 'running') { await pedidoDeDecodificacao; tocar(ping); return true; }
       return false;
     },

@@ -16,7 +16,7 @@ export function ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMous
   });
   canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') { ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = true; } });
   for (const n of ['pointerup', 'pointercancel']) canvas.addEventListener(n, (e) => { if (e.pointerType === 'touch') entrada.teclaAcima('mouse:0'); });
-  addEventListener('touchend', aoGesto, { capture: true, passive: true }); // iOS só libera o áudio dentro de touchend/click
+  for (const n of ['touchend', 'pointerup', 'click']) addEventListener(n, aoGesto, { capture: true, passive: true }); // iOS só libera o áudio dentro de touchend/click
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   canvas.addEventListener('wheel', (e) => e.preventDefault(), { passive: false }); // a câmera é fixa: a roda não rola a página sobre o jogo
   canvas.addEventListener('dragstart', (e) => e.preventDefault());
