@@ -8,7 +8,7 @@ Fantasia medieval original, humor ácido e um sino que nunca devia ter voltado p
 [**▶ Jogar a versão estável**](https://dunwick.netlify.app) · [**🧪 Versão em desenvolvimento**](https://dev--dunwick.netlify.app)
 
 ![status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)
-![versão](https://img.shields.io/badge/versão-v0.1.0-blue)
+![versão](https://img.shields.io/badge/versão-v0.1.1-blue)
 ![classificação](https://img.shields.io/badge/classificação-16%2B-red)
 ![plataforma](https://img.shields.io/badge/plataforma-navegador-brightgreen)
 
@@ -39,9 +39,9 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 | Estável (`main`) | https://dunwick.netlify.app |
 | Em desenvolvimento (`dev`) | https://dev--dunwick.netlify.app |
 
-**Controles atuais do esqueleto (exploração):** clique no chão para andar, `W A S D` também movem. `F1`–`F12` abrem o modo debug (`F3` mostra o fps, `F12` troca o perfil de qualidade).
+**Controles:** clique ou toque no chão para andar (`W A S D` também). Na batalha, tudo funciona só com o mouse ou o toque: menu, alvos e botões. `Esc` (ou o botão ⏸) pausa. No celular, deite o aparelho: o jogo ocupa a tela toda. `F1`–`F12` abrem o modo debug (só em desenvolvimento).
 
-> O jogo ainda está no começo. O que existe hoje é a praça de Baixo Orvalho, o herói andando e atacando, e a base técnica. Combate completo, inimigos, chefe e missões estão a caminho.
+> O jogo ainda está no começo. O que existe hoje é a praça de Baixo Orvalho, o Edric andando, e uma batalha por turnos com a Grace contra Slime e Lobo, jogável no PC e no celular. Mais mapa, missões e o chefe estão a caminho (roteiro abaixo).
 
 ## 🛠️ Rodar localmente
 
@@ -108,7 +108,7 @@ Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_d
 | Marco | Entrega | Situação |
 |---|---|---|
 | M0 Fundação | Bíblia, história, guia visual, especificações | ✅ |
-| M1 Protótipo | batalha por turnos jogável no mapa isométrico | 🔄 validação (v0.1.1) |
+| M1 Protótipo | batalha por turnos jogável no mapa isométrico (v0.1.1) | ✅ |
 | Demo jogável | v0.1.1 a v0.1.8: vila, entorno, missões, bosque, caverna e o Hollowpaw (~30 min) | ⏳ ver roteiro abaixo |
 | M2 Cena-modelo | uma cena com arte final, luz e efeitos | ⏳ |
 | M3 Vertical slice | vila, caverna, estrada, chefe, som e história | ⏳ |
