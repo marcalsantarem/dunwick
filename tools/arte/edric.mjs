@@ -14,6 +14,7 @@ import { MOLDES, AJUSTE, LEGENDA, LEGENDAS } from './rostos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const CELULA = 96, ANCORA = [48, 88], COLUNAS = 12;
+export const ANC_EXP = [48, 80]; // âncora do atlas de exploração: sobe 8 px para o passo (pés à frente) não cortar na base da célula
 export const PITCH = Math.PI / 6, CP = Math.cos(PITCH), SP = Math.sin(PITCH);
 const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 
@@ -169,13 +170,13 @@ export function colarCabeca(px, dirId, ex = 0, ey = 0, giros = 0) {
     const i = (Y * CELULA + X) * 4; px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2]; px[i + 3] = 255;
   }));
 }
-export function quadro(phi, dirId) { montar(); const px = acabar(renderizar(phi)); if (dirId) colarCabeca(px, dirId); return px; }
+export function quadro(phi, dirId) { montar(); const px = acabar(renderizar(phi, CELULA, ANC_EXP)); if (dirId) colarCabeca(px, dirId, 0, ANC_EXP[1] - ANCORA[1]); return px; }
 
 // ---------- animações do meta: o esqueleto referencia estes nomes/quadros (gameplay, validar_dados); por ora TODOS os quadros usam a pose parada ----------
 const ANIMS = {
   idle: { quadros: 4, fps: 6, loop: true },
-  andar: { quadros: 8, fps: 10, loop: true, eventos: [{ quadro: 1, tipo: 'passo' }, { quadro: 5, tipo: 'passo' }] },
-  correr: { quadros: 8, fps: 14, loop: true, eventos: [{ quadro: 1, tipo: 'passo' }, { quadro: 5, tipo: 'passo' }] },
+  andar: { quadros: 8, fps: 18, loop: true, eventos: [{ quadro: 1, tipo: 'passo' }, { quadro: 5, tipo: 'passo' }] },
+  correr: { quadros: 8, fps: 24, loop: true, eventos: [{ quadro: 1, tipo: 'passo' }, { quadro: 5, tipo: 'passo' }] },
   ataque1: { quadros: 6, fps: 16, loop: false, eventos: [{ quadro: 2, tipo: 'hit_inicio' }, { quadro: 4, tipo: 'hit_fim' }] },
   ataque2: { quadros: 6, fps: 16, loop: false, eventos: [{ quadro: 2, tipo: 'hit_inicio' }, { quadro: 4, tipo: 'hit_fim' }] },
   ataque3: { quadros: 6, fps: 16, loop: false, eventos: [{ quadro: 3, tipo: 'hit_inicio' }, { quadro: 4, tipo: 'hit_fim' }] },
@@ -184,22 +185,25 @@ const ANIMS = {
 };
 
 export function gerarEdric() {
-  const quadros = DIRS.map((d) => quadro(d.phi, d.id));
+  const quadros = DIRS.map((d) => quadro(d.phi, d.id));                       // pose parada de referência (item-modelo aprovado)
+  const gerados = { idle: [], andar: [], correr: [] };                         // [quadro][direção] → pixels
+  for (let q = 0; q < 4; q++) gerados.idle.push(DIRS.map((_, d) => quadroPoseDir(poseIdle(q), d)));
+  for (let q = 0; q < 8; q++) { gerados.andar.push(DIRS.map((_, d) => quadroPoseDir(poseAndar(q, false), d))); gerados.correr.push(DIRS.map((_, d) => quadroPoseDir(poseAndar(q, true), d))); }
   const total = Object.values(ANIMS).reduce((s, a) => s + a.quadros * DIRS.length, 0), linhas = Math.ceil(total / COLUNAS);
   const img = novaImagem(COLUNAS * CELULA, linhas * CELULA), anims = {}; let k = 0;
   for (const [nome, a] of Object.entries(ANIMS)) {
     anims[nome] = { ...a, inicio: k };
     for (let d = 0; d < DIRS.length; d++) for (let f = 0; f < a.quadros; f++, k++) {
-      const col = k % COLUNAS, lin = Math.floor(k / COLUNAS);
-      for (let y = 0; y < CELULA; y++) for (let x = 0; x < CELULA; x++) { const s = (y * CELULA + x) * 4, t = ((lin * CELULA + y) * img.w + col * CELULA + x) * 4; img.px.set(quadros[d].subarray(s, s + 4), t); }
+      const col = k % COLUNAS, lin = Math.floor(k / COLUNAS), fonte = gerados[nome]?.[f]?.[d] ?? quadros[d];
+      for (let y = 0; y < CELULA; y++) for (let x = 0; x < CELULA; x++) { const s2 = (y * CELULA + x) * 4, t = ((lin * CELULA + y) * img.w + col * CELULA + x) * 4; img.px.set(fonte.subarray(s2, s2 + 4), t); }
     }
   }
   const meta = {
-    id: 'hero_edric', tipo: 'sprite_humanoide', celula: [CELULA, CELULA], ancora: ANCORA, arte_escala: 1, ref_celula: CELULA,
+    id: 'hero_edric', tipo: 'sprite_humanoide', celula: [CELULA, CELULA], ancora: ANC_EXP, arte_escala: 1, ref_celula: CELULA,
     direcoes: DIRS.map((d) => d.id), espelhar: { sw: 'se', o: 'l', nw: 'ne' }, colunas: COLUNAS, anims,
-    nota: 'Visual v2 (pixel art HD-2D, célula 96): pose parada. Todas as animações apontam o mesmo quadro estático por direção até a etapa de animação.',
+    nota: 'Visual v2 (pixel art HD-2D, célula 96). idle (4q), andar (8q, 18 fps) e correr (8q, 24 fps) animados nas 5 direções; ataque1-3, rolar e dano ainda apontam o quadro estático. fps de andar/correr casam o passo com 3,5 e 6,0 tiles/s (pés sem patinar).',
   };
-  return { img, meta, quadros };
+  return { img, meta, quadros: [...quadros, ...Object.values(gerados).flat(2)], gerados, estatico: quadros };
 }
 
 // ---------- prévia ampliada ----------
@@ -213,14 +217,14 @@ export function gerarPrevia({ quadros }) {
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) pixel(img, x, y, fundo);
   // recortes ampliados ×10 do rosto: de frente (S) e de 3/4 (SE), centrados na cabeça projetada
   [[0, 'S'], [1, 'SE']].forEach(([d, nome], k) => {
-    const aj = AJUSTE[DIRS[d].id], cx0 = ANCORA[0] + aj[0], cy0 = QUEIXO_Y - 12 + aj[1], ox = margem + k * (crop + margem);
+    const aj = AJUSTE[DIRS[d].id], cx0 = ANCORA[0] + aj[0], cy0 = QUEIXO_Y - 12 + aj[1] + ANC_EXP[1] - ANCORA[1], ox = margem + k * (crop + margem);
     for (let y = 0; y < 44; y++) for (let x = 0; x < 44; x++) { const sx = cx0 - 22 + x, sy = cy0 - 20 + y, q = quadros[d], s = (sy * CELULA + sx) * 4, c = q[s + 3] ? [q[s], q[s + 1], q[s + 2]] : fundo; for (let a = 0; a < ER; a++) for (let b = 0; b < ER; b++) pixel(img, ox + x * ER + a, topo + y * ER + b, c); }
     texto(img, nome, ox + 4, 12, 4, [235, 240, 225]);
   });
   const nomes = ['S', 'SE', 'E', 'NE', 'N'], x0 = 2 * (crop + margem) + margem;
   for (let i = 0; i < N; i++) {
     const ox = x0 + i * (cel + margem), oy = topo;
-    for (let y = -6 * E; y <= 6 * E; y++) for (let x = -26 * E; x <= 26 * E; x++) if ((x / (26 * E)) ** 2 + (y / (6 * E)) ** 2 <= 1) pixel(img, ox + ANCORA[0] * E + E / 2 + x, oy + ANCORA[1] * E + y, chao);
+    for (let y = -6 * E; y <= 6 * E; y++) for (let x = -26 * E; x <= 26 * E; x++) if ((x / (26 * E)) ** 2 + (y / (6 * E)) ** 2 <= 1) pixel(img, ox + ANC_EXP[0] * E + E / 2 + x, oy + ANC_EXP[1] * E + y, chao);
     blit(img, quadros[i], ox, oy, E, false);
     texto(img, nomes[i], ox + 4, 12, 4, [235, 240, 225]);
   }
@@ -248,8 +252,8 @@ export function validarEdric({ img, meta, quadros }) {
   quadros.forEach((q, d) => {
     let minY = 99, maxY = -1, minX = 99, maxX = -1;
     for (let y = 0; y < CELULA; y++) for (let x = 0; x < CELULA; x++) if (q[(y * CELULA + x) * 4 + 3]) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); minX = Math.min(minX, x); maxX = Math.max(maxX, x); }
-    if (minX < 1 || minY < 1 || maxX > CELULA - 2 || maxY > CELULA - 2) erros.push(`${DIRS[d].id}: arte encosta na borda da célula (${minX},${minY})-(${maxX},${maxY})`);
-    info.push(`${DIRS[d].id}: ${maxY - minY + 1}px de altura, base y=${maxY}, x ${minX}..${maxX}`);
+    if (minX < 1 || minY < 1 || maxX > CELULA - 2 || maxY > CELULA - 2) erros.push(`${DIRS[d % 5].id}: arte encosta na borda da célula (${minX},${minY})-(${maxX},${maxY})`);
+    if (d < 5) info.push(`${DIRS[d].id}: ${maxY - minY + 1}px de altura, base y=${maxY}, x ${minX}..${maxX}`);
   });
   if (img.w !== meta.colunas * CELULA) erros.push('largura do atlas');
   return { erros, cores: usadas.size, propostas: PROPOSTAS.filter((p) => usadas.has(p)).length, info };
@@ -264,7 +268,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const dir = join(raiz, 'assets/sprites/hero_edric'); mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'hero_edric.png'), codificarPng(r.img)); writeFileSync(join(dir, 'hero_edric.meta.json'), JSON.stringify(r.meta, null, 2) + '\n');
   console.log(`hero_edric: ${r.img.w}×${r.img.h}, ${v.cores} cores (${v.propostas} propostas)`); v.info.forEach((l) => console.log('  ' + l));
-  if (process.argv.includes('--previa')) { const p = gerarPrevia({ quadros: r.quadros }), d2 = join(raiz, 'docs/arte/sprites'); mkdirSync(d2, { recursive: true }); writeFileSync(join(d2, 'previa_edric.png'), codificarPng(p.img)); console.log(`prévia: docs/arte/sprites/previa_edric.png (${p.img.w}×${p.img.h})`); }
+  if (process.argv.includes('--previa')) { const pa = gerarPreviaAnim(r.gerados), d3 = join(raiz, 'docs/arte/sprites'); mkdirSync(d3, { recursive: true }); writeFileSync(join(d3, 'previa_edric_andar.png'), codificarPng(pa)); console.log(`prévia: docs/arte/sprites/previa_edric_andar.png (${pa.w}×${pa.h})`); const p = gerarPrevia({ quadros: r.estatico }), d2 = join(raiz, 'docs/arte/sprites'); mkdirSync(d2, { recursive: true }); writeFileSync(join(d2, 'previa_edric.png'), codificarPng(p.img)); console.log(`prévia: docs/arte/sprites/previa_edric.png (${p.img.w}×${p.img.h})`); }
   if (v.erros.length) { console.error('✗ ' + v.erros.join('\n✗ ')); process.exit(1); }
 }
 
@@ -305,14 +309,42 @@ export function montarPose(P = {}) {
   Ch([0, -6.6, 31.5], eE, 3.0, 2.7, 'musgo', 'manga_e'); const pulso = mix(eE, maoE, 0.8); Ch(eE, pulso, 2.9, 2.8, 'linho', 'faixa'); Ch(pulso, maoE, 2.2, 2.2, 'pele', 'pulso_e'); esfera(T(...maoE), 2.3, 'pele', 'mao_e');
   if (P.frasco) { Ee([maoE[0] + 1.2, maoE[1], maoE[2] + 2.4], [1.6, 1.6, 2.6], 'musgo', 'frasco'); Ee([maoE[0] + 1.2, maoE[1], maoE[2] + 5.2], [1.0, 1.0, 0.9], 'latao', 'rolha'); }
   // espada de treino (θ medido a partir da frente, para cima)
-  const th = (P.theta ?? 30) * Math.PI / 180, d = [Math.cos(th), 0.06, Math.sin(th)], at = (t) => [maoD[0] + d[0] * t, maoD[1] + d[1] * t, maoD[2] + d[2] * t];
+  const th = (P.theta ?? 30) * Math.PI / 180, d = P.dvec ?? [Math.cos(th), 0.06, Math.sin(th)], at = (t) => [maoD[0] + d[0] * t, maoD[1] + d[1] * t, maoD[2] + d[2] * t];
   Ch(at(-3.6), at(1.5), 1.25, 1.25, 'couro', 'cabo'); Ee(at(-4.2), [1.5, 1.5, 1.5], 'latao', 'pomo'); Ee(at(2.4), [0.9, 3.4, 0.9], 'latao', 'guarda');
   Ch(at(3.4), at(15), 1.6, 1.25, 'aco', 'lamina'); Ee(at(15.4), [1.3, 1.3, 1.3], 'aco', 'lamina');
   const c0 = T(1, 0, 45.8);
-  return { dx: SC * (c0[0] - 1), dy: -SC * (c0[2] - 45.8) * CP };
+  return { dx: SC * (c0[0] - 1), dy: -SC * (c0[2] - 45.8) * CP, c0 };
 }
 export function quadroPose(P) {
   const h = montarPose(P), px = acabar(renderizar(Math.PI / 2));
   colarCabeca(px, 'l', Math.round(h.dx + (P.hdx || 0)), Math.round(h.dy + (P.hdy || 0)), P.giros || 0);
   return px;
+}
+
+// ---------- idle e andar/correr (mapa, 5 direções) ----------
+/** Quadro de uma pose em qualquer direção: gira o modelo e leva a cabeça (molde da vista) junto com o tronco. */
+export function quadroPoseDir(P, d) {
+  const h = montarPose(P), phi = DIRS[d].phi, sx = Math.sin(phi), cx = Math.cos(phi), c = h.c0;
+  const px = acabar(renderizar(phi, CELULA, ANC_EXP)), X = (f, l) => -l * cx + f * sx, Y = (f, l, u) => -u * CP + (f * cx + l * sx) * SP;
+  colarCabeca(px, DIRS[d].id, Math.round(SC * (X(c[0], c[1]) - X(1, 0))), Math.round(SC * (Y(c[0], c[1], c[2]) - Y(1, 0, 45.8))) + ANC_EXP[1] - ANCORA[1]);
+  return px;
+}
+function paradoBase() { return { lean: 0, dz: 0, pe: [[1, 0], [1, 0]], maoD: [2.6, 7.4, 17.4], maoE: [2.4, -7.3, 17.0], cotD: [0.8, 7.6, 24.2], cotE: [0.8, -7.6, 24.2], dvec: [0.66, 0.42, -0.62] }; }
+export function poseIdle(q) { const b = [0, 0.5, 1, 0.5][q]; return { ...paradoBase(), dz: 0.5 - 0.5 * b, dvec: [0.66 + 0.03 * b, 0.42, -0.62], maoD: [2.6, 7.4, 17.4 + 0.2 * b], maoE: [2.4 + 0.15 * b, -7.3, 17.0] }; }
+/** Ciclo de 8 quadros; contatos nos quadros 1 e 5 (eventos de passo). */
+export function poseAndar(q, corre) {
+  const ph = ((q - 1) / 8) * Math.PI * 2, c = Math.cos(ph), s = Math.sin(ph), A = corre ? 11 : 8, lev = corre ? 5 : 3.2, k = corre ? 1.4 : 1;
+  return { ...paradoBase(), lean: corre ? 4 : 1.5, dz: (corre ? 1.0 : 0.3) + (corre ? 1.4 : 0.9) * Math.abs(c),
+    pe: [[1 - A * c, Math.max(0, s) * lev], [1 + A * c, Math.max(0, -s) * lev]],
+    maoD: [2.6 - 4.5 * k * c, 7.4, 17.4 + (corre ? 2.5 : 0.6) * Math.abs(s)], maoE: [2.4 + 4.5 * k * c, -7.3, 17.0 + (corre ? 2.5 : 0.6) * Math.abs(s)],
+    cotD: undefined, cotE: undefined, dvec: [0.55 - 0.35 * k * c, 0.42, -0.62] };
+}
+export function gerarPreviaAnim(gerados) {
+  const E = 2, margem = 8, cols = 12, W = cols * (CELULA * E + margem) + margem, H = 5 * (CELULA * E + margem) + margem, img = novaImagem(W, H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) pixel(img, x, y, [86, 98, 84]);
+  for (let d = 0; d < 5; d++) {
+    const seq = [...gerados.idle.map((q) => q[d]), ...gerados.andar.map((q) => q[d])];
+    seq.forEach((px, i) => { const ox = margem + i * (CELULA * E + margem), oy = margem + d * (CELULA * E + margem); for (let y = -3 * E; y <= 3 * E; y++) for (let x = -20 * E; x <= 20 * E; x++) if ((x / (20 * E)) ** 2 + (y / (3 * E)) ** 2 <= 1) pixel(img, ox + ANC_EXP[0] * E + x, oy + ANC_EXP[1] * E + y, [74, 86, 72]); blit(img, px, ox, oy, E, false); });
+  }
+  return img;
 }
