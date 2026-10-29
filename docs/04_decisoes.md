@@ -256,3 +256,8 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Origem:** o esboço da vila v0.1.2 (`docs/niveis/esboco_vila_v012.png`, do 14) mostrou 8 prédios, as saídas e a estrada dentro de zonas de encontro.
 - **Consequência registrada:** da v0.1.2 até a v0.1.4 não há batalha andando; só pela tecla `]` no `npm run dev`. A v0.1.1 (batalha atual) segue com as zonas de hoje para o usuário validar.
 - **Não executado ainda:** o 14 atualiza o mapa e as zonas quando o usuário liberar os briefings da v0.1.2. Layout da vila ainda em análise do usuário.
+
+## D-039 — Jogo preenche a janela (escala contínua) (2026-10-29)
+- **Decisão (usuário):** o jogo **cresce proporcionalmente (16:9) até tocar a borda lateral ou a vertical** da janela, em vez de escalar só por números inteiros. A cena é desenhada na resolução real da janela; sprites mantêm contorno nítido (sem suavização).
+- **Altera** a convenção "escala inteira" do CLAUDE.md/guia visual para o **tamanho de apresentação** (a arte base e os sprites continuam desenhados em múltiplos inteiros). Risco aceito: alguns pixels podem ficar levemente desiguais em escalas fracionadas.
+- **Pacote v0.1.1 (usuário aprovou as 6 sugestões + esta):** tela de início "Toque para começar", ajuste dos inimigos na batalha (+ cura "+0"), menu de pausa, dica de controles, botão de tela cheia, preferências lembradas e preencher a janela.
