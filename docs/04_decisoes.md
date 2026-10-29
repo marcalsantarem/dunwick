@@ -271,5 +271,5 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Consequência técnica:** a **troca de mapa por portal**, antes prevista na v0.1.3, **entra na v0.1.2**. A v0.1.3 passa a reusar o mecanismo para a saída da vila.
 - **Aplica a D-038:** a vila inteira vira zona segura nesta versão (as zonas `z_enc_*` saem da vila).
 
-## D-042 — Minimapa adiado para a rodada seguinte (2026-10-29)
-- **Decisão (usuário):** a v0.1.2 entrega **só o mapa da vila completo** (com interiores e troca por portal). O **minimapa** (girado com a tela, D-041) fica para a **versão seguinte**; o briefing do 15 foi cancelado e o restante do pacote D-041 segue.
+## D-042 — v0.1.2 em duas etapas: mapa da vila, depois minimapa (2026-10-29)
+- **Decisão (usuário):** o **minimapa continua na v0.1.2**, mas em **duas etapas** para concentrar o trabalho em algo visível e testável: **etapa 1 = mapa da vila completo** (interiores, portais, props, colisão, vila segura); **etapa 2 = minimapa** (girado com a tela, D-041), só depois de o usuário ver o mapa. O PR da v0.1.2 sai ao fim das duas.
