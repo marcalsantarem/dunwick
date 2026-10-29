@@ -1,0 +1,18 @@
+{
+  "id": "z_enc_baixo_orvalho",
+  "versao": 2,
+  "nota": "Vila de Baixo Orvalho: 100 % segura (D-038/D-041). Sem zonas de encontro; os encontros voltam nos campos fora da vila (v0.1.3). Interiores não têm arquivo de zonas.",
+  "mapa": "map_baixo_orvalho",
+  "ligado": false,
+  "tiles_por_passo": 1,
+  "passos_minimos": 12,
+  "passos_carencia_pos_batalha": 8,
+  "taxa_por_passo": 0.08,
+  "zonas_seguras": [
+    {
+      "id": "z_seguro_vila",
+      "ret": [0, 0, 47, 47]
+    }
+  ],
+  "zonas_encontro": []
+}

@@ -7,11 +7,11 @@ import { estadoCiclo, lanternaAcesa } from '../src/jogo/ciclo.js';
 import { criarCameraJogo } from '../src/jogo/camera_jogo.js';
 import { criarTextos } from '../src/jogo/textos.js';
 
-test('praça: 48 × 48, início livre, 3 tipos de chão, objetos do kit e os dois bonecos', () => {
+test('vila: 48 × 48, início livre, 3 tipos de chão, objetos do kit e os dois bonecos', () => {
   const { mundo } = novoMundo(); const { mapa, heroi, entidades } = mundo, d = mapa.dados;
   assert.deepEqual(d.tamanho, [48, 48]); assert.ok(mapa.livre(heroi.x, heroi.z, heroi.raioPush), 'início livre');
   assert.deepEqual(entidades.map((e) => e.id).sort(), ['enemy_boneco_alvo', 'enemy_boneco_golpe']);
-  const tipos = new Set(d.objetos.map((o) => o.tipo)); for (const t of ['casa', 'arvore', 'poco', 'torre_sino', 'lanterna', 'cerca']) assert.ok(tipos.has(t), `falta ${t}`);
+  const tipos = new Set(d.objetos.map((o) => o.tipo)); for (const t of ['casa', 'arvore', 'poco', 'lanterna', 'cerca']) assert.ok(tipos.has(t), `falta ${t}`);
   assert.ok(new Set(d.planta.join('')).size >= 3, 'chão com materiais diferentes'); assert.ok(d.objetos.filter((o) => o.tipo === 'casa').length >= 6, 'pelo menos 6 casas');
 });
 

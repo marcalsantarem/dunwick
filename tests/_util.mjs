@@ -16,7 +16,7 @@ export const carregarMetas = () => Object.fromEntries(readdirSync(join(RAIZ, 'as
 export function novoMundo(ajustar, { livre = false, encontros = false, sementeEncontros = 1 } = {}) {
   const dados = carregarDados();
   if (!encontros) for (const z of Object.values(dados.exploracao.encontros)) z.ligado = false;
-  if (livre) for (const m of Object.values(dados.mapas)) m.objetos = m.objetos.filter((o) => o.tipo === 'inimigo');
+  if (livre) for (const m of Object.values(dados.mapas)) { m.objetos = m.objetos.filter((o) => o.tipo === 'inimigo'); m.edificios = []; m.portais = []; m.pois = []; }
   if (ajustar) ajustar(dados);
   const eventos = criarEventos(), mundo = criarMundo(dados, eventos, carregarMetas(), { sementeEncontros }), buffer = new BufferEntrada(dados.config.jogo.entrada.buffer_entrada_quadros), registro = [];
   for (const n of ['golpe_acertou', 'ataque_inicio', 'ataque_fim', 'esquiva_inicio', 'aviso_inicio', 'golpe_ativo', 'golpe_fim']) eventos.em(n, (d) => registro.push({ n, ...d, tick: mundo.ticks }));

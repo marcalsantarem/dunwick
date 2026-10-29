@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { listarArquivos, carregarEsquemas, lerJson } from './lib/dados.mjs';
+import { validarMapasLigados } from './lib/validar_mapas_ligados.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc', 'z', 'cen'];
@@ -103,14 +104,17 @@ export function validarDados(raiz = RAIZ_PADRAO) {
       if (ids.has(o.id)) erro(arq, `/objetos/${i}/id`, `ID "${o.id}" repetido`); ids.add(o.id);
       const pegada = o.tipo === 'inimigo' ? true : kit?.pegadas[o.tipo];
       if (!pegada) erro(arq, `/objetos/${i}/tipo`, `tipo "${o.tipo}" não tem pegada em cfg_kit`);
-      if (o.tipo === 'cerca') { for (const c of ['x0', 'z0', 'x1', 'z1']) if (o[c] === undefined) erro(arq, `/objetos/${i}/${c}`, 'cerca exige x0, z0, x1, z1'); }
+      if (o.tipo === 'cerca' || o.tipo === 'muro_fuligem') { for (const c of ['x0', 'z0', 'x1', 'z1']) if (o[c] === undefined) erro(arq, `/objetos/${i}/${c}`, `${o.tipo} exige x0, z0, x1, z1`); }
       else { if (o.x === undefined || o.z === undefined) erro(arq, `/objetos/${i}`, 'objeto exige x e z'); else if (o.x < 0 || o.z < 0 || o.x > L || o.z > A) erro(arq, `/objetos/${i}`, `objeto "${o.id}" fora do mapa`); }
       if (o.tipo === 'casa' && (!o.w || !o.d || o.telhado === undefined)) erro(arq, `/objetos/${i}`, 'casa exige w, d e telhado');
+      if (pegada && pegada.forma === 'ret' && o.tipo !== 'casa' && ((pegada.w === undefined && !o.w) || (pegada.d === undefined && !o.d))) erro(arq, `/objetos/${i}`, `"${o.tipo}" tem pegada sem tamanho em cfg_kit: exige w e d no objeto`);
+      if (pegada && pegada.forma === 'dupla' && !o.w) erro(arq, `/objetos/${i}/w`, 'pórtico exige w (vão entre os postes)');
       if (o.tipo === 'inimigo' && !inimigos[o.id]) erro(arq, `/objetos/${i}/id`, `inimigo "${o.id}" não existe em data/enemies`);
     });
     const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
     if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
   }
+  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
   // ---- combate por turnos (regras cruzadas; esquemas em data/schemas/*_batalha, encontro, cfg_batalha) ----
   const cb = um('cfg_batalha');
   if (por('cfg_batalha').length === 0 && por('encontro').length) erros.push('data/combate: falta cfg_batalha.json (ou ele é inválido)');

@@ -3,8 +3,10 @@
 // Unidades: tiles. Aleatório sempre por semente (reprodutível). Nada aqui conhece a simulação.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { PECAS_VILA, materiaisCasa, decorarCasa } from './kit_vila.js';
+import { PECAS_INTERIOR } from './kit_interior.js';
 
-const rng = (s) => { let x = (s >>> 0) || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); };
+export const rng = (s) => { let x = (s >>> 0) || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); };
 const M4 = new THREE.Matrix4(), V3 = new THREE.Vector3(), Q = new THREE.Quaternion(), E = new THREE.Euler();
 const COPAS = ['#2E5434', '#3F6B2A', '#4F7A30', '#5E8C3A', '#6FA046'].map((h) => new THREE.Color(h));
 
@@ -34,12 +36,12 @@ export function criarColetor(texelsPorTile) {
   return col;
 }
 
-const folhagemGeo = (g, centro, baseY, topoY, seed, claro = 0.5) => { // cor por vértice (variação de verde) + peso de balanço pelo vento
+export const folhagemGeo = (g, centro, baseY, topoY, seed, claro = 0.5) => { // cor por vértice (variação de verde) + peso de balanço pelo vento
   const r = rng(seed), p = g.attributes.position, cor = new Float32Array(p.count * 3), bal = new Float32Array(p.count);
   for (let i = 0; i < p.count; i++) { const t = Math.min(1, Math.max(0, (p.getY(i) - baseY) / Math.max(0.01, topoY - baseY))), k = Math.min(4, Math.max(0, (t * 0.7 + claro * 0.3 + (r() - 0.5) * 0.35) * 5)), a = COPAS[Math.floor(k)], b = COPAS[Math.min(4, Math.floor(k) + 1)], c = a.clone().lerp(b, k - Math.floor(k)); cor[i * 3] = c.r; cor[i * 3 + 1] = c.g; cor[i * 3 + 2] = c.b; bal[i] = Math.min(1, Math.max(0, (p.getY(i) - baseY * 0.6) / Math.max(0.5, topoY))); }
   g.setAttribute('color', new THREE.BufferAttribute(cor, 3)); g.setAttribute('balanco', new THREE.BufferAttribute(bal, 1)); void centro; return g;
 };
-function blobIco(raio, detalhe, semente, amp = 0.18) { // esfera irregular
+export function blobIco(raio, detalhe, semente, amp = 0.18) { // esfera irregular
   const g = new THREE.IcosahedronGeometry(raio, detalhe), p = g.attributes.position, r = rng(semente), mapa = new Map();
   for (let i = 0; i < p.count; i++) { const k = `${p.getX(i).toFixed(3)},${p.getY(i).toFixed(3)},${p.getZ(i).toFixed(3)}`; if (!mapa.has(k)) mapa.set(k, 1 + (r() - 0.5) * 2 * amp); const f = mapa.get(k); p.setXYZ(i, p.getX(i) * f, p.getY(i) * f * 0.9, p.getZ(i) * f); }
   g.computeVertexNormals(); return g;
@@ -47,42 +49,54 @@ function blobIco(raio, detalhe, semente, amp = 0.18) { // esfera irregular
 
 // ---------------------------------------------------------------- peças
 function casa(col, o, kit, saida) {
+  const M = materiaisCasa(o);
   const v = kit.visual.casa, giro = (((o.rot ?? 0) % 180) + 180) % 180 === 90, w = giro ? o.d : o.w, d = giro ? o.w : o.d;
   const h = v.parede_altura, base = v.base_pedra, rh = v.telhado_altura, bei = v.beiral, cx = o.x, cz = o.z, r = rng(o.seed ?? 1);
   const mTelha = { telha: 'telha_laranja', ardosia: 'ardosia', musgo: 'telha_musgo' }[o.telhado];
-  col.caixa('pedra', cx, base / 2, cz, w + 0.18, base, d + 0.18);
-  col.caixa('reboco', cx, base + (h - base) / 2, cz, w, h - base, d);
+  col.caixa(M.pedra, cx, base / 2, cz, w + 0.18, base, d + 0.18);
+  col.caixa(M.reboco, cx, base + (h - base) / 2, cz, w, h - base, d);
   const zf = cz + d / 2 + 0.035, xf = cx + w / 2 + 0.035, esp = 0.13, yTopo = h - 0.06;
   // enxaimel nas faces visíveis (+z e +x): postes, vigas horizontais e travessas em X
   const face = (comp, fixo, ehZ) => {
     const n = Math.max(2, Math.round(comp / 1.25)), p0 = (ehZ ? cx - w / 2 : cz - d / 2);
     const P = (t, y) => (ehZ ? [p0 + t, y, fixo] : [fixo, y, p0 + t]);
-    for (let i = 0; i <= n; i++) col.viga('madeira', P((comp * i) / n, base), P((comp * i) / n, yTopo), esp);
-    col.viga('madeira', P(0, base + 0.05), P(comp, base + 0.05), esp); col.viga('madeira', P(0, yTopo), P(comp, yTopo), esp); col.viga('madeira', P(0, (base + h) / 2 + 0.2), P(comp, (base + h) / 2 + 0.2), esp * 0.8);
-    for (let i = 0; i < n; i++) if ((i + (o.seed ?? 0)) % 2 === 0) col.viga('madeira', P((comp * i) / n, base + 0.05), P((comp * (i + 1)) / n, (base + h) / 2 + 0.2), esp * 0.7);
+    for (let i = 0; i <= n; i++) col.viga(M.madeira, P((comp * i) / n, base), P((comp * i) / n, yTopo), esp);
+    col.viga(M.madeira, P(0, base + 0.05), P(comp, base + 0.05), esp); col.viga(M.madeira, P(0, yTopo), P(comp, yTopo), esp); col.viga(M.madeira, P(0, (base + h) / 2 + 0.2), P(comp, (base + h) / 2 + 0.2), esp * 0.8);
+    for (let i = 0; i < n; i++) if ((i + (o.seed ?? 0)) % 2 === 0) col.viga(M.madeira, P((comp * i) / n, base + 0.05), P((comp * (i + 1)) / n, (base + h) / 2 + 0.2), esp * 0.7);
   };
   face(w, zf, true); face(d, xf, false);
   // porta (+z) e janelas
-  const px = cx + (r() - 0.5) * (w - 2.2), dh = 1.75; col.caixa('tabuas', px, base + dh / 2, zf + 0.02, 0.95, dh, 0.06, 0, { uv: true }); col.viga('madeira', [px - 0.5, base, zf + 0.05], [px - 0.5, base + dh + 0.05, zf + 0.05], 0.1); col.viga('madeira', [px + 0.5, base, zf + 0.05], [px + 0.5, base + dh + 0.05, zf + 0.05], 0.1); col.viga('madeira', [px - 0.5, base + dh + 0.05, zf + 0.05], [px + 0.5, base + dh + 0.05, zf + 0.05], 0.1); col.caixa('pedra', px, 0.08, zf + 0.3, 1.2, 0.16, 0.5);
+  // porta no MEIO da parede do `lado` ('s' = +z, 'l' = +x, 'o' = −x, 'n' = −z; padrão 's'): é onde o gatilho do portal está colado (layout do 14).
+  // Só 's' e 'l' aparecem para a câmera; 'o' e 'n' ficam nas costas da casa (desenhadas, mas escondidas).
+  const lado = o.lado ?? 's', dh = 1.75; r(); // r() consumido para não mudar as outras sementes
+  { const e = 0.035, ez = lado === 's' ? cz + d / 2 + e : cz - d / 2 - e, ex = lado === 'l' ? cx + w / 2 + e : cx - w / 2 - e, sg = lado === 's' || lado === 'l' ? 1 : -1, topo = base + dh + 0.05;
+    if (lado === 's' || lado === 'n') {
+      col.caixa('tabuas', cx, base + dh / 2, ez + 0.02 * sg, 0.95, dh, 0.06, 0, { uv: true }); for (const t of [-0.5, 0.5]) col.viga(M.madeira, [cx + t, base, ez + 0.05 * sg], [cx + t, topo, ez + 0.05 * sg], 0.1);
+      col.viga(M.madeira, [cx - 0.5, topo, ez + 0.05 * sg], [cx + 0.5, topo, ez + 0.05 * sg], 0.1); col.caixa(M.pedra, cx, 0.08, ez + 0.3 * sg, 1.2, 0.16, 0.5);
+    } else {
+      col.caixa('tabuas', ex + 0.02 * sg, base + dh / 2, cz, 0.06, dh, 0.95, 0, { uv: true }); for (const t of [-0.5, 0.5]) col.viga(M.madeira, [ex + 0.05 * sg, base, cz + t], [ex + 0.05 * sg, topo, cz + t], 0.1);
+      col.viga(M.madeira, [ex + 0.05 * sg, topo, cz - 0.5], [ex + 0.05 * sg, topo, cz + 0.5], 0.1); col.caixa(M.pedra, ex + 0.3 * sg, 0.08, cz, 0.5, 0.16, 1.2);
+    } }
+  const px = lado === 's' ? cx : null;
   let nj = o.janelas ?? 2;
   const slots = [];
-  for (let i = 0; i < Math.max(1, Math.floor((w - 1) / 1.6)); i++) { const sx = cx - w / 2 + 1.0 + i * 1.6; if (Math.abs(sx - px) > 1.1) slots.push({ ehZ: true, a: sx }); }
-  for (let i = 0; i < Math.max(1, Math.floor((d - 0.6) / 1.5)); i++) slots.push({ ehZ: false, a: cz - d / 2 + 0.9 + i * 1.5 });
+  for (let i = 0; i < Math.max(1, Math.floor((w - 1) / 1.6)); i++) { const sx = cx - w / 2 + 1.0 + i * 1.6; if (px === null || Math.abs(sx - px) > 1.1) slots.push({ ehZ: true, a: sx }); }
+  for (let i = 0; i < Math.max(1, Math.floor((d - 0.6) / 1.5)); i++) { const sz = cz - d / 2 + 0.9 + i * 1.5; if (lado !== 'l' || Math.abs(sz - cz) > 1.1) slots.push({ ehZ: false, a: sz }); }
   for (const s of slots) { if (nj-- <= 0) break;
     const y = base + 1.15, gw = 0.55, gh = 0.62;
-    if (s.ehZ) { col.geo('janela', new THREE.PlaneGeometry(gw, gh), new THREE.Matrix4().makeTranslation(s.a, y, zf + 0.012), { uv: false }); for (const [dx, dy, ww, hh] of [[0, gh / 2, gw + 0.14, 0.07], [0, -gh / 2, gw + 0.14, 0.07], [-gw / 2, 0, 0.07, gh], [gw / 2, 0, 0.07, gh], [0, 0, 0.04, gh]]) col.caixa('madeira', s.a + dx, y + dy, zf + 0.03, ww, hh, 0.07); saida.janelas.push({ x: s.a, y, z: zf + 0.1 }); }
-    else { M4.compose(new THREE.Vector3(xf + 0.012, y, s.a), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 2, 0)), new THREE.Vector3(1, 1, 1)); col.geo('janela', new THREE.PlaneGeometry(gw, gh), M4.clone(), { uv: false }); for (const [dz, dy, ww, hh] of [[0, gh / 2, gw + 0.14, 0.07], [0, -gh / 2, gw + 0.14, 0.07], [-gw / 2, 0, 0.07, gh], [gw / 2, 0, 0.07, gh], [0, 0, 0.04, gh]]) col.caixa('madeira', xf + 0.03, y + dy, s.a + dz, 0.07, hh, ww); saida.janelas.push({ x: xf + 0.1, y, z: s.a }); } }
+    if (s.ehZ) { col.geo('janela', new THREE.PlaneGeometry(gw, gh), new THREE.Matrix4().makeTranslation(s.a, y, zf + 0.012), { uv: false }); for (const [dx, dy, ww, hh] of [[0, gh / 2, gw + 0.14, 0.07], [0, -gh / 2, gw + 0.14, 0.07], [-gw / 2, 0, 0.07, gh], [gw / 2, 0, 0.07, gh], [0, 0, 0.04, gh]]) col.caixa(M.madeira, s.a + dx, y + dy, zf + 0.03, ww, hh, 0.07); saida.janelas.push({ x: s.a, y, z: zf + 0.1 }); }
+    else { M4.compose(new THREE.Vector3(xf + 0.012, y, s.a), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 2, 0)), new THREE.Vector3(1, 1, 1)); col.geo('janela', new THREE.PlaneGeometry(gw, gh), M4.clone(), { uv: false }); for (const [dz, dy, ww, hh] of [[0, gh / 2, gw + 0.14, 0.07], [0, -gh / 2, gw + 0.14, 0.07], [-gw / 2, 0, 0.07, gh], [gw / 2, 0, 0.07, gh], [0, 0, 0.04, gh]]) col.caixa(M.madeira, xf + 0.03, y + dy, s.a + dz, 0.07, hh, ww); saida.janelas.push({ x: xf + 0.1, y, z: s.a }); } }
   // telhado de duas águas: cumeeira ao longo do lado maior
   const L = Math.max(w, d), S = Math.min(w, d), e = S / 2 + bei, y0 = h, y1 = h + rh, l0 = -L / 2 - bei, l1 = L / 2 + bei, comp = Math.hypot(e, rh), esc = col.escalaUV;
   const plano = (sinal) => { const g = new THREE.BufferGeometry(); const z0 = sinal * e, P = [[l0, y0, z0], [l1, y0, z0], [l1, y1, 0], [l0, y1, 0]];
     g.setAttribute('position', new THREE.Float32BufferAttribute(P.flat(), 3)); const ny = e / comp, nz = (sinal * rh) / comp; g.setAttribute('normal', new THREE.Float32BufferAttribute(Array(4).fill([0, ny, nz]).flat(), 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute([l0 * esc, 0, l1 * esc, 0, l1 * esc, comp * esc, l0 * esc, comp * esc], 2)); g.setIndex(sinal > 0 ? [0, 1, 2, 0, 2, 3] : [0, 2, 1, 0, 3, 2]); return g; };
   const empena = (x, sinal) => { const g = new THREE.BufferGeometry(), hw = S / 2; g.setAttribute('position', new THREE.Float32BufferAttribute([x, y0, -hw, x, y0, hw, x, y1, 0], 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(Array(3).fill([sinal, 0, 0]).flat(), 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, S * esc, 0, S * esc / 2, rh * esc], 2)); g.setIndex(sinal > 0 ? [0, 2, 1] : [0, 1, 2]); return g; };
   const ang = d > w ? -Math.PI / 2 : 0, T = new THREE.Matrix4().makeTranslation(cx, 0, cz).multiply(new THREE.Matrix4().makeRotationY(ang));
-  col.geo(mTelha, plano(1), T, { uv: false }); col.geo(mTelha, plano(-1), T, { uv: false }); col.geo('reboco', empena(L / 2, 1), T, { uv: false }); col.geo('reboco', empena(-L / 2, -1), T, { uv: false });
+  col.geo(mTelha, plano(1), T, { uv: false }); col.geo(mTelha, plano(-1), T, { uv: false }); col.geo(M.reboco, empena(L / 2, 1), T, { uv: false }); col.geo(M.reboco, empena(-L / 2, -1), T, { uv: false });
   // espessura do telhado e cumeeira
-  for (const sinal of [1, -1]) { const pa = new THREE.Vector3(l0, y0, sinal * e).applyMatrix4(T), pb = new THREE.Vector3(l1, y0, sinal * e).applyMatrix4(T); col.viga('madeira', [pa.x, pa.y, pa.z], [pb.x, pb.y, pb.z], 0.14); }
-  { const pa = new THREE.Vector3(l0, y1 + 0.04, 0).applyMatrix4(T), pb = new THREE.Vector3(l1, y1 + 0.04, 0).applyMatrix4(T); col.viga('madeira', [pa.x, pa.y, pa.z], [pb.x, pb.y, pb.z], 0.18); }
-  if (o.chamine) { const qx = cx + (giro ? 0 : w / 2 - 0.9), qz = cz + (giro ? d / 2 - 0.9 : -0.2), top = y0 + rh * 0.75 + 0.9; col.caixa('pedra', qx, (top + y0) / 2 - 0.2, qz, 0.6, top - y0 + 0.4, 0.6); col.caixa('pedra', qx, top + 0.08, qz, 0.78, 0.16, 0.78); saida.chamines.push({ x: qx, y: top + 0.2, z: qz }); }
+  for (const sinal of [1, -1]) { const pa = new THREE.Vector3(l0, y0, sinal * e).applyMatrix4(T), pb = new THREE.Vector3(l1, y0, sinal * e).applyMatrix4(T); col.viga(M.madeira, [pa.x, pa.y, pa.z], [pb.x, pb.y, pb.z], 0.14); }
+  { const pa = new THREE.Vector3(l0, y1 + 0.04, 0).applyMatrix4(T), pb = new THREE.Vector3(l1, y1 + 0.04, 0).applyMatrix4(T); col.viga(M.madeira, [pa.x, pa.y, pa.z], [pb.x, pb.y, pb.z], 0.18); }
+  if (o.chamine) { const qx = cx + (giro ? 0 : w / 2 - 0.9), qz = cz + (giro ? d / 2 - 0.9 : -0.2), top = y0 + rh * 0.75 + 0.9; col.caixa(M.pedra, qx, (top + y0) / 2 - 0.2, qz, 0.6, top - y0 + 0.4, 0.6); col.caixa(M.pedra, qx, top + 0.08, qz, 0.78, 0.16, 0.78); saida.chamines.push({ x: qx, y: top + 0.2, z: qz }); }
 }
 
 function arvore(col, o, kit) {
@@ -119,7 +133,7 @@ function torreSino(col, o, kit, saida) {
   col.geo('metal', new THREE.TorusGeometry(0.16, 0.035, 6, 14), new THREE.Matrix4().makeTranslation(x, 5.55, z), { uv: false }); col.viga('metal', [x, 5.7, z], [x, 6.5, z], 0.05);
   saida.luzes.push({ x, y: 6.2, z, tipo: 'sino' });
 }
-function lanterna(col, o, kit, saida) {
+export function lanterna(col, o, kit, saida) {
   const h = kit.visual.lanterna.altura, x = o.x, z = o.z;
   col.geo('madeira', new THREE.CylinderGeometry(0.07, 0.11, h, 6), new THREE.Matrix4().makeTranslation(x, h / 2, z)); col.viga('madeira', [x, h - 0.15, z], [x + 0.3, h - 0.15, z], 0.07);
   col.caixa('metal', x + 0.3, h - 0.42, z, 0.3, 0.05, 0.3); col.caixa('lampada', x + 0.3, h - 0.27, z, 0.22, 0.3, 0.22); col.caixa('metal', x + 0.3, h - 0.08, z, 0.3, 0.05, 0.3);
@@ -138,9 +152,10 @@ export function construirKit(mapaDados, kit, texelsPorTile = 64) {
   const col = criarColetor(texelsPorTile), saida = { luzes: [], janelas: [], chamines: [] };
   for (const o of mapaDados.objetos) {
     switch (o.tipo) {
-      case 'casa': casa(col, o, kit, saida); break; case 'arvore': arvore(col, o, kit); break; case 'pinheiro': pinheiro(col, o, kit); break; case 'arbusto': arbusto(col, o); break;
+      case 'casa': { const j0 = saida.janelas.length; casa(col, o, kit, saida); decorarCasa(col, o, kit, saida, saida.janelas.slice(j0)); break; } case 'arvore': arvore(col, o, kit); break; case 'pinheiro': pinheiro(col, o, kit); break; case 'arbusto': arbusto(col, o); break;
       case 'pedra': pedra(col, o); break; case 'poco': poco(col, o); break; case 'torre_sino': torreSino(col, o, kit, saida); break; case 'lanterna': lanterna(col, o, kit, saida); break;
       case 'barril': barril(col, o); break; case 'caixote': caixote(col, o); break; case 'cerca': cerca(col, o); break;
+      default: (PECAS_VILA[o.tipo] ?? PECAS_INTERIOR[o.tipo])?.(col, o, kit, saida);
     }
   }
   saida.grupos = col.fundir(); return saida;

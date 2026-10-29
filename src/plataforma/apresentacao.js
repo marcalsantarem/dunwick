@@ -12,11 +12,14 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
   const reduzir = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
   let tCobre = 0.35 * T, tRevela = 0.65 * T; const tempos = () => { tCobre = reduzir() ? 0.15 : 0.35 * T; tRevela = reduzir() ? 0.15 : 0.65 * T; };
   const apr = {
+    corPortal: [0.045, 0.035, 0.03], // cobertura de portal: escuro e IGUAL dos dois lados (sem salto de cor na troca)
     visao: 'mapa', trans: null, toque: null, ctrl: null, cobertura: 0, automatico: true, aoGameOver: null, ultimoResultado: null,
     /** A UI (15) chama isto ao assumir a escolha de comandos: a política automática se desliga. */
     assumirComandos() { apr.automatico = false; },
   };
-  let esperaGameOver = 0, avisouGameOver = false;
+  let esperaGameOver = 0, avisouGameOver = false, pendentePortal = false;
+  // portal (v0.1.2): o mundo (trocaManual) congela ao tocar o portal e avisa; a névoa cobre, `concluirPortal()` troca o mapa com a tela coberta
+  mundo.eventos.em('portal_usado', () => { pendentePortal = true; });
 
   function trocarParaBatalha() {
     apr.ctrl = jogo.batalha; ren.definirArte(...cenaBatalha.arte);
@@ -36,7 +39,8 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
         apr.cobertura = Math.min(1, t.t / tCobre);
         if (t.t >= tCobre) {
           apr.cobertura = 1; t.fase = 'revela'; t.t = 0;
-          if (t.tipo === 'entrar') trocarParaBatalha();
+          if (t.tipo === 'portal') { mundo.concluirPortal(); pendentePortal = false; opcoes.aoTrocarMapa?.(); }
+          else if (t.tipo === 'entrar') trocarParaBatalha();
           else { if (jogo.modo === 'batalha') apr.ultimoResultado = jogo.encerrarBatalha(); trocarParaMapa(); esperaGameOver = 1.5; avisouGameOver = false; }
         }
       } else {
@@ -47,6 +51,7 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
       return;
     }
     if (apr.visao === 'mapa') {
+      if (pendentePortal && jogo.modo === 'mapa') { tempos(); apr.trans = { tipo: 'portal', fase: 'cobre', t: 0 }; return; }
       if (jogo.modo === 'batalha') { tempos(); apr.trans = { tipo: 'entrar', fase: 'cobre', t: 0 }; }
       else if (jogo.modo === 'game_over') { // com UI (15): ela mostra "Tentar de novo"; sem UI, tenta de novo sozinho depois de 1,5 s
         if (apr.aoGameOver) { if (!avisouGameOver) { avisouGameOver = true; apr.aoGameOver(jogo); } } else if (apr.automatico) { esperaGameOver -= dt; if (esperaGameOver <= 0) jogo.tentarDeNovo(); }

@@ -18,7 +18,8 @@
     "largura_corpo_tiles",
     "clique_min_px_arte",
     "toque_min_px_css",
-    "t_dica_s"
+    "t_dica_s",
+    "minimapa"
   ],
   "properties": {
     "id": {
@@ -88,6 +89,38 @@
       "type": "number",
       "minimum": 2,
       "maximum": 30
+    },
+    "minimapa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "px_base",
+        "px_por_tile_exterior",
+        "px_por_tile_interior_max",
+        "raio_toque_px"
+      ],
+      "properties": {
+        "px_base": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 16
+        },
+        "px_por_tile_exterior": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 16
+        },
+        "px_por_tile_interior_max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 32
+        },
+        "raio_toque_px": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 44
+        }
+      }
     }
   }
 }

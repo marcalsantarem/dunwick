@@ -29,7 +29,7 @@ test('campo desconhecido, id diferente do arquivo e referência quebrada são re
   assert.ok(validarDados(tmp).erros.some((e) => e.includes('cfg_jogo.json') && e.includes('numero_magico'))); rmSync(tmp, { recursive: true });
   tmp = copiaComEdicao('enemies/enemy_boneco_alvo.json', (o) => { o.sprite = 'enemy_que_nao_existe'; });
   assert.ok(validarDados(tmp).erros.some((e) => e.includes('enemy_boneco_alvo.json') && e.includes('enemy_que_nao_existe'))); rmSync(tmp, { recursive: true });
-  tmp = copiaComEdicao('maps/map_baixo_orvalho_praca.json', (o) => { o.nome_txt = 'txt_nao_existe'; o.objetos.push({ id: 'enemy_fantasma', tipo: 'inimigo', x: 5, z: 5 }); });
+  tmp = copiaComEdicao('maps/map_baixo_orvalho.json', (o) => { o.nome_txt = 'txt_nao_existe'; o.objetos.push({ id: 'enemy_fantasma', tipo: 'inimigo', x: 5, z: 5 }); });
   const e = validarDados(tmp).erros.join('\n'); rmSync(tmp, { recursive: true });
   assert.ok(e.includes('txt_nao_existe') && e.includes('enemy_fantasma'), e);
 });
@@ -54,7 +54,7 @@ test('tecla repetida no mesmo contexto e F5/F11 no debug são recusadas', () => 
 });
 
 test('planta com caractere fora da legenda ou tamanho errado é recusada', () => {
-  const tmp = copiaComEdicao('maps/map_baixo_orvalho_praca.json', (o) => { o.planta[5] = o.planta[5].slice(0, 10) + '?' + o.planta[5].slice(11); o.planta.pop(); });
+  const tmp = copiaComEdicao('maps/map_baixo_orvalho.json', (o) => { o.planta[5] = o.planta[5].slice(0, 10) + '?' + o.planta[5].slice(11); o.planta.pop(); });
   const e = validarDados(tmp).erros.join('\n'); rmSync(tmp, { recursive: true });
   assert.ok(e.includes('"?"') && e.includes('47 linhas'), e);
 });

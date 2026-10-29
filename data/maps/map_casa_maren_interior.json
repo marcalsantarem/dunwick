@@ -1,0 +1,126 @@
+{
+  "id": "map_casa_maren_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_casa_maren_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [10, 8],
+  "legenda": {
+    "c": "calcada"
+  },
+  "planta": [
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc"
+  ],
+  "objetos": [
+    {
+      "id": "caixote_1",
+      "tipo": "caixote",
+      "x": 1,
+      "z": 6.2,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "lanterna_2",
+      "tipo": "lanterna",
+      "x": 8.8,
+      "z": 5.2,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "estante_3",
+      "tipo": "estante",
+      "x": 1.6,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "estante_4",
+      "tipo": "estante",
+      "x": 3.2,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "canteiro_5",
+      "tipo": "canteiro",
+      "x": 6.5,
+      "z": 0.6,
+      "w": 1.6,
+      "d": 0.6,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "mesa_6",
+      "tipo": "mesa",
+      "x": 5,
+      "z": 3,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 6,
+      "itens": "vela"
+    },
+    {
+      "id": "cadeira_7",
+      "tipo": "cadeira",
+      "x": 5,
+      "z": 3.9,
+      "rot": 0,
+      "seed": 7
+    },
+    {
+      "id": "cama_8",
+      "tipo": "cama",
+      "x": 8.8,
+      "z": 1.6,
+      "rot": 0,
+      "seed": 8
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 5,
+      "z": 7.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_casa_maren"
+      },
+      "chegada": {
+        "x": 5,
+        "z": 5.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "madeira",
+    "piso": "calcada"
+  },
+  "ambiente": {
+    "cor_luz": "#ffd9a0",
+    "intensidade": 0.9,
+    "fundo": "#1c140e"
+  },
+  "inicio_jogador": {
+    "tile": [5, 4],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 10, 8]
+}

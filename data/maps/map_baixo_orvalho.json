@@ -1,0 +1,1555 @@
+{
+  "id": "map_baixo_orvalho",
+  "versao": 2,
+  "nome_txt": "txt_map_baixo_orvalho_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "exterior",
+  "estado": "dia",
+  "tamanho": [48, 48],
+  "legenda": {
+    "g": "grama",
+    "t": "terra",
+    "c": "calcada",
+    "m": "musgo"
+  },
+  "planta": [
+    "gggmmmmmmggggggmmgggggtttgmmmgggggmmmggggggggggg",
+    "gggmmmmgggggggggggggggtttggmgggggggmmggggggggggg",
+    "ggggggggggggggggggggggtttggggggggggggggggggggggg",
+    "gggggggggggggggggggmmmtttggggggggggggggggggggggg",
+    "gggggggggggggggggggmmmgtttgggggggggggggggggggggg",
+    "gggggggggggggggggggmmmgtttgggggggggggggggggggggg",
+    "ggggggggggmmmgggggmmmmgtttgggggggggggggggggggggg",
+    "ggggggggggmmmgggggmmmmgttggggggggggggggmmggggggg",
+    "ggggggggggmmmgggggmmmmgttggggggggggggggmmggggggg",
+    "gggggggggggmmgggggmmmmgttggggggggggggggmmmgggggg",
+    "ggggggggggggggggmmmmmmmttgggggggggggggmmmmgggggg",
+    "ggggggggggggggmmmmmggmmttmggggggggggggmmmmmmgmmm",
+    "gggggggggggggttmmmmggmmttmgggggtgggttgmmmmmmmmmm",
+    "ggggggggggggttttmmmmmmmttmggggttggtttggmmmmggggg",
+    "gggggggggggmmttttmmmmmmttggggtttgtttmmgggggggggg",
+    "gggmmgggggmtmmttttmmmmgttgggtttttttmmmgggggggggg",
+    "gggmmgggggttttmtttttmccccgctttttttmmmmgggggggggg",
+    "ggggggggggtttttmmtttcccccccttttttgmmmmmggggggggg",
+    "mggggggggmmmtttttcttcccccccccttggmmmmmmmmggggggm",
+    "mmgggggmmmmmmmtttmmccccccccccccmmmmmmmmmmmggggmm",
+    "mmgggggmmmmmmmmmmmccccccccccccccmmmmmmmmmmggggmm",
+    "mggggggggggggggggcccccccccccccccggmmmmmmmmggggmm",
+    "gggggggggttgggggccccccccccccccccggmmmmmggggggmmm",
+    "gggggggttttttttttcccccccccccccccttttttgggggmmmmm",
+    "gggggggttttttttttccccccccccccccttttttttggggmmmmm",
+    "ggggggggggggggggccccccccccccccccgggmttggggggggmm",
+    "ggggggggggmmmgggcccccccccccccccggggmmggggggggggm",
+    "ggmmmmmmmmmmmmmgccccccccccccccgcmmmmgggggggggggm",
+    "ggmmmmmmmmmmmmmgggcccccccccccccmmmmggggggggggggg",
+    "ggmmmmmggggggggggcccccccccccccgmmmmmgggggggggggm",
+    "ggmmmmggggggggggggttcccccccctmmmmmmmmggggggmmmmm",
+    "ggmmmmgggggggggggttttgccctcttttmmmmmmgggggmmmmmm",
+    "ggmmmmggggggggggttttgggttttmtttmgmmmmgggggmmmmmm",
+    "gmmmmmgggggggggttttggggtttttgttttggmggggggmmmmmm",
+    "mmmmmmmmmggggtttttgggggttgttttttttggggggggmmmmmm",
+    "mmmmmmmmmmgggtttgggggggttgttttgtttgggggggmmmmmmm",
+    "mmmmmmmmmmgggtggggggggtttggtttggttttgggggmmmmmmm",
+    "mmmmmmmmmmgggggggggggttttgggttgggtttgggggggmmmmm",
+    "mmgggggggmmmmgggggtttttttgggtttgggggggggggggggmm",
+    "mgggggggggmmmmggggtttggttggggttgggggggggggggggmm",
+    "mgggggggggmmmmggggttgggttgggggggggggggggggggggmm",
+    "mggggggggmmmmmgggggggggttgggggggggggggggggggggmm",
+    "mgggggggmmmmmmggggmmmggttggggggggggmmgggggggmmmm",
+    "mggggggmmmmmmmmgggmmmggttggggggggggmmggggggmmmmm",
+    "mggggggmmmmmmmmgggmmmggtttgggggggggmmggggggmmmmm",
+    "gggggggggmmmmmmmmmmmmggtttgggggggggggggggggmmmmm",
+    "gggmmggggggmmmmmmmmmmggttggmmggggggggggggggggggm",
+    "ggmmmmgggggmmmmmmmmmmggttgmmmmgggggggggggggggggg"
+  ],
+  "objetos": [
+    {
+      "id": "casa_maren",
+      "tipo": "casa",
+      "x": 14,
+      "z": 10.5,
+      "w": 6,
+      "d": 5,
+      "rot": 0,
+      "telhado": "musgo",
+      "janelas": 3,
+      "chamine": true,
+      "seed": 3,
+      "lado": "s",
+      "deco": "maren"
+    },
+    {
+      "id": "taverna",
+      "tipo": "casa",
+      "x": 31.5,
+      "z": 10,
+      "w": 7,
+      "d": 6,
+      "rot": 0,
+      "telhado": "telha",
+      "janelas": 4,
+      "chamine": true,
+      "seed": 5,
+      "lado": "s",
+      "deco": "taverna"
+    },
+    {
+      "id": "forja",
+      "tipo": "casa",
+      "x": 38.5,
+      "z": 14.5,
+      "w": 5,
+      "d": 5,
+      "rot": 0,
+      "telhado": "ardosia",
+      "janelas": 2,
+      "chamine": true,
+      "seed": 7,
+      "lado": "s",
+      "deco": "forja"
+    },
+    {
+      "id": "casa_torvan",
+      "tipo": "casa",
+      "x": 8.5,
+      "z": 17,
+      "w": 5,
+      "d": 4,
+      "rot": 0,
+      "telhado": "telha",
+      "janelas": 2,
+      "chamine": true,
+      "seed": 19,
+      "lado": "l",
+      "deco": "torvan"
+    },
+    {
+      "id": "posto_escrivao",
+      "tipo": "casa",
+      "x": 40.5,
+      "z": 24,
+      "w": 5,
+      "d": 6,
+      "rot": 0,
+      "telhado": "ardosia",
+      "janelas": 2,
+      "chamine": false,
+      "seed": 11,
+      "lado": "s",
+      "deco": "escrivao"
+    },
+    {
+      "id": "casa_sul_1",
+      "tipo": "casa",
+      "x": 14,
+      "z": 38,
+      "w": 4,
+      "d": 4,
+      "rot": 0,
+      "telhado": "telha",
+      "janelas": 2,
+      "chamine": true,
+      "seed": 13,
+      "fechada": true
+    },
+    {
+      "id": "casa_sul_2",
+      "tipo": "casa",
+      "x": 19,
+      "z": 42,
+      "w": 4,
+      "d": 4,
+      "rot": 0,
+      "telhado": "musgo",
+      "janelas": 2,
+      "chamine": true,
+      "seed": 17,
+      "estilo": "enegrecida",
+      "fechada": true
+    },
+    {
+      "id": "casa_nova",
+      "tipo": "casa",
+      "x": 30,
+      "z": 41,
+      "w": 4,
+      "d": 4,
+      "rot": 0,
+      "telhado": "telha",
+      "janelas": 2,
+      "chamine": false,
+      "seed": 23,
+      "estilo": "nova",
+      "fechada": true
+    },
+    {
+      "id": "casa_sul_4",
+      "tipo": "casa",
+      "x": 37,
+      "z": 37,
+      "w": 4,
+      "d": 4,
+      "rot": 0,
+      "telhado": "ardosia",
+      "janelas": 2,
+      "chamine": true,
+      "seed": 29,
+      "fechada": true
+    },
+    {
+      "id": "poco",
+      "tipo": "poco",
+      "x": 24,
+      "z": 24,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "lanterna_0",
+      "tipo": "lanterna",
+      "x": 19,
+      "z": 19,
+      "rot": 0,
+      "seed": 0
+    },
+    {
+      "id": "lanterna_1",
+      "tipo": "lanterna",
+      "x": 29,
+      "z": 19,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "lanterna_2",
+      "tipo": "lanterna",
+      "x": 19,
+      "z": 29,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "lanterna_3",
+      "tipo": "lanterna",
+      "x": 29,
+      "z": 29,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "lanterna_c24_6",
+      "tipo": "lanterna",
+      "x": 24,
+      "z": 6,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "lanterna_c24_42",
+      "tipo": "lanterna",
+      "x": 24,
+      "z": 42,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "lanterna_c6_24",
+      "tipo": "lanterna",
+      "x": 6,
+      "z": 24,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "cerca_treino_1",
+      "tipo": "cerca",
+      "x0": 7,
+      "z0": 20.5,
+      "x1": 19,
+      "z1": 20.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "cerca_treino_2",
+      "tipo": "cerca",
+      "x0": 7,
+      "z0": 27.5,
+      "x1": 19,
+      "z1": 27.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "cerca_treino_3",
+      "tipo": "cerca",
+      "x0": 7,
+      "z0": 20.5,
+      "x1": 7,
+      "z1": 27.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "enemy_boneco_alvo",
+      "tipo": "inimigo",
+      "x": 11.5,
+      "z": 24,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "enemy_boneco_golpe",
+      "tipo": "inimigo",
+      "x": 16.5,
+      "z": 24,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "barril_1",
+      "tipo": "barril",
+      "x": 35.6,
+      "z": 8,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "barril_2",
+      "tipo": "barril",
+      "x": 35.6,
+      "z": 9.1,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "barril_3",
+      "tipo": "barril",
+      "x": 35.4,
+      "z": 17.2,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "caixote_1",
+      "tipo": "caixote",
+      "x": 41.6,
+      "z": 17.4,
+      "rot": 17,
+      "seed": 1
+    },
+    {
+      "id": "caixote_2",
+      "tipo": "caixote",
+      "x": 36.6,
+      "z": 27.6,
+      "rot": 34,
+      "seed": 2
+    },
+    {
+      "id": "caixote_3",
+      "tipo": "caixote",
+      "x": 37.6,
+      "z": 27.9,
+      "rot": 51,
+      "seed": 3
+    },
+    {
+      "id": "portico",
+      "tipo": "portico",
+      "x": 24,
+      "z": 19.5,
+      "w": 4,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "quadro_avisos",
+      "tipo": "quadro_avisos",
+      "x": 28.5,
+      "z": 21,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "quadro_editais",
+      "tipo": "quadro_avisos",
+      "x": 37,
+      "z": 21.2,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "forja_brasa",
+      "tipo": "forja_brasa",
+      "x": 43.5,
+      "z": 14.6,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "canteiro_maren",
+      "tipo": "canteiro",
+      "x": 18.5,
+      "z": 10.5,
+      "w": 2,
+      "d": 3,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "rack_armas_patio",
+      "tipo": "rack_armas",
+      "x": 9.5,
+      "z": 21.3,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "arvore_queimada",
+      "tipo": "arvore_queimada",
+      "x": 26,
+      "z": 36,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "muro_fuligem",
+      "tipo": "muro_fuligem",
+      "x0": 8,
+      "z0": 42.5,
+      "x1": 15,
+      "z1": 42.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "pedra_enegrecida",
+      "tipo": "pedra_enegrecida",
+      "x": 33,
+      "z": 41,
+      "w": 2,
+      "d": 4,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "arvore_0",
+      "tipo": "arvore",
+      "x": 4.7,
+      "z": 10.82,
+      "rot": 329,
+      "escala": 1.01,
+      "seed": 37
+    },
+    {
+      "id": "pinheiro_1",
+      "tipo": "pinheiro",
+      "x": 31.25,
+      "z": 1.95,
+      "rot": 225,
+      "escala": 1.13,
+      "seed": 748
+    },
+    {
+      "id": "pinheiro_2",
+      "tipo": "pinheiro",
+      "x": 33.3,
+      "z": 46.13,
+      "rot": 350,
+      "escala": 1.26,
+      "seed": 760
+    },
+    {
+      "id": "arvore_3",
+      "tipo": "arvore",
+      "x": 12.95,
+      "z": 45.33,
+      "rot": 353,
+      "escala": 1.19,
+      "seed": 149
+    },
+    {
+      "id": "arvore_4",
+      "tipo": "arvore",
+      "x": 2.42,
+      "z": 40.23,
+      "rot": 131,
+      "escala": 0.97,
+      "seed": 988
+    },
+    {
+      "id": "pinheiro_5",
+      "tipo": "pinheiro",
+      "x": 37.16,
+      "z": 3.39,
+      "rot": 116,
+      "escala": 0.99,
+      "seed": 123
+    },
+    {
+      "id": "arvore_6",
+      "tipo": "arvore",
+      "x": 42.05,
+      "z": 42.38,
+      "rot": 204,
+      "escala": 1.32,
+      "seed": 610
+    },
+    {
+      "id": "arvore_7",
+      "tipo": "arvore",
+      "x": 21.64,
+      "z": 12.2,
+      "rot": 354,
+      "escala": 0.91,
+      "seed": 372
+    },
+    {
+      "id": "arvore_8",
+      "tipo": "arvore",
+      "x": 8.84,
+      "z": 38.9,
+      "rot": 140,
+      "escala": 1.3,
+      "seed": 120
+    },
+    {
+      "id": "arvore_9",
+      "tipo": "arvore",
+      "x": 2.21,
+      "z": 3.71,
+      "rot": 221,
+      "escala": 1.07,
+      "seed": 127
+    },
+    {
+      "id": "pinheiro_10",
+      "tipo": "pinheiro",
+      "x": 43.23,
+      "z": 7.38,
+      "rot": 271,
+      "escala": 0.94,
+      "seed": 524
+    },
+    {
+      "id": "pinheiro_11",
+      "tipo": "pinheiro",
+      "x": 14.44,
+      "z": 16.22,
+      "rot": 135,
+      "escala": 1.11,
+      "seed": 523
+    },
+    {
+      "id": "arvore_12",
+      "tipo": "arvore",
+      "x": 42.2,
+      "z": 1.36,
+      "rot": 232,
+      "escala": 0.86,
+      "seed": 52
+    },
+    {
+      "id": "arvore_13",
+      "tipo": "arvore",
+      "x": 14.89,
+      "z": 1.49,
+      "rot": 306,
+      "escala": 1.32,
+      "seed": 990
+    },
+    {
+      "id": "arvore_14",
+      "tipo": "arvore",
+      "x": 3.05,
+      "z": 36.6,
+      "rot": 210,
+      "escala": 1.18,
+      "seed": 144
+    },
+    {
+      "id": "arvore_15",
+      "tipo": "arvore",
+      "x": 3.66,
+      "z": 7.51,
+      "rot": 38,
+      "escala": 1.17,
+      "seed": 645
+    },
+    {
+      "id": "pinheiro_16",
+      "tipo": "pinheiro",
+      "x": 9.25,
+      "z": 3.11,
+      "rot": 216,
+      "escala": 1.15,
+      "seed": 300
+    },
+    {
+      "id": "arvore_17",
+      "tipo": "arvore",
+      "x": 2.12,
+      "z": 43.49,
+      "rot": 181,
+      "escala": 1.31,
+      "seed": 76
+    },
+    {
+      "id": "arvore_18",
+      "tipo": "arvore",
+      "x": 45.97,
+      "z": 28.27,
+      "rot": 169,
+      "escala": 1,
+      "seed": 186
+    },
+    {
+      "id": "arvore_19",
+      "tipo": "arvore",
+      "x": 36.52,
+      "z": 45.75,
+      "rot": 146,
+      "escala": 0.97,
+      "seed": 967
+    },
+    {
+      "id": "arvore_20",
+      "tipo": "arvore",
+      "x": 2,
+      "z": 29.23,
+      "rot": 328,
+      "escala": 1.07,
+      "seed": 601
+    },
+    {
+      "id": "arvore_21",
+      "tipo": "arvore",
+      "x": 7.98,
+      "z": 31.39,
+      "rot": 211,
+      "escala": 1.15,
+      "seed": 218
+    },
+    {
+      "id": "arvore_22",
+      "tipo": "arvore",
+      "x": 7.47,
+      "z": 46,
+      "rot": 235,
+      "escala": 1.03,
+      "seed": 623
+    },
+    {
+      "id": "pinheiro_23",
+      "tipo": "pinheiro",
+      "x": 7.71,
+      "z": 10.08,
+      "rot": 43,
+      "escala": 1.31,
+      "seed": 616
+    },
+    {
+      "id": "arvore_24",
+      "tipo": "arvore",
+      "x": 46.55,
+      "z": 10.08,
+      "rot": 227,
+      "escala": 1.32,
+      "seed": 173
+    },
+    {
+      "id": "pinheiro_25",
+      "tipo": "pinheiro",
+      "x": 18.71,
+      "z": 3.99,
+      "rot": 284,
+      "escala": 1.05,
+      "seed": 288
+    },
+    {
+      "id": "pinheiro_26",
+      "tipo": "pinheiro",
+      "x": 3.38,
+      "z": 46.39,
+      "rot": 81,
+      "escala": 1.26,
+      "seed": 841
+    },
+    {
+      "id": "arvore_27",
+      "tipo": "arvore",
+      "x": 42.16,
+      "z": 38.5,
+      "rot": 325,
+      "escala": 0.97,
+      "seed": 977
+    },
+    {
+      "id": "pinheiro_28",
+      "tipo": "pinheiro",
+      "x": 4.34,
+      "z": 1.21,
+      "rot": 96,
+      "escala": 0.93,
+      "seed": 759
+    },
+    {
+      "id": "arvore_29",
+      "tipo": "arvore",
+      "x": 44.01,
+      "z": 46.45,
+      "rot": 278,
+      "escala": 0.85,
+      "seed": 929
+    },
+    {
+      "id": "arvore_30",
+      "tipo": "arvore",
+      "x": 39.06,
+      "z": 43.67,
+      "rot": 234,
+      "escala": 0.99,
+      "seed": 628
+    },
+    {
+      "id": "arvore_31",
+      "tipo": "arvore",
+      "x": 45.27,
+      "z": 36.2,
+      "rot": 35,
+      "escala": 1.32,
+      "seed": 131
+    },
+    {
+      "id": "arvore_32",
+      "tipo": "arvore",
+      "x": 1.45,
+      "z": 11.2,
+      "rot": 24,
+      "escala": 1.09,
+      "seed": 751
+    },
+    {
+      "id": "arvore_33",
+      "tipo": "arvore",
+      "x": 44.94,
+      "z": 40.73,
+      "rot": 100,
+      "escala": 1.14,
+      "seed": 438
+    },
+    {
+      "id": "arvore_34",
+      "tipo": "arvore",
+      "x": 15.45,
+      "z": 4.51,
+      "rot": 299,
+      "escala": 1.05,
+      "seed": 16
+    },
+    {
+      "id": "arvore_35",
+      "tipo": "arvore",
+      "x": 5.4,
+      "z": 41.29,
+      "rot": 88,
+      "escala": 1.32,
+      "seed": 178
+    },
+    {
+      "id": "arvore_36",
+      "tipo": "arvore",
+      "x": 8.72,
+      "z": 35.82,
+      "rot": 308,
+      "escala": 1.26,
+      "seed": 979
+    },
+    {
+      "id": "pinheiro_37",
+      "tipo": "pinheiro",
+      "x": 12.11,
+      "z": 31.45,
+      "rot": 331,
+      "escala": 0.87,
+      "seed": 247
+    },
+    {
+      "id": "arvore_38",
+      "tipo": "arvore",
+      "x": 19.58,
+      "z": 36.18,
+      "rot": 103,
+      "escala": 1.27,
+      "seed": 779
+    },
+    {
+      "id": "arvore_39",
+      "tipo": "arvore",
+      "x": 45.82,
+      "z": 3.22,
+      "rot": 320,
+      "escala": 1.08,
+      "seed": 305
+    },
+    {
+      "id": "pinheiro_40",
+      "tipo": "pinheiro",
+      "x": 29.61,
+      "z": 46.78,
+      "rot": 355,
+      "escala": 1.22,
+      "seed": 527
+    },
+    {
+      "id": "arvore_41",
+      "tipo": "arvore",
+      "x": 39.02,
+      "z": 31.61,
+      "rot": 117,
+      "escala": 0.85,
+      "seed": 49
+    },
+    {
+      "id": "arvore_42",
+      "tipo": "arvore",
+      "x": 2.94,
+      "z": 22.7,
+      "rot": 15,
+      "escala": 1.29,
+      "seed": 997
+    },
+    {
+      "id": "arvore_43",
+      "tipo": "arvore",
+      "x": 35.06,
+      "z": 32.12,
+      "rot": 338,
+      "escala": 0.92,
+      "seed": 315
+    },
+    {
+      "id": "arvore_44",
+      "tipo": "arvore",
+      "x": 2.57,
+      "z": 32.71,
+      "rot": 137,
+      "escala": 0.98,
+      "seed": 806
+    },
+    {
+      "id": "pinheiro_45",
+      "tipo": "pinheiro",
+      "x": 30.85,
+      "z": 35.61,
+      "rot": 45,
+      "escala": 0.96,
+      "seed": 995
+    },
+    {
+      "id": "arvore_46",
+      "tipo": "arvore",
+      "x": 6.39,
+      "z": 4.68,
+      "rot": 229,
+      "escala": 1.25,
+      "seed": 366
+    },
+    {
+      "id": "arvore_47",
+      "tipo": "arvore",
+      "x": 1.08,
+      "z": 17.32,
+      "rot": 356,
+      "escala": 1.26,
+      "seed": 672
+    },
+    {
+      "id": "pinheiro_48",
+      "tipo": "pinheiro",
+      "x": 46.5,
+      "z": 23.88,
+      "rot": 277,
+      "escala": 1.05,
+      "seed": 403
+    },
+    {
+      "id": "arvore_49",
+      "tipo": "arvore",
+      "x": 40.06,
+      "z": 5.32,
+      "rot": 287,
+      "escala": 1.27,
+      "seed": 989
+    },
+    {
+      "id": "arvore_50",
+      "tipo": "arvore",
+      "x": 22.25,
+      "z": 8.78,
+      "rot": 25,
+      "escala": 1.04,
+      "seed": 782
+    },
+    {
+      "id": "arvore_51",
+      "tipo": "arvore",
+      "x": 40.99,
+      "z": 46.09,
+      "rot": 334,
+      "escala": 1.06,
+      "seed": 123
+    },
+    {
+      "id": "arbusto_0",
+      "tipo": "arbusto",
+      "x": 34.74,
+      "z": 4.68,
+      "rot": 312,
+      "escala": 1.07,
+      "seed": 838
+    },
+    {
+      "id": "arbusto_1",
+      "tipo": "arbusto",
+      "x": 19.02,
+      "z": 12.83,
+      "rot": 153,
+      "escala": 0.75,
+      "seed": 953
+    },
+    {
+      "id": "pedra_2",
+      "tipo": "pedra",
+      "x": 33.32,
+      "z": 29.39,
+      "rot": 106,
+      "escala": 0.76,
+      "seed": 140
+    },
+    {
+      "id": "arbusto_3",
+      "tipo": "arbusto",
+      "x": 20.29,
+      "z": 33.78,
+      "rot": 162,
+      "escala": 1.31,
+      "seed": 98
+    },
+    {
+      "id": "pedra_4",
+      "tipo": "pedra",
+      "x": 41.16,
+      "z": 30.54,
+      "rot": 38,
+      "escala": 1.08,
+      "seed": 335
+    },
+    {
+      "id": "pedra_5",
+      "tipo": "pedra",
+      "x": 43.54,
+      "z": 31.34,
+      "rot": 40,
+      "escala": 0.9,
+      "seed": 751
+    },
+    {
+      "id": "pedra_6",
+      "tipo": "pedra",
+      "x": 10.46,
+      "z": 33.64,
+      "rot": 336,
+      "escala": 0.99,
+      "seed": 419
+    },
+    {
+      "id": "arbusto_7",
+      "tipo": "arbusto",
+      "x": 3.92,
+      "z": 26.29,
+      "rot": 8,
+      "escala": 1.09,
+      "seed": 324
+    },
+    {
+      "id": "arbusto_8",
+      "tipo": "arbusto",
+      "x": 4.69,
+      "z": 28.7,
+      "rot": 8,
+      "escala": 1.25,
+      "seed": 561
+    },
+    {
+      "id": "pedra_9",
+      "tipo": "pedra",
+      "x": 6.5,
+      "z": 38.77,
+      "rot": 186,
+      "escala": 0.97,
+      "seed": 757
+    },
+    {
+      "id": "arbusto_10",
+      "tipo": "arbusto",
+      "x": 36.38,
+      "z": 43.38,
+      "rot": 82,
+      "escala": 1.4,
+      "seed": 349
+    },
+    {
+      "id": "arbusto_11",
+      "tipo": "arbusto",
+      "x": 7.46,
+      "z": 12.45,
+      "rot": 167,
+      "escala": 1.2,
+      "seed": 933
+    },
+    {
+      "id": "pedra_12",
+      "tipo": "pedra",
+      "x": 44.21,
+      "z": 5.24,
+      "rot": 49,
+      "escala": 1.05,
+      "seed": 798
+    },
+    {
+      "id": "arbusto_13",
+      "tipo": "arbusto",
+      "x": 14.41,
+      "z": 32.67,
+      "rot": 154,
+      "escala": 1.09,
+      "seed": 452
+    },
+    {
+      "id": "arbusto_14",
+      "tipo": "arbusto",
+      "x": 8.96,
+      "z": 6.39,
+      "rot": 155,
+      "escala": 0.92,
+      "seed": 453
+    },
+    {
+      "id": "pedra_15",
+      "tipo": "pedra",
+      "x": 6.5,
+      "z": 7.64,
+      "rot": 37,
+      "escala": 1.31,
+      "seed": 937
+    },
+    {
+      "id": "arbusto_16",
+      "tipo": "arbusto",
+      "x": 43.7,
+      "z": 33.77,
+      "rot": 219,
+      "escala": 0.85,
+      "seed": 113
+    },
+    {
+      "id": "arbusto_17",
+      "tipo": "arbusto",
+      "x": 19.19,
+      "z": 7.86,
+      "rot": 50,
+      "escala": 1.09,
+      "seed": 697
+    },
+    {
+      "id": "arbusto_18",
+      "tipo": "arbusto",
+      "x": 37.95,
+      "z": 8.72,
+      "rot": 22,
+      "escala": 1.27,
+      "seed": 912
+    },
+    {
+      "id": "arbusto_19",
+      "tipo": "arbusto",
+      "x": 46.17,
+      "z": 43.73,
+      "rot": 110,
+      "escala": 1.02,
+      "seed": 951
+    },
+    {
+      "id": "arbusto_20",
+      "tipo": "arbusto",
+      "x": 44.11,
+      "z": 11.73,
+      "rot": 136,
+      "escala": 1.07,
+      "seed": 971
+    },
+    {
+      "id": "arbusto_21",
+      "tipo": "arbusto",
+      "x": 1.01,
+      "z": 7.68,
+      "rot": 338,
+      "escala": 1.01,
+      "seed": 80
+    },
+    {
+      "id": "arbusto_22",
+      "tipo": "arbusto",
+      "x": 8.2,
+      "z": 29.09,
+      "rot": 141,
+      "escala": 0.93,
+      "seed": 827
+    },
+    {
+      "id": "arbusto_23",
+      "tipo": "arbusto",
+      "x": 38.71,
+      "z": 1.26,
+      "rot": 288,
+      "escala": 1.18,
+      "seed": 392
+    },
+    {
+      "id": "arbusto_24",
+      "tipo": "arbusto",
+      "x": 15.45,
+      "z": 46.62,
+      "rot": 236,
+      "escala": 0.97,
+      "seed": 124
+    },
+    {
+      "id": "arbusto_25",
+      "tipo": "arbusto",
+      "x": 41.43,
+      "z": 9.99,
+      "rot": 46,
+      "escala": 1.22,
+      "seed": 757
+    },
+    {
+      "id": "pedra_26",
+      "tipo": "pedra",
+      "x": 6.29,
+      "z": 34.84,
+      "rot": 256,
+      "escala": 0.71,
+      "seed": 969
+    },
+    {
+      "id": "arbusto_27",
+      "tipo": "arbusto",
+      "x": 33.88,
+      "z": 21.01,
+      "rot": 202,
+      "escala": 1.1,
+      "seed": 572
+    },
+    {
+      "id": "arbusto_28",
+      "tipo": "arbusto",
+      "x": 10.15,
+      "z": 44.54,
+      "rot": 70,
+      "escala": 0.77,
+      "seed": 220
+    },
+    {
+      "id": "arbusto_29",
+      "tipo": "arbusto",
+      "x": 22.94,
+      "z": 14.27,
+      "rot": 249,
+      "escala": 1.03,
+      "seed": 461
+    },
+    {
+      "id": "arbusto_30",
+      "tipo": "arbusto",
+      "x": 12.26,
+      "z": 4.41,
+      "rot": 21,
+      "escala": 0.74,
+      "seed": 2
+    },
+    {
+      "id": "arbusto_31",
+      "tipo": "arbusto",
+      "x": 29.08,
+      "z": 3.47,
+      "rot": 164,
+      "escala": 1.33,
+      "seed": 935
+    },
+    {
+      "id": "pedra_32",
+      "tipo": "pedra",
+      "x": 3.75,
+      "z": 20.21,
+      "rot": 169,
+      "escala": 1.11,
+      "seed": 654
+    },
+    {
+      "id": "pedra_33",
+      "tipo": "pedra",
+      "x": 25.12,
+      "z": 38.62,
+      "rot": 308,
+      "escala": 1.24,
+      "seed": 716
+    },
+    {
+      "id": "arbusto_34",
+      "tipo": "arbusto",
+      "x": 31.98,
+      "z": 18.79,
+      "rot": 39,
+      "escala": 0.99,
+      "seed": 746
+    },
+    {
+      "id": "pedra_35",
+      "tipo": "pedra",
+      "x": 18.73,
+      "z": 1.46,
+      "rot": 127,
+      "escala": 0.92,
+      "seed": 670
+    }
+  ],
+  "edificios": [
+    {
+      "id": "casa_maren",
+      "tipo": "casa",
+      "x": 14,
+      "z": 10.5,
+      "w": 6,
+      "d": 5,
+      "porta": {
+        "x": 14,
+        "z": 13,
+        "lado": "s"
+      },
+      "interior": "map_casa_maren_interior"
+    },
+    {
+      "id": "taverna",
+      "tipo": "taverna",
+      "x": 31.5,
+      "z": 10,
+      "w": 7,
+      "d": 6,
+      "porta": {
+        "x": 31.5,
+        "z": 13,
+        "lado": "s"
+      },
+      "interior": "map_taverna_interior"
+    },
+    {
+      "id": "forja",
+      "tipo": "forja",
+      "x": 38.5,
+      "z": 14.5,
+      "w": 5,
+      "d": 5,
+      "porta": {
+        "x": 38.5,
+        "z": 17,
+        "lado": "s"
+      },
+      "interior": "map_forja_interior"
+    },
+    {
+      "id": "casa_torvan",
+      "tipo": "casa",
+      "x": 8.5,
+      "z": 17,
+      "w": 5,
+      "d": 4,
+      "porta": {
+        "x": 11,
+        "z": 17,
+        "lado": "l"
+      },
+      "interior": "map_casa_torvan_interior"
+    },
+    {
+      "id": "posto_escrivao",
+      "tipo": "posto",
+      "x": 40.5,
+      "z": 24,
+      "w": 5,
+      "d": 6,
+      "porta": {
+        "x": 40.5,
+        "z": 27,
+        "lado": "s"
+      },
+      "interior": "map_posto_escrivao_interior"
+    },
+    {
+      "id": "casa_sul_1",
+      "tipo": "casa",
+      "x": 14,
+      "z": 38,
+      "w": 4,
+      "d": 4,
+      "porta": {
+        "x": 14,
+        "z": 36,
+        "lado": "n"
+      },
+      "interior": null
+    },
+    {
+      "id": "casa_sul_2",
+      "tipo": "casa",
+      "x": 19,
+      "z": 42,
+      "w": 4,
+      "d": 4,
+      "porta": {
+        "x": 19,
+        "z": 40,
+        "lado": "n"
+      },
+      "interior": null
+    },
+    {
+      "id": "casa_nova",
+      "tipo": "casa",
+      "x": 30,
+      "z": 41,
+      "w": 4,
+      "d": 4,
+      "porta": {
+        "x": 30,
+        "z": 39,
+        "lado": "n"
+      },
+      "interior": null
+    },
+    {
+      "id": "casa_sul_4",
+      "tipo": "casa",
+      "x": 37,
+      "z": 37,
+      "w": 4,
+      "d": 4,
+      "porta": {
+        "x": 35,
+        "z": 37,
+        "lado": "o"
+      },
+      "interior": null
+    }
+  ],
+  "portais": [
+    {
+      "id": "porta_casa_maren",
+      "x": 14,
+      "z": 13.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_casa_maren_interior",
+        "portal": "saida"
+      },
+      "chegada": {
+        "x": 14,
+        "z": 14.5,
+        "direcao": "s"
+      },
+      "ativo": true
+    },
+    {
+      "id": "porta_taverna",
+      "x": 31.5,
+      "z": 13.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_taverna_interior",
+        "portal": "saida"
+      },
+      "chegada": {
+        "x": 31.5,
+        "z": 14.5,
+        "direcao": "s"
+      },
+      "ativo": true
+    },
+    {
+      "id": "porta_forja",
+      "x": 38.5,
+      "z": 17.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_forja_interior",
+        "portal": "saida"
+      },
+      "chegada": {
+        "x": 38.5,
+        "z": 18.5,
+        "direcao": "s"
+      },
+      "ativo": true
+    },
+    {
+      "id": "porta_casa_torvan",
+      "x": 11.5,
+      "z": 17,
+      "w": 1,
+      "d": 2,
+      "destino": {
+        "mapa": "map_casa_torvan_interior",
+        "portal": "saida"
+      },
+      "chegada": {
+        "x": 12.5,
+        "z": 17,
+        "direcao": "l"
+      },
+      "ativo": true
+    },
+    {
+      "id": "porta_posto_escrivao",
+      "x": 40.5,
+      "z": 27.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_posto_escrivao_interior",
+        "portal": "saida"
+      },
+      "chegada": {
+        "x": 40.5,
+        "z": 28.5,
+        "direcao": "s"
+      },
+      "ativo": true
+    },
+    {
+      "id": "saida_norte",
+      "x": 24,
+      "z": 0.5,
+      "w": 4,
+      "d": 1,
+      "destino": {
+        "mapa": "map_campos_norte",
+        "portal": "saida_vila"
+      },
+      "chegada": {
+        "x": 24,
+        "z": 2.5,
+        "direcao": "s"
+      },
+      "ativo": false
+    },
+    {
+      "id": "saida_sul",
+      "x": 24,
+      "z": 47.5,
+      "w": 4,
+      "d": 1,
+      "destino": {
+        "mapa": "map_campos_sul",
+        "portal": "saida_vila"
+      },
+      "chegada": {
+        "x": 24,
+        "z": 45.5,
+        "direcao": "n"
+      },
+      "ativo": false
+    }
+  ],
+  "pois": [
+    {
+      "id": "poco",
+      "tipo": "poco",
+      "x": 24,
+      "z": 24,
+      "nome_txt": "txt_poi_poco"
+    },
+    {
+      "id": "portico",
+      "tipo": "portico",
+      "x": 24,
+      "z": 19.5,
+      "nome_txt": "txt_poi_portico"
+    },
+    {
+      "id": "quadro_avisos",
+      "tipo": "quadro_avisos",
+      "x": 28.5,
+      "z": 21,
+      "nome_txt": "txt_poi_quadro_avisos"
+    },
+    {
+      "id": "casa_maren",
+      "tipo": "edificio",
+      "x": 14,
+      "z": 13,
+      "nome_txt": "txt_poi_casa_maren"
+    },
+    {
+      "id": "taverna",
+      "tipo": "edificio",
+      "x": 31.5,
+      "z": 13,
+      "nome_txt": "txt_poi_taverna"
+    },
+    {
+      "id": "forja",
+      "tipo": "edificio",
+      "x": 38.5,
+      "z": 17,
+      "nome_txt": "txt_poi_forja"
+    },
+    {
+      "id": "posto_escrivao",
+      "tipo": "edificio",
+      "x": 40.5,
+      "z": 27,
+      "nome_txt": "txt_poi_posto_escrivao"
+    },
+    {
+      "id": "patio_torvan",
+      "tipo": "patio",
+      "x": 13,
+      "z": 24,
+      "nome_txt": "txt_poi_patio_torvan"
+    },
+    {
+      "id": "saida_norte",
+      "tipo": "saida",
+      "x": 24,
+      "z": 0.5,
+      "nome_txt": "txt_poi_saida_norte"
+    },
+    {
+      "id": "saida_sul",
+      "tipo": "saida",
+      "x": 24,
+      "z": 47.5,
+      "nome_txt": "txt_poi_saida_sul"
+    }
+  ],
+  "inicio_jogador": {
+    "tile": [24, 28],
+    "direcao": "s"
+  },
+  "limites_camera": [0, 0, 48, 48]
+}

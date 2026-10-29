@@ -13,5 +13,11 @@
   "largura_corpo_tiles": 0.9,
   "clique_min_px_arte": 32,
   "toque_min_px_css": 44,
-  "t_dica_s": 6
+  "t_dica_s": 6,
+  "minimapa": {
+    "px_base": 8,
+    "px_por_tile_exterior": 4,
+    "px_por_tile_interior_max": 12,
+    "raio_toque_px": 14
+  }
 }

@@ -1,0 +1,113 @@
+{
+  "id": "map_forja_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_forja_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [10, 8],
+  "legenda": {
+    "t": "terra"
+  },
+  "planta": [
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt"
+  ],
+  "objetos": [
+    {
+      "id": "barril_1",
+      "tipo": "barril",
+      "x": 8.8,
+      "z": 6.6,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "caixote_2",
+      "tipo": "caixote",
+      "x": 1.1,
+      "z": 6.6,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "caixote_3",
+      "tipo": "caixote",
+      "x": 2.1,
+      "z": 6.7,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "fornalha_4",
+      "tipo": "fornalha",
+      "x": 2,
+      "z": 1,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "bigorna_5",
+      "tipo": "bigorna",
+      "x": 4.5,
+      "z": 3.2,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "bancada_6",
+      "tipo": "bancada",
+      "x": 7.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 6
+    },
+    {
+      "id": "rack_armas_7",
+      "tipo": "rack_armas",
+      "x": 9,
+      "z": 3,
+      "rot": 0,
+      "seed": 7
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 5,
+      "z": 7.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_forja"
+      },
+      "chegada": {
+        "x": 5,
+        "z": 5.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "pedra",
+    "piso": "terra"
+  },
+  "ambiente": {
+    "cor_luz": "#ff9a5a",
+    "intensidade": 1.1,
+    "fundo": "#140c08"
+  },
+  "inicio_jogador": {
+    "tile": [5, 4],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 10, 8]
+}

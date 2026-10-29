@@ -1,0 +1,115 @@
+{
+  "id": "map_posto_escrivao_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_posto_escrivao_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [10, 8],
+  "legenda": {
+    "c": "calcada"
+  },
+  "planta": [
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc"
+  ],
+  "objetos": [
+    {
+      "id": "caixote_1",
+      "tipo": "caixote",
+      "x": 1.1,
+      "z": 6.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "caixote_2",
+      "tipo": "caixote",
+      "x": 8.9,
+      "z": 6.5,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "lanterna_3",
+      "tipo": "lanterna",
+      "x": 8.8,
+      "z": 3.5,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "balcao_4",
+      "tipo": "balcao",
+      "x": 5,
+      "z": 3,
+      "w": 4,
+      "d": 0.7,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "arquivo_5",
+      "tipo": "arquivo",
+      "x": 1.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "arquivo_6",
+      "tipo": "arquivo",
+      "x": 8.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 6
+    },
+    {
+      "id": "quadro_avisos_7",
+      "tipo": "quadro_avisos",
+      "x": 5,
+      "z": 0.4,
+      "rot": 0,
+      "seed": 7
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 5,
+      "z": 7.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_posto_escrivao"
+      },
+      "chegada": {
+        "x": 5,
+        "z": 5.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "pedra",
+    "piso": "calcada"
+  },
+  "ambiente": {
+    "cor_luz": "#e8e2c8",
+    "intensidade": 0.9,
+    "fundo": "#121214"
+  },
+  "inicio_jogador": {
+    "tile": [5, 4],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 10, 8]
+}

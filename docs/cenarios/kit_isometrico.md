@@ -181,3 +181,15 @@ O mapa e a colisão são **um só**; o estado vira a tabela `estados_mapa` (cond
 
 ## 10. Perguntas ao usuário (via Produtor)
 1. **Ciclo dia/noite:** a vila tem um ciclo que passa de manhã a noite durante o jogo, ou só os três estados (dia, adormecida, acordada) com a luz de entardecer da direção A? (Recomendado: **estados fixos + entardecer** no slice; ciclo no M4.)
+
+## 11. Implementado na v0.1.2 (D-041) — props da vila e mobília dos interiores
+Código: `src/motor/kit_vila.js` (exterior), `src/motor/kit_interior.js` (mobília), materiais novos em `src/motor/materiais.js` (variações de cor sobre as mesmas texturas; nenhuma textura nova), pegadas e fontes de luz em `data/config/cfg_kit.json` (v2). Paredes e corte de câmera dos interiores: `src/motor/interior.js` (08). Capturas: `docs/arte/capturas_v012/` (`node tools/capturar_vila.mjs`). Testes: `tests/kit_vila.test.mjs`.
+
+| Tipo de objeto | Parâmetros | Pegada | Observação |
+|---|---|---|---|
+| `casa` | `lado` (`s` = +z, `l` = +x: as que a câmera vê; `o`, `n` ficam nas costas), `estilo` (`padrao`, `nova`, `enegrecida`), `deco` (`maren`, `taverna`, `forja`, `escrivao`, `torvan`), `fechada` | `w × d` | a **porta fica no meio** da parede do `lado`; `deco`: ervas e vela (Maren), placa e lanterna (taverna), chaminé alta (forja), editais, brasão, selo e bandeira (escrivão), escudo e espadas (Torvan) |
+| `portico` | `w` (vão), `rot` | 2 postes r 0,3 | viga com **gancho vazio**, flâmulas, marca clara onde o sino pendia |
+| `quadro_avisos`, `arvore_queimada` (rebrotando), `muro_fuligem` (x0,z0,x1,z1), `pedra_enegrecida`, `canteiro`, `rack_armas`, `forja_brasa`, `bigorna` | `w`, `d`, `rot`, `seed` | `cfg_kit.pegadas` | `forja_brasa` emite luz dinâmica (`forja`) e fumaça |
+| `mesa` (`itens`: `taverna`, `papeis`, `vela`), `cadeira`, `banco`, `cama`, `estante`, `balcao`, `lareira`, `bancada`, `fornalha`, `arquivo`, `tapete` (`cor`), `castical` | `w`, `d`, `rot` | `cfg_kit.pegadas` | `lareira`, `fornalha` e `vela` emitem luz de ambiente (`cfg_kit.fontes`: cor, intensidade, alcance, oscilação) |
+
+**Regras que a vista isométrica impôs:** só as paredes +z e +x são detalhadas; objetos altos atrás de um prédio somem sob o telhado dele (por isso o 14 levou o forno de brasa para (43,5; 14,6), a leste da forja); portas em `o` e `n` ficam escondidas (só restam em casas fechadas). **Orçamento:** o exterior reaproveita materiais para ficar em 71 chamadas de desenho (teto 80); a vila tem ≈ 107 mil vértices e cada interior de 2 a 6 mil.

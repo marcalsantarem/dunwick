@@ -1,0 +1,108 @@
+{
+  "id": "map_casa_torvan_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_casa_torvan_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [10, 8],
+  "legenda": {
+    "c": "calcada"
+  },
+  "planta": [
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc",
+    "cccccccccc"
+  ],
+  "objetos": [
+    {
+      "id": "caixote_1",
+      "tipo": "caixote",
+      "x": 8.6,
+      "z": 6.4,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "lanterna_2",
+      "tipo": "lanterna",
+      "x": 1.2,
+      "z": 6.6,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "cama_3",
+      "tipo": "cama",
+      "x": 1,
+      "z": 1.6,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "rack_armas_4",
+      "tipo": "rack_armas",
+      "x": 5,
+      "z": 0.5,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "mesa_5",
+      "tipo": "mesa",
+      "x": 7.5,
+      "z": 3.5,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 5,
+      "itens": "papeis"
+    },
+    {
+      "id": "cadeira_6",
+      "tipo": "cadeira",
+      "x": 7.5,
+      "z": 4.4,
+      "rot": 0,
+      "seed": 6
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 5,
+      "z": 7.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_casa_torvan"
+      },
+      "chegada": {
+        "x": 5,
+        "z": 5.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "reboco",
+    "piso": "calcada"
+  },
+  "ambiente": {
+    "cor_luz": "#f2dcb0",
+    "intensidade": 0.85,
+    "fundo": "#16120e"
+  },
+  "inicio_jogador": {
+    "tile": [5, 4],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 10, 8]
+}

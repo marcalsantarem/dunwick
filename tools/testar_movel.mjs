@@ -94,7 +94,7 @@ try {
     checar('PC 950×510: o jogo preenche a janela (≥ 99 % da altura, retângulo 16:9), escala contínua', m.vh >= 505 && Math.abs(m.vw / m.vh - 16 / 9) < 0.01, JSON.stringify({ vw: m.vw, vh: m.vh }));
     const h0 = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]), alvo = await p.evaluate((x, z) => __dunwick.mundoParaTela(x, 0, z), h0[0] + 3, h0[1] - 3);
     await p.mouse.click(alvo.x, alvo.y); await dormir(1500); const h1 = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
-    checar('PC 950×510: clique no chão anda até o ponto clicado (mouse mapeado no retângulo contínuo)', Math.hypot(h1[0] - (h0[0] + 3), h1[1] - (h0[1] - 3)) < 0.8, 'de ' + h0.map((v) => v.toFixed(1)) + ' para ' + h1.map((v) => v.toFixed(1)));
+    checar('PC 950×510: clique no chão anda até o ponto clicado (mouse mapeado no retângulo contínuo)', (() => { const dx = h1[0] - h0[0], dz = h1[1] - h0[1], d = Math.hypot(dx, dz); return d > 2 && (dx * 3 - dz * 3) / (d * Math.hypot(3, 3)) > 0.9; })(), 'de ' + h0.map((v) => v.toFixed(1)) + ' para ' + h1.map((v) => v.toFixed(1))); // andou ≥ 2 tiles na direção clicada (a vila nova tem obstáculos no caminho)
     await p.screenshot({ path: join(DIR, 'pc_950x510_depois.png') }); await p.setViewport({ width: 700, height: 900 }); await dormir(400);
     const r = await medir(p); checar('redimensiona ao vivo (janela 700×900): retângulo 16:9 largura total', r.vw >= 699 && Math.abs(r.vw / r.vh - 16 / 9) < 0.01, JSON.stringify({ vw: r.vw, vh: r.vh })); await p.close(); }
   // tela de início (?inicio=1): simulação pausada até o gesto; o gesto destrava áudio e começa; versão mostrada
@@ -106,6 +106,30 @@ try {
     if (op.movel) await p.touchscreen.tap(400, 200); else await p.mouse.click(400, 300); await dormir(800);
     const dep = await p.evaluate(() => ({ existe: !!document.getElementById('inicio'), ticks: __dunwick.mundo.ticks, audio: __dunwick.audio.estado }));
     checar(rotulo + ': o gesto remove a tela, destrava o áudio e inicia a simulação', !dep.existe && dep.ticks > t1 + 10 && dep.audio === 'running', JSON.stringify(dep)); await p.close();
+  }
+  // entrar e sair de uma casa por portal (v0.1.2): PC e celular deitado; troca por névoa, herói reaparece na chegada, cena do interior ativa, fps medido
+  for (const [rotulo, op] of [['PC', { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w: 1280, h: 720, dpr: 1, touch: false }], ['iPhone deitado', { ua: UA_IOS, w: 844, h: 390, dpr: 3, movel: true }]]) {
+    const p = await abrir(op);
+    const info = await p.evaluate(() => { const d = __dunwick.mundo.dados.mapas, ext = __dunwick.mundo.mapaId, ed = d[ext].edificios.find((e) => e.interior), pe = d[ext].portais.find((q) => q.destino.mapa === ed.interior), pi = d[ed.interior].portais.find((q) => q.destino.mapa === ext); return { ext, int: ed.interior, pe, pi, tamanho: d[ed.interior].tamanho }; });
+    const ir = (x, z) => p.evaluate((x, z) => { const h = __dunwick.mundo.heroi; h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; }, x, z);
+    const esperar = (cond) => p.waitForFunction(cond, { timeout: 8000 }).then(() => true, () => false);
+    await ir(info.pe.x, info.pe.z + info.pe.d + 0.2); await dormir(300); await ir(info.pe.x, info.pe.z); // toca o portal da porta
+    const noInterior = await esperar(`__dunwick.mundo.mapaId === '${info.int}' && !__dunwick.apr.trans`);
+    const ativa = await p.evaluate((id) => __dunwick.cena === __dunwick.cenas.get(id), info.int);
+    const pos = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+    checar(rotulo + ': tocar a porta leva ao interior (mapa trocado, cena do interior ativa, herói na chegada do portal de saída)', noInterior && ativa && Math.hypot(pos[0] - info.pi.chegada.x, pos[1] - info.pi.chegada.z) < 0.6, JSON.stringify({ noInterior, ativa, pos, chegada: info.pi.chegada }));
+    await dormir(500); await p.screenshot({ path: join(DIR, 'interior_' + rotulo.replace(' ', '_') + '.png') });
+    const fps = await p.evaluate(() => new Promise((ok) => { const f = []; let u = performance.now(); const l = (t) => { f.push(t - u); u = t; if (f.length < 120) requestAnimationFrame(l); else { const s = f.slice(10).sort((a, b) => a - b); ok({ fps: +(1000 / (s.reduce((a, b) => a + b) / s.length)).toFixed(1), p99: +s[Math.floor(s.length * 0.99)].toFixed(1) }); } }; requestAnimationFrame(l); }));
+    checar(rotulo + ': fps no interior (6 cenas carregadas)', fps.fps >= 40, JSON.stringify(fps));
+    // dentro do cômodo o herói não passa das paredes e a câmera centra o cômodo pequeno
+    await ir(-5, -5); await dormir(300); const preso = await p.evaluate((t) => { const h = __dunwick.mundo.heroi; return h.x >= 0 && h.z >= 0 && h.x <= t[0] && h.z <= t[1]; }, info.tamanho);
+    checar(rotulo + ': as paredes do cômodo seguram o herói', preso);
+    await ir(info.pi.x, info.pi.z); // toca o portal de saída
+    const fora = await esperar(`__dunwick.mundo.mapaId === '${info.ext}' && !__dunwick.apr.trans`);
+    const pos2 = await p.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+    checar(rotulo + ': tocar a saída volta à vila, herói na chegada da porta, sem reentrar no portal', fora && Math.hypot(pos2[0] - info.pe.chegada.x, pos2[1] - info.pe.chegada.z) < 0.6, JSON.stringify({ fora, pos2, chegada: info.pe.chegada }));
+    await dormir(800); const ainda = await p.evaluate(() => __dunwick.mundo.mapaId); checar(rotulo + ': continua na vila depois de 0,8 s (portal rearma só ao sair)', ainda === info.ext, ainda);
+    await p.close();
   }
   checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 4).join(' | '));
 } finally { await nav.close(); srv.kill(); }

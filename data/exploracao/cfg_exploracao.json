@@ -1,0 +1,11 @@
+{
+  "id": "cfg_exploracao",
+  "versao": 1,
+  "nota": "Exploração (13): portas, portais e interação com objetos (pois). Distâncias em tiles.",
+  "alcance_interagir_tiles": 2.2,
+  "folga_clique_portal_tiles": 0.4,
+  "raio_clique_poi_tiles": 0.9,
+  "contato_portal_tiles": 0.12,
+  "soltar_contato_portal_tiles": 0.5,
+  "aviso_portal_inativo_txt": "txt_portal_interditado"
+}

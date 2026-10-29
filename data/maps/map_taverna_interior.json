@@ -1,0 +1,174 @@
+{
+  "id": "map_taverna_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_taverna_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [14, 10],
+  "legenda": {
+    "c": "calcada"
+  },
+  "planta": [
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc",
+    "cccccccccccccc"
+  ],
+  "objetos": [
+    {
+      "id": "barril_1",
+      "tipo": "barril",
+      "x": 0.9,
+      "z": 1,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "barril_2",
+      "tipo": "barril",
+      "x": 0.9,
+      "z": 2,
+      "rot": 0,
+      "seed": 2
+    },
+    {
+      "id": "barril_3",
+      "tipo": "barril",
+      "x": 1.9,
+      "z": 1,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "caixote_4",
+      "tipo": "caixote",
+      "x": 12.8,
+      "z": 8.6,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "lanterna_5",
+      "tipo": "lanterna",
+      "x": 7,
+      "z": 4.6,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "balcao_6",
+      "tipo": "balcao",
+      "x": 5,
+      "z": 2,
+      "w": 4,
+      "d": 0.7,
+      "rot": 0,
+      "seed": 6
+    },
+    {
+      "id": "lareira_7",
+      "tipo": "lareira",
+      "x": 11.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 7
+    },
+    {
+      "id": "mesa_8",
+      "tipo": "mesa",
+      "x": 3.5,
+      "z": 6,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 8,
+      "itens": "taverna"
+    },
+    {
+      "id": "cadeira_9",
+      "tipo": "cadeira",
+      "x": 3.5,
+      "z": 6.9,
+      "rot": 0,
+      "seed": 9
+    },
+    {
+      "id": "mesa_10",
+      "tipo": "mesa",
+      "x": 10,
+      "z": 6,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 10,
+      "itens": "taverna"
+    },
+    {
+      "id": "cadeira_11",
+      "tipo": "cadeira",
+      "x": 10,
+      "z": 6.9,
+      "rot": 0,
+      "seed": 11
+    },
+    {
+      "id": "mesa_12",
+      "tipo": "mesa",
+      "x": 11.8,
+      "z": 3.6,
+      "w": 1.6,
+      "d": 0.9,
+      "rot": 0,
+      "seed": 12,
+      "itens": "taverna"
+    },
+    {
+      "id": "banco_13",
+      "tipo": "banco",
+      "x": 11.8,
+      "z": 4.5,
+      "rot": 0,
+      "seed": 13
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 7,
+      "z": 9.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_taverna"
+      },
+      "chegada": {
+        "x": 7,
+        "z": 7.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "madeira",
+    "piso": "calcada"
+  },
+  "ambiente": {
+    "cor_luz": "#ffc27a",
+    "intensidade": 1,
+    "fundo": "#1a110a"
+  },
+  "inicio_jogador": {
+    "tile": [7, 5],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 14, 10]
+}

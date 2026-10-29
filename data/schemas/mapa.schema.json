@@ -4,36 +4,505 @@
   "title": "Mapa isométrico: terreno por tiles + objetos do kit (layout é do 06)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "versao", "nome_txt", "tamanho", "legenda", "planta", "objetos", "inicio_jogador", "limites_camera"],
+  "required": [
+    "id",
+    "versao",
+    "nome_txt",
+    "tamanho",
+    "legenda",
+    "planta",
+    "objetos",
+    "inicio_jogador",
+    "limites_camera"
+  ],
   "$defs": {
-    "tile": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }], "items": false, "minItems": 2 }
+    "tile": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ],
+      "items": false,
+      "minItems": 2
+    }
   },
   "properties": {
-    "id": { "type": "string", "pattern": "^map_[a-z0-9_]+$" },
-    "versao": { "type": "integer", "minimum": 1 },
-    "nome_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
-    "origem": { "type": "string" },
-    "tamanho": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1 }], "items": false, "minItems": 2 },
-    "legenda": { "type": "object", "minProperties": 1, "propertyNames": { "type": "string", "minLength": 1, "maxLength": 1 }, "additionalProperties": { "enum": ["grama", "terra", "calcada", "musgo"] } },
-    "planta": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "id": {
+      "type": "string",
+      "pattern": "^map_[a-z0-9_]+$"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "origem": {
+      "type": "string"
+    },
+    "tamanho": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "items": false,
+      "minItems": 2
+    },
+    "legenda": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "additionalProperties": {
+        "enum": [
+          "grama",
+          "terra",
+          "calcada",
+          "musgo"
+        ]
+      }
+    },
+    "planta": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "objetos": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false, "required": ["id", "tipo"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tipo"
+        ],
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z]+(_[a-z0-9]+)*$" },
-          "tipo": { "enum": ["casa", "torre_sino", "poco", "arvore", "pinheiro", "arbusto", "pedra", "lanterna", "barril", "caixote", "cerca", "inimigo"] },
-          "x": { "type": "number" }, "z": { "type": "number" }, "x0": { "type": "number" }, "z0": { "type": "number" }, "x1": { "type": "number" }, "z1": { "type": "number" },
-          "w": { "type": "number", "exclusiveMinimum": 0 }, "d": { "type": "number", "exclusiveMinimum": 0 },
-          "rot": { "type": "number" }, "escala": { "type": "number", "exclusiveMinimum": 0 }, "seed": { "type": "integer" },
-          "telhado": { "enum": ["telha", "ardosia", "musgo"] }, "janelas": { "type": "integer", "minimum": 0, "maximum": 8 }, "chamine": { "type": "boolean" }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+(_[a-z0-9]+)*$"
+          },
+          "tipo": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "tipo do kit (cfg_kit.pegadas) ou inimigo; o validador confere a pegada"
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "x0": {
+            "type": "number"
+          },
+          "z0": {
+            "type": "number"
+          },
+          "x1": {
+            "type": "number"
+          },
+          "z1": {
+            "type": "number"
+          },
+          "w": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "d": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "rot": {
+            "type": "number"
+          },
+          "escala": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "seed": {
+            "type": "integer"
+          },
+          "telhado": {
+            "enum": [
+              "telha",
+              "ardosia",
+              "musgo"
+            ]
+          },
+          "janelas": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8
+          },
+          "chamine": {
+            "type": "boolean"
+          },
+          "estilo": {
+            "enum": [
+              "padrao",
+              "nova",
+              "enegrecida"
+            ]
+          },
+          "deco": {
+            "enum": [
+              "maren",
+              "taverna",
+              "forja",
+              "escrivao",
+              "torvan"
+            ]
+          },
+          "fechada": {
+            "type": "boolean"
+          },
+          "lado": {
+            "enum": [
+              "s",
+              "l",
+              "o",
+              "n"
+            ],
+            "description": "casa: parede da porta (s = +z, l = +x são as que a câmera vê; o e n ficam nas costas)"
+          },
+          "itens": {
+            "enum": [
+              "taverna",
+              "papeis",
+              "vela"
+            ]
+          },
+          "cor": {
+            "enum": [
+              "vinho",
+              "ocre",
+              "verde"
+            ]
+          },
+          "alt": {
+            "type": "number",
+            "minimum": 0
+          }
         }
       }
     },
     "inicio_jogador": {
-      "type": "object", "additionalProperties": false, "required": ["tile", "direcao"],
-      "properties": { "tile": { "$ref": "#/$defs/tile" }, "direcao": { "enum": ["s", "n", "l", "o"] } }
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tile",
+        "direcao"
+      ],
+      "properties": {
+        "tile": {
+          "$ref": "#/$defs/tile"
+        },
+        "direcao": {
+          "enum": [
+            "s",
+            "n",
+            "l",
+            "o"
+          ]
+        }
+      }
     },
-    "limites_camera": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }, { "type": "number" }], "items": false, "minItems": 4 }
+    "ambiente": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cor_luz",
+        "intensidade",
+        "fundo"
+      ],
+      "properties": {
+        "cor_luz": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "intensidade": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fundo": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      }
+    },
+    "limites_camera": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "items": false,
+      "minItems": 4
+    },
+    "tipo_mapa": {
+      "enum": [
+        "exterior",
+        "interior"
+      ]
+    },
+    "estado": {
+      "enum": [
+        "dia"
+      ]
+    },
+    "edificios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tipo",
+          "x",
+          "z",
+          "w",
+          "d",
+          "porta",
+          "interior"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+(_[a-z0-9]+)*$"
+          },
+          "tipo": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "w": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "d": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "porta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "x",
+              "z",
+              "lado"
+            ],
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              },
+              "lado": {
+                "enum": [
+                  "n",
+                  "s",
+                  "l",
+                  "o"
+                ]
+              }
+            }
+          },
+          "interior": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^map_[a-z0-9_]+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "portais": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "x",
+          "z",
+          "w",
+          "d",
+          "destino",
+          "chegada",
+          "ativo"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+(_[a-z0-9]+)*$"
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "w": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "d": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "ativo": {
+            "type": "boolean"
+          },
+          "nome_txt": {
+            "type": "string",
+            "pattern": "^txt_[a-z0-9_]+$"
+          },
+          "destino": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mapa",
+              "portal"
+            ],
+            "properties": {
+              "mapa": {
+                "type": "string",
+                "pattern": "^map_[a-z0-9_]+$"
+              },
+              "portal": {
+                "type": "string"
+              }
+            }
+          },
+          "chegada": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "x",
+              "z",
+              "direcao"
+            ],
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "z": {
+                "type": "number"
+              },
+              "direcao": {
+                "enum": [
+                  "s",
+                  "n",
+                  "l",
+                  "o"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "pois": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tipo",
+          "x",
+          "z",
+          "nome_txt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+(_[a-z0-9]+)*$"
+          },
+          "tipo": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "nome_txt": {
+            "type": "string",
+            "pattern": "^txt_[a-z0-9_]+$"
+          }
+        }
+      }
+    },
+    "sala": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "altura_parede",
+        "parede",
+        "piso"
+      ],
+      "properties": {
+        "altura_parede": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "parede": {
+          "enum": [
+            "reboco",
+            "madeira",
+            "pedra"
+          ]
+        },
+        "piso": {
+          "enum": [
+            "calcada",
+            "terra"
+          ]
+        }
+      }
+    }
   }
 }
