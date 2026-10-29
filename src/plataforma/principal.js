@@ -49,10 +49,11 @@ async function iniciar() {
   const aviso = document.getElementById('aviso'); aviso.textContent = t('ui_comecar');
   let desbloqueando = false;
   const aoGesto = () => { if (desbloqueando || audio.estado === 'running') return; desbloqueando = true; audio.desbloquear().then((ok) => { desbloqueando = false; if (ok) aviso.remove(); }); };
-  const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto });
+  const ponte = ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMouse: () => !!mundo.jogo && mundo.jogo.modo !== 'mapa' });
+  eventos.em('modo_mudou', () => entrada.soltarTudo()); // nada fica "apertado" ao entrar/sair da batalha
   // UI da batalha por turnos (15): só aparece com mundo.jogo.modo === 'batalha'; no desenvolvimento, ] dispara o próximo encontro de teste
   const batalhaUi = mundo.jogo ? criarBatalhaUi({ mundo, dados, t, debug: __DEV__ }) : null;
-  if (batalhaUi && apr) { apr.assumirComandos(); batalhaUi.definirProjecao((p) => { const q = cenaBat.projetarPonto(p); return { x: q.x * 100, y: q.y * 100 }; }); batalhaUi.definirEspera(() => !!apr.toque && !apr.toque.ocioso); } // a UI escolhe os comandos e fecha a batalha; a apresentação só toca as animações e troca a vista
+  if (batalhaUi && apr) { apr.assumirComandos(); batalhaUi.definirProjecao((p) => { const q = cenaBat.projetarPonto(p); return { x: q.x * 100, y: q.y * 100 }; }); batalhaUi.aoEvento((ev) => apr.toque?.alimentar(ev)); /* a UI é o relógio: a animação começa no mesmo instante que o número e a barra */ } // a UI escolhe os comandos e fecha a batalha; a apresentação só toca as animações e troca a vista
 
   // ---------- debug (só desenvolvimento) ----------
   let debug = null, debugDesenho = null;

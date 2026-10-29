@@ -65,3 +65,27 @@ test('reduzir movimento: sem deslize nem avanço', () => {
   const { toque } = jogar('enc_slime_1', 3, { reduzirMovimento: true });
   assert.ok(toque.terminou); for (const a of toque.atores.values()) assert.equal(a.dx, 0);
 });
+
+test('modo externo: a reação ao golpe (pose de dano, clarão, barra) acontece no instante em que a UI entrega o resultado', () => {
+  const dados = carregarDados(), ctrl = criarControladorBatalha(dados, { encontro: 'enc_slime_1', semente: 3 }); ctrl.iniciar();
+  const toque = criarToque(ctrl, { cfg: dados.config.batalha, acoes: dados.combate.acoes, externo: true, reduzirMovimento: true }), alvo = toque.atores.get('enemy_slime'), vida0 = alvo.vida;
+  const vistos = []; toque.eventos.em('dano', (e) => vistos.push(e));
+  for (let i = 0; i < 40; i++) toque.avancar(DT); // entrada
+  toque.alimentar({ nome: 'ato_executado', ator: 'hero_edric', tipo: 'atacar', id: 'atk_edric_golpe', alvos: ['enemy_slime'], duracao_s: 0.9, duracao_real_s: 0.9, impacto_s: 0.405, intervalo_s: 0.2, pose: 'bat_ataque' });
+  for (let t = 0; t < 0.405; t += DT) toque.avancar(DT);
+  assert.equal(alvo.vida, vida0); assert.equal(alvo.brilho, 0); assert.equal(vistos.length, 0);
+  toque.alimentar({ nome: 'dano', ator: 'hero_edric', alvo: 'enemy_slime', valor: 10, aplicado: 10, acao: 'atk_edric_golpe' }); // a UI entrega no impacto
+  toque.alimentar({ nome: 'vida_mudou', ator: 'enemy_slime', vida: vida0 - 10, vida_max: alvo.vida_max, delta: -10 });
+  assert.equal(vistos.length, 1); assert.equal(alvo.vida, vida0 - 10, 'barra desce NO instante do impacto'); assert.equal(alvo.brilho, 1, 'clarão'); assert.equal(alvo.pose, 'bat_dano'); assert.equal(alvo.empurrao, 0, 'reduzir movimento: sem recuo');
+  for (let t = 0; t < 0.2; t += DT) toque.avancar(DT); assert.equal(alvo.brilho, 0, 'clarão some em ~7 quadros');
+});
+
+test('reduzir flashes: o acerto não gera clarão', () => {
+  const dados = carregarDados(), ctrl = criarControladorBatalha(dados, { encontro: 'enc_slime_1', semente: 3 }); ctrl.iniciar();
+  const toque = criarToque(ctrl, { cfg: dados.config.batalha, acoes: dados.combate.acoes, externo: true, reduzirMovimento: true, reduzirFlashes: true });
+  for (let i = 0; i < 40; i++) toque.avancar(DT);
+  toque.alimentar({ nome: 'ato_executado', ator: 'hero_edric', tipo: 'atacar', id: 'atk_edric_golpe', alvos: ['enemy_slime'], duracao_s: 0.9, duracao_real_s: 0.9, impacto_s: 0.1, intervalo_s: 0.2, pose: 'bat_ataque' });
+  toque.alimentar({ nome: 'dano', ator: 'hero_edric', alvo: 'enemy_slime', valor: 5 });
+  let max = 0; for (let t = 0; t < 0.5; t += DT) { toque.avancar(DT); max = Math.max(max, toque.atores.get('enemy_slime').brilho); }
+  assert.equal(max, 0);
+});

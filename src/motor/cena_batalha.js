@@ -51,7 +51,8 @@ export function criarCenaBatalha({ dados, recursos, perfil, opcoes = {} }) {
   const texSombra = new THREE.CanvasTexture(cvSombra), geoSombra = new THREE.PlaneGeometry(1.7, 1.7).rotateX(-Math.PI / 2);
   // marcas de posição: discretas, sob cada slot (cor reservada: nada de magenta)
   const marcasMat = new THREE.MeshBasicMaterial({ color: 0xe8d9a8, transparent: true, opacity: 0.16, depthWrite: false });
-  for (const lado of ['grupo', 'inimigos']) for (const [x, z] of cfgB.posicoes[lado]) { const m = new THREE.Mesh(new THREE.RingGeometry(cen.palco.marca_raio * 0.82, cen.palco.marca_raio, 40).rotateX(-Math.PI / 2), marcasMat); m.position.set(ox + x, 0.03, oz + z); m.renderOrder = 1; cena.add(m); }
+  const marcas = new Map(); // só os slots ocupados mostram a marca
+  for (const lado of ['grupo', 'inimigos']) for (const [i, [x, z]] of cfgB.posicoes[lado].entries()) { const m = new THREE.Mesh(new THREE.RingGeometry(cen.palco.marca_raio * 0.82, cen.palco.marca_raio, 40).rotateX(-Math.PI / 2), marcasMat); m.position.set(ox + x, 0.03, oz + z); m.renderOrder = 1; m.visible = false; marcas.set(`${lado}${i + 1}`, m); cena.add(m); }
 
   const normalizar = (meta) => ({ ...meta, anims: meta.poses, direcoes: [meta.direcao ?? 'l'] });
   const metaDe = (id) => { const e = cfgS.atores[id]; return recursos.atlasBatalha[e.atlas ?? e.provisorio.base].meta; };
@@ -68,8 +69,9 @@ export function criarCenaBatalha({ dados, recursos, perfil, opcoes = {} }) {
       const sombra = new THREE.Mesh(geoSombra, new THREE.MeshBasicMaterial({ map: texSombra, transparent: true, depthWrite: false })); sombra.renderOrder = 2;
       const escala = prov?.escala ?? 1; sprite.malha.scale.setScalar(escala);
       if (prov) { sprite.malha.material.color.set(prov.tinta); sprite.malha.material.emissive.set(prov.tinta); }
+      const corBase = prov ? prov.tinta : '#ffffff';
       sprite.malha.material.alphaToCoverage = perfil.msaa > 0; sprite.malha.material.alphaTest = perfil.msaa > 0 ? 0.01 : 0.45;
-      cena.add(sprite.malha, sombra); v = { id, sprite, sombra, usada: false, escala, fade: false }; lista.push(v);
+      cena.add(sprite.malha, sombra); v = { id, sprite, sombra, usada: false, escala, fade: false, corBase }; lista.push(v);
     }
     v.usada = true; v.sprite.malha.visible = v.sombra.visible = true; return v;
   }
@@ -79,9 +81,9 @@ export function criarCenaBatalha({ dados, recursos, perfil, opcoes = {} }) {
 
   /** Mostra os atores do toque nos slots (criando as vistas só na primeira vez de cada tipo). */
   function ligar(toque) {
-    desligar(); ligados = [...toque.atores.values()].map((a) => ({ a, v: vistaDe(a.id) }));
+    desligar(); ligados = [...toque.atores.values()].map((a) => ({ a, v: vistaDe(a.id) })); for (const { a } of ligados) marcas.get(`${a.lado}${a.slot}`).visible = true;
   }
-  function desligar() { for (const { v } of ligados) { v.usada = false; v.sprite.malha.visible = v.sombra.visible = false; } ligados = []; }
+  function desligar() { for (const m of marcas.values()) m.visible = false; for (const { v } of ligados) { v.usada = false; v.sprite.malha.visible = v.sombra.visible = false; } ligados = []; }
 
   function atualizar(dtS, tempoS, hora) {
     const ec = estadoCiclo(ciclo, hora); visual.tom = ec.tom; visual.luzArtificial = ec.luzArtificial; visual.ciclo = ec;
@@ -99,7 +101,7 @@ export function criarCenaBatalha({ dados, recursos, perfil, opcoes = {} }) {
       v.sprite.definir(nomePose, quadro, normalizar(metaDe(a.id)).direcoes[0], a.lado === 'grupo' && cfgS.alinhamento?.grupo_espelha !== false);
       const m = v.sprite.malha.material, fade = a.alfa < 1;
       if (fade !== v.fade) { v.fade = fade; m.transparent = fade; m.alphaToCoverage = !fade && perfil.msaa > 0; m.alphaTest = fade || perfil.msaa <= 0 ? (fade ? 0.01 : 0.45) : 0.01; m.needsUpdate = true; }
-      m.opacity = a.alfa; m.emissiveIntensity = 0.3 + a.brilho * 0.8; v.sprite.malha.visible = a.alfa > 0.01;
+      m.opacity = a.alfa; const claro = a.brilho > 0.4; m.emissive.set(claro ? 0xffffff : v.corBase); m.emissiveIntensity = claro ? 1.6 : 0.3 + a.brilho * 0.8; /* acerto: clarão branco curto */ v.sprite.malha.visible = a.alfa > 0.01;
       const so = a.queda ? Math.max(0, Math.min(1, 1 - (a.queda.t - cfgB.tempos.t_cair - 0.3) / 0.3)) : 1; v.sombra.material.opacity = a.lado === 'inimigos' && a.queda ? so : (a.caido ? 0.6 : 1); v.sombra.visible = v.sombra.material.opacity > 0.01;
       v.sombra.scale.setScalar(v.escala);
     }

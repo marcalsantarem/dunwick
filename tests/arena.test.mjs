@@ -24,6 +24,12 @@ test('encontros do M1 sem cenário próprio caem no cenário padrão', () => {
 
 test('os 6 slots do cfg_batalha ficam na faixa de combate do cenário', () => {
   const dados = carregarDados(), cen = dados.cenarios.cen_praca;
-  for (const lado of ['grupo', 'inimigos']) for (const [x, z] of dados.config.batalha.posicoes[lado]) { assert.ok(Math.abs(x) <= 4.6 && z >= -2 && z <= 2, `${lado} (${x}; ${z})`); }
+  for (const lado of ['grupo', 'inimigos']) for (const [x, z] of dados.config.batalha.posicoes[lado]) { assert.ok(Math.abs(x) <= 5 && z >= -2.5 && z <= 2.5, `${lado} (${x}; ${z})`); }
   assert.ok(cen.camera.arte[0] === 640);
+});
+
+test('slots sem sobreposição: mesmo lado separados ≥ 1,5 tile em x; lados opostos ≥ 4 tiles; marcas dentro do palco', () => {
+  const P = carregarDados().config.batalha.posicoes;
+  for (const lado of ['grupo', 'inimigos']) for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) assert.ok(Math.abs(P[lado][i][0] - P[lado][j][0]) >= 1.5 || Math.abs(P[lado][i][1] - P[lado][j][1]) >= 3.2, `${lado} ${i + 1}×${j + 1}`);
+  for (const [gx] of P.grupo) for (const [ix] of P.inimigos) assert.ok(gx - ix >= 4, 'grupo e inimigos separados');
 });

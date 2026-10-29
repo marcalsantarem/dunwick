@@ -119,6 +119,7 @@
     "ui_bat_continuar": "Continuar",
     "ui_bat_derrota_titulo": "O grupo caiu.",
     "ui_gameover_tentar": "Tentar de novo",
-    "ui_bat_erro": "Comando recusado ({erro})."
+    "ui_bat_erro": "Comando recusado ({erro}).",
+    "ui_voltar": "Voltar"
   }
 }

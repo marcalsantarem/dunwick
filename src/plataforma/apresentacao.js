@@ -18,7 +18,7 @@ export function criarApresentacao({ mundo, dados, cenaBatalha, ren, container, o
 
   function trocarParaBatalha() {
     apr.ctrl = jogo.batalha; ren.definirArte(...cenaBatalha.arte);
-    apr.toque = criarToque(apr.ctrl, { cfg: cfgB, acoes: dados.combate.acoes, infoPose: cenaBatalha.infoPoseDe(apr.ctrl), reduzirMovimento: reduzir });
+    apr.toque = criarToque(apr.ctrl, { cfg: cfgB, acoes: dados.combate.acoes, infoPose: cenaBatalha.infoPoseDe(apr.ctrl), reduzirMovimento: reduzir, reduzirFlashes: !!opcoes.reduzirFlashes, externo: !apr.automatico });
     cenaBatalha.ligar(apr.toque); apr.visao = 'batalha';
   }
   function trocarParaMapa() {

@@ -15,14 +15,15 @@ const lerp = (a, b, t) => a + (b - a) * t;
  * @param ctrl controlador (criarControladorBatalha / mundo.jogo.batalha)
  * @param opcoes.cfg `dados.config.batalha` · `acoes` = `dados.combate.acoes`
  * @param opcoes.infoPose (uid, pose) → { duracao_s, impacto_s } do atlas (opcional; sem ele usa padrões)
+ * @param opcoes.externo true = o relógio é de FORA (a UI do 15 toca a fila no ritmo dela e entrega cada evento por `alimentar(ev)` no instante certo): o toque não assina o controlador, e animação e UI começam o ato juntos
+ * @param opcoes.reduzirFlashes sem clarão de acerto (acessibilidade)
  * @param opcoes.reduzirMovimento sem deslize de entrada nem avanço (só a pose)
  */
-export function criarToque(ctrl, { cfg, acoes = {}, infoPose = null, reduzirMovimento = false, entradaDeslize = { distancia: 8, duracao_s: 0.45 } }) {
+export function criarToque(ctrl, { cfg, acoes = {}, infoPose = null, reduzirMovimento = false, reduzirFlashes = false, externo = false, entradaDeslize = { distancia: 8, duracao_s: 0.45 } }) {
   const eventos = criarEventos(), T = cfg.tempos, fila = [], atores = new Map();
   // o controlador decora `ato_executado` com tempos só na fila dele; aqui calculamos os mesmos (duração ÷ velocidade)
   const decorar = (ev) => { if (ev.nome !== 'ato_executado' || ev.duracao_real_s !== undefined) return ev; const v = ctrl.velocidade ?? 1, d = ev.duracao_s / v; return { ...ev, duracao_real_s: d, impacto_s: d * cfg.fracao_impacto, intervalo_s: T.t_intervalo_ato / v }; };
-  for (const ev of ctrl.log) fila.push(decorar(ev)); // o que já aconteceu (iniciar())
-  ctrl.assinar('*', (ev) => fila.push(decorar(ev)));
+  if (!externo) { for (const ev of ctrl.log) fila.push(decorar(ev)); /* o que já aconteceu (iniciar()) */ ctrl.assinar('*', (ev) => fila.push(decorar(ev))); }
   const est = { ato: null, espera: 0, terminou: false, fimAnunciado: false, entrada: null };
   const ini = ctrl.consultar();
   for (const a of ini.atores) {
@@ -72,7 +73,7 @@ export function criarToque(ctrl, { cfg, acoes = {}, infoPose = null, reduzirMovi
   function aplicarResultados(ato) {
     for (const r of ato.resultados) {
       const alvo = A(r.alvo ?? r.ator);
-      if (r.nome === 'dano' && alvo) { alvo.brilho = 1; alvo.empurrao = alvo.lado === 'grupo' ? 0.35 : -0.35; if (!alvo.caido) definirPose(alvo, 'bat_dano', false, T.t_dano); }
+      if (r.nome === 'dano' && alvo) { alvo.brilho = reduzirFlashes ? 0 : 1; alvo.empurrao = reduzirMovimento ? 0 : (alvo.lado === 'grupo' ? 0.45 : -0.45); if (!alvo.caido) definirPose(alvo, 'bat_dano', false, T.t_dano); }
       else if (r.nome === 'curou' && alvo) alvo.brilho = 0.6;
       else if (r.nome === 'vida_mudou' && alvo) alvo.vida = r.vida;
       else if (r.nome === 'mana_mudou' && alvo) alvo.mana = r.mana;
@@ -119,7 +120,7 @@ export function criarToque(ctrl, { cfg, acoes = {}, infoPose = null, reduzirMovi
   function efeitosVisuais(dt) {
     for (const a of atores.values()) {
       a.tPose += dt;
-      if (a.brilho > 0) a.brilho = Math.max(0, a.brilho - dt / 0.25);
+      if (a.brilho > 0) a.brilho = Math.max(0, a.brilho - dt / 0.12); // clarão curto (~7 quadros, 2–3 em branco pleno): ≤ 3 flashes/s por regra
       if (a.empurrao !== 0) { const k = Math.max(0, 1 - dt / 0.18); a.empurrao *= k; if (Math.abs(a.empurrao) < 0.01) a.empurrao = 0; }
       if (a.poseAte > 0 && a.tPose >= a.poseAte) { a.poseAte = 0; if (!(est.ato && est.ato.ator === a)) parado(a); }
       if (a.queda) { a.queda.t += dt; if (a.lado === 'inimigos') { const k = (a.queda.t - T.t_cair) / 0.3; a.alfa = Math.max(0, Math.min(1, 1 - k)); if (a.alfa <= 0) a.sombraSomente = true; } }
@@ -128,6 +129,8 @@ export function criarToque(ctrl, { cfg, acoes = {}, infoPose = null, reduzirMovi
 
   const toque = {
     eventos, atores,
+    /** Modo externo: entrega um evento (já decorado pela UI/controlador) no instante em que a UI o toca. */
+    alimentar(ev) { if (externo && RESULTADO_DO_ATO.has(ev.nome)) aplicarResultados({ resultados: [ev], fugaPara: 0 }); /* a UI já esperou o impacto: reage agora */ else fila.push(decorar(ev)); },
     /** Nada tocando e nada pendente (os eventos de `executar()` entram na hora: o menu só abre depois de tocar tudo). */
     get ocioso() { return !est.ato && fila.length === 0 && est.espera <= 0 && !est.entrada; },
     get terminou() { return est.terminou; },

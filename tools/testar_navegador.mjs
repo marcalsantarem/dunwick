@@ -194,6 +194,24 @@ if (SEG_MEDIR > 0) {
   const b = await pag.evaluate(() => ({ modo: __dunwick.jogo.modo, visao: document.getElementById('ui').dataset.visao, ligada: !!__dunwick.batalhaUi.controlador, menu: !!document.querySelector('.bat:not([hidden])') }));
   checar('batalha por encontro natural: UI ligada, menu visível e vista de batalha', b.modo === 'batalha' && b.visao === 'batalha' && b.ligada && b.menu, JSON.stringify(b));
 }
+{ // mouse-only (cliques reais): Atacar → inimigo → ... → resultado → Continuar; o clique no canvas não move o herói; depois a fuga
+  const hx = await pag.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+  const centroDe = (sel, texto) => pag.evaluate((s, t) => { const e = [...document.querySelectorAll(s)].filter((x) => x.getBoundingClientRect().width > 0 && !x.hidden && (!t || x.textContent.includes(t))).sort((a, b) => a.textContent.length - b.textContent.length)[0]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, sel, texto);
+  const jogarComMouse = async (enc, comando) => {
+    await pag.evaluate((e) => { const j = __dunwick.jogo; if (j.modo === 'mapa') j.depurarEncontro(e); }, enc); await dormir(3500);
+    await pag.mouse.click(960, 200); await pag.mouse.click(960, 200, { button: 'right' }); // cliques no canvas durante a batalha: inofensivos
+    for (let i = 0; i < 240; i++) {
+      const m = await pag.evaluate(() => [__dunwick.jogo.modo, __dunwick.batalhaUi.modo]); if (m[0] !== 'batalha') break;
+      const c = m[1] === 'menu' ? await centroDe('.bat li', comando) : m[1] === 'alvo' ? await centroDe('.bat-alvo-area-inimigos.valido') : m[1] === 'resultado' ? (await centroDe('.bat button', 'Continuar')) ?? (await centroDe('.bat button', 'Tentar')) : null;
+      if (c) await pag.mouse.click(c.x, c.y); await dormir(m[1] === 'tocando' ? 250 : 350);
+    }
+    await dormir(1500); return pag.evaluate(() => ({ modo: __dunwick.jogo.modo, res: __dunwick.jogo.ultimoResultado?.resultado ?? null }));
+  };
+  const v = await jogarComMouse('enc_slime_1', 'Atacar'); const hy = await pag.evaluate(() => [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z]);
+  checar('batalha só com o mouse: Atacar → inimigo → vitória → Continuar volta ao mapa', v.modo === 'mapa' && v.res === 'vitoria', JSON.stringify(v));
+  checar('clique no canvas durante a batalha não move o herói', Math.hypot(hy[0] - hx[0], hy[1] - hx[1]) < 0.05, JSON.stringify({ antes: hx, depois: hy }));
+  const f = await jogarComMouse('enc_lobo_1', 'Fugir'); checar('batalha só com o mouse: Fugir volta ao mapa', f.modo === 'mapa' && f.res === 'fuga', JSON.stringify(f));
+}
 checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 5).join(' | '));
 if (avisos.length) console.log(`  avisos do console (${avisos.length}): ${avisos.slice(0, 3).join(' | ')}`);
 writeFileSync(join(dirQA, 'resultado_navegador.json'), JSON.stringify({ data: new Date().toISOString(), navegador: await navegador.version(), gpu, resultados, medicao, avisos }, null, 1));

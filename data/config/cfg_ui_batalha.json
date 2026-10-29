@@ -6,8 +6,10 @@
   "t_barra_inimigo_visivel": 1.5,
   "vida_baixa_fracao": 0.25,
   "acelerar_mult": 2,
-  "numero_altura_px": 56,
   "gamepad_limiar": 0.5,
   "palco_meia_largura_tiles": 5,
-  "palco_meia_profundidade_tiles": 3
+  "palco_meia_profundidade_tiles": 3,
+  "altura_cabeca_tiles": 2,
+  "largura_corpo_tiles": 0.9,
+  "clique_min_px_arte": 32
 }

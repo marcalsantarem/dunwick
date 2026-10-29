@@ -1,11 +1,11 @@
 // Ponte navegador → entrada lógica: teclado e mouse por eventos (fila), cursor por movimento do ponteiro, gamepad por amostragem a cada quadro.
 // Não captura atalhos do navegador: com Ctrl/Meta/Alt a tecla passa direto; F5/F11 não existem no mapeamento. Botão direito é do jogo SÓ sobre o canvas.
-export function ligarEntradaDom({ entrada, canvas, eventos, aoGesto }) {
+export function ligarEntradaDom({ entrada, canvas, eventos, aoGesto, ignorarMouse = () => false }) {
   const usaModificador = (e) => e.ctrlKey || e.metaKey || e.altKey;
   const ponteiro = { x: 0, y: 0, dentro: false };
   addEventListener('keydown', (e) => { aoGesto(); if (e.repeat || usaModificador(e)) return; if (entrada.teclaAbaixo(e.code)) e.preventDefault(); }, { capture: true });
   addEventListener('keyup', (e) => { entrada.teclaAcima(e.code); });
-  canvas.addEventListener('mousedown', (e) => { aoGesto(); ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = true; if (entrada.teclaAbaixo(`mouse:${e.button}`)) e.preventDefault(); });
+  canvas.addEventListener('mousedown', (e) => { aoGesto(); if (ignorarMouse()) return; /* batalha: o clique do canvas não vira "andar" no mapa */ ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = true; if (entrada.teclaAbaixo(`mouse:${e.button}`)) e.preventDefault(); });
   addEventListener('mouseup', (e) => entrada.teclaAcima(`mouse:${e.button}`));
   addEventListener('mousemove', (e) => { ponteiro.x = e.clientX; ponteiro.y = e.clientY; ponteiro.dentro = e.target === canvas; });
   canvas.addEventListener('mouseleave', () => { ponteiro.dentro = false; });

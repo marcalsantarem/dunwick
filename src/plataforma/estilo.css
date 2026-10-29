@@ -8,9 +8,11 @@ canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated
 #debug { position: fixed; left: 6px; top: 6px; margin: 0; padding: 4px 6px; max-width: 96vw; color: #9f9; background: rgba(0, 0, 0, 0.55); font: 12px/1.35 ui-monospace, Consolas, monospace; white-space: pre-wrap; pointer-events: none; }
 
 /* ---------- UI de batalha (15, docs/ui/batalha.md): madeira escura + linho, cantos de latão; foco dourado (brilho_*); alerta só em alerta_ui. Sem magenta. ---------- */
-.bat {
+.bat, .bat-camada {
   --ui-1: #211209; --ui-2: #886b56; --ui-3: #d3b89e; --ui-4: #fdf0dc; --madeira-2: #5c3120; --madeira-3: #875a3b; --latao: #ae8865;
   --brilho-1: #fcd176; --brilho-2: #ffe79d; --alerta-1: #780105; --alerta-2: #f44d21; --cura: #97b55f; --cura-claro: #e1e3a7;
+}
+.bat {
   position: fixed; inset: 0; pointer-events: none; color: var(--ui-4); font: 16px/1.3 ui-monospace, Consolas, "Courier New", monospace;
   display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; padding: 16px; box-sizing: border-box; user-select: none;
 }
@@ -33,21 +35,27 @@ canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated
 .bat-rodada { color: var(--ui-3); text-shadow: 2px 2px 0 #000; }
 .bat-vel { pointer-events: auto; background: var(--ui-1); border: 2px solid var(--madeira-3); padding: 2px 8px; cursor: pointer; }
 .bat-palco { position: relative; min-height: 0; }
-.bat-placa { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: 0; padding: 4px; pointer-events: auto; cursor: pointer; }
-.bat-placa.caido { opacity: 0.45; }
-.bat-placa-nome { font-size: 13px; padding: 0 6px; background: rgba(33, 18, 9, 0.85); border: 1px solid var(--madeira-3); white-space: nowrap; }
-.bat-cursor { visibility: hidden; color: var(--brilho-1); font-size: 20px; line-height: 1; text-shadow: 2px 2px 0 #000; animation: bat-cursor 0.8s steps(2) infinite; }
-.bat-placa.alvo-foco .bat-cursor { visibility: visible; }
-.bat-placa.alvo-foco .bat-figura, .bat-placa.alvo-foco .bat-placa-nome { outline: 2px solid var(--brilho-1); outline-offset: 2px; }
+.bat-camada { position: absolute; inset: 0; pointer-events: none; color: var(--ui-4); font: 16px/1.3 ui-monospace, Consolas, "Courier New", monospace; user-select: none; }
+.bat-camada[hidden], .bat-camada [hidden] { display: none; }
+.bat-alvo-area { position: absolute; display: flex; align-items: flex-end; justify-content: center; background: none; border: 0; padding: 0; pointer-events: auto; cursor: pointer; }
+.bat-alvo-area.caido { opacity: 0.45; }
+.bat-anel { position: absolute; transform: translate(-50%, -50%); border: 3px solid var(--brilho-1); border-radius: 50%; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.7), inset 0 0 0 2px rgba(0, 0, 0, 0.7); pointer-events: none; }
+.bat-cursor { position: absolute; transform: translate(-50%, -100%); color: var(--brilho-1); font-size: 22px; line-height: 1; text-shadow: 2px 2px 0 #000, -1px -1px 0 #000; animation: bat-cursor 0.8s steps(2) infinite; pointer-events: none; }
+.bat-rotulo-ator { position: absolute; display: flex; flex-direction: column; gap: 3px; min-width: 9ch; padding: 2px 6px 4px; background: rgba(33, 18, 9, 0.9); border: 2px solid var(--madeira-3); box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5); white-space: nowrap; pointer-events: auto; cursor: pointer; }
+.bat-rotulo-ator.alvo-foco { border-color: var(--brilho-1); color: var(--brilho-2); }
+.bat-placa-nome { font-size: 13px; }
+.atingido { animation: bat-tremor 0.24s linear 1; }
+.bat-caixa.atingido { animation: bat-tremor 0.24s linear 1, bat-acerto 0.3s steps(1) 1; }
 .bat-figura { width: 40px; height: 56px; background: var(--ui-2); border: 2px solid var(--ui-3); }
 .bat-figura-grupo { border-radius: 20px 20px 4px 4px; background: var(--madeira-3); }
 .bat-figura-inimigos { width: 52px; height: 40px; border-radius: 50% 50% 8px 8px; background: var(--ui-2); }
 .bat-figura[hidden] { display: none; }
-.bat-barra { width: 100%; min-width: 64px; height: 6px; background: #000; border: 1px solid var(--ui-2); }
+.bat-barra { position: relative; width: 100%; min-width: 64px; height: 6px; background: #000; border: 1px solid var(--ui-2); }
 .bat-barra[hidden] { display: none; }
-.bat-barra-enche { height: 100%; background: var(--ui-3); transition: width 0.4s steps(8); }
+.bat-barra-enche, .bat-barra-rastro { position: absolute; left: 0; top: 0; height: 100%; background: var(--ui-3); transition: width 0.4s steps(8); }
+.bat-barra-rastro { background: var(--brilho-2); transition: width 0.5s steps(6) 0.35s; }
 .bat-barra-mana .bat-barra-enche { background: var(--latao); }
-.bat-numero { position: absolute; transform: translateX(-50%); display: flex; gap: 4px; align-items: center; font-size: 22px; font-weight: bold; color: var(--ui-4); text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000; animation: bat-sobe 0.8s ease-out forwards; pointer-events: none; }
+.bat-numero { position: absolute; transform: translate(-50%, -100%); z-index: 2; display: flex; gap: 4px; align-items: center; font-size: 22px; font-weight: bold; color: var(--ui-4); text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000; animation: bat-sobe 0.8s ease-out forwards; pointer-events: none; }
 .bat-numero-fraco { font-size: 28px; color: var(--brilho-2); }
 .bat-numero-resiste { font-size: 18px; color: var(--ui-3); }
 .bat-numero-cura { color: var(--cura-claro); }
@@ -93,8 +101,18 @@ canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated
 .bat-res-nivel { color: var(--brilho-2); }
 .bat-res-caido { color: var(--ui-3); }
 .bat-botao { margin: 0 auto; }
-@keyframes bat-sobe { from { transform: translate(-50%, 0); opacity: 1; } 70% { opacity: 1; } to { transform: translate(-50%, -32px); opacity: 0; } }
-@keyframes bat-cursor { 50% { transform: translateY(3px); } }
+@keyframes bat-sobe { from { transform: translate(-50%, -100%); opacity: 1; } 70% { opacity: 1; } to { transform: translate(-50%, calc(-100% - 36px)); opacity: 0; } }
+@keyframes bat-tremor { 25% { translate: -3px 0; } 50% { translate: 3px 0; } 75% { translate: -2px 0; } }
+@keyframes bat-acerto { 0% { border-color: var(--ui-4); } }
+@keyframes bat-cursor { 50% { translate: 0 3px; } }
 @keyframes bat-pulso { 50% { opacity: 0.4; } }
 @keyframes bat-pisca { 50% { background: var(--alerta-1); } }
-@media (prefers-reduced-motion: reduce) { .bat *, .bat-numero { animation: none !important; transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .bat *, .bat-camada * { animation: none !important; transition: none !important; } }
+.reduzir *, .bat-camada.reduzir * { animation: none !important; transition: none !important; }
+/* batalha só com mouse: escudo sobre a cena (o clique nunca chega ao canvas do mapa), botão Voltar, hover visível */
+.bat-escudo { position: absolute; inset: 0; pointer-events: auto; }
+.bat-voltar { align-self: flex-end; display: flex; gap: 6px; align-items: center; min-height: 40px; padding: 4px 14px; cursor: pointer; }
+.bat-voltar[hidden] { display: none; }
+.bat-item { min-height: 32px; box-sizing: border-box; }
+.bat-voltar:hover, .bat-vel:hover, .bat-botao:hover { border-color: var(--brilho-1); color: var(--brilho-2); }
+.bat-alvo-area.valido:hover, .bat-rotulo-ator:hover { filter: brightness(1.15); }
