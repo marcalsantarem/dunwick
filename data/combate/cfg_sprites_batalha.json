@@ -1,19 +1,40 @@
 {
   "id": "cfg_sprites_batalha",
   "versao": 1,
-  "nota": "Qual atlas de batalha cada ator usa (formato do hero_edric_batalha: 1 direção, voltado à direita, poses bat_*). `atlas` = id da pasta em assets/sprites. Entradas `provisorio` reaproveitam o atlas do Edric com tinta e escala até o 04 entregar o atlas próprio (BL-009): trocar para `atlas` própria quando existir.",
-  "alinhamento": { "grupo_espelha": true },
+  "nota": "Qual atlas de batalha cada ator usa (formato do hero_edric_batalha: 1 direção, voltado à direita, poses bat_*). `atlas` = id da pasta em assets/sprites. Os atlas próprios de Grace, Slime e Lobo estão em uso (BL-009/BL-010); `provisorio` fica como recurso para atores sem atlas.",
+  "alinhamento": {
+    "grupo_espelha": true
+  },
   "atores": {
-    "hero_edric": { "atlas": "hero_edric_batalha" },
-    "hero_grace": { "provisorio": { "base": "hero_edric_batalha", "tinta": "#7fb4ff", "escala": 0.92 } },
-    "enemy_slime": { "provisorio": { "base": "hero_edric_batalha", "tinta": "#7fe39a", "escala": 0.7 } },
-    "enemy_lobo": { "provisorio": { "base": "hero_edric_batalha", "tinta": "#b8a090", "escala": 0.85 } }
+    "hero_edric": {
+      "atlas": "hero_edric_batalha"
+    },
+    "hero_grace": {
+      "atlas": "hero_grace_batalha"
+    },
+    "enemy_slime": {
+      "atlas": "enemy_slime_batalha"
+    },
+    "enemy_lobo": {
+      "atlas": "enemy_lobo_batalha"
+    }
   },
   "poses_alias": {
-    "bat_cura": ["bat_habilidade", "bat_ataque"],
-    "bat_ataque_forte": ["bat_ataque"],
-    "bat_espera": ["bat_parado"],
-    "bat_morte": ["bat_caido"],
-    "bat_fugir": ["bat_avanca"]
+    "bat_cura": [
+      "bat_habilidade",
+      "bat_ataque"
+    ],
+    "bat_ataque_forte": [
+      "bat_ataque"
+    ],
+    "bat_espera": [
+      "bat_parado"
+    ],
+    "bat_morte": [
+      "bat_caido"
+    ],
+    "bat_fugir": [
+      "bat_avanca"
+    ]
   }
 }
