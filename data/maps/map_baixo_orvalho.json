@@ -353,14 +353,6 @@
       "seed": 1
     },
     {
-      "id": "enemy_boneco_alvo",
-      "tipo": "inimigo",
-      "x": 34.5,
-      "z": 47,
-      "rot": 0,
-      "seed": 1
-    },
-    {
       "id": "barril_1",
       "tipo": "barril",
       "x": 58.6,
@@ -530,6 +522,15 @@
       "z0": 24.3,
       "x1": 21.6,
       "z1": 24.3,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "boneco_treino",
+      "tipo": "boneco_treino",
+      "x": 34.5,
+      "z": 47,
+      "encontro": "enc_boneco_treino",
       "rot": 0,
       "seed": 1
     },

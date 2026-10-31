@@ -509,7 +509,7 @@ export function criarBatalhaUi({ mundo, dados, t, debug = false, plataforma = {}
   }
 
   return {
-    ligar, atualizar, encerrar,
+    ligar, atualizar, encerrar, telas, // telas: pausa, achado, banner e minimapa (os testes de navegador leem telas.minimapa.medidas)
     /** Controlador ligado agora (ou null): a plataforma liga a UI a toda batalha, não só à de depuração. */
     get controlador() { return ctrl; },
     get modo() { return modo; }, get ocupado() { return rep.ocupado; },

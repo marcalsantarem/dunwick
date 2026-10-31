@@ -10,7 +10,10 @@ import { criarTextos } from '../src/jogo/textos.js';
 test('vila: 94 × 94 (núcleo 48 × 48 + mata), início livre, 3 tipos de chão, objetos do kit e um só boneco de treino (interativo)', () => {
   const { mundo } = novoMundo(); const { mapa, heroi, entidades } = mundo, d = mapa.dados;
   assert.deepEqual(d.tamanho, [94, 94]); assert.ok(mapa.livre(heroi.x, heroi.z, heroi.raioPush), 'início livre');
-  assert.deepEqual(entidades.map((e) => e.id), ['enemy_boneco_alvo'], 'só o boneco oposto ao poço (D-043)');
+  const real = carregarDados().mapas.map_baixo_orvalho; void entidades; // o novoMundo dos testes reinsere os bonecos do M1 para os testes de movimento
+  assert.deepEqual(real.objetos.filter((o) => o.tipo === 'inimigo').map((o) => o.id), [], 'sem entidade na vila: o boneco do M1 virou objeto do kit (D-043)');
+  const bo = real.objetos.filter((o) => /boneco/.test(o.id)); assert.deepEqual(bo.map((o) => [o.id, o.tipo, o.x, o.z]), [['boneco_treino', 'boneco_treino', 11.5 + DV, 24 + DV]], 'só o boneco oposto ao poço');
+  assert.ok(mundo.dados.config.kit.pegadas.boneco_treino.raio <= 0.5, 'pegada pequena: o herói chega perto');
   const poi = d.pois.find((p) => p.id === 'boneco_treino'); assert.deepEqual([poi.x, poi.z, poi.encontro], [11.5 + DV, 24 + DV, 'enc_boneco_treino'], 'interativo no mesmo ponto');
   const tipos = new Set(d.objetos.map((o) => o.tipo)); for (const t of ['casa', 'arvore', 'poco', 'lanterna', 'cerca']) assert.ok(tipos.has(t), `falta ${t}`);
   assert.ok(new Set(d.planta.join('')).size >= 3, 'chão com materiais diferentes'); assert.ok(d.objetos.filter((o) => o.tipo === 'casa').length >= 6, 'pelo menos 6 casas');

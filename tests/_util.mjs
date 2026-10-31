@@ -20,7 +20,7 @@ export function novoMundo(ajustar, { livre = false, encontros = false, sementeEn
   if (!encontros) for (const z of Object.values(dados.exploracao.encontros)) z.ligado = false;
   // os bonecos de teste (enemy_boneco_alvo/golpe) saem da vila na v0.1.2b; os testes de movimento e ataque ainda contam com eles
   const vila = Object.values(dados.mapas).find((m) => m.tipo_mapa === 'exterior');
-  if (vila && !vila.objetos.some((o) => o.tipo === 'inimigo')) vila.objetos.push({ id: 'enemy_boneco_alvo', tipo: 'inimigo', x: 11.5, z: 24, rot: 0, seed: 1 }, { id: 'enemy_boneco_golpe', tipo: 'inimigo', x: 16.5, z: 24, rot: 0, seed: 1 });
+  if (vila && !vila.objetos.some((o) => o.tipo === 'inimigo')) vila.objetos.push({ id: 'enemy_boneco_alvo', tipo: 'inimigo', x: 11.5 + DV, z: 24 + DV, rot: 0, seed: 1 }, { id: 'enemy_boneco_golpe', tipo: 'inimigo', x: 16.5 + DV, z: 24 + DV, rot: 0, seed: 1 });
   if (livre) for (const m of Object.values(dados.mapas)) { m.objetos = m.objetos.filter((o) => o.tipo === 'inimigo'); m.edificios = []; m.portais = []; m.pois = []; }
   if (ajustar) ajustar(dados);
   const eventos = criarEventos(), mundo = criarMundo(dados, eventos, carregarMetas(), { sementeEncontros }), buffer = new BufferEntrada(dados.config.jogo.entrada.buffer_entrada_quadros), registro = [];

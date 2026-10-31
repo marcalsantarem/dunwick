@@ -250,6 +250,16 @@ function rackArmas(col, o) {
   a.g('madeira', new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12), 0.95, 0.5, 0.2, Math.PI / 2, 0, 0); a.g('metal', new THREE.SphereGeometry(0.06, 6, 5), 0.95, 0.5, 0.25);
 }
 
+// boneco de treino do pátio do Torvan (v0.1.2b): poste fincado, braços de travessa, corpo de saco de palha amarrado, cabeça com faixa vinho.
+// Provisório do 14 para tirar o boneco do M1 (entidade = alvo de ataque, o herói parava longe); o 07 refina o visual. Colisão: círculo do kit.
+function bonecoTreino(col, o) {
+  const a = ajudantes(col, o);
+  a.g('madeira', new THREE.CylinderGeometry(0.07, 0.09, 1.9, 7), 0, 0.95, 0); a.b('madeira', 0, 0.06, 0, 0.5, 0.12, 0.5); // poste e base
+  a.v('madeira', [-0.55, 1.3, 0], [0.55, 1.3, 0], 0.07); // braços
+  a.g('palha', new THREE.CylinderGeometry(0.24, 0.2, 0.75, 9), 0, 1.15, 0); for (const y of [0.92, 1.42]) a.g('linho', new THREE.CylinderGeometry(0.245, 0.245, 0.04, 9), 0, y, 0); // corpo e amarras
+  a.g('palha', new THREE.SphereGeometry(0.19, 9, 7), 0, 1.72, 0); a.g('tecido_vinho', new THREE.CylinderGeometry(0.2, 0.2, 0.06, 9), 0, 1.76, 0); // cabeça e faixa
+}
+
 function forjaBrasa(col, o, kit, saida) { // forno de pedra aberto na frente, com brasa viva, chaminé e fumaça; emite luz dinâmica (tipo `forja`)
   const a = ajudantes(col, o);
   a.b('pedra', 0, 0.45, 0, 1.4, 0.9, 1.0); a.b('pedra', 0, 0.93, 0, 1.5, 0.08, 1.1);
@@ -285,4 +295,4 @@ function balde(col, o) {
   a.g('agua', new THREE.CircleGeometry(0.17, 9).rotateX(-Math.PI / 2), 0, 0.3, 0, 0, 0, 0, { uv: false }); a.g('metal', new THREE.TorusGeometry(0.19, 0.012, 4, 10, Math.PI), 0, 0.3, 0, 0, 0, 0);
 }
 
-export const PECAS_VILA = { lenha, varal, balde, bau_tesouro: (col, o) => corpoBau(col, o), portico, quadro_avisos: quadroAvisos, arvore_queimada: arvoreQueimada, muro_fuligem: muroFuligem, muralha_baixa: muralhaBaixa, estacada, tronco_caido: troncoCaido, moita, pedra_enegrecida: pedraEnegrecida, canteiro, rack_armas: rackArmas, forja_brasa: forjaBrasa, bigorna };
+export const PECAS_VILA = { boneco_treino: bonecoTreino, lenha, varal, balde, bau_tesouro: (col, o) => corpoBau(col, o), portico, quadro_avisos: quadroAvisos, arvore_queimada: arvoreQueimada, muro_fuligem: muroFuligem, muralha_baixa: muralhaBaixa, estacada, tronco_caido: troncoCaido, moita, pedra_enegrecida: pedraEnegrecida, canteiro, rack_armas: rackArmas, forja_brasa: forjaBrasa, bigorna };

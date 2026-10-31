@@ -1,5 +1,5 @@
-// Minimapa (15, D-041): gira com a tela (cima do minimapa = cima da tela, giro da câmera isométrica). Lê plataforma.mapaAtivo()
-// (objeto estável por mapa) e mundo.heroi (x, z, face). A BASE (chão, edifícios, portas, passagens) é desenhada UMA vez por mapa
+// Minimapa (15, D-041, etapa 2 da v0.1.2): gira com a tela (cima do minimapa = cima da tela, giro da câmera isométrica). Lê o mapa
+// ativo por `fonte()` (objeto estável por mapa: plataforma.mapaAtivo() do 08 ou fonteDoMapa) e mundo.heroi (x, z, face). A BASE (chão, edifícios, portas, passagens) é desenhada UMA vez por mapa
 // num canvas fora da tela; por quadro só se gira/move a base e se desenham a seta do herói e os pontos de interesse (de pé, legíveis).
 // Exterior: centrado no herói. Interior: o cômodo inteiro cabe e a seta anda. Nada só por cor: formas, ícones, legenda e texto alternativo.
 import { mundoParaMini, miniParaMundo, anguloSeta, maisProximo } from './minimapa_geo.js';
@@ -7,8 +7,9 @@ import { mundoParaMini, miniParaMundo, anguloSeta, maisProximo } from './minimap
 // chão por material (paleta neutra v0.2); no alto contraste o chão vira dois tons e os elementos ganham contorno forte
 const CHAO = { grama: '#478638', terra: '#875a3b', calcada: '#a99d90', musgo: '#01523c', agua: '#3b6e8f' };
 const COR = { fundo: '#120c07', casa: '#5c3120', casaBorda: '#ece7dd', porta: '#fcd176', passagem: '#fcd176', fechada: '#685a50', poi: '#fdf0dc', poiBorda: '#211209', heroi: '#ffe79d', heroiBorda: '#211209' };
-const CONTRASTE = { chao: '#3a332c', chaoBorda: '#000000', casa: '#000000', casaBorda: '#ffffff', porta: '#ffe79d', passagem: '#ffffff', fechada: '#9a9a9a' };
-const ICONE_POI = { poco: '◎', portico: '⌂', torre_sino: '♜', loja: '$', forja: '⚒', taverna: '♨', praca: '✦' };
+const MURO = { muralha_baixa: '#c9bcae', estacada: '#ae8865', muro_fuligem: '#4a3a30', cerca: '#d3b89e' };
+const CONTRASTE = { muro: '#ffffff', chao: '#3a332c', chaoBorda: '#000000', casa: '#000000', casaBorda: '#ffffff', porta: '#ffe79d', passagem: '#ffffff', fechada: '#9a9a9a' };
+const ICONE_POI = { poco: '◎', portico: '⌂', torre_sino: '♜', loja: '$', forja: '⚒', taverna: '♨', praca: '✦', edificio: '⌂', quadro_avisos: '▤', patio: '✦', saida: '↥', boneco_treino: '♟', bau_tesouro: '▣', bau: '▣' };
 
 function el(tag, classe, pai, texto) { const e = document.createElement(tag); if (classe) e.className = classe; if (texto !== undefined) e.textContent = texto; if (pai) pai.appendChild(e); return e; }
 
@@ -17,6 +18,10 @@ export function desenharBase(ctx, mapa, B, contraste) {
   const [L, A] = mapa.tamanho;
   ctx.fillStyle = COR.fundo; ctx.fillRect(0, 0, L * B, A * B);
   mapa.planta.forEach((linha, z) => { for (let x = 0; x < linha.length; x++) { const mat = mapa.legenda[linha[x]]; if (!mat) continue; ctx.fillStyle = contraste ? CONTRASTE.chao : (CHAO[mat] ?? CHAO.terra); ctx.fillRect(x * B, z * B, B, B); } });
+  for (const m of mapa.muros ?? []) { // muralha, estacada, cerca: linha (a cerca, fina)
+    ctx.lineWidth = Math.max(1, B * (m.tipo === 'cerca' ? 0.25 : 0.5)); ctx.strokeStyle = contraste ? CONTRASTE.muro : MURO[m.tipo];
+    ctx.beginPath(); ctx.moveTo(m.x0 * B, m.z0 * B); ctx.lineTo(m.x1 * B, m.z1 * B); ctx.stroke();
+  }
   for (const e of mapa.edificios) { // bloco (x, z = centro) com contorno; porta como marca dourada no lado dela
     ctx.save(); ctx.translate(e.x * B, e.z * B); ctx.rotate(((e.rot ?? 0) * Math.PI) / 180);
     ctx.fillStyle = contraste ? CONTRASTE.casa : COR.casa; ctx.fillRect((-e.w / 2) * B, (-e.d / 2) * B, e.w * B, e.d * B);
@@ -31,7 +36,7 @@ export function desenharBase(ctx, mapa, B, contraste) {
   }
 }
 
-export function criarMinimapa({ mundo, t, cfg, plataforma = {}, preferencia, visivel }) {
+export function criarMinimapa({ mundo, t, cfg, fonte, preferencia, visivel }) {
   const C = cfg.minimapa, pai = document.getElementById('ui') ?? document.body;
   const raiz = el('div', 'minimapa', pai); raiz.hidden = true;
   const tela = el('canvas', 'minimapa-tela', raiz); tela.setAttribute('role', 'img');
@@ -44,7 +49,6 @@ export function criarMinimapa({ mundo, t, cfg, plataforma = {}, preferencia, vis
   let mapaBase = null, contrasteBase = null, chave = '', param = null, dicaAte = 0, sobre = null;
   const medidas = { quadros: 0, ms: 0, bases: 0 }; // custo medido (o teste lê)
 
-  const fonte = () => plataforma.mapaAtivo?.() ?? null;
   function montarBase(m, contraste) {
     const t0 = performance.now(); base.width = m.tamanho[0] * C.px_base; base.height = m.tamanho[1] * C.px_base;
     desenharBase(bctx, m, C.px_base, contraste); mapaBase = m; contrasteBase = contraste; medidas.bases++; medidas.msBase = performance.now() - t0;
@@ -53,7 +57,7 @@ export function criarMinimapa({ mundo, t, cfg, plataforma = {}, preferencia, vis
 
   function desenhar(m, contraste) {
     const h = mundo.heroi, S = raiz.clientWidth, dpr = globalThis.devicePixelRatio || 1, [L, A] = m.tamanho;
-    const escala = m.interior ? Math.min(C.px_por_tile_interior_max, (S * 0.86) / Math.max(L, A)) : C.px_por_tile_exterior;
+    const escala = m.interior ? Math.min(C.px_por_tile_interior_max, (S * 0.86) / Math.max(L, A)) : (C.px_por_tile_exterior * S) / 160; // exterior: 4 px/tile num minimapa de 160 px
     param = { cx: m.interior ? L / 2 : h.x, cz: m.interior ? A / 2 : h.z, giroGraus: m.giro_graus, escala, meio: S / 2 };
     const k = [m.id, contraste, S, dpr, h.x.toFixed(2), h.z.toFixed(2), h.face.toFixed(2), sobre?.id ?? ''].join('|');
     if (k === chave) return; chave = k;
@@ -72,6 +76,7 @@ export function criarMinimapa({ mundo, t, cfg, plataforma = {}, preferencia, vis
     }
     // seta do herói: sempre visível, apontando para onde ele olha (já girada junto com a tela)
     const s = mundoParaMini(h.x, h.z, param), ang = anguloSeta(h.face, param.giroGraus), tam = Math.max(6, S / 16);
+    medidas.angSeta = Math.atan2(Math.sin(ang), Math.cos(ang)); // radianos na tela do minimapa (−π/2 = para cima); o teste lê
     ctx.save(); ctx.translate(Math.min(S - 4, Math.max(4, s.x)), Math.min(S - 4, Math.max(4, s.y))); ctx.rotate(ang);
     ctx.beginPath(); ctx.moveTo(tam, 0); ctx.lineTo(-tam * 0.7, tam * 0.65); ctx.lineTo(-tam * 0.35, 0); ctx.lineTo(-tam * 0.7, -tam * 0.65); ctx.closePath();
     ctx.fillStyle = COR.heroi; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = COR.heroiBorda; ctx.stroke(); ctx.restore();
@@ -90,7 +95,7 @@ export function criarMinimapa({ mundo, t, cfg, plataforma = {}, preferencia, vis
   tela.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'touch') { sobre = null; dica.hidden = true; } });
 
   return {
-    medidas, elemento: raiz,
+    medidas, elemento: raiz, fonte,
     atualizar() {
       const m = fonte(), mostrar = !!m && preferencia('minimapa') && visivel();
       if (raiz.hidden === mostrar) raiz.hidden = !mostrar;

@@ -39,9 +39,9 @@ Os tamanhos são os do esboço aprovado pelo usuário (D-041). Se o 07 preferir 
 | `varal_edric` | `varal` | vão 2,4; postes r 0,1 | −5,1, −0,4 | quintal do Edric (1 tile livre dos dois lados) |
 | `canteiro_edric` | `canteiro` | 2 × 1 | −2,6, 0,4 | hortinha do Edric |
 | `cerca_edric` | `cerca` | linha de (−3,8; 1,3) a (−1,4; 1,3) | — | cerca baixa da horta |
-| `boneco_treino` | POI `boneco_treino` + sprite `enemy_boneco_alvo` | pushbox do boneco do M1 | 11,5, 24 | pátio do Torvan, o boneco mais a oeste (oposto ao poço); POI com `encontro: enc_boneco_treino` no mesmo ponto; `enemy_boneco_golpe` saiu. Quando o kit tiver a pegada `boneco_treino`, o gerador troca pelo objeto `boneco_treino` ⏳ |
+| `boneco_treino` | `boneco_treino` (objeto do kit + POI de mesmo id) | círculo r 0,5 | 11,5, 24 | pátio do Torvan, o boneco mais a oeste (oposto ao poço); POI com `encontro: enc_boneco_treino`. Não é mais entidade: o cursor não o toma por alvo de ataque e o clique leva o herói até ~1,3 tile (teclado: encosta a 0,85). Visual 3D provisório do 14 em `kit_vila.js` (07 refina). `enemy_boneco_alvo`/`_golpe` saíram da vila |
 
-⏳ = ainda fora do kit; o gerador troca sozinho quando a pegada existir. Caminho de terra: porta do Edric (0; −3,5) → (9; 3) → (9; 13,8) → trilha da porta da Maren. Quintal do Edric sem árvores.
+Caminho de terra: porta do Edric (0; −3,5) → (9; 3) → (9; 13,8) → trilha da porta da Maren. Quintal do Edric sem árvores.
 
 ## Perímetro e mata (pedido de 29/10; tipos do 07 já no kit)
 

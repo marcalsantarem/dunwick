@@ -100,7 +100,7 @@ const m = await pag.evaluate('__dunwick.marcas');
 console.log(`  carga (ms): dados ${(m.dados - m.inicio).toFixed(0)} · assets ${(m.assets - m.dados).toFixed(0)} · cena ${(m.cena - m.assets).toFixed(0)} · shaders ${(m.compilado - m.cena).toFixed(0)} · total no script ${(m.compilado - m.inicio).toFixed(0)}`);
 const audioInicial = await pag.evaluate('__dunwick.audio.estado');
 await dormir(800); await pag.screenshot({ path: CAPTURA });
-const estado = () => pag.evaluate(() => { const m = __dunwick.mundo, h = m.heroi; return { ticks: m.ticks, x: h.x, z: h.z, v: h.velocidade(), est: h.estado, acao: h.acao ? { tipo: h.acao.tipo, t: h.acao.t } : null, destino: h.destino, acertos: m.entidades[0].contadores.acertos, hora: m.hora, t: performance.now() }; });
+const estado = () => pag.evaluate(() => { const m = __dunwick.mundo, h = m.heroi; return { ticks: m.ticks, x: h.x, z: h.z, v: h.velocidade(), est: h.estado, acao: h.acao ? { tipo: h.acao.tipo, t: h.acao.t } : null, destino: h.destino, acertos: m.entidades[0]?.contadores.acertos ?? 0, hora: m.hora, t: performance.now() }; });
 const por = (x, y, z) => pag.evaluate(([x, y, z]) => __dunwick.mundoParaTela(x, y, z), [x, y, z]);
 const colocar = (x, z) => pag.evaluate(([x, z]) => { const m = __dunwick.mundo, h = m.heroi; h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; h.destino = null; h.alvoId = null; h.acao = null; m.camera.encaixar(h); }, [x, z]).then(() => dormir(400)); // espera um quadro: a câmera só se move no quadro seguinte
 const livre = (x, z) => pag.evaluate(([x, z]) => __dunwick.mundo.mapa.livre(x, z, 0.4), [x, z]);
@@ -123,9 +123,9 @@ await colocar(IX, IZ);
   checar('mouse: clique no chão define o destino e o herói corre (> 5 tiles)', !!a.destino && a.v > 2, `destino ${a.destino ? a.destino.x.toFixed(2) + ',' + a.destino.z.toFixed(2) : 'nenhum'}, v ${a.v.toFixed(2)}`);
   await dormir(2500); const b = await estado(); checar('mouse: chega ao ponto clicado e para', Math.hypot(b.x - alvo[0], b.z - alvo[1]) < 0.4 && b.v < 0.1, `a ${Math.hypot(b.x - alvo[0], b.z - alvo[1]).toFixed(2)} tiles do alvo`); }
 await pag.screenshot({ path: join(dirQA, 'praca_clique_mover.png') });
-{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.entidades[0]; return { x: e.x, z: e.z }; }); await colocar(al.x - 2.8, al.z); const alvoTela = await por(al.x, 1.0, al.z);
-  await pag.mouse.move(alvoTela.x, alvoTela.y); await dormir(300); const sob = await pag.evaluate('document.getElementById("debug").textContent.includes("alvo enemy_boneco_alvo")');
-  checar('mouse: cursor sobre o boneco → alvo sob o cursor detectado', sob);
+{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.mapa.dados.pois.find((p) => p.id === 'boneco_treino'); return { x: e.x, z: e.z }; }); /* boneco = objeto do kit + POI (não é mais entidade) */ await colocar(al.x - 2.8, al.z); const alvoTela = await por(al.x, 1.0, al.z);
+  await pag.mouse.move(alvoTela.x, alvoTela.y); await dormir(300); const sob = await pag.evaluate('__dunwick.atualizarCursor().alvo');
+  checar('mouse: cursor sobre o boneco de treino não vira alvo de ataque (é interativo; o herói anda até ele)', !sob, `alvo ${sob}`);
   await pag.evaluate(() => { window.__treinoId = null; const j = __dunwick.jogo, orig = j.iniciarBatalha; j.iniciarBatalha = (id, o) => { window.__treinoId = id; j.iniciarBatalha = orig; }; }); // só observa o disparo (não entra na batalha)
   await pag.mouse.click(alvoTela.x, alvoTela.y); const entrou = await pag.waitForFunction('window.__treinoId', { timeout: 8000 }).then(() => true, () => false);
   checar('mouse: clique no boneco de treino → anda até ele e dispara a batalha de treino (D-043)', entrou && (await pag.evaluate('window.__treinoId')) === 'enc_boneco_treino'); await pag.screenshot({ path: join(dirQA, 'praca_ataque.png') });

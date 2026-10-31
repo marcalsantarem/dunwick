@@ -99,7 +99,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     const ordem = reuniao.map((p, i) => [Math.hypot(p.x - cx, p.z - cz), i]).sort((a, b) => a[0] - b[0]);
     luzesPontuais.forEach((l, i) => {
       const src = i < n && ordem[i] && ordem[i][0] < 26 ? lanternas[ordem[i][1]] : null, f = src && FONTES[src.tipo], ok = !!src && (f ? f.sempre || acesa : acesa);
-      l.visible = ok; if (!ok) return; l.position.copy(reuniao[ordem[i][1]]);
+      l.visible = i < n; if (!ok) { l.intensity = 0; return; } // visível = constante por perfil: ligar/desligar luz muda o nº de luzes do shader e recompila (travada de ~400 ms) l.position.copy(reuniao[ordem[i][1]]);
       if (f) { l.color.set(f.cor); l.distance = f.alcance_tiles; l.intensity = f.intensidade * (1 + (f.oscila ?? 0) * (0.6 * Math.sin(tempoS * 9.1 + ordem[i][1] * 2.3) + 0.4 * Math.sin(tempoS * 17.3 + ordem[i][1]))); }
       else { l.color.set(ll.cor); l.distance = ll.alcance_tiles; l.intensity = ll.intensidade * ec.luzArtificial * (1 + 0.06 * Math.sin(tempoS * 9 + ordem[i][1] * 2.3)); }
     });

@@ -26,3 +26,18 @@ export function maisProximo(pontos, x, z, raio) {
   for (const p of pontos) { const d = Math.hypot(p.x - x, p.z - z); if (d <= dMin) { dMin = d; melhor = p; } }
   return melhor;
 }
+
+// tipos de objeto que viram linha de muro/cerca no minimapa (segmentos x0,z0 → x1,z1 no mapa)
+const MUROS = ['muralha_baixa', 'estacada', 'muro_fuligem', 'cerca'];
+/** Pura: o que o minimapa precisa de um mapa (dados de data/maps), montado uma vez por mapa. `interativos(md)` = objetos com que se
+ * interage (boneco, baú) + pois, do 13. Quando a plataforma tiver `mapaAtivo()` (08), ele pode substituir isto. */
+export function fonteDoMapa(md, giroGraus, interativos = (m) => m.pois ?? []) {
+  const muros = (md.objetos ?? []).filter((o) => MUROS.includes(o.tipo) && Number.isFinite(o.x0)).map((o) => ({ tipo: o.tipo, x0: o.x0, z0: o.z0, x1: o.x1, z1: o.z1 }));
+  return Object.freeze({
+    id: md.id, nome_txt: md.nome_txt, tamanho: md.tamanho, planta: md.planta, legenda: md.legenda, interior: md.tipo_mapa === 'interior', giro_graus: giroGraus,
+    edificios: (md.edificios ?? []).map((e) => ({ x: e.x, z: e.z, w: e.w, d: e.d, rot: e.rot ?? 0, porta: e.porta ?? null })),
+    portais: (md.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: p.ativo === false, nome_txt: p.nome_txt ?? null })),
+    pois: interativos(md).filter((p) => p.nome_txt && Number.isFinite(p.x)).map((p) => ({ id: p.id, tipo: p.tipo, x: p.x, z: p.z, nome_txt: p.nome_txt })),
+    muros,
+  });
+}

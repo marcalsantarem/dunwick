@@ -1,7 +1,8 @@
 // Minimapa (D-041): a transformação mundo → minimapa gira com a tela (cima do minimapa = cima da tela da câmera isométrica).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mundoParaMini, miniParaMundo, anguloSeta, maisProximo } from '../src/ui/minimapa_geo.js';
+import { mundoParaMini, miniParaMundo, anguloSeta, maisProximo, fonteDoMapa } from '../src/ui/minimapa_geo.js';
+import { interativosDe } from '../src/jogo/exploracao/portais.js';
 import { carregarDados } from './_util.mjs';
 
 const G = carregarDados().config.jogo.camera.giro_graus, g = (G * Math.PI) / 180;
@@ -31,4 +32,14 @@ test('seta do herói: olhar para "cima da tela" aponta para cima (−90°) no mi
 test('ponto de interesse mais próximo dentro do raio', () => {
   const pois = [{ id: 'a', x: 1, z: 1 }, { id: 'b', x: 5, z: 5 }];
   assert.equal(maisProximo(pois, 4.5, 4.6, 1)?.id, 'b'); assert.equal(maisProximo(pois, 3, 3, 1), null);
+});
+
+test('fonte do minimapa: vila com muralha/estacada, casas com porta e portais fechados; interior com o baú e a saída', () => {
+  const d = carregarDados(), vila = fonteDoMapa(d.mapas.map_baixo_orvalho, G, interativosDe), casa = fonteDoMapa(d.mapas.map_casa_edric_interior, G, interativosDe);
+  assert.equal(vila.interior, false); assert.deepEqual(vila.tamanho, [94, 94]); assert.ok(Object.isFrozen(vila));
+  assert.ok(vila.muros.some((m) => m.tipo === 'muralha_baixa') && vila.muros.some((m) => m.tipo === 'estacada'));
+  assert.ok(vila.edificios.length >= 6 && vila.edificios.every((e) => e.porta));
+  assert.ok(vila.portais.some((p) => p.interditado) && vila.portais.some((p) => !p.interditado));
+  assert.ok(vila.pois.some((p) => p.tipo === 'boneco_treino') && vila.pois.every((p) => p.nome_txt && d.textos['pt-BR'][p.nome_txt]));
+  assert.equal(casa.interior, true); assert.ok(casa.pois.some((p) => p.tipo === 'bau_tesouro')); assert.equal(casa.portais.length, 1);
 });

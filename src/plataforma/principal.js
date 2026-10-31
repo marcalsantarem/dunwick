@@ -53,7 +53,7 @@ async function iniciar() {
   const cenaBat = temBatalha ? criarCenaBatalha({ dados, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64) } }) : null;
   const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { aoTrocarMapa: () => { cena = cenas.get(idMapa()); }, reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
   const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); for (const c of cenas.values()) c.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
-  aplicarPerfil(); marcas.cena = performance.now();
+  aplicarPerfil(); for (const c of cenas.values()) c.atualizar(1, 0, 0), ren.compilar(c); marcas.cena = performance.now(); // aquece: posiciona luzes e compila os shaders de cada mapa antes de jogar
 
   // ---------- áudio desbloqueado por clique/tecla ----------
   const audio = criarAudio(recursos.sfxPing);
@@ -61,7 +61,19 @@ async function iniciar() {
   // API de plataforma para a UI (15): preferências persistentes, tela cheia, pausa por motivos, volume e a tela de início
   const telaCheia = criarTelaCheia(), pausa = criarPausa({ audio });
   audio.definirVolume(preferencias.obter('volume')); preferencias.aoMudar((k, v) => { if (k === 'volume') audio.definirVolume(v); });
-  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null };
+  // leitura do mapa ativo para o minimapa (15): um objeto congelado e ESTÁVEL por mapa (mesma referência enquanto o mapa não muda)
+  const vistaMapas = new Map();
+  const mapaAtivo = () => {
+    const id = idMapa(); if (vistaMapas.has(id)) return vistaMapas.get(id);
+    const m = dados.mapas[id], v = Object.freeze({
+      id, tipo_mapa: m.tipo_mapa, interior: m.tipo_mapa === 'interior', nome_txt: m.nome_txt, tamanho: m.tamanho, legenda: m.legenda, planta: m.planta, giro_graus: cfg.camera.giro_graus,
+      edificios: (m.edificios ?? []).map((e) => ({ id: e.id, x: e.x, z: e.z, w: e.w, d: e.d, rot: e.rot ?? 0, porta: e.porta ?? null, interior: e.interior })),
+      portais: (m.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: !p.ativo, nome_txt: p.nome_txt ?? null, destino: p.destino ?? null })),
+      pois: (m.pois ?? []).map((p) => ({ id: p.id, tipo: p.tipo, x: p.x, z: p.z, nome_txt: p.nome_txt })),
+    });
+    vistaMapas.set(id, v); return v;
+  };
+  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null, mapaAtivo };
   // tela de início: em produção sempre; em desenvolvimento só com ?inicio=1 (os testes automáticos já começam jogando)
   if (!__DEV__ || P.get('inicio') === '1') {
     pausa.pausar('inicio'); aviso.remove();
