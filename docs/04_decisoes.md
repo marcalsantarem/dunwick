@@ -285,3 +285,10 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Efeito no roteiro:** **v0.1.3** (entorno) passa a ser o **mapa aberto simplificado** com a vila como ponto de entrada; **v0.1.7** (bosque e caverna) são **locais ricos acessados por portal**, com corredores e salas estreitas (mais baratos que céu aberto). Escopo e versões não mudam; só o custo por mapa cai.
 - **Registro de desejo (usuário):** depois do slice, **gerar campos e masmorras por regras** (densidade de vegetação, caminhos, salas, sementes) para expandir o jogo com facilidade. **Fora do slice e da demo**; entra no backlog como BL-033.
 - **Processo:** pedir uma coisa por vez, a menos agentes, e juntar os ajustes de playtest num briefing só.
+
+## D-045 — v0.1.3: mapa de mundo estilizado (estilo Final Fantasy) e baús só em locais (2026-11-02)
+- **Decisão (usuário):** o mapa aberto é um **mapa de mundo estilizado**, não a câmera da vila: visão **mais distante**, terreno em tiles simples, **herói minúsculo (sprite própria, mais simples) e mais lento**. A vila (e depois bosque e caverna) aparece como **marcador** no mapa de mundo; **entra-se tocando o marcador** (D-044).
+- **Baús de tesouro:** **saem do mapa de mundo**; existem só em **mapas de locais** (vilas, cidades, bosques, florestas, cavernas, masmorras…). A vila já tem o baú da casa do Edric; a v0.1.3 não coloca baús no mundo.
+- **Nome provisório (usuário):** **Campos de Baixo Orvalho**.
+- **Assumido pelo Produtor (declarado):** v0.1.3 = modo de mapa de mundo (render e câmera próprios), 1 mapa `map_mundo_orvalho` com terreno, a vila como marcador ativo e marcadores futuros (bosque, caverna) visíveis porém interditados, **transição mundo ↔ local por portal** com a mesma névoa escura, saída da vila pelo vão sul volta ao marcador, minimapa desligado no mundo (o mapa já é o resumo), encontros aleatórios só na v0.1.5. Trabalho em branch `dev-v013` (a v0.1.2 aguarda o teste do usuário em `dev`).
+- Briefing: `docs/briefings/BRF-v013_mapa_de_mundo.md`.
