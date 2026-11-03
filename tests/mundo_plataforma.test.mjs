@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { carregarDados } from './_util.mjs';
-import { pixelsTerreno } from '../src/motor/terreno_mundo.js';
+import { gerarAtlas, indicesTerreno, listaMateriais } from '../src/motor/terreno_mundo.js';
 import { criarMapa } from '../src/jogo/mapa.js';
 import { validarMapasLigados } from '../tools/lib/validar_mapas_ligados.mjs';
 
@@ -15,11 +15,14 @@ test('cfg_mundo: câmera mais distante que a do jogo e paleta cobre a legenda do
   for (const mat of Object.values(m.legenda)) assert.ok(d.config.mundo.terreno.materiais[mat], `cor de ${mat}`);
 });
 
-test('terreno do mundo: pixels determinísticos, um bloco de px_por_tile por tile, cor do material', () => {
-  const d = carregarDados(), m = mundoDe(d), T = d.config.mundo.terreno, a = pixelsTerreno(m, T), b = pixelsTerreno(m, T);
-  assert.equal(a.largura, m.tamanho[0] * T.px_por_tile); assert.equal(a.altura, m.tamanho[1] * T.px_por_tile); assert.deepEqual(a.dados, b.dados);
-  const [x, z] = [10, 10], mat = m.legenda[m.planta[z][x]], cor = parseInt(T.materiais[mat].cor.slice(1, 3), 16), o = (z * T.px_por_tile * a.largura + x * T.px_por_tile) * 4;
-  assert.ok(Math.abs(a.dados[o] - cor) <= cor * (T.ruido + T.variacao_tile), 'vermelho próximo da paleta');
+test('terreno do mundo: atlas determinístico (variantes × materiais) e mapa de índices com material, variante e profundidade', () => {
+  const d = carregarDados(), m = mundoDe(d), T = d.config.mundo.terreno, a = gerarAtlas(T), b = gerarAtlas(T), mats = listaMateriais(T);
+  assert.equal(a.largura, T.variantes * T.px_por_tile); assert.equal(a.altura, mats.length * T.px_por_tile); assert.deepEqual(a.dados, b.dados); assert.ok(a.dados.every((_, i) => i % 4 !== 3 || a.dados[i] === 255), 'alfa opaco');
+  const ix = indicesTerreno(m, T); assert.equal(ix.largura, m.tamanho[0]); assert.equal(ix.altura, m.tamanho[1]);
+  const ag = mats.indexOf(T.agua.material); let aguaFunda = 0, aguaRasa = 0;
+  for (let i = 0; i < ix.dados.length; i += 4) { assert.ok(ix.dados[i] < mats.length && ix.dados[i + 1] < T.variantes); if (ix.dados[i] === ag) { if (ix.dados[i + 2] > 200) aguaFunda++; else if (ix.dados[i + 2] < 60) aguaRasa++; } }
+  assert.ok(aguaFunda > 0 && aguaRasa > 0, 'a água tem costa rasa e miolo fundo');
+  const [x, z] = [10, 10], mat = m.legenda[m.planta[z][x]]; assert.equal(mats[ix.dados[(z * ix.largura + x) * 4]], mat);
 });
 
 test('colisão do terreno: o herói não entra na água nem na montanha, mas anda na grama', () => {

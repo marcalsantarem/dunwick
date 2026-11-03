@@ -34,7 +34,9 @@ export function criarMateriais(T, perfil) {
       t = new THREE.CanvasTexture(cv);
     }
     materiais.brilho_saida = new THREE.MeshBasicMaterial({ map: t, color: 0xffe6a8, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
+    materiais.brilho_fria = materiais.brilho_saida.clone(); materiais.brilho_fria.color.set(0x7ad8c8); materiais.brilho_fria.opacity = 0.6; // luz fria que vaza da boca da caverna (sino_aqua)
   }
+  materiais.folha_mundo = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, flatShading: true }); materiais.folha_mundo.color.setRGB(1.35, 1.35, 1.25); // copas dos marcadores do mundo (a `folhagem` do kit depende da luz da vila e sai preta no mundo)
   materiais.folhagem.color.setRGB(1.75, 1.7, 1.55);
   materiais.folhagem.onBeforeCompile = (sh) => { // vento: balanço da copa pelo peso do vértice
     Object.assign(sh.uniforms, uniformesVento);

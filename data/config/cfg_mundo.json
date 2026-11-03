@@ -1,34 +1,135 @@
 {
   "id": "cfg_mundo",
-  "versao": 1,
-  "nota": "Mapa de mundo (tipo_mapa \"mundo\", v0.1.3). Câmera mais distante, terreno em tiles simples (textura de cores gerada da planta, filtro nearest), luz do `ambiente` do mapa (sem ciclo dia/noite e sem sombra). Paleta provisória: o 07/10 ajustam aqui.",
+  "versao": 3,
+  "nota": "Mapa de mundo (tipo_mapa \"mundo\"). v0.1.3b: terreno em shader com atlas de tiles pintado por código, transições automáticas entre materiais (prioridade maior invade o vizinho), água animada com espuma, sombras de nuvem; câmera, resolução do buffer e pós livres. Paleta provisória: 07/10 ajustam aqui.",
   "camera": {
-    "pixels_por_unidade": 14,
+    "pixels_por_unidade": 20,
     "giro_graus": 45,
-    "inclinacao_graus": 35
+    "inclinacao_graus": 35,
+    "arte": [
+      960,
+      540
+    ]
+  },
+  "pos": {
+    "dof": false,
+    "vinheta_extra": 0.05,
+    "saturacao": 0.97,
+    "contraste": 1.04
   },
   "ambiente_padrao": {
     "cor_luz": "#fff1d6",
     "intensidade": 1.15,
     "fundo": "#3f78a6",
-    "sol": { "cor": "#fff0cc", "intensidade": 1.4, "elevacao_graus": 50 }
+    "sol": {
+      "cor": "#fff0cc",
+      "intensidade": 1.4,
+      "elevacao_graus": 50
+    }
   },
   "terreno": {
-    "px_por_tile": 8,
-    "ruido": 0.07,
-    "variacao_tile": 0.08,
+    "px_por_tile": 16,
+    "variantes": 4,
+    "brilho": 1,
     "borda_tiles": 80,
     "borda_material": "agua",
+    "transicao": {
+      "vies": 0.035,
+      "ruido": 0.34,
+      "contorno": 0.72
+    },
+    "agua": {
+      "material": "agua",
+      "cor_rasa": "#66BCD2",
+      "cor_funda": "#245B84",
+      "cor_onda": "#7CCFD6",
+      "espuma": "#F6FAF4",
+      "brilhos": 0.0012
+    },
+    "nuvens": {
+      "ligado": true,
+      "intensidade": 0.26,
+      "escala": 0.04,
+      "limiar": 0.5,
+      "vento": [
+        0.5,
+        0.2
+      ]
+    },
     "materiais": {
-      "grama": { "cor": "#6aa04a" },
-      "mata_rala": { "cor": "#3f7038" },
-      "agua": { "cor": "#3f78a6" },
-      "estrada": { "cor": "#b88f5a" },
-      "montanha": { "cor": "#80776b" },
-      "areia": { "cor": "#d6c48c" },
-      "terra": { "cor": "#8a6340" },
-      "calcada": { "cor": "#a89c8e" },
-      "musgo": { "cor": "#4f7f4a" }
-    }
+      "agua": {
+        "cor": "#3f78a6",
+        "padrao": "agua",
+        "prioridade": 0
+      },
+      "areia": {
+        "cor": "#DEC48C",
+        "cor_b": "#C9AC74",
+        "cor_c": "#EEDBA8",
+        "padrao": "areia",
+        "prioridade": 1
+      },
+      "grama": {
+        "cor": "#5A9444",
+        "cor_b": "#3F7A3A",
+        "cor_c": "#78A85A",
+        "padrao": "relva",
+        "prioridade": 2,
+        "flor": "#F2E08A"
+      },
+      "mata_rala": {
+        "cor": "#255E36",
+        "cor_b": "#1A4829",
+        "cor_c": "#347A44",
+        "padrao": "folhas",
+        "prioridade": 3
+      },
+      "estrada": {
+        "cor": "#D2B47A",
+        "cor_b": "#A88650",
+        "cor_c": "#E8D4A0",
+        "padrao": "trilha",
+        "prioridade": 4
+      },
+      "montanha": {
+        "cor": "#6E6A76",
+        "cor_b": "#4E4A56",
+        "cor_c": "#908C96",
+        "padrao": "rocha",
+        "prioridade": 5
+      },
+      "terra": {
+        "cor": "#8a6340",
+        "cor_b": "#6c4a2e",
+        "cor_c": "#a87c52",
+        "padrao": "trilha",
+        "prioridade": 4
+      },
+      "calcada": {
+        "cor": "#a89c8e",
+        "cor_b": "#867b6f",
+        "cor_c": "#c4baad",
+        "padrao": "rocha",
+        "prioridade": 4
+      },
+      "musgo": {
+        "cor": "#3F7F52",
+        "cor_b": "#2B6232",
+        "cor_c": "#68A064",
+        "padrao": "relva",
+        "prioridade": 2
+      }
+    },
+    "variacao_zona": 0.2
+  },
+  "relevo": {
+    "ligado": true,
+    "px_relevo": 16,
+    "altura_montanha": 0.5,
+    "neve": 0.62,
+    "celulas_por_tile": 3,
+    "densidade": 1,
+    "sombra_nuvem": 0.2,
+    "floresta": true
   }
 }

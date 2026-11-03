@@ -1,0 +1,518 @@
+{
+  "id": "paleta_mundo",
+  "versao": "1.0.0-rascunho",
+  "status": "provisoria",
+  "aviso": "Paleta do MAPA DE MUNDO (D-046, 10). Dia claro com toque quente; variações por região via grade de cor e névoa, não por trocar rampas. Rampas de material do jogo (madeira, telha, reboco, ardósia, brilho) repetem a paleta mestra para os marcadores combinarem com a vila.",
+  "base": "dia claro (direção C) com sombra azul-esverdeada e luz quente da direção A",
+  "regras": {
+    "sombra": "rgba(14,34,48,0.38) para sombras projetadas; nunca preto",
+    "nuvem": "sombra de nuvem rgba(16,40,60,0.18) multiplicada sobre o terreno, deslocando-se ~0,4 tile/s na diagonal",
+    "reservadas": "brilho_*: marcadores ativos e interativos; sino_aqua_*: só o Sino de Cobre; perigo (magenta) não aparece no mapa de mundo",
+    "orcamento": "sem limite de cores por sprite; cada material usa 3–6 passos da própria rampa"
+  },
+  "rampas": [
+    {
+      "nome": "agua_funda",
+      "cores": [
+        {
+          "id": "agua_funda_1",
+          "hex": "#12304F"
+        },
+        {
+          "id": "agua_funda_2",
+          "hex": "#1B4468"
+        },
+        {
+          "id": "agua_funda_3",
+          "hex": "#245B84"
+        },
+        {
+          "id": "agua_funda_4",
+          "hex": "#2E749E"
+        }
+      ]
+    },
+    {
+      "nome": "agua_media",
+      "cores": [
+        {
+          "id": "agua_media_1",
+          "hex": "#3A8CB8"
+        },
+        {
+          "id": "agua_media_2",
+          "hex": "#4FA6C8"
+        },
+        {
+          "id": "agua_media_3",
+          "hex": "#66BCD2"
+        }
+      ]
+    },
+    {
+      "nome": "agua_rasa",
+      "cores": [
+        {
+          "id": "agua_rasa_1",
+          "hex": "#7CCFD6"
+        },
+        {
+          "id": "agua_rasa_2",
+          "hex": "#9FE1DE"
+        },
+        {
+          "id": "agua_rasa_3",
+          "hex": "#C4F1EA"
+        }
+      ]
+    },
+    {
+      "nome": "espuma",
+      "cores": [
+        {
+          "id": "espuma_1",
+          "hex": "#DDF3F0"
+        },
+        {
+          "id": "espuma_2",
+          "hex": "#F4FCFA"
+        },
+        {
+          "id": "espuma_3",
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "nome": "areia",
+      "cores": [
+        {
+          "id": "areia_1",
+          "hex": "#A8875A"
+        },
+        {
+          "id": "areia_2",
+          "hex": "#C9AC74"
+        },
+        {
+          "id": "areia_3",
+          "hex": "#DEC48C"
+        },
+        {
+          "id": "areia_4",
+          "hex": "#EEDBA8"
+        },
+        {
+          "id": "areia_5",
+          "hex": "#F8EDC8"
+        }
+      ]
+    },
+    {
+      "nome": "grama",
+      "cores": [
+        {
+          "id": "grama_1",
+          "hex": "#2B6232"
+        },
+        {
+          "id": "grama_2",
+          "hex": "#3A7F3A"
+        },
+        {
+          "id": "grama_3",
+          "hex": "#4E9A44"
+        },
+        {
+          "id": "grama_4",
+          "hex": "#68B250"
+        },
+        {
+          "id": "grama_5",
+          "hex": "#86C862"
+        },
+        {
+          "id": "grama_6",
+          "hex": "#A8DC80"
+        }
+      ]
+    },
+    {
+      "nome": "prado_seco",
+      "cores": [
+        {
+          "id": "prado_seco_1",
+          "hex": "#8A9A48"
+        },
+        {
+          "id": "prado_seco_2",
+          "hex": "#A8B458"
+        },
+        {
+          "id": "prado_seco_3",
+          "hex": "#C4C872"
+        }
+      ]
+    },
+    {
+      "nome": "mata",
+      "cores": [
+        {
+          "id": "mata_1",
+          "hex": "#10301C"
+        },
+        {
+          "id": "mata_2",
+          "hex": "#1A4829"
+        },
+        {
+          "id": "mata_3",
+          "hex": "#255E36"
+        },
+        {
+          "id": "mata_4",
+          "hex": "#347A44"
+        },
+        {
+          "id": "mata_5",
+          "hex": "#4C9656"
+        }
+      ]
+    },
+    {
+      "nome": "pinheiro",
+      "cores": [
+        {
+          "id": "pinheiro_1",
+          "hex": "#0F332E"
+        },
+        {
+          "id": "pinheiro_2",
+          "hex": "#18493F"
+        },
+        {
+          "id": "pinheiro_3",
+          "hex": "#256050"
+        },
+        {
+          "id": "pinheiro_4",
+          "hex": "#3E8068"
+        }
+      ]
+    },
+    {
+      "nome": "outono",
+      "cores": [
+        {
+          "id": "outono_1",
+          "hex": "#A85A22"
+        },
+        {
+          "id": "outono_2",
+          "hex": "#CC7C30"
+        },
+        {
+          "id": "outono_3",
+          "hex": "#E8A044"
+        }
+      ]
+    },
+    {
+      "nome": "cultivo",
+      "cores": [
+        {
+          "id": "cultivo_1",
+          "hex": "#5E3E22"
+        },
+        {
+          "id": "cultivo_2",
+          "hex": "#7A5430"
+        },
+        {
+          "id": "cultivo_3",
+          "hex": "#9A7040"
+        },
+        {
+          "id": "cultivo_4",
+          "hex": "#B8904E"
+        }
+      ]
+    },
+    {
+      "nome": "estrada",
+      "cores": [
+        {
+          "id": "estrada_1",
+          "hex": "#7A5A34"
+        },
+        {
+          "id": "estrada_2",
+          "hex": "#A88650"
+        },
+        {
+          "id": "estrada_3",
+          "hex": "#D2B47A"
+        },
+        {
+          "id": "estrada_4",
+          "hex": "#E8D4A0"
+        },
+        {
+          "id": "estrada_5",
+          "hex": "#F6E8C4"
+        }
+      ]
+    },
+    {
+      "nome": "rocha",
+      "cores": [
+        {
+          "id": "rocha_1",
+          "hex": "#34303A"
+        },
+        {
+          "id": "rocha_2",
+          "hex": "#4E4A56"
+        },
+        {
+          "id": "rocha_3",
+          "hex": "#6E6A76"
+        },
+        {
+          "id": "rocha_4",
+          "hex": "#908C96"
+        },
+        {
+          "id": "rocha_5",
+          "hex": "#B4B0BA"
+        },
+        {
+          "id": "rocha_6",
+          "hex": "#D2CED6"
+        }
+      ]
+    },
+    {
+      "nome": "rocha_quente",
+      "cores": [
+        {
+          "id": "rocha_quente_1",
+          "hex": "#5A4438"
+        },
+        {
+          "id": "rocha_quente_2",
+          "hex": "#7C6252"
+        },
+        {
+          "id": "rocha_quente_3",
+          "hex": "#9E8470"
+        },
+        {
+          "id": "rocha_quente_4",
+          "hex": "#BEA690"
+        }
+      ]
+    },
+    {
+      "nome": "neve",
+      "cores": [
+        {
+          "id": "neve_1",
+          "hex": "#8EA4C4"
+        },
+        {
+          "id": "neve_2",
+          "hex": "#C0D0E6"
+        },
+        {
+          "id": "neve_3",
+          "hex": "#E4ECF8"
+        },
+        {
+          "id": "neve_4",
+          "hex": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "nome": "madeira",
+      "cores": [
+        {
+          "id": "madeira_1",
+          "hex": "#2C1A12"
+        },
+        {
+          "id": "madeira_2",
+          "hex": "#4A2E1A"
+        },
+        {
+          "id": "madeira_3",
+          "hex": "#6B4428"
+        },
+        {
+          "id": "madeira_4",
+          "hex": "#8A5A34"
+        }
+      ]
+    },
+    {
+      "nome": "telha",
+      "cores": [
+        {
+          "id": "telha_1",
+          "hex": "#7A3A20"
+        },
+        {
+          "id": "telha_2",
+          "hex": "#9E4B2A"
+        },
+        {
+          "id": "telha_3",
+          "hex": "#C2643A"
+        },
+        {
+          "id": "telha_4",
+          "hex": "#DC8250"
+        }
+      ]
+    },
+    {
+      "nome": "reboco",
+      "cores": [
+        {
+          "id": "reboco_1",
+          "hex": "#B8A886"
+        },
+        {
+          "id": "reboco_2",
+          "hex": "#D6C7A6"
+        },
+        {
+          "id": "reboco_3",
+          "hex": "#E8DCC0"
+        },
+        {
+          "id": "reboco_4",
+          "hex": "#F6EFDC"
+        }
+      ]
+    },
+    {
+      "nome": "ardosia",
+      "cores": [
+        {
+          "id": "ardosia_1",
+          "hex": "#2E3A52"
+        },
+        {
+          "id": "ardosia_2",
+          "hex": "#42547A"
+        },
+        {
+          "id": "ardosia_3",
+          "hex": "#5C70A0"
+        }
+      ]
+    },
+    {
+      "nome": "fumaca",
+      "cores": [
+        {
+          "id": "fumaca_1",
+          "hex": "#9A9AA2"
+        },
+        {
+          "id": "fumaca_2",
+          "hex": "#C4C4CA"
+        },
+        {
+          "id": "fumaca_3",
+          "hex": "#E6E6EA"
+        }
+      ]
+    },
+    {
+      "nome": "brilho",
+      "cores": [
+        {
+          "id": "brilho_1",
+          "hex": "#F5CB70"
+        },
+        {
+          "id": "brilho_2",
+          "hex": "#FFE38D"
+        },
+        {
+          "id": "brilho_3",
+          "hex": "#FFFAD8"
+        }
+      ]
+    },
+    {
+      "nome": "sino_aqua",
+      "cores": [
+        {
+          "id": "sino_aqua_1",
+          "hex": "#1E5A5A"
+        },
+        {
+          "id": "sino_aqua_2",
+          "hex": "#3A9A92"
+        },
+        {
+          "id": "sino_aqua_3",
+          "hex": "#7AD8C8"
+        }
+      ]
+    },
+    {
+      "nome": "sombra_mundo",
+      "cores": [
+        {
+          "id": "sombra_mundo_1",
+          "hex": "#0E2230"
+        },
+        {
+          "id": "sombra_mundo_2",
+          "hex": "#173544"
+        },
+        {
+          "id": "sombra_mundo_3",
+          "hex": "#244A56"
+        }
+      ]
+    }
+  ],
+  "cor_assinatura_heroi_mundo": {
+    "gibao": "#2C524C",
+    "contorno": "#14201E",
+    "observacao": "gibão musgo azulado escuro; 1 px de contorno escuro e sombra elíptica sob os pés"
+  },
+  "validacao": {
+    "erros": [],
+    "avisos": [],
+    "relatorio": [
+      "Total: 89 cores em 23 rampas",
+      "herói (gibão) x grama_3: ΔL 0.209 (mín 0.17)",
+      "herói (gibão) x grama_4: ΔL 0.285 (mín 0.17)",
+      "herói (gibão) x grama_5: ΔL 0.357 (mín 0.17)",
+      "herói (gibão) x estrada_3: ΔL 0.374 (mín 0.17)",
+      "herói (gibão) x areia_3: ΔL 0.421 (mín 0.17)",
+      "herói (gibão) x prado_seco_2: ΔL 0.332 (mín 0.17)",
+      "estrada_4 (corpo da estrada) x grama_4: ΔE (4 modos) 0.151 (mín 0.1)",
+      "estrada_4 x grama_4 (valor): ΔL 0.181 (mín 0.1)",
+      "estrada_4 x prado_seco_2 (valor): ΔL 0.133 (mín 0.08)",
+      "areia_3 x agua_rasa_1: ΔE (4 modos) 0.101 (mín 0.1)",
+      "grama_4 x areia_3: ΔE (4 modos) 0.104 (mín 0.1)",
+      "rocha_3 x grama_4: ΔE (4 modos) 0.181 (mín 0.12)",
+      "mata_3 x grama_4 (floresta densa lê-se como bloqueio): ΔL 0.260 (mín 0.12)",
+      "agua_funda_3 x grama_4: ΔE (4 modos) 0.235 (mín 0.12)",
+      "brilho_1 x grama_4: ΔE (4 modos) 0.118 (mín 0.08)",
+      "Nota: brilho sobre estrada clara e telha_4 (lado luz) sobre grama têm o mesmo valor do fundo; todo marcador leva contorno escuro de 1 px (sombra_mundo_1) e sombra projetada.",
+      "Nota: brilho sobre areia (ΔE baixo) exige contorno escuro (`sombra_mundo_1`) no marcador; não depende da cor.",
+      "telha_2 (lado sombra) x grama_4 (valor): ΔL 0.181 (mín 0.1)",
+      "neve_3 x rocha_3: ΔL 0.409 (mín 0.12)",
+      "Contraste texto do banner (branco) x sombra_mundo_1: 16.3:1"
+    ]
+  }
+}

@@ -5,7 +5,7 @@
   "sprite": "hero_edric",
   "escala_mapa": 0.7,
   "sprite_mundo": "hero_edric_mundo",
-  "escala_mundo": 1,
+  "escala_mundo": 1.5,
   "movimento": {
     "vel_andar": 3.5,
     "vel_correr": 6.0,

@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { criarSolo } from './solo.js';
 import { criarTerrenoMundo } from './terreno_mundo.js';
+import { criarRelevoMundo } from './terreno_mundo_relevo.js';
 import { construirKit } from './kit.js';
 import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
@@ -24,10 +25,11 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const cena = new THREE.Scene(); cena.background = new THREE.Color(0x202838); cena.fog = new THREE.Fog(0x202838, cfg.camera.distancia + 8, cfg.camera.distancia + 70); if (interior || mundoT) { cena.fog.near = 1e5; cena.fog.far = 2e5; }
 
   // ---------- câmera ortográfica isométrica: a área visível em unidades do mundo é fixa (arte/32); a resolução só muda a nitidez ----------
-  const [aw, ah] = cfg.resolucao.arte, meioW = aw / ppuCam / 2, meioH = ah / ppuCam / 2, giro = (mundoT ? cfgM.camera.giro_graus : cfg.camera.giro_graus) * RAD, incl = (mundoT ? cfgM.camera.inclinacao_graus : cfg.camera.inclinacao_graus) * RAD;
+  const [aw, ah] = (mundoT && cfgM.camera.arte) || cfg.resolucao.arte, meioW = aw / ppuCam / 2, meioH = ah / ppuCam / 2, giro = (mundoT ? cfgM.camera.giro_graus : cfg.camera.giro_graus) * RAD, incl = (mundoT ? cfgM.camera.inclinacao_graus : cfg.camera.inclinacao_graus) * RAD;
   const camera = new THREE.OrthographicCamera(-meioW, meioW, meioH, -meioH, cfg.camera.near, cfg.camera.far);
   const offset = new THREE.Vector3(Math.cos(incl) * Math.sin(giro), Math.sin(incl), Math.cos(incl) * Math.cos(giro)).multiplyScalar(cfg.camera.distancia);
   const alvoCam = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
+  if (incl > 80 * RAD) camera.up.set(-Math.sin(giro), 0, -Math.cos(giro)); // de cima (top-down): "cima da tela" = para o norte do mundo, sem degenerar o lookAt
   camera.position.copy(offset); camera.lookAt(0, 0, 0); camera.updateMatrixWorld();
   const quatCamera = camera.quaternion.clone(), direita = new THREE.Vector3(1, 0, 0).applyQuaternion(quatCamera), cima = new THREE.Vector3(0, 1, 0).applyQuaternion(quatCamera);
   /** Cola um ponto do mundo à grade do pixel de arte (1/32 de unidade) no plano da imagem; a profundidade não muda. */
@@ -37,10 +39,10 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   camera.quaternion.copy(quatCamera);
 
   // ---------- chão e kit ----------
-  const solo = mundoT ? criarTerrenoMundo(mapaDados, cfgM.terreno, perfil) : criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha);
+  const solo = mundoT ? criarTerrenoMundo(mapaDados, cfgM.terreno, perfil, (() => { const l = ecInterior.hemiCeu, mx = Math.max(...l, 1e-6); return l.map((x) => x / mx); })()) : criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha); if (mundoT && cfgM.relevo?.ligado) cena.add(criarRelevoMundo(mapaDados, cfgM.relevo, { reduzirMovimento: opcoes.reduzirMovimento, densidade: perfil.id === 'perfil_baixo' ? 0.55 : perfil.id === 'perfil_medio' ? 0.8 : 1 }).malha); // montanhas em 3D e floresta (07)
   const kit = construirKit(mapaDados, kitDados, texelsPorTile);
   const T = recursos.texturas, { materiais, uniformesVento } = criarMateriais(T, perfil);
-  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = nome !== 'brilho_saida'; m.receiveShadow = nome !== 'brilho_saida'; m.name = `kit_${nome}`; cena.add(m); }
+  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = !nome.startsWith('brilho_'); m.receiveShadow = !nome.startsWith('brilho_'); m.name = `kit_${nome}`; cena.add(m); }
   if (interior) for (const m of paredesInterior(mapaDados, materiais, texelsPorTile)) cena.add(m); // paredes de trás inteiras; as da frente somem (rodapé)
 
   // ---------- luz: hemisférica + sol com sombra (direção fixa na tela; a hora muda cor/altura/intensidade) + lanternas ----------
@@ -83,14 +85,14 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const reduzirMov = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
 
   // ---------- estado visual do ciclo (lido pelo pós) ----------
-  const visual = { tom: [1, 1, 1], luzArtificial: 0, fundo: [0, 0, 0], ciclo: null };
+  const visual = { tom: [1, 1, 1], luzArtificial: 0, fundo: [0, 0, 0], ciclo: null, pos: mundoT ? cfgM.pos ?? null : null }; // `pos` (mundo): dof/vinheta/saturação/contraste do cfg_mundo
   const _v = new THREE.Vector3(), lerp = (a, b, t) => a + (b - a) * t, cor = (c) => new THREE.Color(c[0], c[1], c[2]);
   const reuniao = lanternas.map((l) => new THREE.Vector3(l.x, l.y, l.z));
 
   function atualizar(alfa, tempoS, dtS = 0.016) {
     const { camera: cam, heroi } = mundo, cx = lerp(cam.ox, cam.x, alfa), cz = lerp(cam.oz, cam.z, alfa);
     posicionarCamera(cx, cz);
-    const ec = ecInterior ?? estadoCiclo(ciclo, mundo.hora); visual.tom = ec.tom; visual.luzArtificial = ec.luzArtificial; visual.ciclo = ec;
+    solo.atualizar?.(tempoS); const ec = ecInterior ?? estadoCiclo(ciclo, mundo.hora); visual.tom = ec.tom; visual.luzArtificial = ec.luzArtificial; visual.ciclo = ec;
     sol.color.setRGB(...ec.solCor); sol.intensity = ec.solInt; posicionarSol(cx, cz, ec.solElev); hemi.color.setRGB(...ec.hemiCeu); hemi.groundColor.setRGB(...ec.hemiChao); hemi.intensity = ec.hemiInt;
     cena.background.setRGB(...ec.fundo); cena.fog.color.setRGB(...ec.nevoa);
     materiais.janela.emissiveIntensity = ec.luzArtificial * 1.6; materiais.lampada.emissiveIntensity = Math.max(0.15, ec.luzArtificial) * 2.4; uniformesVento.uTempo.value = tempoS;
@@ -135,7 +137,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   }
   /** Perfil de qualidade (dados): sombras, anisotropia, partículas, alpha-to-coverage dos sprites. */
   function aplicarPerfil(p) {
-    perfil = p; const liga = p.sombra_sol_px > 0 && !mundoT; sol.castShadow = liga;
+    perfil = p; solo.aplicarPerfil?.(p); const liga = p.sombra_sol_px > 0 && !mundoT; sol.castShadow = liga;
     if (sol.shadow.mapSize.x !== p.sombra_sol_px && liga) { sol.shadow.mapSize.set(p.sombra_sol_px, p.sombra_sol_px); sol.shadow.map?.dispose(); sol.shadow.map = null; } if (!liga) { sol.shadow.map?.dispose(); sol.shadow.map = null; }
     for (const m of Object.values(materiais)) if (m.map) m.map.anisotropy = p.aniso; for (const t of Object.values(T)) t.anisotropy = p.aniso;
     for (const a of atores) { a.sprite.malha.material.alphaToCoverage = p.msaa > 0; a.sprite.malha.material.alphaTest = p.msaa > 0 ? 0.01 : 0.45; a.sprite.malha.material.needsUpdate = true; }
@@ -144,5 +146,5 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   }
   /** Abre/fecha a tampa do baú de tesouro `id`; `instantaneo` pula a animação. Devolve false se não existe nesta cena. */
   const definirBau = (id, aberto, instantaneo = false) => { const q = baus.get(id); if (!q) return false; q.alvo = aberto ? 1 : 0; if (instantaneo) { q.t = q.alvo; q.b.definir(q.t); } return true; };
-  return { cena, camera, atualizar, definirBau, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
+  return { cena, camera, arte: [aw, ah], atualizar, definirBau, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
 }

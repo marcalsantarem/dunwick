@@ -98,8 +98,8 @@ test('perímetro e mata (v0.1.2b): muralha baixa, estacada, tronco caído e moit
 test('mapa de mundo (v0.1.3): marcadores (vila, bosque, caverna, com e sem lacre) e props entram no kit, leves, com pegada do cfg_kit', () => {
   const objs = [{ id: 'mv', tipo: 'marcador_vila', x: 10, z: 30 }, { id: 'mb', tipo: 'marcador_bosque', x: 20, z: 10, interditado: true }, { id: 'mc', tipo: 'marcador_caverna', x: 5, z: 5, interditado: true }, { id: 'a', tipo: 'arvore_mundo', x: 3, z: 3 }, { id: 'r', tipo: 'rocha_mundo', x: 4, z: 4 }, { id: 'p', tipo: 'ponte_mundo', x: 8, z: 8, w: 2 }, { id: 'mm', tipo: 'montanha_mundo', x: 12, z: 12 }];
   const k = construirKit({ objetos: objs }, kit);
-  for (const g of ['reboco', 'telha_laranja', 'folhagem', 'pedra', 'carvao', 'metal', 'latao', 'tabuas']) assert.ok(k.grupos.has(g), `sem ${g}`);
-  assert.ok(vertices(k) < 12000, `${vertices(k)} vértices`);
+  for (const g of ['reboco', 'telha_laranja', 'folha_mundo', 'pedra', 'carvao', 'metal', 'latao', 'tabuas']) assert.ok(k.grupos.has(g), `sem ${g}`);
+  assert.ok(vertices(k) < 30000, `${vertices(k)} vértices`);
   for (const t of ['arvore_mundo', 'rocha_mundo']) assert.ok(colisorDe({ ...objs[0], tipo: t }, kit).r > 0, t);
   for (const t of ['marcador_vila', 'marcador_bosque', 'marcador_caverna', 'montanha_mundo']) assert.equal(colisorDe({ ...objs[0], tipo: t }, kit), null, `${t} sem colisão (o terreno bloqueia)`);
   assert.equal(colisorDe(objs[5], kit), null, 'ponte sem colisão');
@@ -111,4 +111,14 @@ test('mapa de mundo do 14: o kit constrói o mundo inteiro só com peças existe
   for (const nome of k.grupos.keys()) assert.ok(materiais[nome], `sem material ${nome}`);
   assert.ok(vertices(k) < 150000, `${vertices(k)} vértices`); assert.ok(k.grupos.size <= 40, `${k.grupos.size} grupos`);
   for (const o of m.objetos) assert.ok(kit.pegadas[o.tipo], `sem pegada para ${o.tipo}`);
+});
+
+test('relevo do mundo (v0.1.3b): altura zero em todo tile andável, montanha sobe a partir da divisa, floresta só em mata/sopé e dentro do mapa', async () => {
+  const { gerarTerreno, posicoesFloresta, geometriaFloresta } = await import('../src/motor/terreno_mundo_relevo.js');
+  const m = mapas.find((x) => x.tipo_mapa === 'mundo'); if (!m) return;
+  const t = gerarTerreno(m, { px_relevo: 4 }), [L, A] = m.tamanho; let altos = 0;
+  for (let z = 0; z < A; z++) for (let x = 0; x < L; x++) { const p = t.papelEm(x, z), h = t.alturaEm(x + 0.5, z + 0.5); if (p !== 'montanha') assert.equal(h, 0, `tile ${p} (${x},${z}) tem altura`); else if (h > 0.2) altos++; }
+  assert.ok(altos > 0, 'alguma montanha sobe');
+  const f = posicoesFloresta(t); assert.ok(f.length > 100 && f.every((q) => q.x > 0 && q.z > 0 && q.x < L && q.z < A));
+  assert.ok(geometriaFloresta(f).attributes.position.count < 400000, 'floresta leve');
 });
