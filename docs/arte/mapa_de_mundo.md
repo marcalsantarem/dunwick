@@ -339,3 +339,17 @@ Capturas: `mundo_vila.png`, `mundo_bosque.png`, `mundo_caverna.png` (câmera 26 
 **P2 (já pedido, em ordem):** R7 cordilheira (a montanha ainda é uma encosta lisa com neve só na crista), R8 brilhos alongados na água, R12 variedade (bétula, outono, rochas com musgo, cultivo), R13 colinas, R14 moldura; **fim de tarde** com luz dourada e sombras longas (hoje só escurece); ponte com tabuado e sombra na água.
 
 **Atualização (2026-11-03, 08):** o 08 já aplicou `pixels_por_unidade` = 20 e `escala_mundo` do herói = 1,5 (pendência **R6** atendida; falta eu ver a captura) e confirmou o terreno em shader com fronteira orgânica por campo de pesos + ruído + contorno fino, também na mata. Restam as pendências (b) bosque legível e (c) faixa diagonal e "estrelas" na água.
+
+## 17. Parecer final do visual (10, 2026-11-03) — **APROVADO COM RESSALVAS**
+
+Base: capturas `mundo_n14_vila.png` e `mundo_n14_bosque.png` (câmera isométrica, ppu 20, `paleta_mundo.json` em `cfg_mundo.json`). Doc ajustado à isométrica (D-048) e à paleta realmente usada.
+
+**Aprovado:** composição (ilha, costa recortada, rio com ponte, lago, estrada), florestas em massa com copas sobrepostas, cordilheira com neve e sombra, bordas orgânicas do terreno, marcadores com leitura de forma, paleta (validada em 3 modos de daltonismo).
+
+**Ressalvas (não bloqueiam a v0.1.3; vão para P2/polimento):**
+1. **Marcadores escuros:** a caverna e o marcador à direita ainda leem como mancha preta (R1). Pedir tom `rocha`/`sombra_mundo` com contorno claro e boca com `sino_aqua`.
+2. **Espuma/"neve" na água:** os flocos claros repetidos por todo o mar parecem ruído; reduzir densidade e opacidade, deixar espuma só junto da costa, e remover pontos tipo "estrela".
+3. **Herói:** ainda pequeno nestas capturas (verificar a escala 20 ppu × 1,5 em jogo e manter halo/contorno).
+4. **Mar fora da ilha:** plano e escuro; adicionar gradiente de profundidade, névoa de horizonte e moldura (R14).
+5. **Grama:** verde muito saturado e uniforme; aplicar manchas de prado seco/flores (R2/R12).
+6. **Costa em degraus:** o "diamante" de água rasa denuncia a grade; suavizar com o mesmo campo de pesos do terreno.

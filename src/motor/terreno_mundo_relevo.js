@@ -88,7 +88,7 @@ export function gerarTerreno(mapaDados, cfgT = {}) {
     } else if (venc === 'montanha') {
       const h = alturaEm(x, z), luz = luzDe(x, z), estrato = Math.sin((h * 9 + fbm(x * 4, z * 4, semente + 40) * 3) * 3) * 0.05, rocha = tom(escolher(cores.rocha, fbm(x * 5, z * 5, semente + 41)), 1);
       const l = lim(0.5 + luz * 0.65 + estrato, 0, 1.05); cor = l > 0.5 ? misturar(rocha, cores.luz, (l - 0.5) * 1.5) : misturar(cores.sombra, rocha, l * 2);
-      const sopé = 1 - lim(h / (alturaMax * 0.2) + (fbm(x * 6, z * 6, semente + 42) - 0.5) * 0.7); if (sopé > 0.3) cor = misturar(cor, tom(cores.sopé, 0.8 + 0.3 * l), lim((sopé - 0.3) / 0.5));
+      const sopé = 1 - lim(h / (alturaMax * 0.34) + (fbm(x * 6, z * 6, semente + 42) - 0.5) * 0.6); if (sopé > 0.2) { const verde = misturar(tom(cores.sopé, 0.62), tom(escolher(cores.grama, fbm(x * 4, z * 4, semente + 44)), 1.08), lim(l * 1.1)); cor = misturar(cor, verde, lim((sopé - 0.2) / 0.35)); } // COLINAS: encosta baixa verde, redonda, com luz de forma
       const neve = (h - limiteNeve) / (alturaMax * 0.1) + (fbm(x * 7, z * 7, semente + 43) - 0.5) * 1.2; if (neve > 0) cor = misturar(cor, tom(cores.neve, 0.78 + 0.28 * lim(luz + 0.4)), lim(neve));
       cor = tom(cor, 0.96 + fino * 0.08);
     } else {
@@ -165,6 +165,44 @@ export function geometriaFloresta(posicoes) {
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(cor, 3)); return geo;
 }
 
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------
+/** Campos de cultivo (R12): até 3 canteiros de 3×2 tiles em grama plana perto da vila, com sulcos de terra e fileiras de plantas (trigo, repolho, abóbora). Não bloqueiam: ficam rente ao chão. */
+export function camposCultivo(t, vila, dens = 1) {
+  const { L, A, papelEm, semente } = t, pos = [], nor = [], cor = [], achados = [];
+  const livre = (x0, z0, w, d) => { for (let j = -1; j <= d; j++) for (let i = -1; i <= w; i++) { const p = papelEm(x0 + i, z0 + j); if (p !== 'grama') return false; } return true; };
+  for (let r = 4; r <= 9 && achados.length < Math.max(1, Math.round(3 * dens)); r++) for (let a = 0; a < 16 && achados.length < 3; a++) {
+    const ang = (a / 16) * Math.PI * 2 + r * 0.7, x0 = Math.round(vila.x + Math.cos(ang) * r) - 1, z0 = Math.round(vila.z + Math.sin(ang) * r * 0.8) - 1, w = a % 2 ? 3 : 2, d = a % 2 ? 2 : 3;
+    if (x0 < 1 || z0 < 1 || x0 + w >= L - 1 || z0 + d >= A - 1 || !livre(x0, z0, w, d) || achados.some((q) => Math.abs(q.x0 - x0) < 5 && Math.abs(q.z0 - z0) < 5)) continue;
+    achados.push({ x0, z0, w, d });
+  }
+  if (!achados.length) return null;
+  const caixa = (cx, cy, cz, sx, sy, sz, c) => { const g = new THREE.BoxGeometry(sx, sy, sz).translate(cx, cy, cz).toNonIndexed(); g.computeVertexNormals(); const p = g.attributes.position.array, n = g.attributes.normal.array; for (let i = 0; i < p.length; i += 3) { pos.push(p[i], p[i + 1], p[i + 2]); nor.push(n[i], n[i + 1], n[i + 2]); const k = 0.92 + (p[i + 1] - cy) / sy * 0.2; cor.push(c[0] * k, c[1] * k, c[2] * k); } g.dispose(); };
+  const CULT = [[0.9, 0.78, 0.3], [0.38, 0.62, 0.22], [0.9, 0.5, 0.15]];
+  achados.forEach((c, n) => {
+    const cult = CULT[n % CULT.length], alongaX = c.w >= c.d;
+    caixa(c.x0 + c.w / 2, 0.015, c.z0 + c.d / 2, c.w, 0.03, c.d, [0.45, 0.31, 0.2]); // terra arada
+    const linhas = alongaX ? c.d * 2 : c.w * 2;
+    for (let l = 0; l < linhas; l++) {
+      const off = (l + 0.5) / 2, passos = (alongaX ? c.w : c.d) * 3;
+      caixa(alongaX ? c.x0 + c.w / 2 : c.x0 + off, 0.045, alongaX ? c.z0 + off : c.z0 + c.d / 2, alongaX ? c.w - 0.1 : 0.12, 0.03, alongaX ? 0.12 : c.d - 0.1, [0.36, 0.24, 0.15]); // sulco
+      for (let k = 0; k < passos; k++) { const u = (k + 0.5) / 3, hh = 0.1 + hash(c.x0 + k, c.z0 + l, semente) * 0.1; caixa(alongaX ? c.x0 + u : c.x0 + off, 0.06 + hh / 2, alongaX ? c.z0 + off : c.z0 + u, 0.11, hh, 0.11, cult); }
+    }
+    const cx = c.x0 - 0.15, cz = c.z0 + c.d / 2; for (let k = 0; k < c.d * 2; k++) caixa(cx, 0.1, c.z0 + k / 2 + 0.2, 0.05, 0.2, 0.05, [0.4, 0.3, 0.2]); // estacas da cerca
+  });
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(cor, 3)); return geo;
+}
+
+/** Moldura (R14): anel de nuvens baixas fora do mapa, mais densas nos cantos, que esconde a borda seca do diorama. */
+export function geometriaMoldura(L, A, semente = 11) {
+  const pos = [], nor = [];
+  const nuvem = (cx, cz, e, y) => { for (let k = 0; k < 3; k++) { const g = new THREE.IcosahedronGeometry(e * (0.7 + 0.3 * hash(k, cx | 0, semente)), 0); g.scale(1.5, 0.45, 1.1); g.translate(cx + (k - 1) * e * 0.8, y + k * 0.03, cz + (hash(k, cz | 0, semente) - 0.5) * e); const ni = g.toNonIndexed(); ni.computeVertexNormals(); pos.push(...ni.attributes.position.array); nor.push(...ni.attributes.normal.array); g.dispose(); ni.dispose(); } };
+  const passo = 2.0; for (let camada = 0; camada < 2; camada++) { const f = camada * 1.4 + 1.6;
+    for (let x = -3; x <= L + 3; x += passo) { nuvem(x + hash(x, 1, semente) * 1.2, -f - hash(x, 2, semente) * 0.8, 1.4 + hash(x, 3, semente) * 0.6, 0.4 + camada * 0.15); nuvem(x + hash(x, 4, semente) * 1.2, A + f + hash(x, 5, semente) * 0.8, 1.4 + hash(x, 6, semente) * 0.6, 0.4 + camada * 0.15); }
+    for (let z = -1; z <= A + 1; z += passo) { nuvem(-f - hash(z, 7, semente) * 0.8, z + hash(z, 8, semente) * 1.2, 1.4 + hash(z, 9, semente) * 0.6, 0.4 + camada * 0.15); nuvem(L + f + hash(z, 10, semente) * 0.8, z + hash(z, 11, semente) * 1.2, 1.4 + hash(z, 12, semente) * 0.6, 0.4 + camada * 0.15); } }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); return geo;
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------
 const GLSL_RUIDO = `
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -215,8 +253,12 @@ export function criarRelevoMundo(mapaDados, cfgR = {}, opcoes = {}) {
     const matF = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, flatShading: true }); aplicarEfeitos(matF, uniformes, { terreno: false });
     const f = new THREE.Mesh(geometriaFloresta(posicoesFloresta(t, { ...cfgR, densidade: (cfgR.densidade ?? 1) * (opcoes.densidade ?? 1), evitar: (mapaDados.objetos ?? []).filter((o) => RAIO_CLAREIRA[o.tipo]).map((o) => ({ x: o.x, z: o.z, r: RAIO_CLAREIRA[o.tipo] })) })), matF); f.name = 'floresta_mundo'; grupo.add(f);
   }
+  const vila = (mapaDados.objetos ?? []).find((o) => o.tipo === 'marcador_vila');
+  if (cfgR.campos !== false && vila) { const c = camposCultivo(t, vila, (cfgR.densidade ?? 1) * (opcoes.densidade ?? 1)); if (c) { const mc = new THREE.Mesh(c, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })); mc.name = 'campos_mundo'; mc.receiveShadow = false; grupo.add(mc); } }
+  let nuvens = null; // moldura de nuvens: opcional (`cfg_mundo.relevo.moldura`), desligada por padrão
+  if (cfgR.moldura === true) {  nuvens = new THREE.Mesh(geometriaMoldura(L, A, t.semente), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xb8c8d8, emissiveIntensity: 0.3, roughness: 1, flatShading: false, transparent: true, opacity: 0.15, depthWrite: false })); nuvens.name = 'moldura_mundo'; nuvens.renderOrder = 5; grupo.add(nuvens); }
   let parado = false, t0 = 0; const lerParado = () => parado || !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
-  grupo.onBeforeRender = () => { if (!lerParado()) t0 = (typeof performance !== 'undefined' ? performance.now() : 0) / 1000; uniformes.uTempo.value = t0; };
+  grupo.onBeforeRender = () => { if (!lerParado()) t0 = (typeof performance !== 'undefined' ? performance.now() : 0) / 1000; uniformes.uTempo.value = t0; if (nuvens) { nuvens.position.x = Math.sin(t0 * 0.05) * 0.6; nuvens.position.z = Math.cos(t0 * 0.04) * 0.4; } };
   for (const m of grupo.children) m.onBeforeRender = grupo.onBeforeRender;
   return { malha: grupo, terreno: t, definirReduzirMovimento(b) { parado = !!b; } };
 }

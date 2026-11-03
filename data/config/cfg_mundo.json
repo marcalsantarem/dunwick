@@ -130,6 +130,7 @@
     "celulas_por_tile": 3,
     "densidade": 1,
     "sombra_nuvem": 0.2,
-    "floresta": true
+    "floresta": true,
+    "moldura": false
   }
 }

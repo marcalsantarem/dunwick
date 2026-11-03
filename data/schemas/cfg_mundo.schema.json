@@ -391,6 +391,9 @@
         },
         "floresta": {
           "type": "boolean"
+        },
+        "moldura": {
+          "type": "boolean"
         }
       }
     }

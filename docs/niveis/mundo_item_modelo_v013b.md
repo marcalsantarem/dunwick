@@ -1,5 +1,7 @@
 # Item-modelo do mapa de mundo — planta 12×12 (14, D-046)
 
+> **Obsoleto (D-048):** o usuário aprovou o mundo isométrico 3D denso. Esta planta 12×12 com câmera 2D não será usada; o mapa vigente está em `props_mundo_v013.md`.
+
 Planta do 14 a partir da sugestão do 10 (`docs/arte/mapa_de_mundo.md` §11.1) e das respostas dele: 32 px/tile, câmera ≈ 30×17 tiles, marcadores 3×3, clareira da vila de ~7×7 com a estrada saindo pelo sul e ponte 3×1.
 
 - **Dados:** `tools/lib/mundo_item_modelo.mjs`, que exporta:

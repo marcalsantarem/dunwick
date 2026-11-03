@@ -49,15 +49,18 @@ function marcadorVila(col, o, kit, saida) {
 
 /** Bosque: arco de árvores GIGANTES e clareira de entrada ao sul (+z); interditado: corrente e cadeado entre os troncos do arco e copas mais escuras. */
 function marcadorBosque(col, o) {
-  const a = ajudantes(col, o), r = rng(o.seed ?? 3), claro = o.interditado ? 0.3 : 0.45;
+  const a = ajudantes(col, o), r = rng(o.seed ?? 3), claro = o.interditado ? 0.55 : 0.75;
   a.g('terra_canteiro', new THREE.CylinderGeometry(1.5, 1.6, 0.04, 16), 0, 0.02, 1.0);
   const gigante = (lx, lz, k, tipo) => {
     const [x, z] = a.L(lx, lz), H = 1.7 * k; col.geo('casca', new THREE.CylinderGeometry(0.17 * k, 0.28 * k, H, 8), M4.clone().makeTranslation(x, H / 2, z));
     if (tipo === 'pinho') for (let i = 0; i < 4; i++) col.geo('folha_mundo', folhagemGeo(new THREE.ConeGeometry((1.05 - i * 0.2) * k, 0.9 * k, 8), null, 0.4, H * 1.5, Math.floor(r() * 1e6), 0.1 + claro * 0.5), M4.clone().makeTranslation(x, H * 0.55 + i * 0.5 * k, z), { escala: col.escalaUV * 0.5 });
     else for (const [dx, dy, rr] of [[0, 1.2, 0.95], [-0.7, 0.9, 0.7], [0.7, 0.9, 0.7], [0, 1.7, 0.7]]) folha(col, x + dx * k, H * 0.72 + dy * k * 0.5, z, rr * k, Math.floor(r() * 1e6), 0.1 + claro * r());
   };
-  gigante(-1.15, 0.9, 1.65, 'pinho'); gigante(1.15, 0.9, 1.65, 'carvalho'); gigante(-1.95, -0.2, 1.4, 'carvalho'); gigante(1.95, -0.15, 1.45, 'pinho'); gigante(-0.95, -1.25, 1.35, 'pinho'); gigante(0.95, -1.2, 1.4, 'carvalho');
-  gigante(-2.4, 1.3, 1.0, 'pinho'); gigante(2.4, 1.2, 1.05, 'carvalho'); // arco: o vão do meio fica livre, com a trilha de pedras
+  gigante(-2.6, 0.3, 1.3, 'pinho'); gigante(2.6, 0.3, 1.3, 'carvalho'); gigante(-1.9, -1.4, 1.2, 'carvalho'); gigante(1.9, -1.4, 1.2, 'pinho'); // fundo e flancos mais abertos: o arco do meio é o foco
+  // ARCO de raízes e galhos: meia-argola de casca sobre a trilha, hera clara e cortina de cipós; o interior luminoso lê como porta
+  a.g('pedra', new THREE.TorusGeometry(1.5, 0.3, 6, 16, Math.PI), 0, 0, 1.0); for (const sx of [-1, 1]) a.g('pedra', new THREE.CylinderGeometry(0.34, 0.44, 0.5, 6), sx * 1.5, 0.25, 1.0);
+  for (let i = 0; i <= 7; i++) { const ang = (i / 7) * Math.PI, [wx, wz] = a.L(Math.cos(ang) * 1.5, 1.0); folha(col, wx, Math.sin(ang) * 1.5 + 0.05, wz, 0.28 + r() * 0.1, Math.floor(r() * 1e6), 0.85); }
+  for (let i = 0; i < 6; i++) { const lx = -1.0 + i * 0.4, y = Math.sqrt(Math.max(0.05, 2.1 - lx * lx)); a.b('casca', lx, y - 0.25, 1.1, 0.05, 0.4 + r() * 0.2, 0.05); }
   for (let i = 0; i < 5; i++) a.g('pedra', new THREE.DodecahedronGeometry(0.13 + r() * 0.06, 0), -0.55 + i * 0.28 + r() * 0.1, 0.1, 1.6 + r() * 0.5); // trilha de pedras de entrada
   if (o.interditado) lacre(col, o, 0, 0.7, 0.95, 1.9, 0.7); else a.g('brilho_saida', new THREE.PlaneGeometry(2.6, 2.6).rotateX(-Math.PI / 2), 0, 0.06, 0.7, 0, 0, 0, { uv: false });
 }
@@ -89,7 +92,11 @@ function montanhaMundo(col, o) {
 }
 
 /** Rocha de mundo: um bloco arredondado. */
-function rochaMundo(col, o) { const r = rng(o.seed ?? 1), e = o.escala ?? 1, g = blobIco(0.4 * e, 1, Math.floor(r() * 1e6), 0.25); g.scale(1.2, 0.7, 1); col.geo('pedra', g, M4.clone().makeTranslation(o.x, 0.2 * e, o.z)); }
+function rochaMundo(col, o) {
+  const r = rng(o.seed ?? 1), e = o.escala ?? 1, g = blobIco(0.4 * e, 1, Math.floor(r() * 1e6), 0.25); g.scale(1.2, 0.7, 1); col.geo('pedra', g, M4.clone().makeTranslation(o.x, 0.2 * e, o.z));
+  const g2 = blobIco(0.22 * e, 1, Math.floor(r() * 1e6), 0.25); g2.scale(1.1, 0.7, 1); col.geo('pedra_negra', g2, M4.clone().makeTranslation(o.x + 0.42 * e, 0.1 * e, o.z + 0.12 * e));
+  folha(col, o.x - 0.05 * e, 0.3 * e, o.z, 0.24 * e, Math.floor(r() * 1e6), 0.8); folha(col, o.x + 0.4 * e, 0.17 * e, o.z + 0.12 * e, 0.13 * e, Math.floor(r() * 1e6), 0.8); // musgo
+}
 
 /** Ponte de mundo sobre água: `rot` 0 = atravessa em x, 90 = em z. Comprimento `w` (padrão 2). */
 function ponteMundo(col, o) {
