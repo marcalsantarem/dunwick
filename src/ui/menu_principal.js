@@ -192,7 +192,9 @@ export function criarMenuPrincipal({ mundo, t, dados = {}, plataforma = {}, raiz
         for (const [k, id] of COMPARA) if (a && n) linhaAttr(ul, id, a[k], n[k]);
       }
     } else if (sec === 'status') {
-      const s = statsDe(l.heroi), base = C.herois?.[l.heroi]?.atributos ?? {}, ul = el('ul', 'mp-attrs', detalhe);
+      // revisão do 10: a metade livre do Status ganha o retrato grande do herói
+      const caixa = el('div', 'mp-status', detalhe), grande = el('canvas', 'mp-retrato mp-retrato-grande', caixa); grande.width = grande.height = 96; grande.setAttribute('aria-hidden', 'true'); desenharRetrato(grande, l.heroi);
+      const s = statsDe(l.heroi), base = C.herois?.[l.heroi]?.atributos ?? {}, ul = el('ul', 'mp-attrs', caixa);
       for (const [k, id] of BASE) linhaAttr(ul, id, base[k]);
       if (s) for (const [k, id] of COMPARA) linhaAttr(ul, id, s[k]);
       const eq = jogo().equipamentoDe?.(l.heroi) ?? {};

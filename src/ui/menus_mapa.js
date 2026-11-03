@@ -111,8 +111,9 @@ export function criarMenusMapa({ mundo, t, cfg, dados = {}, plataforma = {}, rai
     ls.forEach((l, i) => {
       const li = el('li', 'loja-linha', listaLoja); li.setAttribute('role', 'option'); li.dataset.item = l.item;
       const caro = loja.aba === 'comprar' && (l.preco > (jogo().moedas ?? 0) || l.estoque === 0);
-      li.classList.toggle('foco', i === loja.foco); li.classList.toggle('caro', caro || l.preco == null); li.setAttribute('aria-selected', String(i === loja.foco));
-      el('span', 'loja-nome', li, nomeItem(l.item));
+      li.classList.toggle('foco', i === loja.foco); li.classList.toggle('caro', caro); li.classList.toggle('sem-preco', l.preco == null); li.setAttribute('aria-selected', String(i === loja.foco));
+      const nomeEl = el('span', 'loja-nome', li, nomeItem(l.item));
+      if (caro && l.estoque !== 0) el('span', 'loja-falta', nomeEl, t('ui_loja_falta')); // revisão do 10: forma + ícone + texto, não só cor
       el('span', 'loja-info', li, loja.aba === 'comprar' ? (l.estoque == null ? t('ui_loja_tem', { qtd: l.tem }) : t('ui_loja_estoque', { qtd: l.estoque })) : t('ui_loja_tem', { qtd: l.tem }));
       el('span', 'loja-preco', li, l.preco == null ? t('ui_loja_sem_preco') : moeda(l.preco));
       li.addEventListener('click', () => escolher(i));

@@ -322,3 +322,42 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
   .mp-painel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .mp-painel-titulo { display: none; }
 }
+
+/* ---------- revisão do 10 (v0.1.4, docs/arte/revisao_v014.md §2–3) ---------- */
+/* menu: fonte-base maior e mais respiro (reserva de +40 % para tradução); barras com texto claro sobre cor escura (contraste ≥ 4,5:1) */
+.mp { font-size: max(15px, calc(20 * var(--u))); }
+.mp-secao, .mp-fechar { min-height: 48px; }
+.mp-linha { min-height: 48px; padding: 0 calc(12 * var(--u)); }
+.mp-attr { font-size: max(14px, calc(17 * var(--u))); padding: calc(4 * var(--u)) calc(8 * var(--u)); }
+.mp-barra { height: max(18px, calc(20 * var(--u))); }
+.mp-barra-texto { font-size: max(12px, calc(14 * var(--u))); line-height: max(18px, calc(20 * var(--u))); }
+.mp-barra-vida { --cor-barra: #4f7d2c; } .mp-barra-mana { --cor-barra: #7a4a9e; }
+.mp-barra-xp { --cor-barra: #a87a2c; height: max(16px, calc(16 * var(--u))); border-color: var(--latao); }
+.mp-barra-xp .mp-barra-texto { line-height: max(16px, calc(16 * var(--u))); font-size: max(11px, calc(12 * var(--u))); }
+.mp-status { display: grid; grid-template-columns: auto 1fr; gap: calc(14 * var(--u)); align-items: start; }
+.mp-cartao canvas.mp-retrato, .mp-status canvas.mp-retrato-grande { position: static; inset: auto; }
+.mp-status canvas.mp-retrato-grande { width: max(144px, calc(192 * var(--u))); height: max(144px, calc(192 * var(--u))); image-rendering: pixelated; border: max(1px, calc(2 * var(--u))) solid var(--madeira-2); background: radial-gradient(circle at 50% 70%, rgba(174, 136, 101, 0.3), transparent 70%); }
+/* loja: véu mais leve (o cenário aparece), nome sempre legível, "faltam Coroas" com ícone + texto em alerta_ui (guia §8) */
+.loja { background: rgba(12, 7, 4, 0.42); }
+.loja-nome { display: flex; flex-direction: column; color: var(--ui-4); }
+.loja-linha.caro .loja-nome { color: var(--ui-3); }
+.loja-linha.caro .loja-preco { color: var(--alerta-2); }
+.loja-linha.sem-preco .loja-nome, .loja-linha.sem-preco .loja-preco { color: var(--ui-3); }
+.loja-info { color: var(--ui-3); }
+.loja-falta { display: inline-flex; align-items: center; gap: 0.4em; color: var(--alerta-2); font-size: max(11px, calc(12 * var(--u))); }
+.loja-falta::before { content: "!"; display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; background: var(--alerta-2); color: var(--ui-1); font-weight: bold; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.loja-falta::before { line-height: 1; }
+/* quantidade e −/+ maiores para o toque */
+.loja-passo { min-width: 52px; min-height: 52px; font-size: max(18px, calc(22 * var(--u))); }
+.loja-qtd-valor { min-width: 5ch; font-size: max(16px, calc(20 * var(--u))); }
+@media (max-height: 460px) {
+  .mp { font-size: 15px; }
+  .mp-status canvas.mp-retrato-grande { width: 96px; height: 96px; }
+  .mp-attr { font-size: 13px; padding: 2px 6px; }
+}
+/* loja e diálogo: mesma fonte-base maior do menu */
+.loja-painel { font-size: max(15px, calc(19 * var(--u))); width: min(94%, 70ch); }
+.loja-linha { min-height: 48px; }
+.loja-info, .loja-desc, .loja-vazio { font-size: max(13px, calc(15 * var(--u))); }
+.loja-falta { font-size: max(12px, calc(14 * var(--u))); }
+@media (max-height: 460px) { .loja-painel { font-size: 14px; max-height: calc(100% - 16px); } .loja-linha { min-height: 44px; } .loja-passo { min-width: 48px; min-height: 48px; } }

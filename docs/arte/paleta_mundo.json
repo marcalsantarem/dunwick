@@ -481,6 +481,94 @@
           "hex": "#244A56"
         }
       ]
+    },
+    {
+      "nome": "tijolo",
+      "uso": "NPC: avental da taverneira, retalhos da Ysolt",
+      "cores": [
+        {
+          "id": "tijolo_1",
+          "hex": "#3A1612"
+        },
+        {
+          "id": "tijolo_2",
+          "hex": "#7A2E24"
+        },
+        {
+          "id": "tijolo_3",
+          "hex": "#A8503A"
+        },
+        {
+          "id": "tijolo_4",
+          "hex": "#CF8062"
+        }
+      ]
+    },
+    {
+      "nome": "tinta",
+      "uso": "NPC: manga protegida do escrivão",
+      "cores": [
+        {
+          "id": "tinta_1",
+          "hex": "#1C2638"
+        },
+        {
+          "id": "tinta_2",
+          "hex": "#34496B"
+        },
+        {
+          "id": "tinta_3",
+          "hex": "#5A76A0"
+        },
+        {
+          "id": "tinta_4",
+          "hex": "#93A9C9"
+        }
+      ]
+    },
+    {
+      "nome": "brasa",
+      "uso": "NPC: faíscas da forja (ferreiro)",
+      "cores": [
+        {
+          "id": "brasa_1",
+          "hex": "#4A1A0A"
+        },
+        {
+          "id": "brasa_2",
+          "hex": "#A8420F"
+        },
+        {
+          "id": "brasa_3",
+          "hex": "#E07A1F"
+        },
+        {
+          "id": "brasa_4",
+          "hex": "#F5B45A"
+        }
+      ]
+    },
+    {
+      "nome": "cabelo_grisalho",
+      "uso": "NPC: cabelo grisalho (Maren, Torvan)",
+      "cores": [
+        {
+          "id": "cabelo_grisalho_1",
+          "hex": "#464C5A"
+        },
+        {
+          "id": "cabelo_grisalho_2",
+          "hex": "#868D9C"
+        },
+        {
+          "id": "cabelo_grisalho_3",
+          "hex": "#B8BFCA"
+        },
+        {
+          "id": "cabelo_grisalho_4",
+          "hex": "#E0E4EA"
+        }
+      ]
     }
   ],
   "cor_assinatura_heroi_mundo": {
@@ -512,7 +600,11 @@
       "Nota: brilho sobre areia (ΔE baixo) exige contorno escuro (`sombra_mundo_1`) no marcador; não depende da cor.",
       "telha_2 (lado sombra) x grama_4 (valor): ΔL 0.181 (mín 0.1)",
       "neve_3 x rocha_3: ΔL 0.409 (mín 0.12)",
-      "Contraste texto do banner (branco) x sombra_mundo_1: 16.3:1"
+      "Contraste texto do banner (branco) x sombra_mundo_1: 16.3:1",
+      "NPC tijolo_2 (tom base) x chão: pior ΔE OKLab 0.138 em rocha_3 (deuteranopia) (mín 0.10); os 3 outros tons dão contraste interno via contorno escuro #14201E",
+      "NPC tinta_2 (tom base) x chão: pior ΔE OKLab 0.122 em rocha_3 (protanopia) (mín 0.10); os 3 outros tons dão contraste interno via contorno escuro #14201E",
+      "NPC brasa_2 (tom base) x chão: pior ΔE OKLab 0.065 em cultivo_3 (deuteranopia) (mín 0.10); os 3 outros tons dão contraste interno via contorno escuro #14201E",
+      "NPC cabelo_grisalho_2 (tom base) x chão: pior ΔE OKLab 0.009 em rocha_4 (protanopia) (mín 0.10); os 3 outros tons dão contraste interno via contorno escuro #14201E"
     ]
   }
 }

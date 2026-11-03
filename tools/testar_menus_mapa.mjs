@@ -78,6 +78,16 @@ async function rodar(tela, nome) {
   const hexRgb = (h) => `rgb(${parseInt(h.slice(1, 3), 16)}, ${parseInt(h.slice(3, 5), 16)}, ${parseInt(h.slice(5, 7), 16)})`;
 
   // 1) conversa simples: caixa embaixo, nome e cor, texto aparece aos poucos, avança por clique/toque e teclado
+  // 0) (13) o jogador mira no boneco: clique/toque no CORPO e na CABEÇA do NPC (não nos pés), de longe → anda até ele e abre a conversa
+  for (const [parte, altura] of [['no corpo', 0.9], ['na cabeça', 1.4]]) {
+    const n = await p.evaluate(() => { const n = __dunwick.mundo.npcs.find((q) => q.id === 'npc_maren'), h = __dunwick.mundo.heroi; h.x = h.ox = n.x + 1.5; h.z = h.oz = n.z + 2.5; h.destino = null; return { x: n.x, z: n.z }; });
+    await dormir(200);
+    const c = await p.evaluate((x, y, z) => __dunwick.mundoParaTela(x, y, z), n.x, altura, n.z);
+    if (toque) await p.touchscreen.tap(c.x, c.y); else await p.mouse.click(c.x, c.y);
+    const ok = await p.waitForFunction(() => __dunwick.jogo.dialogo?.npc === 'npc_maren', { timeout: 6000 }).then(() => true, () => false);
+    checar(`${nome}: ${toque ? 'toque' : 'clique'} ${parte} da Maren (de longe) anda até ela e abre a conversa`, ok);
+    await p.evaluate(() => __dunwick.jogo.encerrarDialogo()); await dormir(150);
+  }
   const abriu = await conversar('npc_maren'); await dormir(60);
   let e = await estado(p);
   const corMaren = await p.evaluate(() => __dunwick.mundo.dados.npcs.npc_maren.cor ?? __dunwick.mundo.dados.npcs.npc_maren.cor_falante);
