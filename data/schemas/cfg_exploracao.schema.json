@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_exploracao",
+  "title": "Exploração (13): portas, portais e interação com objetos",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "alcance_interagir_tiles", "folga_clique_portal_tiles", "raio_clique_poi_tiles", "contato_portal_tiles", "soltar_contato_portal_tiles", "aviso_portal_inativo_txt"],
+  "properties": {
+    "id": { "const": "cfg_exploracao" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "alcance_interagir_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 5 },
+    "folga_clique_portal_tiles": { "type": "number", "minimum": 0, "maximum": 2 },
+    "raio_clique_poi_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 },
+    "contato_portal_tiles": { "type": "number", "minimum": 0, "maximum": 1 },
+    "soltar_contato_portal_tiles": { "type": "number", "minimum": 0, "maximum": 3 },
+    "aviso_portal_inativo_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" }
+  }
+}

@@ -57,7 +57,7 @@ export function criarControladorBatalha(dados, { encontro, semente = 1, grupo, e
       const vez = b.atorDaVez(), est = b.estado();
       const escolhas = {}; for (const [uid, c] of Object.entries(est.escolhas)) if (b.ator(uid).lado === 'grupo') escolhas[uid] = { comando: c.comando, id: c.id ?? null, alvo: c.alvo ?? null };
       return {
-        encontro, semente, rodada: b.rodada, fase: b.fase, velocidade: vel, pode_fugir: encontroDados.pode_fugir, fim: !!b.resultado,
+        encontro, semente, rodada: b.rodada, fase: b.fase, velocidade: vel, pode_fugir: encontroDados.pode_fugir, treino: !!encontroDados.treino, fim: !!b.resultado,
         vez, comandos: vez ? b.comandosDe(vez) : null, ordem_prevista: b.ordemPrevista(), escolhas,
         atores: ['grupo', 'inimigos'].flatMap((l) => est.atores.filter((a) => a.lado === l).map((a) => resumoAtor(b.ator(a.uid)))),
         inventario: b.inventario(),
@@ -67,7 +67,7 @@ export function criarControladorBatalha(dados, { encontro, semente = 1, grupo, e
     encerrar() {
       const r = b.resultado; if (!r) return null;
       return {
-        resultado: MAPA_RESULTADO[r.resultado], motivo: r.resultado === 'empate' ? 'empate' : null, xp: r.xp, moedas: r.moedas, itens: r.itens, niveis: r.niveis,
+        resultado: MAPA_RESULTADO[r.resultado], treino: !!r.treino, motivo: r.resultado === 'empate' ? 'empate' : null, xp: r.xp, moedas: r.moedas, itens: r.itens, niveis: r.niveis,
         semente: r.semente, rodadas: r.rodadas, tempo_animacao_s: r.tempo_animacao_s, grupo: r.grupo, inventario: r.inventario,
       };
     },

@@ -25,7 +25,7 @@ async function iniciar() {
   const dados = await carregador.dados(); marcas.dados = performance.now();
   const t = criarTextos(dados.textos['pt-BR']);
   const recursos = await carregarRecursos(carregador, dados); marcas.assets = performance.now();
-  const cfg = dados.config.jogo, eventos = criarEventos(), mundo = criarMundo(dados, eventos, recursos.metas, { sementeEncontros: (crypto.getRandomValues(new Uint32Array(1))[0] || 1) });
+  const cfg = dados.config.jogo, eventos = criarEventos(), mundo = criarMundo(dados, eventos, recursos.metas, { trocaManual: true, sementeEncontros: (crypto.getRandomValues(new Uint32Array(1))[0] || 1) });
 
   if (__DEV__ && P.get('hora')) { mundo.hora = Number(P.get('hora')); mundo.cicloLigado = false; } // ?hora=21 para olhar a noite
   const cfgEntrada = __DEV__ ? dados.config.entrada : { ...dados.config.entrada, debug: {} };
@@ -44,13 +44,16 @@ async function iniciar() {
   const ren = criarRenderizador(canvas, cfg, perfis[iPerfil], P.get('modo') ?? undefined);
   redimensionar = () => { const a = movel.area(); ren.ajustar(a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); };
   redimensionar(); addEventListener('resize', redimensionar);
-  const cena = criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest' } });
+  // uma cena por mapa (exteriores e interiores), todas montadas no início (troca por portal sem engasgo); `cena` aponta para a do mapa ativo
+  const idMapa = () => mundo.mapaId ?? mundo.mapa.dados.id, cenas = new Map();
+  for (const id of Object.keys(dados.mapas)) cenas.set(id, criarCena({ dados, mundo, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64), chaoNearest: P.get('chao') === 'nearest', mapaDados: dados.mapas[id], entidades: id === idMapa() ? mundo.entidades : [], reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') } }));
+  let cena = cenas.get(idMapa());
   // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
   const temBatalha = !!(mundo.jogo && dados.cenarios && dados.config.sprites_batalha);
   const cenaBat = temBatalha ? criarCenaBatalha({ dados, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64) } }) : null;
-  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
-  const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); cena.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
-  aplicarPerfil(); marcas.cena = performance.now();
+  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { aoTrocarMapa: () => { cena = cenas.get(idMapa()); }, reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
+  const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); for (const c of cenas.values()) c.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
+  aplicarPerfil(); for (const c of cenas.values()) c.atualizar(1, 0, 0), ren.compilar(c); marcas.cena = performance.now(); // aquece: posiciona luzes e compila os shaders de cada mapa antes de jogar
 
   // ---------- áudio desbloqueado por clique/tecla ----------
   const audio = criarAudio(recursos.sfxPing);
@@ -58,15 +61,26 @@ async function iniciar() {
   // API de plataforma para a UI (15): preferências persistentes, tela cheia, pausa por motivos, volume e a tela de início
   const telaCheia = criarTelaCheia(), pausa = criarPausa({ audio });
   audio.definirVolume(preferencias.obter('volume')); preferencias.aoMudar((k, v) => { if (k === 'volume') audio.definirVolume(v); });
-  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null };
+  // leitura do mapa ativo para o minimapa (15): um objeto congelado e ESTÁVEL por mapa (mesma referência enquanto o mapa não muda)
+  const vistaMapas = new Map();
+  const mapaAtivo = () => {
+    const id = idMapa(); if (vistaMapas.has(id)) return vistaMapas.get(id);
+    const m = dados.mapas[id], v = Object.freeze({
+      id, tipo_mapa: m.tipo_mapa, interior: m.tipo_mapa === 'interior', nome_txt: m.nome_txt, tamanho: m.tamanho, legenda: m.legenda, planta: m.planta, giro_graus: cfg.camera.giro_graus,
+      edificios: (m.edificios ?? []).map((e) => ({ id: e.id, x: e.x, z: e.z, w: e.w, d: e.d, rot: e.rot ?? 0, porta: e.porta ?? null, interior: e.interior })),
+      portais: (m.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: !p.ativo, nome_txt: p.nome_txt ?? null, destino: p.destino ?? null })),
+      pois: (m.pois ?? []).map((p) => ({ id: p.id, tipo: p.tipo, x: p.x, z: p.z, nome_txt: p.nome_txt })),
+    });
+    vistaMapas.set(id, v); return v;
+  };
+  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null, mapaAtivo };
   // tela de início: em produção sempre; em desenvolvimento só com ?inicio=1 (os testes automáticos já começam jogando)
   if (!__DEV__ || P.get('inicio') === '1') {
     pausa.pausar('inicio'); aviso.remove();
     plataforma.inicio = criarInicio({ t, versao: __VERSAO__, movel: movel.ativo, aoComecar: () => {
       audio.desbloquear(); // síncrono dentro do gesto (iOS)
       if (movel.ativo || preferencias.obter('tela_cheia_pedida')) telaCheia.entrar(); // PC: só se o jogador já pediu tela cheia nas preferências
-      entrada.soltarTudo(); pausa.retomar('inicio');
-    } });
+      entrada.soltarTudo(); pausa.retomar('inicio');    } });
   } else aviso.textContent = t(movel.ativo ? 'ui_comecar_toque' : 'ui_comecar');
   let desbloqueando = false;
   // cada gesto tenta de novo (o resume do iOS só vale dentro de touchend/click); no celular a mensagem some já no 1º toque, mesmo se o áudio falhar
@@ -87,7 +101,8 @@ async function iniciar() {
   }
 
   // Compila shaders e sobe texturas ANTES do primeiro quadro (sem engasgo no começo)
-  cena.atualizar(1, 0); await ren.renderer.compileAsync(cena.cena, cena.camera); ren.desenhar(cena.cena, cena.camera, cena.visual);
+  for (const c of cenas.values()) { c.atualizar(1, 0); await ren.renderer.compileAsync(c.cena, c.camera); }
+  cena.atualizar(1, 0); ren.desenhar(cena.cena, cena.camera, cena.visual);
   if (cenaBat) { cenaBat.preparar(); await ren.renderer.compileAsync(cenaBat.cena, cenaBat.camera); cenaBat.desligar(); }
   marcas.compilado = performance.now();
 
@@ -136,7 +151,7 @@ async function iniciar() {
       cena.atualizar(alfa, tempoS, dtS);
       if (__DEV__) debugDesenho.atualizar(debug.estado.caixas, alfa);
       heroiNdc.set(mundo.heroi.x, 1, mundo.heroi.z).project(cena.camera);
-      ren.desenhar(cena.cena, cena.camera, cena.visual, heroiNdc.y * 0.5 + 0.5, apr ? { cobertura: apr.cobertura, corCobertura: cena.visual.ciclo.nevoa } : {});
+      ren.desenhar(cena.cena, cena.camera, cena.visual, heroiNdc.y * 0.5 + 0.5, apr ? { cobertura: apr.cobertura, corCobertura: apr.trans?.tipo === 'portal' ? apr.corPortal : cena.visual.ciclo.nevoa } : {});
     }
     if (__DEV__ && sincronizar) glFinish();
     if (__DEV__) {
@@ -149,7 +164,7 @@ async function iniciar() {
   if (__DEV__) {
     // Gancho para testes automáticos e medições (tools/testar_navegador.mjs). NÃO existe no build de produção.
     window.__dunwick = {
-      plataforma, mundo, entrada, debug, ren, audio, cena, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
+      plataforma, mundo, entrada, debug, ren, audio, get cena() { return cena; }, cenas, acum, perfis, t, marcas, eventos, apr, cenaBat, jogo: mundo.jogo, batalhaUi,
       ticks: () => mundo.ticks, exportarTempos: () => debug.exportar(false), estatisticasGl: () => ren.estatisticas(), escala: () => ren.escala, perfilAtual: () => perfis[iPerfil].id,
       textosFaltando: () => [...t.faltando], redimensionar, modo: () => ren.modo, atualizarCursor,
       definirModo: (m) => { const a = movel.area(); ren.definirModo(m, a.w, a.h, Math.min(window.devicePixelRatio || 1, movel.dprMax)); }, movel,

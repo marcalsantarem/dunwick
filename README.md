@@ -8,7 +8,7 @@ Fantasia medieval original, humor ácido e um sino que nunca devia ter voltado p
 [**▶ Jogar a versão estável**](https://dunwick.netlify.app) · [**🧪 Versão em desenvolvimento**](https://dev--dunwick.netlify.app)
 
 ![status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)
-![versão](https://img.shields.io/badge/versão-v0.1.1-blue)
+![versão](https://img.shields.io/badge/versão-v0.1.2-blue)
 ![classificação](https://img.shields.io/badge/classificação-16%2B-red)
 ![plataforma](https://img.shields.io/badge/plataforma-navegador-brightgreen)
 
@@ -28,7 +28,8 @@ Sem querer, Edric adia o sonho de entrar para a Guarda de Mor-Allen (e a vingan�
 
 - **Visão isométrica HD-2D:** sprites de pixel art nítidos dentro de um cenário 3D com luz, sombras, névoa e profundidade.
 - **Combate por turnos** no estilo de RPGs clássicos: cena de batalha com o grupo e os inimigos em sprite, comandos e habilidades. *(em definição; o design de ação em tempo real está arquivado em `docs/arquivo/combate_acao/`)*
-- **Exploração isométrica:** clique para andar pelo mundo.
+- **Exploração isométrica:** clique para andar pelo mundo, entrar nas casas pela porta e abrir baús; o nome do mapa aparece ao entrar.
+- **Treino:** clique no boneco do pátio do Torvan para lutar quantas vezes quiser, sem XP nem recompensa.
 - **Tudo gerado por código:** sprites, texturas, cenário e sons são produzidos por scripts, sem arte externa.
 - **Acessível:** tremor, flashes, partículas e desfoque podem ser desligados.
 
@@ -122,13 +123,15 @@ Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_d
 |---|---|
 | v0.1.0 | esqueleto (na `main` hoje) |
 | v0.1.1 | batalha por turnos básica validada |
-| v0.1.2 | resto da vila e minimapa |
-| v0.1.3 | mapa ao redor (campos) e baús de tesouro |
+| v0.1.2 | vila completa com interiores, casa do Edric, boneco de treino, entorno com mata e muralha, nome do mapa e minimapa ✅ |
+| v0.1.3 | mapa aberto simplificado ao redor da vila e baús de tesouro |
 | v0.1.4 | NPCs, diálogos, lojas e moeda |
 | v0.1.5 | encontros aleatórios, classe, nível por XP, save e recompensas |
 | v0.1.6 | missões da vila e sistema de missões |
-| v0.1.7 | mapa do bosque e da caverna |
+| v0.1.7 | bosque e caverna como locais ricos acessados por portal |
 | v0.1.8 | chefe Hollowpaw, cena final e volta à vila |
+
+O jogo segue o modelo **mundo aberto simples + locais ricos** (D-044): vila, bosque e caverna são locais detalhados acessados por portal; gerar campos e masmorras por regras fica para depois do slice (BL-033).
 
 Detalhes e requisitos técnicos em [`docs/02_roadmap.md`](docs/02_roadmap.md).
 

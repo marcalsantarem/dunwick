@@ -28,6 +28,7 @@
     "versao": { "type": "integer", "minimum": 1 },
     "nota": { "type": "string" },
     "sprite": { "type": "string", "pattern": "^[a-z]+_[a-z0-9_]+$" },
+    "escala_mapa": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
     "movimento": {
       "type": "object", "additionalProperties": false, "required": ["vel_andar", "vel_correr", "aceleracao_s", "freada_s"],
       "properties": {

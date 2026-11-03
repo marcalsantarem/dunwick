@@ -93,3 +93,4 @@ Objetivo da onda: Edric + Grace contra 1 inimigo comum, numa tela de batalha sep
 | BL-030 | Lojas e moeda do jogo | 06, 02, 15 | v0.1.4 |
 | BL-031 | Sistema de missões e diário; missões de coleta e caça | 13, 02, 15, 06 | v0.1.6 |
 | BL-032 | Sistema de cenas (câmera e diálogo) e cena pós-batalha com final alternativo (poupar) | 08, 02, 07 | v0.1.8 |
+| BL-033 | Geração de campos e masmorras por regras (vegetação, caminhos, salas, sementes) para expandir depois do slice (D-044) | 14, 08, 07 | pós-slice |

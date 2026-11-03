@@ -42,6 +42,26 @@ Metas (06 §10): tempo para matar o comum 3–8 s (o besouro está no teto; a po
 
 Os números e o resumo dos golpes estão em `docs/niveis/metricas.md` §9 (d), na escala acima: vida de referência ~2800, 3 fases por vida, postura 200 com `resist_recuo` 1,0, ponto fraco ×1,25, quatro golpes (pancada 90 q, varrida 72 q, investida 100 q, estouro de cristais 66 q) e aviso nunca abaixo de 60 q. A ficha completa vem depois, com os outros chefes.
 
+## 5. Boneco de treino (`enemy_boneco_treino`) — v0.1.2b, combate por turnos
+
+Igual a um inimigo comum no sistema; o que o faz boneco está nos dados (`data/combate/enemy_boneco_treino.json` e `enc_boneco_treino.json`, validados). Valores do 03 **aprovados** pelo 06.
+
+| Campo | Valor | Por quê |
+|---|---|---|
+| Vida · Defesa · Agilidade | **200 · 1 · 0** | ~5 rodadas contra o grupo nível 1 (simulação: 5,0 rodadas, 16 s de animação, vitória 100 %); defesa baixa deixa os números do herói quase crus (Atacar 19, Golpe Firme 35, Grace 9) |
+| Força · ataques | 0 · nenhum (`ia: []`) | passa a vez, por último; a UI mostra "{nome} não faz nada." |
+| Resistências · imunidades | nenhuma | o treino mostra o dano cheio |
+| XP · moedas · drops | **0 · 0 · nenhum** | o validador exige tudo zerado quando `treino: true` |
+| Papel | `combatente` (o esquema não tem "boneco") | só para o campo ficar preenchido |
+| `treino` | **sim**, no inimigo e no encontro | sem recompensa; grupo volta com vida e mana cheias; repetível; derrota vira `fugiu` |
+| Nome · descrição | `txt_enemy_boneco_treino_nome` · `txt_enemy_boneco_treino_desc` | "Boneco de Treino" · "Palha, corda e remendos. Aguenta tudo e não revida." |
+
+Uso: teste de dano e de habilidades sem risco (e referência de dano para o 09). Como o boneco não age, a Mão Boa e o Defender não têm o que testar; para isso valem os encontros com lobo e slime.
+
+## 6. Item do baú da casa do Edric (`item_lembranca_edric`)
+
+**Pião Entalhado** (nome provisório, 02 revisa): lembrança de infância entalhada pelo pai do Edric. **Sem efeito**, valor 0 (não vende), categoria `lembranca`, não usável em batalha. Dados em `data/combate/item_lembranca_edric.json` (ID combinado com o 14). Para caber no esquema, `item_batalha` agora aceita `efeito: "nenhum"` (e `categoria`, `desc_txt`, `valor`) sem exigir campos de cura; a poção continua igual. Itens de missão do 02 (sino, livro, contrato) podem usar o mesmo molde.
+
 ## Histórico de mudanças
 | Data | Mudança | Motivo |
 |---|---|---|

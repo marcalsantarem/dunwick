@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "dunwick/item_batalha",
-  "title": "Item usável em batalha (M1: poção de cura)",
+  "title": "Item do jogo: usável em batalha (cura) ou sem efeito (lembrança, chave). M1: poção de cura e a lembrança do Edric",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -9,12 +9,7 @@
     "versao",
     "nome_txt",
     "uso_batalha",
-    "alvo_tipo",
-    "efeito",
-    "cura_base",
-    "escala",
-    "tempo",
-    "pose"
+    "efeito"
   ],
   "properties": {
     "id": {
@@ -43,7 +38,10 @@
       ]
     },
     "efeito": {
-      "const": "cura"
+      "enum": [
+        "cura",
+        "nenhum"
+      ]
     },
     "cura_base": {
       "type": "number",
@@ -60,6 +58,72 @@
     "pose": {
       "type": "string",
       "pattern": "^bat_[a-z_]+$"
+    },
+    "categoria": {
+      "enum": [
+        "consumivel",
+        "lembranca",
+        "chave"
+      ],
+      "description": "consumivel (padrão) · lembranca/chave: sem efeito, não vendem nem se descartam"
+    },
+    "desc_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "valor": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "preço de venda em moedas; 0 = não vende"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "efeito": {
+            "const": "cura"
+          }
+        },
+        "required": [
+          "efeito"
+        ]
+      },
+      "then": {
+        "properties": {
+          "alvo_tipo": true,
+          "cura_base": true,
+          "escala": true,
+          "tempo": true,
+          "pose": true
+        },
+        "required": [
+          "alvo_tipo",
+          "cura_base",
+          "escala",
+          "tempo",
+          "pose"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "efeito": {
+            "const": "nenhum"
+          }
+        },
+        "required": [
+          "efeito"
+        ]
+      },
+      "then": {
+        "properties": {
+          "uso_batalha": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
 }

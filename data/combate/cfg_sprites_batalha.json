@@ -18,6 +18,9 @@
     },
     "enemy_lobo": {
       "atlas": "enemy_lobo_batalha"
+    },
+    "enemy_boneco_treino": {
+      "atlas": "enemy_boneco_treino_batalha"
     }
   },
   "poses_alias": {

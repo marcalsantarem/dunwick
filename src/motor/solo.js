@@ -14,7 +14,7 @@ export function gerarMapaMistura(mapaDados) {
   return out;
 }
 
-export function criarSolo(mapaDados, tex, perfil, texelsPorTile, nearest = false) {
+export function criarSolo(mapaDados, tex, perfil, texelsPorTile, nearest = false, borda = 90) {
   const [L, A] = mapaDados.tamanho, repeticaoTiles = 256 / texelsPorTile;
   const ajustar = (t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = perfil.aniso; if (nearest) { t.magFilter = t.minFilter = THREE.NearestFilter; t.generateMipmaps = false; } else { t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; } t.needsUpdate = true; return t; };
   const mistura = new THREE.CanvasTexture(gerarMapaMistura(mapaDados)); mistura.colorSpace = THREE.NoColorSpace; mistura.flipY = false; // linha z da planta = v do mapa (sem inverter): o chão fica como desenhado no `planta` mistura.minFilter = mistura.magFilter = THREE.LinearFilter; mistura.generateMipmaps = false;
@@ -34,7 +34,7 @@ export function criarSolo(mapaDados, tex, perfil, texelsPorTile, nearest = false
       vec3 c = g; c = mix(c, musgo, b.b); c = mix(c, texture2D(tTerra, uvT).rgb, b.r); c = mix(c, texture2D(tCal, uvT).rgb, b.g);
       diffuseColor.rgb *= c;`);
   };
-  const BORDA = 90; // o chão continua além do mapa (grama) para a borda nunca mostrar o céu; a câmera é limitada pelo mapa
+  const BORDA = borda; // exterior: o chão continua além do mapa (grama) para a borda nunca mostrar o céu; interior: 0 (só o cômodo)
   const malha = new THREE.Mesh(new THREE.PlaneGeometry(L + BORDA * 2, A + BORDA * 2).rotateX(-Math.PI / 2).translate(L / 2, 0, A / 2), mat);
   malha.receiveShadow = true; malha.name = 'solo';
   return { malha, trocarTexel(novoTexel) { mat.userData.rep = 256 / novoTexel; } };

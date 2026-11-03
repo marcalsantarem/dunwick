@@ -48,6 +48,9 @@
     "musica": {
       "type": "string",
       "pattern": "^mus_[a-z0-9_]+$"
+    },
+    "treino": {
+      "type": "boolean"
     }
   }
 }

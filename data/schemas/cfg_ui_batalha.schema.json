@@ -18,7 +18,9 @@
     "largura_corpo_tiles",
     "clique_min_px_arte",
     "toque_min_px_css",
-    "t_dica_s"
+    "t_dica_s",
+    "minimapa",
+    "banner_mapa"
   ],
   "properties": {
     "id": {
@@ -88,6 +90,64 @@
       "type": "number",
       "minimum": 2,
       "maximum": 30
+    },
+    "minimapa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "px_base",
+        "px_por_tile_exterior",
+        "px_por_tile_interior_max",
+        "raio_toque_px"
+      ],
+      "properties": {
+        "px_base": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 16
+        },
+        "px_por_tile_exterior": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 16
+        },
+        "px_por_tile_interior_max": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 32
+        },
+        "raio_toque_px": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 44
+        }
+      }
+    },
+    "banner_mapa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "t_total_s",
+        "t_entra_s",
+        "t_sai_s"
+      ],
+      "properties": {
+        "t_total_s": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "t_entra_s": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "t_sai_s": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        }
+      }
     }
   }
 }

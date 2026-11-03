@@ -23,7 +23,7 @@
       "items": { "type": "object", "additionalProperties": false, "required": ["id", "ret"], "properties": { "id": { "type": "string", "pattern": "^z_[a-z0-9_]+$" }, "ret": { "$ref": "#/$defs/ret" } } }
     },
     "zonas_encontro": {
-      "type": "array", "minItems": 1,
+      "type": "array",
       "items": {
         "type": "object", "additionalProperties": false, "required": ["id", "ret", "tabela"],
         "properties": {

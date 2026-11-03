@@ -7,15 +7,19 @@ import { construirKit } from './kit.js';
 import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
 import { criarMateriais } from './materiais.js';
+import { paredesInterior, ambienteInterior } from './interior.js';
+import { criarTampaBau } from './bau_tesouro.js';
 import { estadoCiclo, lanternaAcesa } from '../jogo/ciclo.js';
 
 const COR_AVISO = 0xd01a8f, COR_AVISO_BORDA = 0xffa0e6; // magenta reservado a perigo
 const RAD = Math.PI / 180;
 
 export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
-  const cfg = dados.config.jogo, kitDados = dados.config.kit, ciclo = dados.config.ciclo, mapaDados = mundo.mapa.dados, ppu = cfg.pixels_por_unidade;
+  const cfg = dados.config.jogo, kitDados = dados.config.kit, ciclo = dados.config.ciclo, ppu = cfg.pixels_por_unidade;
+  // uma cena por MAPA (v0.1.2): exterior ou interior; `opcoes.mapaDados` / `opcoes.entidades` permitem montar mapas que não são o ativo
+  const mapaDados = opcoes.mapaDados ?? mundo.mapa.dados, entidades = opcoes.entidades ?? mundo.entidades, interior = mapaDados.tipo_mapa === 'interior', ecInterior = interior ? ambienteInterior(mapaDados.ambiente) : null;
   const texelsPorTile = opcoes.texelsPorTile ?? 64;
-  const cena = new THREE.Scene(); cena.background = new THREE.Color(0x202838); cena.fog = new THREE.Fog(0x202838, cfg.camera.distancia + 8, cfg.camera.distancia + 70);
+  const cena = new THREE.Scene(); cena.background = new THREE.Color(0x202838); cena.fog = new THREE.Fog(0x202838, cfg.camera.distancia + 8, cfg.camera.distancia + 70); if (interior) { cena.fog.near = 1e5; cena.fog.far = 2e5; }
 
   // ---------- câmera ortográfica isométrica: a área visível em unidades do mundo é fixa (arte/32); a resolução só muda a nitidez ----------
   const [aw, ah] = cfg.resolucao.arte, meioW = aw / ppu / 2, meioH = ah / ppu / 2, giro = cfg.camera.giro_graus * RAD, incl = cfg.camera.inclinacao_graus * RAD;
@@ -31,10 +35,11 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   camera.quaternion.copy(quatCamera);
 
   // ---------- chão e kit ----------
-  const solo = criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest); cena.add(solo.malha);
+  const solo = criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha);
   const kit = construirKit(mapaDados, kitDados, texelsPorTile);
   const T = recursos.texturas, { materiais, uniformesVento } = criarMateriais(T, perfil);
-  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = true; m.receiveShadow = true; m.name = `kit_${nome}`; cena.add(m); }
+  for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = nome !== 'brilho_saida'; m.receiveShadow = nome !== 'brilho_saida'; m.name = `kit_${nome}`; cena.add(m); }
+  if (interior) for (const m of paredesInterior(mapaDados, materiais, texelsPorTile)) cena.add(m); // paredes de trás inteiras; as da frente somem (rodapé)
 
   // ---------- luz: hemisférica + sol com sombra (direção fixa na tela; a hora muda cor/altura/intensidade) + lanternas ----------
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1); cena.add(hemi);
@@ -46,7 +51,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     const a = Math.round(_s.dot(_r) / texel) * texel, b = Math.round(_s.dot(_u) / texel) * texel, c = _s.dot(_l);
     _d.set(0, 0, 0).addScaledVector(_r, a).addScaledVector(_u, b).addScaledVector(_l, c); sol.target.position.copy(_d); sol.position.copy(_d).addScaledVector(_l, 70); sol.target.updateMatrixWorld();
   }
-  const lanternas = kit.luzes.filter((l) => l.tipo === 'lanterna'), ll = kitDados.luz_lanterna;
+  const FONTES = kitDados.fontes ?? {}, lanternas = kit.luzes.filter((l) => l.tipo === 'lanterna' || FONTES[l.tipo]), ll = kitDados.luz_lanterna; // lanternas (por hora) + fontes de ambiente (vela, lareira, forja: sempre acesas)
   const POOL = 8, luzesPontuais = Array.from({ length: POOL }, () => { const l = new THREE.PointLight(ll.cor, 0, ll.alcance_tiles, 2); l.visible = false; cena.add(l); return l; });
   const heroiDados = Object.values(dados.personagens)[0], luzHeroi = new THREE.PointLight(heroiDados.luz.cor, 0, heroiDados.luz.alcance_tiles, 2); cena.add(luzHeroi);
 
@@ -62,13 +67,18 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     atores.push(ator); return ator;
   }
   const atorHeroi = novoAtor(mundo.heroi, recursos.atlas[heroiDados.sprite], true);
-  for (const e of mundo.entidades) novoAtor(e, recursos.atlas[e.dados.sprite], false);
+  { const k = heroiDados.escala_mapa ?? 1; atorHeroi.sprite.malha.scale.setScalar(k); atorHeroi.sprite.silhueta?.scale.setScalar(k); atorHeroi.sombra.scale.setScalar(k); } // escala só na exploração (a batalha usa o atlas próprio); a âncora nos pés é a origem da malha
+  for (const e of entidades) novoAtor(e, recursos.atlas[e.dados.sprite], false);
   const mkAnel = (r0, r1, cor, op) => { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: cor, transparent: true, opacity: op, depthWrite: false, depthTest: false })); m.renderOrder = 25; m.visible = false; cena.add(m); return m; };
   const marcadorDestino = mkAnel(0.32, 0.42, 0xfff0d0, 0.9), anelAlvo = mkAnel(0.62, 0.72, 0xd8ecff, 0.9);
   let alvoSobId = null, destinoAnterior = null, destinoT = 0;
 
   // ---------- partículas (pólen/vaga-lumes e fumaça das chaminés) ----------
-  const particulas = criarParticulas(cena, kit.chamines, perfil);
+  const particulas = criarParticulas(cena, kit.chamines, perfil), maxPart = (p) => (interior ? mapaDados.ambiente?.particulas ?? 0 : p.particulas_max); // interior: sem pólen nem vaga-lumes (cômodo fechado); `ambiente.particulas` liga poeira
+  particulas.definirMax(maxPart(perfil));
+  // baús de tesouro: o corpo está no kit; a TAMPA é um objeto à parte que abre/fecha (cena.definirBau(id, aberto)); estado inicial = `aberto` do objeto
+  const baus = new Map(); for (const o of mapaDados.objetos) if (o.tipo === 'bau_tesouro') { const b = criarTampaBau(o, materiais), t = o.aberto ? 1 : 0; b.definir(t); cena.add(b.grupo); baus.set(o.id, { b, t, alvo: t }); }
+  const reduzirMov = () => !!(typeof opcoes.reduzirMovimento === 'function' ? opcoes.reduzirMovimento() : opcoes.reduzirMovimento);
 
   // ---------- estado visual do ciclo (lido pelo pós) ----------
   const visual = { tom: [1, 1, 1], luzArtificial: 0, fundo: [0, 0, 0], ciclo: null };
@@ -78,14 +88,22 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   function atualizar(alfa, tempoS, dtS = 0.016) {
     const { camera: cam, heroi } = mundo, cx = lerp(cam.ox, cam.x, alfa), cz = lerp(cam.oz, cam.z, alfa);
     posicionarCamera(cx, cz);
-    const ec = estadoCiclo(ciclo, mundo.hora); visual.tom = ec.tom; visual.luzArtificial = ec.luzArtificial; visual.ciclo = ec;
+    const ec = ecInterior ?? estadoCiclo(ciclo, mundo.hora); visual.tom = ec.tom; visual.luzArtificial = ec.luzArtificial; visual.ciclo = ec;
     sol.color.setRGB(...ec.solCor); sol.intensity = ec.solInt; posicionarSol(cx, cz, ec.solElev); hemi.color.setRGB(...ec.hemiCeu); hemi.groundColor.setRGB(...ec.hemiChao); hemi.intensity = ec.hemiInt;
     cena.background.setRGB(...ec.fundo); cena.fog.color.setRGB(...ec.nevoa);
     materiais.janela.emissiveIntensity = ec.luzArtificial * 1.6; materiais.lampada.emissiveIntensity = Math.max(0.15, ec.luzArtificial) * 2.4; uniformesVento.uTempo.value = tempoS;
+    for (const q of baus.values()) if (q.t !== q.alvo) { q.t = reduzirMov() ? q.alvo : q.alvo > q.t ? Math.min(q.alvo, q.t + dtS / 0.45) : Math.max(q.alvo, q.t - dtS / 0.45); q.b.definir(q.t * q.t * (3 - 2 * q.t)); } // tampa: 0,45 s, com suavização
+    if (materiais.brilho_saida) materiais.brilho_saida.opacity = reduzirMov() ? 0.5 : 0.42 + 0.14 * Math.sin(tempoS * 2.4); // luz de fora pulsa de leve (parada com reduzir movimento)
     // lanternas: as N mais próximas do foco ganham PointLight real (N do perfil); todas brilham pelo material emissivo
     const acesa = lanternaAcesa(kitDados, mundo.hora) || ec.luzArtificial > 0.3, n = Math.min(POOL, perfil.luzes_pontuais_max);
     const ordem = reuniao.map((p, i) => [Math.hypot(p.x - cx, p.z - cz), i]).sort((a, b) => a[0] - b[0]);
-    luzesPontuais.forEach((l, i) => { const ok = i < n && acesa && ordem[i] && ordem[i][0] < 26; l.visible = !!ok; if (ok) { const p = reuniao[ordem[i][1]]; l.position.copy(p); l.intensity = ll.intensidade * ec.luzArtificial * (1 + 0.06 * Math.sin(tempoS * 9 + ordem[i][1] * 2.3)); } });
+    luzesPontuais.forEach((l, i) => {
+      const src = i < n && ordem[i] && ordem[i][0] < 26 ? lanternas[ordem[i][1]] : null, f = src && FONTES[src.tipo], ok = !!src && (f ? f.sempre || acesa : acesa);
+      l.visible = i < n; if (!ok) { l.intensity = 0; return; } // visível = constante por perfil: ligar/desligar luz muda o nº de luzes do shader e recompila (travada de ~400 ms) l.position.copy(reuniao[ordem[i][1]]);
+      if (f) { l.color.set(f.cor); l.distance = f.alcance_tiles; l.intensity = f.intensidade * (1 + (f.oscila ?? 0) * (0.6 * Math.sin(tempoS * 9.1 + ordem[i][1] * 2.3) + 0.4 * Math.sin(tempoS * 17.3 + ordem[i][1]))); }
+      else { l.color.set(ll.cor); l.distance = ll.alcance_tiles; l.intensity = ll.intensidade * ec.luzArtificial * (1 + 0.06 * Math.sin(tempoS * 9 + ordem[i][1] * 2.3)); }
+    });
+    if (materiais.brasa) { materiais.brasa.emissiveIntensity = 1.7 + 0.35 * Math.sin(tempoS * 7.3) + 0.15 * Math.sin(tempoS * 13.1); materiais.chama.emissiveIntensity = 2.4 + 0.5 * Math.sin(tempoS * 11.7); }
     // atores
     for (const a of atores) {
       const e = a.entidade, x = a.ehHeroi ? lerp(e.ox, e.x, alfa) : e.x, z = a.ehHeroi ? lerp(e.oz, e.z, alfa) : e.z;
@@ -102,7 +120,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     // marcadores no chão
     const d = heroi.destino; if (d && (!destinoAnterior || destinoAnterior.x !== d.x || destinoAnterior.z !== d.z)) destinoT = 0; destinoAnterior = d ? { x: d.x, z: d.z } : null; destinoT += dtS;
     marcadorDestino.visible = !!d; if (d) { marcadorDestino.position.set(d.x, 0.05, d.z); const k = 1 + 0.15 * Math.sin(destinoT * 8); marcadorDestino.scale.set(k, 1, k); }
-    const al = alvoSobId ? mundo.entidades.find((e) => e.id === alvoSobId) : null; anelAlvo.visible = !!al; if (al) anelAlvo.position.set(al.x, 0.05, al.z);
+    const al = alvoSobId ? entidades.find((e) => e.id === alvoSobId) : null; anelAlvo.visible = !!al; if (al) anelAlvo.position.set(al.x, 0.05, al.z);
     particulas.atualizar(dtS, tempoS, cx, cz, ec.luzArtificial);
   }
 
@@ -120,7 +138,9 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     for (const m of Object.values(materiais)) if (m.map) m.map.anisotropy = p.aniso; for (const t of Object.values(T)) t.anisotropy = p.aniso;
     for (const a of atores) { a.sprite.malha.material.alphaToCoverage = p.msaa > 0; a.sprite.malha.material.alphaTest = p.msaa > 0 ? 0.01 : 0.45; a.sprite.malha.material.needsUpdate = true; }
     cena.traverse((o) => { if (o.material && !o.material.isShaderMaterial) { for (const m of Array.isArray(o.material) ? o.material : [o.material]) m.needsUpdate = true; } });
-    particulas.definirMax(p.particulas_max);
+    particulas.definirMax(maxPart(p));
   }
-  return { cena, camera, atualizar, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
+  /** Abre/fecha a tampa do baú de tesouro `id`; `instantaneo` pula a animação. Devolve false se não existe nesta cena. */
+  const definirBau = (id, aberto, instantaneo = false) => { const q = baus.get(id); if (!q) return false; q.alvo = aberto ? 1 : 0; if (instantaneo) { q.t = q.alvo; q.b.definir(q.t); } return true; };
+  return { cena, camera, atualizar, definirBau, aplicarPerfil, pegarCursor, visual, atores, kit, solo, texelsPorTile, definirAlvoSob: (id) => { alvoSobId = id; }, meioW, meioH, estatisticasKit: () => ({ grupos: kit.grupos.size, janelas: kit.janelas.length, chamines: kit.chamines.length, luzes: kit.luzes.length }) };
 }

@@ -85,6 +85,7 @@ export function criarRenderizador(canvas, cfg, perfil, modoInicial) {
     /** Resolução de ARTE por cena (batalha 640×360, mapa 960×540): refaz os alvos de desenho; a escala continua inteira. */
     definirArte(w, h) { if (w === AW && h === AH) return; AW = w; AH = h; ajustar(...ultimaJanela); },
     get arte() { return [AW, AH]; }, arteBase,
+    /** Pré-compila os shaders da cena (evita a travada do primeiro quadro). */ compilar: (c) => renderer.compile(c.cena, c.camera),
     estatisticas: () => ({ chamadas: renderer.info.render.calls, triangulos: renderer.info.render.triangles, texturas: renderer.info.memory.textures, geometrias: renderer.info.memory.geometries }),
     infoGpu() { const gl = renderer.getContext(), e = gl.getExtension('WEBGL_debug_renderer_info'); return e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : 'desconhecida'; },
   };

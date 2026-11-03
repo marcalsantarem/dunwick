@@ -3,6 +3,7 @@
   "versao": 1,
   "nota": "Edric Moss. Movimento, ataques (combo de 3), golpe forte e rolamento em DADOS; dano, fôlego e atributos são do 03/06. Quadros a 60 Hz.",
   "sprite": "hero_edric",
+  "escala_mapa": 0.7,
   "movimento": {
     "vel_andar": 3.5,
     "vel_correr": 6.0,

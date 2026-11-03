@@ -26,6 +26,7 @@ export const REGISTRO = [
   ['attacks', /^(atk|skill)_[a-z0-9_]+\.json$/, 'acao_batalha'],
   // exploração (13): encontro aleatório por passos, um arquivo por mapa
   ['exploracao', /^z_enc_[a-z0-9_]+\.json$/, 'zonas_encontro'],
+  ['exploracao', /^cfg_exploracao\.json$/, 'cfg_exploracao'],
 ];
 
 export function lerJson(caminho) {

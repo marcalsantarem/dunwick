@@ -107,5 +107,6 @@
       "enc_lobo_1",
       "enc_misto_1"
     ]
-  }
+  },
+  "msg_nao_faz_nada_txt": "ui_batalha_nao_faz_nada"
 }

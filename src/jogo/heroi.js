@@ -11,14 +11,17 @@ export function dir8DeMundo(vx, vz) { const sx = vx - vz, sy = (vx + vz) * 0.5; 
 const DIR_SPRITE = [['l', false], ['se', false], ['s', false], ['se', true], ['l', true], ['ne', true], ['n', false], ['ne', false]]; // 5 desenhadas, 3 espelhadas
 export const spriteDeDir8 = (k) => ({ dir: DIR_SPRITE[k][0], espelhar: DIR_SPRITE[k][1] });
 
-export function criarHeroi(dadosHeroi, mapa, cfgJogo, metaSprite) {
+export const FACE_DE_DIRECAO = { s: Math.atan2(1, 1), n: Math.atan2(-1, -1), l: Math.atan2(-1, 1), o: Math.atan2(1, -1) }; // ângulo no mundo (atan2(z, x))
+
+export function criarHeroi(dadosHeroi, mapaInicial, cfgJogo, metaSprite) {
+  let mapa = mapaInicial;
   const m = dadosHeroi.movimento, r = dadosHeroi.caixas.pushbox_raio_tiles, [ix, iz] = mapa.dados.inicio_jogador.tile, dt = 1 / cfgJogo.passo_logico_hz;
   const cfgE = cfgJogo.entrada, ataques = dadosHeroi.ataques, esq = dadosHeroi.esquiva;
-  const faceInicial = { s: Math.atan2(1, 1), n: Math.atan2(-1, -1), l: Math.atan2(-1, 1), o: Math.atan2(1, -1) }[mapa.dados.inicio_jogador.direcao]; // ângulo no mundo (atan2(z, x))
+  const faceInicial = FACE_DE_DIRECAO[mapa.dados.inicio_jogador.direcao];
   const h = {
     id: dadosHeroi.id, x: ix + 0.5, z: iz + 0.5, vx: 0, vz: 0, ox: ix + 0.5, oz: iz + 0.5,
     face: faceInicial, estado: ESTADOS_HEROI.PARADO, quadroEstado: 0, raioPush: r, raioHurt: dadosHeroi.caixas.hurtbox_raio_tiles,
-    velMax: m.vel_andar, correndoClique: false, destino: null, alvoId: null,
+    velMax: m.vel_andar, correndoClique: false, destino: null, rota: null, alvoId: null, chaveRota: null,
     acao: null, // { tipo: 'ataque'|'esquiva', idx, def, t, total, acertou: Set }
     combo: 0, comboAte: -1, esqRecarga: 0, invencivel: false, travadoSemProgresso: 0,
     anim: { nome: dadosHeroi.animacoes.parado, quadro: 0 }, dir8: dir8DeMundo(Math.cos(faceInicial), Math.sin(faceInicial)),
@@ -69,8 +72,8 @@ export function criarHeroi(dadosHeroi, mapa, cfgJogo, metaSprite) {
     const pressionou = entrada.apertou.includes('clique_principal'), segura = entrada.segurando.has('clique_principal');
     if (temMover) { h.destino = null; h.alvoId = null; }
     else if (!ancorado) {
-      if (pressionou) { if (alvoSob) { h.alvoId = alvoSob.id; h.destino = null; } else if (entrada.cursor.valido) { h.destino = { x: entrada.cursor.x, z: entrada.cursor.z }; h.alvoId = null; h.correndoClique = false; } }
-      else if (segura && !alvoSob && !h.alvoId && entrada.cursor.valido) h.destino = { x: entrada.cursor.x, z: entrada.cursor.z }; // segurar = seguir o cursor
+      if (pressionou) { if (alvoSob) { h.alvoId = alvoSob.id; h.destino = null; } else if (entrada.cursor.valido) { h.irPara(entrada.cursor.x, entrada.cursor.z); h.alvoId = null; h.correndoClique = false; } }
+      else if (segura && !alvoSob && !h.alvoId && entrada.cursor.valido) { const k = `${Math.floor(entrada.cursor.x * 2)},${Math.floor(entrada.cursor.z * 2)}`; if (k !== h.chaveRota || !h.destino) h.irPara(entrada.cursor.x, entrada.cursor.z); } // segurar = seguir o cursor (rota refeita só quando o cursor muda de célula)
     }
     const alvoPerseguido = h.alvoId ? alvos.find((a) => a.id === h.alvoId) : null; if (h.alvoId && !alvoPerseguido) h.alvoId = null;
 
@@ -117,7 +120,7 @@ export function criarHeroi(dadosHeroi, mapa, cfgJogo, metaSprite) {
         const t = alvoPerseguido ?? h.destino;
         if (t) {
           const dx = t.x - h.x, dz = t.z - h.z, d = Math.hypot(dx, dz), chega = alvoPerseguido ? alvoPerseguido.raioHurt + ataques[0].hitbox.alcance_tiles * 0.8 : cfgE.chegada_tiles;
-          if (d <= chega) { if (!alvoPerseguido) { h.destino = null; } }
+          if (d <= chega) { if (!alvoPerseguido) { h.destino = h.rota?.length ? h.rota.shift() : null; } }
           else { querMover = true; alvoX = dx / d; alvoZ = dz / d; if (d > cfgE.clique_corrida_distancia_tiles) h.correndoClique = true; correr = correr || h.correndoClique; }
         }
       }
@@ -147,6 +150,22 @@ export function criarHeroi(dadosHeroi, mapa, cfgJogo, metaSprite) {
     if (ac) { const meta = metaSprite.anims[ac.def.anim ?? esq.anim], n = meta.quadros; h.anim.nome = ac.def.anim ?? esq.anim; h.anim.quadro = Math.min(n - 1, Math.floor((ac.t / ac.total) * n)); }
     else { const nome = h.estado === 'PARADO' ? an.parado : h.estado === 'CORRER' ? an.correr : an.andar, meta = metaSprite.anims[nome]; h.anim.nome = nome; h.anim.quadro = h.estado === 'PARADO' ? Math.floor(h.quadroEstado * meta.fps / 60) % meta.quadros : Math.floor(h.quadroEstado * meta.fps / 60 * (h.estado === 'CORRER' ? 1 : 1)) % meta.quadros; }
   };
+  /** Andar até (x, z) contornando o que é sólido (rota do mapa); destino inalcançável vira o ponto livre mais próximo. Devolve se há rota. */
+  h.irPara = (x, z) => {
+    h.chaveRota = `${Math.floor(x * 2)},${Math.floor(z * 2)}`;
+    const r = mapa.rota(h.x, h.z, x, z, h.raioPush);
+    if (!r || !r.length) { h.destino = null; h.rota = null; return false; }
+    h.destino = r.shift(); h.rota = r; h.travadoSemProgresso = 0; return true;
+  };
+  /** Troca de mapa (portal) ou carregamento: novo mapa lógico (opcional), posição e direção; parado, sem rota nem ação. */
+  h.definirMapa = (novoMapa, x, z, direcao) => {
+    if (novoMapa) mapa = novoMapa;
+    h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; h.destino = null; h.rota = null; h.alvoId = null; h.acao = null; h.chaveRota = null;
+    if (direcao) { h.face = FACE_DE_DIRECAO[direcao]; h.dir8 = dir8DeMundo(Math.cos(h.face), Math.sin(h.face)); }
+    h.estado = ESTADOS_HEROI.PARADO; h.quadroEstado = 0;
+  };
+  /** Direção cardinal (s | n | l | o) mais próxima da face (para o save). */
+  h.direcao = () => Object.entries(FACE_DE_DIRECAO).reduce((m, [k, a]) => { const d = Math.abs(Math.atan2(Math.sin(h.face - a), Math.cos(h.face - a))); return d < m[1] ? [k, d] : m; }, ['s', Infinity])[0];
   h.velocidade = () => Math.hypot(h.vx, h.vz);
   h.spriteDir = () => spriteDeDir8(h.dir8);
   h.mover = { x: 0, z: 0 };

@@ -264,3 +264,24 @@ Respostas do usuário às perguntas t, u, v do 02:
 
 ## D-040 — Cura e poção funcionam com a vida cheia (2026-10-29)
 - **Decisão (usuário):** poção e magia de cura **executam e gastam o recurso mesmo com o alvo de vida cheia** (nenhuma recusa nem redirecionamento). Na **escolha de alvo**, aparece **"VIDA CHEIA"** sobre o sprite do personagem que está com a vida cheia, como aviso; o jogador pode escolher mesmo assim. Só apresentação; sem mudança de regra no motor.
+
+## D-041 — v0.1.2: vila completa, com interiores e minimapa girado (2026-10-29)
+- **Decisão (usuário):** (1) o **minimapa gira junto com a tela** (cima do minimapa = cima da tela); (2) **os interiores entram**: "vila completinha"; (3) o **esboço da vila está aprovado**, mas o usuário quer **vê-lo implementado** para confirmar.
+- **Escopo assumido pelo Produtor (declarado):** interiores simples (um cômodo cada, sem NPCs até a v0.1.4) para a **casa da Maren, a taverna, a forja, o pátio/casa do Torvan e o posto do escrivão**; as casas de moradores do sul ficam **fechadas** (fachada, sem interior). Cada interior é um **mapa pequeno** ligado ao exterior por **porta (portal)**.
+- **Consequência técnica:** a **troca de mapa por portal**, antes prevista na v0.1.3, **entra na v0.1.2**. A v0.1.3 passa a reusar o mecanismo para a saída da vila.
+- **Aplica a D-038:** a vila inteira vira zona segura nesta versão (as zonas `z_enc_*` saem da vila).
+
+## D-042 — v0.1.2 em duas etapas: mapa da vila, depois minimapa (2026-10-29)
+- **Decisão (usuário):** o **minimapa continua na v0.1.2**, mas em **duas etapas** para concentrar o trabalho em algo visível e testável: **etapa 1 = mapa da vila completo** (interiores, portais, props, colisão, vila segura); **etapa 2 = minimapa** (girado com a tela, D-041), só depois de o usuário ver o mapa. O PR da v0.1.2 sai ao fim das duas.
+
+## D-043 — Casa do Edric, mochila infinita e boneco de treino (2026-10-29)
+- **Decisão (usuário):** o **Edric mora sozinho** numa casinha **pequena e rudimentar por fora e detalhada por dentro** (armas simples nas paredes, livros, **baú de tesouro**), perto da **Maren** e do **Torvan**. A **mochila é infinita**: não há baú de armazenar, só baús de tesouro.
+- **Pátio do Torvan:** só **1 boneco de treino** (o oposto ao poço). Novo inimigo **`enemy_boneco_treino`** (~200 PV, não ataca, sem XP/moedas/drops, `treino: true`); clicar nele inicia `enc_boneco_treino`, **repetível sem limite**, com o grupo restaurado ao fim.
+- **Interiores:** sem porta desenhada nem rótulo "Sair"; ficam **só a marcação no chão e o portal**.
+- Detalhes por agente: `docs/briefings/BRF-v012b_casa_edric_boneco_treino.md`.
+
+## D-044 — Mundo aberto simples + locais ricos; geração por regras só depois do slice (2026-10-29)
+- **Decisão (usuário):** o jogo adota o modelo **mundo aberto simples + locais ricos** (estilo Final Fantasy antigo/RPG Maker): o **mapa aberto** (campos, planícies, entorno) é **simplificado** — terreno leve, vegetação rala, personagem **menor e mais lento**, sem props detalhados — e as **áreas exploráveis** (vila, bosque, caverna, interiores) são **locais ricos**, no estilo atual da vila, **acessados por portal** que teleporta para o mapa expandido. Motivo: custo em tokens e tempo.
+- **Efeito no roteiro:** **v0.1.3** (entorno) passa a ser o **mapa aberto simplificado** com a vila como ponto de entrada; **v0.1.7** (bosque e caverna) são **locais ricos acessados por portal**, com corredores e salas estreitas (mais baratos que céu aberto). Escopo e versões não mudam; só o custo por mapa cai.
+- **Registro de desejo (usuário):** depois do slice, **gerar campos e masmorras por regras** (densidade de vegetação, caminhos, salas, sementes) para expandir o jogo com facilidade. **Fora do slice e da demo**; entra no backlog como BL-033.
+- **Processo:** pedir uma coisa por vez, a menos agentes, e juntar os ajustes de playtest num briefing só.

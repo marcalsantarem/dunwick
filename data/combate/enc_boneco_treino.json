@@ -1,0 +1,13 @@
+{
+  "id": "enc_boneco_treino",
+  "versao": 1,
+  "nota": "Treino: sem recompensa, grupo restaurado ao fim, repetível sem limite (v0.1.2b).",
+  "nome_txt": "txt_enc_boneco_treino_nome",
+  "inimigos": [
+    "enemy_boneco_treino"
+  ],
+  "pode_fugir": true,
+  "treino": true,
+  "cenario": "cen_campo_baixo_orvalho",
+  "musica": "mus_batalha_comum"
+}

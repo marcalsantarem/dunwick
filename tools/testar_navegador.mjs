@@ -100,7 +100,7 @@ const m = await pag.evaluate('__dunwick.marcas');
 console.log(`  carga (ms): dados ${(m.dados - m.inicio).toFixed(0)} · assets ${(m.assets - m.dados).toFixed(0)} · cena ${(m.cena - m.assets).toFixed(0)} · shaders ${(m.compilado - m.cena).toFixed(0)} · total no script ${(m.compilado - m.inicio).toFixed(0)}`);
 const audioInicial = await pag.evaluate('__dunwick.audio.estado');
 await dormir(800); await pag.screenshot({ path: CAPTURA });
-const estado = () => pag.evaluate(() => { const m = __dunwick.mundo, h = m.heroi; return { ticks: m.ticks, x: h.x, z: h.z, v: h.velocidade(), est: h.estado, acao: h.acao ? { tipo: h.acao.tipo, t: h.acao.t } : null, destino: h.destino, acertos: m.entidades[0].contadores.acertos, hora: m.hora, t: performance.now() }; });
+const estado = () => pag.evaluate(() => { const m = __dunwick.mundo, h = m.heroi; return { ticks: m.ticks, x: h.x, z: h.z, v: h.velocidade(), est: h.estado, acao: h.acao ? { tipo: h.acao.tipo, t: h.acao.t } : null, destino: h.destino, acertos: m.entidades[0]?.contadores.acertos ?? 0, hora: m.hora, t: performance.now() }; });
 const por = (x, y, z) => pag.evaluate(([x, y, z]) => __dunwick.mundoParaTela(x, y, z), [x, y, z]);
 const colocar = (x, z) => pag.evaluate(([x, z]) => { const m = __dunwick.mundo, h = m.heroi; h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; h.destino = null; h.alvoId = null; h.acao = null; m.camera.encaixar(h); }, [x, z]).then(() => dormir(400)); // espera um quadro: a câmera só se move no quadro seguinte
 const livre = (x, z) => pag.evaluate(([x, z]) => __dunwick.mundo.mapa.livre(x, z, 0.4), [x, z]);
@@ -111,33 +111,35 @@ await pag.evaluate(() => { __dunwick.mundo.cicloLigado = false; });
 
 // ---- teclado (relativo à tela) ----
 async function velTeclado(tecla, correr) { if (correr) await pag.keyboard.down('ShiftLeft'); await pag.keyboard.down(tecla); await dormir(500); const a = await estado(); await dormir(800); const b = await estado(); await pag.keyboard.up(tecla); if (correr) await pag.keyboard.up('ShiftLeft'); await dormir(300); return Math.hypot(b.x - a.x, b.z - a.z) / ((b.ticks - a.ticks) / 60); }
-await colocar(24.5, 28.5); { const v = await velTeclado('KeyD', false); checar('teclado: andar a 3,5 tiles/s (± 5 %)', Math.abs(v - 3.5) / 3.5 <= 0.05, `${v.toFixed(3)} tiles/s`); }
-await colocar(26.5, 30.5); { const v = await velTeclado('KeyA', true); checar('teclado: correr a 6,0 tiles/s (± 5 %)', Math.abs(v - 6) / 6 <= 0.05, `${v.toFixed(3)} tiles/s`); }
+// início do jogador no mapa (a vila fica deslocada dentro da faixa de mata: as posições do teste são relativas a ele)
+const [IX, IZ] = await pag.evaluate(() => __dunwick.mundo.mapa.dados.inicio_jogador.tile.map((v) => v + 0.5));
+await colocar(IX, IZ); { const v = await velTeclado('KeyD', false); checar('teclado: andar a 3,5 tiles/s (± 5 %)', Math.abs(v - 3.5) / 3.5 <= 0.05, `${v.toFixed(3)} tiles/s`); }
+{ const c = await pag.evaluate(([ix, iz]) => { const m = __dunwick.mundo.mapa; for (let z = iz; z < iz + 5.5; z += 0.5) for (let x = ix + 6; x > ix - 6.5; x -= 0.5) { let ok = true; for (let d = 0; d <= 9 && ok; d += 0.25) ok = m.livre(x - d, z, 0.4); if (ok) return [x, z]; } return [ix, iz]; }, [IX, IZ]); await colocar(c[0], c[1]); } // corredor livre de 9 tiles para a esquerda (a vila nova tem obstáculos onde antes era vazio) { const v = await velTeclado('KeyA', true); checar('teclado: correr a 6,0 tiles/s (± 5 %)', Math.abs(v - 6) / 6 <= 0.05, `${v.toFixed(3)} tiles/s`); }
 
 // ---- mouse à Diablo ----
-await colocar(24.5, 28.5);
-{ let alvo = null; for (const [dx, dz] of [[6, 0], [0, 6], [-6, 0], [-4, 4], [4, 4]]) if (await livre(24.5 + dx, 28.5 + dz)) { alvo = [24.5 + dx, 28.5 + dz]; break; }
+await colocar(IX, IZ);
+{ let alvo = null; for (const [dx, dz] of [[6, 0], [0, 6], [-6, 0], [-4, 4], [4, 4]]) if (await livre(IX + dx, IZ + dz)) { alvo = [IX + dx, IZ + dz]; break; }
   const pt = await por(alvo[0], 0, alvo[1]); await pag.mouse.move(pt.x, pt.y); await pag.mouse.click(pt.x, pt.y); await dormir(300); const a = await estado();
   checar('mouse: clique no chão define o destino e o herói corre (> 5 tiles)', !!a.destino && a.v > 2, `destino ${a.destino ? a.destino.x.toFixed(2) + ',' + a.destino.z.toFixed(2) : 'nenhum'}, v ${a.v.toFixed(2)}`);
   await dormir(2500); const b = await estado(); checar('mouse: chega ao ponto clicado e para', Math.hypot(b.x - alvo[0], b.z - alvo[1]) < 0.4 && b.v < 0.1, `a ${Math.hypot(b.x - alvo[0], b.z - alvo[1]).toFixed(2)} tiles do alvo`); }
 await pag.screenshot({ path: join(dirQA, 'praca_clique_mover.png') });
-{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.entidades[0]; return { x: e.x, z: e.z }; }); await colocar(al.x - 4, al.z); const alvoTela = await por(al.x, 1.0, al.z);
-  await pag.mouse.move(alvoTela.x, alvoTela.y); await dormir(300); const sob = await pag.evaluate('document.getElementById("debug").textContent.includes("alvo enemy_boneco_alvo")');
-  checar('mouse: cursor sobre o boneco → alvo sob o cursor detectado', sob);
-  const antes = (await estado()).acertos; await pag.mouse.click(alvoTela.x, alvoTela.y); await dormir(2500); const d = await estado();
-  checar('mouse: clique no boneco → aproxima, ataca e acerta (contador de acertos sobe)', d.acertos > antes, `acertos ${antes} → ${d.acertos}`); await pag.screenshot({ path: join(dirQA, 'praca_ataque.png') });
-  const antes2 = d.acertos; await colocar(al.x - 1.3, al.z); await pag.mouse.move(alvoTela.x, alvoTela.y); await pag.mouse.click(alvoTela.x, alvoTela.y, { button: 'right' }); await dormir(900); const e = await estado();
-  checar('mouse: botão direito = golpe forte (sem abrir o menu de contexto)', e.acertos > antes2, `acertos ${antes2} → ${e.acertos}`); }
-{ await colocar(24.5, 28.5); const pt = await por(30.5, 0, 28.5); await pag.mouse.move(pt.x, pt.y); await dormir(100); const a = await estado(); await pag.keyboard.press('Space'); await dormir(120); const meio = await estado(); await dormir(600); const b = await estado(); const dist = Math.hypot(b.x - a.x, b.z - a.z);
+{ const al = await pag.evaluate(() => { const e = __dunwick.mundo.mapa.dados.pois.find((p) => p.id === 'boneco_treino'); return { x: e.x, z: e.z }; }); /* boneco = objeto do kit + POI (não é mais entidade) */ await colocar(al.x - 2.8, al.z); const alvoTela = await por(al.x, 1.0, al.z);
+  await pag.mouse.move(alvoTela.x, alvoTela.y); await dormir(300); const sob = await pag.evaluate('__dunwick.atualizarCursor().alvo');
+  checar('mouse: cursor sobre o boneco de treino não vira alvo de ataque (é interativo; o herói anda até ele)', !sob, `alvo ${sob}`);
+  await pag.evaluate(() => { window.__treinoId = null; const j = __dunwick.jogo, orig = j.iniciarBatalha; j.iniciarBatalha = (id, o) => { window.__treinoId = id; j.iniciarBatalha = orig; }; }); // só observa o disparo (não entra na batalha)
+  await pag.mouse.click(alvoTela.x, alvoTela.y); const entrou = await pag.waitForFunction('window.__treinoId', { timeout: 8000 }).then(() => true, () => false);
+  checar('mouse: clique no boneco de treino → anda até ele e dispara a batalha de treino (D-043)', entrou && (await pag.evaluate('window.__treinoId')) === 'enc_boneco_treino'); await pag.screenshot({ path: join(dirQA, 'praca_ataque.png') });
+  }
+{ await colocar(IX, IZ); const pt = await por(IX + 6, 0, IZ); await pag.mouse.move(pt.x, pt.y); await dormir(100); const a = await estado(); await pag.keyboard.press('Space'); await dormir(120); const meio = await estado(); await dormir(600); const b = await estado(); const dist = Math.hypot(b.x - a.x, b.z - a.z);
   checar('Espaço: rolamento de ~3 tiles na direção do cursor', Math.abs(dist - 3) / 3 < 0.12, `${dist.toFixed(2)} tiles; ação ${meio.acao?.tipo}`); }
 
 // ---- aba oculta ----
-await colocar(24.5, 28.5); await pag.keyboard.down('KeyD'); await dormir(300);
+await colocar(IX, IZ); await pag.keyboard.down('KeyD'); await dormir(300);
 const antes = await pag.evaluate(() => { const m = __dunwick.mundo, a = { ticks: m.ticks, x: m.heroi.x }; Object.defineProperty(document, 'hidden', { value: true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); return a; });
 await dormir(3000); const oculto = await estado();
 await pag.evaluate(() => { Object.defineProperty(document, 'hidden', { value: false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); }); await dormir(200); const volta = await estado(); await pag.keyboard.up('KeyD');
 checar('M1-05 aba oculta: ticks avançam ≤ 2 em 3 s', oculto.ticks - antes.ticks <= 2, `+${oculto.ticks - antes.ticks} ticks`); checar('M1-05 aba oculta: herói parado e sem "corrida" ao voltar', Math.abs(oculto.x - antes.x) <= 0.2 && volta.x - oculto.x < 1.5, `parado ${(oculto.x - antes.x).toFixed(3)} · +${(volta.x - oculto.x).toFixed(2)} em 0,2 s`);
-await dormir(400); await colocar(24.5, 28.5);
+await dormir(400); await colocar(IX, IZ);
 
 // ---- debug ----
 await pag.keyboard.press('F6'); await dormir(300); const p1 = await estado(); await dormir(1000); const p2 = await estado(); checar('debug F6 pausa a simulação', p2.ticks === p1.ticks, `${p1.ticks} → ${p2.ticks}`);
@@ -161,9 +163,9 @@ checar('escala contínua preenche a janela: 720p→1,333, 1080p→2 (inteira), 1
 await pag.setViewport({ width: JW, height: JH, deviceScaleFactor: 1 }); await dormir(300);
 
 // ---- gamepad simulado ----
-await colocar(24.5, 28.5);
+await colocar(IX, IZ);
 await pag.evaluate(() => { window.__pad = { connected: true, buttons: Array.from({ length: 17 }, () => ({ pressed: false })), axes: [0.12, -0.1, 0, 0], mapping: 'standard' }; navigator.getGamepads = () => [window.__pad && window.__pad.connected ? window.__pad : null]; });
-await dormir(1500); const g0 = await estado(); checar('M1-08 gamepad: analógico solto não anda sozinho (1,5 s)', g0.v < 0.01 && Math.abs(g0.x - 24.5) < 0.01, `x = ${g0.x.toFixed(3)}`);
+await dormir(1500); const g0 = await estado(); checar('M1-08 gamepad: analógico solto não anda sozinho (1,5 s)', g0.v < 0.01 && Math.abs(g0.x - IX) < 0.01, `x = ${g0.x.toFixed(3)}`);
 await pag.evaluate(() => { window.__pad.axes = [1, 0, 0, 0]; }); await dormir(700); const g1 = await estado(); checar('M1-08 gamepad: analógico move o herói', g1.v > 3, `v = ${g1.v.toFixed(2)}`);
 await pag.evaluate(() => { window.__pad.connected = false; }); await dormir(150); const g2 = await estado(); checar('M1-09 gamepad: desconectar solta tudo (herói para em ≤ 150 ms)', g2.v < 0.01, `v = ${g2.v.toFixed(3)}`);
 await pag.evaluate(() => { window.__pad.connected = true; window.__pad.axes = [0, 0, 0, 0]; }); await dormir(300);
@@ -176,7 +178,7 @@ const audioDepois = await pag.evaluate('__dunwick.audio.estado'); checar('áudio
 // ---- medição de fps ----
 let medicao = null;
 if (SEG_MEDIR > 0) {
-  await pag.evaluate(() => { __dunwick.mundo.hora = 17; const h = __dunwick.mundo.heroi; h.x = h.ox = 24.5; h.z = h.oz = 28.5; __dunwick.exportarTempos(); });
+  await pag.evaluate(([ix, iz]) => { __dunwick.mundo.hora = 17; const h = __dunwick.mundo.heroi; h.x = h.ox = ix; h.z = h.oz = iz; __dunwick.exportarTempos(); }, [IX, IZ]);
   console.log(`\nmedindo ${SEG_MEDIR} s (herói correndo em rota)…`); const rota = [['KeyD', 1500], ['KeyS', 1000], ['KeyA', 1500], ['KeyW', 1000]];
   await pag.evaluate(() => { window.__lt = []; window.__t0 = performance.now(); new PerformanceObserver((l) => l.getEntries().forEach((e) => window.__lt.push({ t_s: +((e.startTime - window.__t0) / 1000).toFixed(2), ms: +e.duration.toFixed(0) }))).observe({ entryTypes: ['longtask'] }); });
   await pag.keyboard.down('ShiftLeft'); const ini = Date.now();

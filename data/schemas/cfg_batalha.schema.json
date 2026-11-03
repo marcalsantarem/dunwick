@@ -24,7 +24,8 @@
     "dist_contato_tiles",
     "inventario_teste",
     "fracao_impacto",
-    "debug"
+    "debug",
+    "msg_nao_faz_nada_txt"
   ],
   "properties": {
     "id": {
@@ -439,6 +440,10 @@
           }
         }
       }
+    },
+    "msg_nao_faz_nada_txt": {
+      "type": "string",
+      "pattern": "^ui_[a-z0-9_]+$"
     }
   }
 }

@@ -1,0 +1,129 @@
+{
+  "id": "map_forja_interior",
+  "versao": 1,
+  "nome_txt": "txt_map_forja_interior_nome",
+  "origem": "tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-041)",
+  "tipo_mapa": "interior",
+  "tamanho": [10, 8],
+  "legenda": {
+    "t": "terra"
+  },
+  "planta": [
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt",
+    "tttttttttt"
+  ],
+  "objetos": [
+    {
+      "id": "aplique_1",
+      "tipo": "aplique",
+      "x": 5,
+      "z": 0,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "aplique_2",
+      "tipo": "aplique",
+      "x": 0,
+      "z": 4,
+      "rot": 90,
+      "seed": 2
+    },
+    {
+      "id": "barril_3",
+      "tipo": "barril",
+      "x": 8.8,
+      "z": 6.6,
+      "rot": 0,
+      "seed": 3
+    },
+    {
+      "id": "caixote_4",
+      "tipo": "caixote",
+      "x": 1.1,
+      "z": 6.6,
+      "rot": 0,
+      "seed": 4
+    },
+    {
+      "id": "caixote_5",
+      "tipo": "caixote",
+      "x": 2.1,
+      "z": 6.7,
+      "rot": 0,
+      "seed": 5
+    },
+    {
+      "id": "fornalha_6",
+      "tipo": "fornalha",
+      "x": 2,
+      "z": 1,
+      "rot": 0,
+      "seed": 6
+    },
+    {
+      "id": "bigorna_7",
+      "tipo": "bigorna",
+      "x": 4.5,
+      "z": 3.2,
+      "rot": 0,
+      "seed": 7
+    },
+    {
+      "id": "bancada_8",
+      "tipo": "bancada",
+      "x": 7.5,
+      "z": 0.6,
+      "rot": 0,
+      "seed": 8
+    },
+    {
+      "id": "rack_armas_9",
+      "tipo": "rack_armas",
+      "x": 9,
+      "z": 3,
+      "rot": 0,
+      "seed": 9
+    }
+  ],
+  "portais": [
+    {
+      "id": "saida",
+      "x": 5,
+      "z": 7.5,
+      "w": 2,
+      "d": 1,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "porta_forja"
+      },
+      "chegada": {
+        "x": 5,
+        "z": 5.5,
+        "direcao": "n"
+      },
+      "ativo": true
+    }
+  ],
+  "sala": {
+    "altura_parede": 3,
+    "parede": "pedra",
+    "piso": "terra"
+  },
+  "ambiente": {
+    "cor_luz": "#ff9a5a",
+    "intensidade": 1.1,
+    "fundo": "#140c08"
+  },
+  "inicio_jogador": {
+    "tile": [5, 4],
+    "direcao": "n"
+  },
+  "limites_camera": [0, 0, 10, 8]
+}
