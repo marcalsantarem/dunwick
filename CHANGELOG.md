@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.3 — Mapa de mundo (2026-11-03)
+- Mapa de mundo estilizado "Campos de Baixo Orvalho": costa, praia com espuma, rio com ponte, lago, estradas, cordilheira em 3D com neve, floresta em massa com variedade de árvores, campos de cultivo e rochas com musgo; bordas orgânicas e água animada, sombras de nuvem e mar até o horizonte.
+- Vila, bosque e caverna aparecem como marcadores no mundo; a vila é entrada pelo portal (saída sul da vila ↔ marcador), e o bosque e a caverna ficam interditados, com aviso.
+- Edric de mundo (sprite própria, mais lento e maior), colisão do terreno (água e montanha), placa com o nome do marcador, banner "Campos de Baixo Orvalho" e minimapa desligado no mundo.
+- Plataforma: tipo de mapa `mundo`, câmera e render de mundo, pré-compilação por mapa e perfis de densidade da floresta; FPS ~57 (pior 1 % ≥ 53 na maioria das rodadas).
+- Decisões D-044, D-045, D-046 e D-048 (mundo aberto simples + locais ricos; baús só em locais; visual refeito).
+
 ## v0.1.2 — Vila completa com interiores e minimapa (2026-11-03)
 - Vila de Baixo Orvalho completa (94×94): casas, taverna, forja, posto do escrivão, praça, poço e quadro, cercada por mata densa, cerca, muralha e estacada (sem "fim do mundo").
 - Interiores com troca de mapa por portal (névoa escura): casas da Maren, do Torvan e do Edric, taverna, forja e posto do escrivão; só marcação no chão como saída. Vila 100% segura (sem encontros).
