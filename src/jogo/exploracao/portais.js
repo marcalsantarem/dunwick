@@ -40,7 +40,7 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
 
   function avisarBloqueado(p) {
     contato.add(p.id);
-    eventos.emitir('portal_bloqueado', { mapa: mundo.mapaId, portal: p.id, aviso_txt: cfg.aviso_portal_inativo_txt });
+    eventos.emitir('portal_bloqueado', { mapa: mundo.mapaId, portal: p.id, nome_txt: p.nome_txt ?? null, aviso_txt: p.aviso_txt ?? cfg.aviso_portal_inativo_txt });
   }
   function interagir(o) {
     const h = heroi(); h.face = Math.atan2(o.z - h.z, o.x - h.x);
@@ -68,7 +68,7 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
     P.retorno = md.tipo_mapa === 'interior' ? { mapa: t.de_mapa, portal: t.portal } : null; // de onde se entrou (exterior) enquanto se está num interior
     trocarMapa(t.para_mapa, c.x, c.z, c.direcao);
     P.pendente = null; P.rearmar();
-    eventos.emitir('mapa_trocado', { mapa: t.para_mapa, de_mapa: t.de_mapa, portal: destino?.id ?? null, x: c.x, z: c.z, direcao: c.direcao });
+    eventos.emitir('mapa_trocado', { mapa: t.para_mapa, tipo_mapa: md.tipo_mapa ?? null, de_mapa: t.de_mapa, portal: destino?.id ?? null, x: c.x, z: c.z, direcao: c.direcao });
     return true;
   };
   P.cancelar = () => { P.pendente = null; P.intencao = null; };
@@ -112,7 +112,13 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
       if (it.tipo === 'poi') { const o = pois().find((q) => q.id === it.id); if (o && Math.hypot(o.x - h.x, o.z - h.z) <= cfg.alcance_interagir_tiles) interagir(o); }
       else { const p = portais().find((q) => q.id === it.id); if (p && p.ativo === false && distRet(retDe(p), h.x, h.z) - r <= cfg.alcance_interagir_tiles && !contato.has(p.id)) avisarBloqueado(p); }
     }
-    if (entrada.apertou.includes('interagir')) { const o = poiAoAlcance(); if (o) interagir(o); }
+    if (entrada.apertou.includes('interagir')) { // poi mais perto; senão o portal/marcador ao alcance (ativo: entra; interditado: aviso)
+      const o = poiAoAlcance(), doMarcador = o && portais().find((q) => q.id === o.id); // marcador do mundo: poi e portal com o mesmo id → vale o portal
+      if (doMarcador) { if (doMarcador.ativo === false) avisarBloqueado(doMarcador); else usar(doMarcador); return; }
+      if (o) { interagir(o); return; }
+      let pm = null, dm = cfg.alcance_interagir_tiles; for (const q of portais()) { const d = distRet(retDe(q), h.x, h.z) - r; if (d <= dm) { dm = d; pm = q; } }
+      if (pm) { if (pm.ativo === false) avisarBloqueado(pm); else usar(pm); }
+    }
   };
   return P;
 }

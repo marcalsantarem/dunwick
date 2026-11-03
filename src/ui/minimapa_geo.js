@@ -36,7 +36,7 @@ export function fonteDoMapa(md, giroGraus, interativos = (m) => m.pois ?? []) {
   return Object.freeze({
     id: md.id, nome_txt: md.nome_txt, tamanho: md.tamanho, planta: md.planta, legenda: md.legenda, interior: md.tipo_mapa === 'interior', giro_graus: giroGraus,
     edificios: (md.edificios ?? []).map((e) => ({ x: e.x, z: e.z, w: e.w, d: e.d, rot: e.rot ?? 0, porta: e.porta ?? null })),
-    portais: (md.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: p.ativo === false, nome_txt: p.nome_txt ?? null })),
+    portais: (md.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: p.ativo === false, nome_txt: p.nome_txt ?? null, destino: p.destino ?? null })),
     pois: interativos(md).filter((p) => p.nome_txt && Number.isFinite(p.x)).map((p) => ({ id: p.id, tipo: p.tipo, x: p.x, z: p.z, nome_txt: p.nome_txt })),
     muros,
   });

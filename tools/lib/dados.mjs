@@ -10,6 +10,7 @@ export const REGISTRO = [
   ['config', /^cfg_entrada\.json$/, 'cfg_entrada'],
   ['config', /^cfg_ciclo\.json$/, 'cfg_ciclo'],
   ['config', /^cfg_kit\.json$/, 'cfg_kit'],
+  ['config', /^cfg_mundo\.json$/, 'cfg_mundo'],
   ['config', /^cfg_ui_batalha\.json$/, 'cfg_ui_batalha'],
   ['characters', /^hero_[a-z0-9_]+\.json$/, 'personagem'],
   ['enemies', /^enemy_[a-z0-9_]+\.json$/, 'inimigo'],

@@ -94,3 +94,21 @@ test('perímetro e mata (v0.1.2b): muralha baixa, estacada, tronco caído e moit
   assert.equal(colisorDe(objs[0], kit).forma, 'linha'); assert.equal(colisorDe(objs[1], kit).forma, 'linha'); assert.equal(colisorDe(objs[2], kit).forma, 'ret'); assert.ok(Math.abs(colisorDe(objs[3], kit).r - 0.91) < 1e-9);
   assert.ok(vertices(construirKit({ objetos: [objs[0]] }, kit)) < 3000, 'muralha de 6 tiles leve');
 });
+
+test('mapa de mundo (v0.1.3): marcadores (vila, bosque, caverna, com e sem lacre) e props entram no kit, leves, com pegada do cfg_kit', () => {
+  const objs = [{ id: 'mv', tipo: 'marcador_vila', x: 10, z: 30 }, { id: 'mb', tipo: 'marcador_bosque', x: 20, z: 10, interditado: true }, { id: 'mc', tipo: 'marcador_caverna', x: 5, z: 5, interditado: true }, { id: 'a', tipo: 'arvore_mundo', x: 3, z: 3 }, { id: 'r', tipo: 'rocha_mundo', x: 4, z: 4 }, { id: 'p', tipo: 'ponte_mundo', x: 8, z: 8, w: 2 }, { id: 'mm', tipo: 'montanha_mundo', x: 12, z: 12 }];
+  const k = construirKit({ objetos: objs }, kit);
+  for (const g of ['reboco', 'telha_laranja', 'folhagem', 'pedra', 'carvao', 'metal', 'latao', 'tabuas']) assert.ok(k.grupos.has(g), `sem ${g}`);
+  assert.ok(vertices(k) < 12000, `${vertices(k)} vértices`);
+  for (const t of ['arvore_mundo', 'rocha_mundo']) assert.ok(colisorDe({ ...objs[0], tipo: t }, kit).r > 0, t);
+  for (const t of ['marcador_vila', 'marcador_bosque', 'marcador_caverna', 'montanha_mundo']) assert.equal(colisorDe({ ...objs[0], tipo: t }, kit), null, `${t} sem colisão (o terreno bloqueia)`);
+  assert.equal(colisorDe(objs[5], kit), null, 'ponte sem colisão');
+});
+
+test('mapa de mundo do 14: o kit constrói o mundo inteiro só com peças existentes e dentro do orçamento de peso', () => {
+  const m = mapas.find((x) => x.tipo_mapa === 'mundo'); if (!m) return;
+  const k = construirKit(m, kit);
+  for (const nome of k.grupos.keys()) assert.ok(materiais[nome], `sem material ${nome}`);
+  assert.ok(vertices(k) < 150000, `${vertices(k)} vértices`); assert.ok(k.grupos.size <= 40, `${k.grupos.size} grupos`);
+  for (const o of m.objetos) assert.ok(kit.pegadas[o.tipo], `sem pegada para ${o.tipo}`);
+});

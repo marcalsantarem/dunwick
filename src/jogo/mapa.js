@@ -28,6 +28,11 @@ export function criarMapa(dados, kit, cfgMundo) {
   const retDe = (o) => o.ret ?? [o.x - o.w / 2, o.z - o.d / 2, o.x + o.w / 2, o.z + o.d / 2];
   // edifícios: a pegada já vem do objeto "casa" (kit, com rot); não duplicar aqui
   for (const p of dados.portais ?? []) if (p.ativo === false) colisores.push(ret(retDe(p), p.id, { portal: true }));
+  // mapa de mundo (v0.1.3): os caracteres de `solidos` (água, montanha…) viram colisores, uma corrida de tiles por fila da planta
+  if (dados.solidos?.length) {
+    const bloq = new Set(dados.solidos.map((c) => dados.legenda[c]));
+    dados.planta.forEach((linha, z) => { for (let x = 0; x < linha.length; x++) { if (!bloq.has(dados.legenda[linha[x]])) continue; let x1 = x + 1; while (x1 < linha.length && bloq.has(dados.legenda[linha[x1]])) x1++; colisores.push(ret([x, z, x1, z + 1], `terreno_${z}_${x}`, { terreno: true })); x = x1 - 1; } });
+  }
   const CEL = 4, nx = Math.ceil(L / CEL), nz = Math.ceil(A / CEL), grade = Array.from({ length: nx * nz }, () => []);
   const caixa = (c) => (c.forma === 'circ' ? [c.x - c.r, c.z - c.r, c.x + c.r, c.z + c.r] : c.forma === 'ret' ? [c.x0, c.z0, c.x1, c.z1] : [Math.min(c.ax, c.bx) - c.r, Math.min(c.az, c.bz) - c.r, Math.max(c.ax, c.bx) + c.r, Math.max(c.az, c.bz) + c.r]);
   for (const c of colisores) { const [a, b, e, f] = caixa(c); for (let j = Math.max(0, Math.floor(b / CEL)); j <= Math.min(nz - 1, Math.floor(f / CEL)); j++) for (let i = Math.max(0, Math.floor(a / CEL)); i <= Math.min(nx - 1, Math.floor(e / CEL)); i++) grade[j * nx + i].push(c); }

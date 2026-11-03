@@ -186,6 +186,13 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
 .tela-banner-mapa::before, .tela-banner-mapa::after { content: "◆"; color: var(--latao); font-size: 0.6em; vertical-align: middle; margin: 0 0.8em; }
 .tela.reduzir .tela-banner-mapa { transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { .tela-banner-mapa { transform: translate(-50%, 0); } }
+/* mapa de mundo (D-045): nome do marcador apontado/perto e aviso de portal interditado; placa pequena abaixo do lugar do banner, sem clique */
+.tela-marcador { position: absolute; left: 50%; top: calc(64 * var(--u)); transform: translateX(-50%); max-width: min(60%, 48ch); display: flex; flex-direction: column; align-items: center; gap: calc(2 * var(--u)); padding: calc(4 * var(--u)) calc(14 * var(--u)); background: rgba(33, 18, 9, 0.88); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); color: var(--brilho-2); text-align: center; text-shadow: 1px 1px 0 #000; pointer-events: none; }
+.tela-marcador[hidden], .tela-marcador span[hidden] { display: none; }
+.tela-marcador-nome { font-size: max(14px, calc(18 * var(--u))); letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.tela-marcador-nota { font-size: max(12px, calc(14 * var(--u))); color: var(--ui-4); }
+.tela-marcador.interditado { border-color: var(--latao); }
+.tela-marcador.interditado .tela-marcador-nota::before { content: "✕ "; color: var(--latao); }
 .inicio { background: radial-gradient(ellipse at 50% 40%, #3a2416 0%, #120c07 70%); }
 .inicio-titulo { text-shadow: 0 4px 0 #2c120e, 0 0 24px rgba(252, 209, 118, 0.25); }
 .inicio-chamada { color: #fdf0dc; }

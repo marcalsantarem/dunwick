@@ -186,6 +186,29 @@
     "boneco_treino": {
       "forma": "circ",
       "raio": 0.5
+    },
+    "marcador_vila": {
+      "forma": "nenhuma"
+    },
+    "marcador_bosque": {
+      "forma": "nenhuma"
+    },
+    "marcador_caverna": {
+      "forma": "nenhuma"
+    },
+    "arvore_mundo": {
+      "forma": "circ",
+      "raio": 0.3
+    },
+    "rocha_mundo": {
+      "forma": "circ",
+      "raio": 0.4
+    },
+    "ponte_mundo": {
+      "forma": "nenhuma"
+    },
+    "montanha_mundo": {
+      "forma": "nenhuma"
     }
   },
   "visual": {

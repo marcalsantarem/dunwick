@@ -631,22 +631,6 @@
       "seed": 10
     },
     {
-      "id": "tronco_saida_sul_1",
-      "tipo": "tronco_caido",
-      "x": 45.9,
-      "z": 80.2,
-      "rot": 0,
-      "seed": 9
-    },
-    {
-      "id": "tronco_saida_sul_2",
-      "tipo": "tronco_caido",
-      "x": 48.1,
-      "z": 80.2,
-      "rot": 0,
-      "seed": 10
-    },
-    {
       "id": "estacada_oeste",
       "tipo": "estacada",
       "x0": 15,
@@ -10836,15 +10820,15 @@
       "w": 4,
       "d": 1,
       "destino": {
-        "mapa": "map_campos_sul",
-        "portal": "saida_vila"
+        "mapa": "map_mundo_orvalho",
+        "portal": "marcador_vila"
       },
       "chegada": {
         "x": 47,
         "z": 77,
         "direcao": "n"
       },
-      "ativo": false
+      "ativo": true
     }
   ],
   "pois": [

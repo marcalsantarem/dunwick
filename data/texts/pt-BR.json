@@ -1,7 +1,7 @@
 {
   "id": "txt_tabela_pt_br",
   "idioma": "pt-BR",
-  "versao": 2,
+  "versao": 3,
   "textos": {
     "ui_gire_celular": "Gire o celular para jogar na horizontal",
     "ui_inicio_titulo": "Dunwick",
@@ -146,7 +146,7 @@
     "txt_map_casa_maren_interior_nome": "Casa da Maren",
     "txt_poi_poco": "Poço",
     "txt_map_baixo_orvalho_nome": "Baixo Orvalho",
-    "txt_portal_interditado": "O caminho está interditado.",
+    "txt_portal_interditado": "Caminho interditado pela Coroa. Motivo: em análise.",
     "txt_map_taverna_interior_nome": "Taverna",
     "txt_map_forja_interior_nome": "Forja",
     "txt_map_casa_torvan_interior_nome": "Casa do Torvan",
@@ -159,8 +159,9 @@
     "txt_poi_posto_escrivao": "Posto do Escrivão",
     "txt_poi_patio_torvan": "Pátio do Torvan",
     "txt_poi_saida_norte": "Estrada do norte",
-    "txt_poi_saida_sul": "Estrada do sul",
+    "txt_poi_saida_sul": "Campos de Baixo Orvalho",
     "ui_pausa_minimapa": "Minimapa (M)",
+    "ui_marcador_inacessivel": "Ainda inacessível",
     "ui_pausa_minimapa_contraste": "Minimapa: alto contraste",
     "ui_minimapa_alt": "Minimapa: {nome_mapa}",
     "ui_minimapa_leg_casa": "Casa",
@@ -185,6 +186,12 @@
     "txt_poi_boneco_treino": "Boneco de treino",
     "txt_poi_bau_casa_edric": "Baú",
     "ui_bat_treino_concluido": "Treino concluído",
-    "ui_bat_treino_sem_recompensa": "Vida e mana do grupo restauradas. Treino não dá experiência."
+    "ui_bat_treino_sem_recompensa": "Vida e mana do grupo restauradas. Treino não dá experiência.",
+    "txt_map_mundo_orvalho_nome": "Campos de Baixo Orvalho",
+    "txt_mundo_marcador_vila_nome": "Baixo Orvalho",
+    "txt_mundo_marcador_bosque_nome": "Bosque das Névoas",
+    "txt_mundo_marcador_caverna_nome": "Caverna do Sino",
+    "txt_mundo_marcador_bosque_aviso": "Bosque fechado por ordem da Coroa. Motivo: em análise.",
+    "txt_mundo_marcador_caverna_aviso": "Caverna interditada pela Coroa. Taxa de acesso: a combinar."
   }
 }

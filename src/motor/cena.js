@@ -3,6 +3,7 @@
 // Lê o estado da simulação com interpolação; nunca o altera.
 import * as THREE from 'three';
 import { criarSolo } from './solo.js';
+import { criarTerrenoMundo } from './terreno_mundo.js';
 import { construirKit } from './kit.js';
 import { criarSpriteFactory } from './sprites.js';
 import { criarParticulas } from './efeitos.js';
@@ -17,12 +18,13 @@ const RAD = Math.PI / 180;
 export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const cfg = dados.config.jogo, kitDados = dados.config.kit, ciclo = dados.config.ciclo, ppu = cfg.pixels_por_unidade;
   // uma cena por MAPA (v0.1.2): exterior ou interior; `opcoes.mapaDados` / `opcoes.entidades` permitem montar mapas que não são o ativo
-  const mapaDados = opcoes.mapaDados ?? mundo.mapa.dados, entidades = opcoes.entidades ?? mundo.entidades, interior = mapaDados.tipo_mapa === 'interior', ecInterior = interior ? ambienteInterior(mapaDados.ambiente) : null;
+  const mapaDados = opcoes.mapaDados ?? mundo.mapa.dados, entidades = opcoes.entidades ?? mundo.entidades, interior = mapaDados.tipo_mapa === 'interior', mundoT = mapaDados.tipo_mapa === 'mundo', ecInterior = interior || mundoT ? ambienteInterior(mapaDados.ambiente ?? dados.config.mundo?.ambiente_padrao, mundoT) : null; // mundo (v0.1.3): luz fixa do `ambiente`, sem ciclo, sem sombra, câmera mais distante (cfg_mundo)
+  const cfgM = dados.config.mundo, ppuCam = mundoT ? cfgM.camera.pixels_por_unidade : ppu;
   const texelsPorTile = opcoes.texelsPorTile ?? 64;
-  const cena = new THREE.Scene(); cena.background = new THREE.Color(0x202838); cena.fog = new THREE.Fog(0x202838, cfg.camera.distancia + 8, cfg.camera.distancia + 70); if (interior) { cena.fog.near = 1e5; cena.fog.far = 2e5; }
+  const cena = new THREE.Scene(); cena.background = new THREE.Color(0x202838); cena.fog = new THREE.Fog(0x202838, cfg.camera.distancia + 8, cfg.camera.distancia + 70); if (interior || mundoT) { cena.fog.near = 1e5; cena.fog.far = 2e5; }
 
   // ---------- câmera ortográfica isométrica: a área visível em unidades do mundo é fixa (arte/32); a resolução só muda a nitidez ----------
-  const [aw, ah] = cfg.resolucao.arte, meioW = aw / ppu / 2, meioH = ah / ppu / 2, giro = cfg.camera.giro_graus * RAD, incl = cfg.camera.inclinacao_graus * RAD;
+  const [aw, ah] = cfg.resolucao.arte, meioW = aw / ppuCam / 2, meioH = ah / ppuCam / 2, giro = (mundoT ? cfgM.camera.giro_graus : cfg.camera.giro_graus) * RAD, incl = (mundoT ? cfgM.camera.inclinacao_graus : cfg.camera.inclinacao_graus) * RAD;
   const camera = new THREE.OrthographicCamera(-meioW, meioW, meioH, -meioH, cfg.camera.near, cfg.camera.far);
   const offset = new THREE.Vector3(Math.cos(incl) * Math.sin(giro), Math.sin(incl), Math.cos(incl) * Math.cos(giro)).multiplyScalar(cfg.camera.distancia);
   const alvoCam = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
@@ -30,12 +32,12 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const quatCamera = camera.quaternion.clone(), direita = new THREE.Vector3(1, 0, 0).applyQuaternion(quatCamera), cima = new THREE.Vector3(0, 1, 0).applyQuaternion(quatCamera);
   /** Cola um ponto do mundo à grade do pixel de arte (1/32 de unidade) no plano da imagem; a profundidade não muda. */
   const eixoZ = cima.clone().cross(direita);
-  const colar = (p, s = _b) => { const r = Math.round(p.dot(direita) * ppu) / ppu, u = Math.round(p.dot(cima) * ppu) / ppu, f = p.dot(eixoZ); return s.copy(direita).multiplyScalar(r).addScaledVector(cima, u).addScaledVector(eixoZ, f); };
+  const colar = (p, s = _b) => { const r = Math.round(p.dot(direita) * ppuCam) / ppuCam, u = Math.round(p.dot(cima) * ppuCam) / ppuCam, f = p.dot(eixoZ); return s.copy(direita).multiplyScalar(r).addScaledVector(cima, u).addScaledVector(eixoZ, f); };
   function posicionarCamera(x, z) { colar(_a.set(x, 0, z), alvoCam); camera.position.copy(alvoCam).add(offset); camera.quaternion.copy(quatCamera); camera.updateMatrixWorld(); }
   camera.quaternion.copy(quatCamera);
 
   // ---------- chão e kit ----------
-  const solo = criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha);
+  const solo = mundoT ? criarTerrenoMundo(mapaDados, cfgM.terreno, perfil) : criarSolo(mapaDados, recursos.texturas, perfil, texelsPorTile, !!opcoes.chaoNearest, interior ? 0 : 90); cena.add(solo.malha);
   const kit = construirKit(mapaDados, kitDados, texelsPorTile);
   const T = recursos.texturas, { materiais, uniformesVento } = criarMateriais(T, perfil);
   for (const [nome, geo] of kit.grupos) { const m = new THREE.Mesh(geo, materiais[nome]); m.castShadow = nome !== 'brilho_saida'; m.receiveShadow = nome !== 'brilho_saida'; m.name = `kit_${nome}`; cena.add(m); }
@@ -66,15 +68,15 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
     if (g) { const disco = new THREE.Mesh(new THREE.CircleGeometry(g.raio_tiles, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: COR_AVISO, transparent: true, opacity: 0.55, depthWrite: false, depthTest: false })); const anel = new THREE.Mesh(new THREE.RingGeometry(g.raio_tiles * 0.95, g.raio_tiles, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: COR_AVISO_BORDA, transparent: true, opacity: 0.95, depthWrite: false, depthTest: false })); disco.renderOrder = 30; anel.renderOrder = 31; disco.visible = anel.visible = false; cena.add(disco, anel); ator.aviso = { disco, anel }; }
     atores.push(ator); return ator;
   }
-  const atorHeroi = novoAtor(mundo.heroi, recursos.atlas[heroiDados.sprite], true);
-  { const k = heroiDados.escala_mapa ?? 1; atorHeroi.sprite.malha.scale.setScalar(k); atorHeroi.sprite.silhueta?.scale.setScalar(k); atorHeroi.sombra.scale.setScalar(k); } // escala só na exploração (a batalha usa o atlas próprio); a âncora nos pés é a origem da malha
+  const atorHeroi = novoAtor(mundo.heroi, (mundoT && recursos.atlas[heroiDados.sprite_mundo]) || recursos.atlas[heroiDados.sprite], true);
+  { const k = mundoT ? heroiDados.escala_mundo ?? 1 : heroiDados.escala_mapa ?? 1; atorHeroi.sprite.malha.scale.setScalar(k); atorHeroi.sprite.silhueta?.scale.setScalar(k); atorHeroi.sombra.scale.setScalar(k); } // escala só na exploração (a batalha usa o atlas próprio); a âncora nos pés é a origem da malha
   for (const e of entidades) novoAtor(e, recursos.atlas[e.dados.sprite], false);
   const mkAnel = (r0, r1, cor, op) => { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: cor, transparent: true, opacity: op, depthWrite: false, depthTest: false })); m.renderOrder = 25; m.visible = false; cena.add(m); return m; };
   const marcadorDestino = mkAnel(0.32, 0.42, 0xfff0d0, 0.9), anelAlvo = mkAnel(0.62, 0.72, 0xd8ecff, 0.9);
   let alvoSobId = null, destinoAnterior = null, destinoT = 0;
 
   // ---------- partículas (pólen/vaga-lumes e fumaça das chaminés) ----------
-  const particulas = criarParticulas(cena, kit.chamines, perfil), maxPart = (p) => (interior ? mapaDados.ambiente?.particulas ?? 0 : p.particulas_max); // interior: sem pólen nem vaga-lumes (cômodo fechado); `ambiente.particulas` liga poeira
+  const particulas = criarParticulas(cena, kit.chamines, perfil), maxPart = (p) => (interior || mundoT ? mapaDados.ambiente?.particulas ?? 0 : p.particulas_max); // interior: sem pólen nem vaga-lumes (cômodo fechado); `ambiente.particulas` liga poeira
   particulas.definirMax(maxPart(perfil));
   // baús de tesouro: o corpo está no kit; a TAMPA é um objeto à parte que abre/fecha (cena.definirBau(id, aberto)); estado inicial = `aberto` do objeto
   const baus = new Map(); for (const o of mapaDados.objetos) if (o.tipo === 'bau_tesouro') { const b = criarTampaBau(o, materiais), t = o.aberto ? 1 : 0; b.definir(t); cena.add(b.grupo); baus.set(o.id, { b, t, alvo: t }); }
@@ -110,7 +112,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
       // o sprite é um plano voltado à câmera: puxa-o para perto dela (em ortográfica não muda a posição na tela) para os pés não afundarem no chão
       colar(_v.set(x, 0, z)); _v.addScaledVector(eixoZ, -cfg.camera.sprite_recuo_tiles); a.sprite.malha.position.copy(_v); if (a.sprite.silhueta) a.sprite.silhueta.position.copy(_v);
       colar(_v.set(x, 0.02, z)); a.sombra.position.copy(_v);
-      if (a.ehHeroi) { const sd = heroi.spriteDir(); a.sprite.definir(heroi.anim.nome, heroi.anim.quadro, sd.dir, sd.espelhar); }
+      if (a.ehHeroi) { const sd = heroi.spriteDir(), an = a.sprite.meta.anims, nome = an[heroi.anim.nome] ? heroi.anim.nome : an.andar && Math.hypot(heroi.vx, heroi.vz) > 0.05 ? 'andar' : Object.keys(an)[0]; a.sprite.definir(nome, heroi.anim.quadro, sd.dir, sd.espelhar); } // atlas de mundo: só idle/andar
       else a.sprite.definir(e.anim.nome, e.anim.quadro, 's', false);
       const brilho = !a.ehHeroi && e.estado === 'DANO' ? 1 : 0, realce = a.entidade.id === alvoSobId ? 0.25 : 0; a.sprite.malha.material.emissiveIntensity = 0.3 + brilho * 0.8 + realce;
       if (a.aviso) { const ativo = e.estado === 'AVISO' || e.estado === 'ATIVO', p = e.estado === 'ATIVO' ? 1 : e.aviso; a.aviso.disco.visible = a.aviso.anel.visible = ativo; if (ativo) { a.aviso.disco.scale.set(Math.max(0.01, p), 1, Math.max(0.01, p)); a.aviso.disco.position.set(x, 0.04, z); a.aviso.anel.position.set(x, 0.045, z); } }
@@ -133,7 +135,7 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   }
   /** Perfil de qualidade (dados): sombras, anisotropia, partículas, alpha-to-coverage dos sprites. */
   function aplicarPerfil(p) {
-    perfil = p; const liga = p.sombra_sol_px > 0; sol.castShadow = liga;
+    perfil = p; const liga = p.sombra_sol_px > 0 && !mundoT; sol.castShadow = liga;
     if (sol.shadow.mapSize.x !== p.sombra_sol_px && liga) { sol.shadow.mapSize.set(p.sombra_sol_px, p.sombra_sol_px); sol.shadow.map?.dispose(); sol.shadow.map = null; } if (!liga) { sol.shadow.map?.dispose(); sol.shadow.map = null; }
     for (const m of Object.values(materiais)) if (m.map) m.map.anisotropy = p.aniso; for (const t of Object.values(T)) t.anisotropy = p.aniso;
     for (const a of atores) { a.sprite.malha.material.alphaToCoverage = p.msaa > 0; a.sprite.malha.material.alphaTest = p.msaa > 0 ? 0.01 : 0.45; a.sprite.malha.material.needsUpdate = true; }

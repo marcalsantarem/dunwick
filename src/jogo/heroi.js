@@ -21,7 +21,7 @@ export function criarHeroi(dadosHeroi, mapaInicial, cfgJogo, metaSprite) {
   const h = {
     id: dadosHeroi.id, x: ix + 0.5, z: iz + 0.5, vx: 0, vz: 0, ox: ix + 0.5, oz: iz + 0.5,
     face: faceInicial, estado: ESTADOS_HEROI.PARADO, quadroEstado: 0, raioPush: r, raioHurt: dadosHeroi.caixas.hurtbox_raio_tiles,
-    velMax: m.vel_andar, correndoClique: false, destino: null, rota: null, alvoId: null, chaveRota: null,
+    velMax: m.vel_andar, multVel: 1, correndoClique: false, destino: null, rota: null, alvoId: null, chaveRota: null,
     acao: null, // { tipo: 'ataque'|'esquiva', idx, def, t, total, acertou: Set }
     combo: 0, comboAte: -1, esqRecarga: 0, invencivel: false, travadoSemProgresso: 0,
     anim: { nome: dadosHeroi.animacoes.parado, quadro: 0 }, dir8: dir8DeMundo(Math.cos(faceInicial), Math.sin(faceInicial)),
@@ -124,7 +124,7 @@ export function criarHeroi(dadosHeroi, mapaInicial, cfgJogo, metaSprite) {
           else { querMover = true; alvoX = dx / d; alvoZ = dz / d; if (d > cfgE.clique_corrida_distancia_tiles) h.correndoClique = true; correr = correr || h.correndoClique; }
         }
       }
-      const velAlvoMod = correr ? m.vel_correr : m.vel_andar;
+      const velAlvoMod = (correr ? m.vel_correr : m.vel_andar) * h.multVel; // multVel: mapa de mundo anda mais devagar (cfg_exploracao.mundo)
       if (querMover) { velAlvo = velAlvoMod; h.velMax = velAlvo; h.face = Math.atan2(alvoZ, alvoX); alvoX *= velAlvo; alvoZ *= velAlvo; } else h.correndoClique = false;
       const dvx = alvoX - h.vx, dvz = alvoZ - h.vz, dist = Math.hypot(dvx, dvz);
       if (dist > 0) {
@@ -143,7 +143,7 @@ export function criarHeroi(dadosHeroi, mapaInicial, cfgJogo, metaSprite) {
     if (querMover && !temMover && Math.hypot(h.x - x0, h.z - z0) < 0.002) { if (++h.travadoSemProgresso > 30) { h.destino = null; h.travadoSemProgresso = 0; } } else h.travadoSemProgresso = 0;
 
     // ---------- estado e animação ----------
-    if (!h.acao) { const v = Math.hypot(h.vx, h.vz), novo = v < 0.05 && !querMover ? ESTADOS_HEROI.PARADO : v > m.vel_andar + 0.3 ? ESTADOS_HEROI.CORRER : ESTADOS_HEROI.ANDAR; if (novo !== h.estado) { h.estado = novo; h.quadroEstado = 0; } else h.quadroEstado++; }
+    if (!h.acao) { const v = Math.hypot(h.vx, h.vz), novo = v < 0.05 && !querMover ? ESTADOS_HEROI.PARADO : v > m.vel_andar * h.multVel + 0.3 * h.multVel ? ESTADOS_HEROI.CORRER : ESTADOS_HEROI.ANDAR; if (novo !== h.estado) { h.estado = novo; h.quadroEstado = 0; } else h.quadroEstado++; }
     else h.quadroEstado++;
     h.dir8 = dir8DeMundo(Math.cos(h.face), Math.sin(h.face));
     const an = dadosHeroi.animacoes, ac = h.acao;

@@ -25,6 +25,15 @@ export function validarMapasLigados(entradas, kit, cfgMundo, erro, textoOk, refs
       if (p.tipo === 'boneco_treino' && p.encontro === undefined) erro(arq, `/pois/${i}`, 'boneco_treino exige o campo encontro');
       if (p.tipo === 'bau_tesouro' && p.item === undefined) erro(arq, `/pois/${i}`, 'bau_tesouro exige o campo item');
     });
+    // ---- mapa de mundo (v0.1.3): luz própria, paleta de cada material da legenda, `bloqueiam` na legenda, sem edifícios/sala ----
+    if (m.tipo_mapa === 'mundo') {
+      if ((m.edificios ?? []).length) erro(arq, '/edificios', 'mapa de mundo não tem edifícios (use portais)');
+      if (m.sala) erro(arq, '/sala', 'mapa de mundo não tem sala');
+      const usados = new Set(Object.values(m.legenda));
+      if (refs?.paleta) for (const mat of usados) if (!refs.paleta.has(mat)) erro(arq, '/legenda', `material "${mat}" sem cor em cfg_mundo.terreno.materiais`);
+      for (const c of m.solidos ?? []) if (!(c in m.legenda)) erro(arq, '/solidos', `"${c}" não está na legenda`);
+      if (!(m.portais ?? []).some((p) => p.ativo)) erro(arq, '/portais', 'mapa de mundo sem portal ativo (marcador da vila)');
+    } else if (m.solidos) erro(arq, '/solidos', 'só o mapa de mundo usa solidos');
     // ---- edifícios ----
     const edif = m.edificios ?? [], idsEd = new Set();
     edif.forEach((e, i) => {

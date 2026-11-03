@@ -46,6 +46,9 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
   const heroi = criarHeroi(heroiDados, ini.mapa, cfg, metasSprite[heroiDados.sprite]);
   const camera = criarCameraJogo(cfg.camera, ini.mapa.dados.limites_camera);
   camera.encaixar(heroi);
+  // mapa de mundo (v0.1.3): herói mais lento (cfg_exploracao.mundo); o atlas de mundo é escolhido pela cena (sprite_mundo do hero_edric.json, 08)
+  const aplicarTipoMapa = (md) => { const mm = md.tipo_mapa === 'mundo' ? dados.config.exploracao?.mundo : null; heroi.multVel = mm ? mm.mult_velocidade : 1; };
+  aplicarTipoMapa(ini.mapa.dados);
   const mundo = { ticks: 0, dados, mapaId: idInicial, mapa: ini.mapa, heroi, camera, entidades: ini.entidades, obstaculos: ini.obstaculos, eventos, dt: 1 / cfg.passo_logico_hz, hora: ciclo.hora_inicial, cicloLigado: ciclo.ligado };
 
   // ponte mundo ↔ batalha (BL-008): modo mapa | batalha | cena | game_over. Fora do modo `mapa` a exploração fica congelada (só o relógio de ticks anda).
@@ -62,7 +65,7 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
   function trocarMapa(id, x, z, direcao) {
     const p = preparar(id);
     mundo.mapaId = id; mundo.mapa = p.mapa; mundo.entidades = p.entidades; mundo.obstaculos = p.obstaculos;
-    heroi.definirMapa(p.mapa, x, z, direcao);
+    heroi.definirMapa(p.mapa, x, z, direcao); aplicarTipoMapa(p.mapa.dados);
     camera.definirLimites(p.mapa.dados.limites_camera); camera.encaixar(heroi);
     if (mundo.encontros) mundo.encontros.definirConfig(cfgEncDe(id));
   }

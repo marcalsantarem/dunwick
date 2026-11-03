@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_mundo",
+  "title": "Mapa de mundo: câmera distante e paleta do terreno em tiles simples",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "versao", "camera", "terreno", "ambiente_padrao"],
+  "$defs": { "cor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" } },
+  "properties": {
+    "id": { "const": "cfg_mundo" },
+    "versao": { "type": "integer", "minimum": 1 },
+    "nota": { "type": "string" },
+    "camera": {
+      "type": "object", "additionalProperties": false, "required": ["pixels_por_unidade", "giro_graus", "inclinacao_graus"],
+      "properties": {
+        "pixels_por_unidade": { "type": "number", "minimum": 4, "maximum": 32 },
+        "giro_graus": { "type": "number", "minimum": 0, "maximum": 360 },
+        "inclinacao_graus": { "type": "number", "minimum": 20, "maximum": 80 }
+      }
+    },
+    "ambiente_padrao": {
+      "type": "object", "additionalProperties": false, "required": ["cor_luz", "intensidade", "fundo"],
+      "properties": { "cor_luz": { "$ref": "#/$defs/cor" }, "intensidade": { "type": "number", "exclusiveMinimum": 0 }, "fundo": { "$ref": "#/$defs/cor" },
+        "sol": { "type": "object", "additionalProperties": false, "required": ["cor", "intensidade", "elevacao_graus"], "properties": { "cor": { "$ref": "#/$defs/cor" }, "intensidade": { "type": "number", "minimum": 0 }, "elevacao_graus": { "type": "number", "minimum": 5, "maximum": 90 } } } }
+    },
+    "terreno": {
+      "type": "object", "additionalProperties": false, "required": ["px_por_tile", "ruido", "variacao_tile", "borda_tiles", "borda_material", "materiais"],
+      "properties": {
+        "px_por_tile": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "ruido": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "variacao_tile": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "borda_tiles": { "type": "integer", "minimum": 0, "maximum": 400 },
+        "borda_material": { "enum": ["grama", "terra", "calcada", "musgo", "mata_rala", "agua", "estrada", "montanha", "areia"] },
+        "materiais": {
+          "type": "object", "minProperties": 1,
+          "propertyNames": { "enum": ["grama", "terra", "calcada", "musgo", "mata_rala", "agua", "estrada", "montanha", "areia"] },
+          "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["cor"], "properties": { "cor": { "$ref": "#/$defs/cor" } } }
+        }
+      }
+    }
+  }
+}
