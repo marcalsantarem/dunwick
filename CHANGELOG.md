@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.4 — NPCs, diálogos, lojas, moeda e menu principal (em andamento)
+- 6 NPCs na vila e nos interiores (Maren, Torvan, Ysolt, ferreiro, taverneira e escrivão), com sprites próprios, sombra, poses de idle e conversa por clique, toque ou `E`.
+- Caixa de diálogo (nome do falante, texto aos poucos, avanço por clique, toque ou tecla) e lojas do ferreiro e da taverneira (comprar e vender, quantidade, total, mouse, teclado, toque e gamepad).
+- Moeda **Coroa** (80 iniciais; venda a 50 %), tabela de preços e 9 itens novos, com equipamento de arma e armadura ligado ao motor de batalha.
+- Menu principal de tela cheia (`C`, `Tab`, `I` ou ☰): Itens (usar em um personagem), Equipamento (comparar e trocar), Status e Sistema.
+- Plataforma: esquemas de NPC, diálogo e loja, `plataforma.menu`, estado de moedas, mochila e equipamento sempre atual; tecla `0` soma Coroas só no modo de desenvolvimento.
+- Decisões D-049 e D-050.
+
 ## v0.1.3 — Mapa de mundo (2026-11-03)
 - Mapa de mundo estilizado "Campos de Baixo Orvalho": costa, praia com espuma, rio com ponte, lago, estradas, cordilheira em 3D com neve, floresta em massa com variedade de árvores, campos de cultivo e rochas com musgo; bordas orgânicas e água animada, sombras de nuvem e mar até o horizonte.
 - Vila, bosque e caverna aparecem como marcadores no mundo; a vila é entrada pelo portal (saída sul da vila ↔ marcador), e o bosque e a caverna ficam interditados, com aviso.
