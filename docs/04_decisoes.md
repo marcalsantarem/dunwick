@@ -292,3 +292,7 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Nome provisório (usuário):** **Campos de Baixo Orvalho**.
 - **Assumido pelo Produtor (declarado):** v0.1.3 = modo de mapa de mundo (render e câmera próprios), 1 mapa `map_mundo_orvalho` com terreno, a vila como marcador ativo e marcadores futuros (bosque, caverna) visíveis porém interditados, **transição mundo ↔ local por portal** com a mesma névoa escura, saída da vila pelo vão sul volta ao marcador, minimapa desligado no mundo (o mapa já é o resumo), encontros aleatórios só na v0.1.5. Trabalho em branch `dev-v013` (a v0.1.2 aguarda o teste do usuário em `dev`).
 - Briefing: `docs/briefings/BRF-v013_mapa_de_mundo.md`.
+
+## D-046 — Visual do mapa de mundo: refazer do zero, sem se prender ao estipulado (2026-11-02)
+- **Decisão (usuário):** o primeiro visual do mapa de mundo (terreno chapado, montanhas de cones, herói minúsculo) foi reprovado: "feio, pobre; os Final Fantasy de 35 anos atrás eram mais bonitos". **Repensar e reconstruir** o visual para ficar bonito, **mesmo que saia do que estava estipulado** (câmera, resolução de tile, estilo 3D×2D, escala). A parte funcional (portais, marcadores, colisão, banner, placa) é mantida.
+- **Responsável pela direção:** Diretor de Arte (10), com 07 (execução), 08 (render) e 14 (dados do mapa). Briefing: `docs/briefings/BRF-v013b_visual_mundo.md`.
