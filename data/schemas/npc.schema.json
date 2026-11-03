@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/npc",
+  "title": "NPC da exploração: ficha (nome, sprite, diálogo, loja); a posição fica no mapa (campo npcs)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "nome_txt",
+    "sprite",
+    "dialogo"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^npc_[a-z0-9]+(_[a-z0-9]+)*$"
+    },
+    "nome_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "sprite": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "id do atlas em assets/sprites/<id>/<id>.png + .meta.json"
+    },
+    "escala_mapa": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 4,
+      "description": "escala do sprite na exploração (padrão: a do herói no mapa)"
+    },
+    "cor_falante": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "raio": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "description": "raio da colisão em tiles (padrão cfg_exploracao.npc_raio ou 0.35)"
+    },
+    "dir_padrao": {
+      "enum": [
+        "s",
+        "l",
+        "n",
+        "o"
+      ]
+    },
+    "dialogo": {
+      "type": "string",
+      "pattern": "^dlg_[a-z0-9_]+$"
+    },
+    "loja": {
+      "type": "string",
+      "pattern": "^shop_[a-z0-9_]+$"
+    },
+    "nota": {
+      "type": "string",
+      "description": "observação livre (ex.: sprite provisório)"
+    }
+  }
+}

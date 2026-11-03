@@ -22,6 +22,10 @@
     "poder": 8,
     "tipo_dano": "impacto"
   },
+  "equipamento": {
+    "arma": "item_cajado_madeira",
+    "armadura": "item_manto_simples"
+  },
   "resistencias": {},
   "kit": {
     "ataque": "atk_grace_cajado",

@@ -22,6 +22,10 @@
     "poder": 14,
     "tipo_dano": "corte"
   },
+  "equipamento": {
+    "arma": "item_espada_treino",
+    "armadura": "item_tunica_remendada"
+  },
   "resistencias": {},
   "kit": {
     "ataque": "atk_edric_golpe",

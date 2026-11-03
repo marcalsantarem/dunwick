@@ -9,7 +9,7 @@ const sobrepoe = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.z0 < b.z1 && a.z1 > b
 /** entradas = [[arquivo, mapa]]; erro(arq, campo, msg). */
 export function validarMapasLigados(entradas, kit, cfgMundo, erro, textoOk, refs = null) {
   const porId = new Map(entradas.map(([arq, m]) => [m.id, { arq, m }]));
-  const logicas = new Map(entradas.map(([, m]) => [m.id, criarMapa(m, kit, cfgMundo)]));
+  const logicas = new Map(entradas.map(([, m]) => [m.id, criarMapa(m, kit, cfgMundo, refs?.fichasNpc)]));
   for (const [arq, m] of entradas) {
     const mapa = logicas.get(m.id), [L, A] = m.tamanho, dentro = (x, z) => x >= 0 && z >= 0 && x <= L && z <= A;
     // ---- referências dos objetos: boneco_treino → encontro existente; bau_tesouro → item existente (e cada baú/boneco com o campo) ----
@@ -83,6 +83,18 @@ export function validarMapasLigados(entradas, kit, cfgMundo, erro, textoOk, refs
       textoOk(arq, `/pois/${i}/nome_txt`, poi.nome_txt);
       if (!dentro(poi.x, poi.z)) erro(arq, `/pois/${i}`, 'POI fora do mapa'); else if (!alcanca(poi.x, poi.z, 1.6)) erro(arq, `/pois/${i}`, `POI "${poi.id}" não é alcançável a pé`);
     });
+    // ---- NPCs (v0.1.4): ficha existente, dentro do mapa, fora de sólidos, alcançável a pé, sem dois a menos de 1 tile ----
+    if (refs?.fichasNpc) {
+      const semNpc = criarMapa({ ...m, npcs: [] }, kit, cfgMundo), npcs = m.npcs ?? [], vistos = new Set();
+      npcs.forEach((n, i) => {
+        if (!refs.fichasNpc[n.id]) { erro(arq, `/npcs/${i}/id`, `NPC "${n.id}" não existe em data/npcs`); return; }
+        if (vistos.has(n.id)) erro(arq, `/npcs/${i}/id`, `NPC "${n.id}" aparece duas vezes no mesmo mapa`); vistos.add(n.id);
+        if (!dentro(n.x, n.z)) { erro(arq, `/npcs/${i}`, `NPC "${n.id}" fora do mapa`); return; }
+        if (!semNpc.livre(n.x, n.z, refs.fichasNpc[n.id].raio ?? 0.35)) erro(arq, `/npcs/${i}`, `NPC "${n.id}" está dentro de um sólido (edifício, prop ou terreno bloqueado)`);
+        else if (!alcanca(n.x, n.z, 1.6)) erro(arq, `/npcs/${i}`, `NPC "${n.id}" não é alcançável a pé`);
+        for (let j = 0; j < i; j++) if (npcs[j].id !== n.id && Math.hypot(npcs[j].x - n.x, npcs[j].z - n.z) < 1) erro(arq, `/npcs/${i}`, `NPC "${n.id}" a menos de 1 tile de "${npcs[j].id}"`);
+      });
+    }
     if (m.tipo_mapa === 'interior' && !portais.some((p) => p.ativo)) erro(arq, '/portais', 'interior sem portal de saída ativo');
   }
 }

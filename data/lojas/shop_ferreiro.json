@@ -1,0 +1,29 @@
+{
+  "id": "shop_ferreiro",
+  "nome_txt": "txt_shop_ferreiro_nome",
+  "falas": {
+    "saudacao_txt": "txt_loja_ferreiro_saudacao",
+    "comprou_txt": "txt_loja_ferreiro_comprou",
+    "vendeu_txt": "txt_loja_ferreiro_vendeu",
+    "sem_moedas_txt": "txt_loja_ferreiro_sem_moedas",
+    "despedida_txt": "txt_loja_ferreiro_despedida"
+  },
+  "estoque": [
+    {
+      "item": "item_pocao_ervas"
+    },
+    {
+      "item": "item_espada_ferro"
+    },
+    {
+      "item": "item_cajado_freixo"
+    },
+    {
+      "item": "item_gibao_couro"
+    }
+  ],
+  "compra_tipos": [
+    "consumivel",
+    "equipamento"
+  ]
+}

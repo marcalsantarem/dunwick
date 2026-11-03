@@ -12,6 +12,11 @@ export const REGISTRO = [
   ['config', /^cfg_kit\.json$/, 'cfg_kit'],
   ['config', /^cfg_mundo\.json$/, 'cfg_mundo'],
   ['config', /^cfg_ui_batalha\.json$/, 'cfg_ui_batalha'],
+  ['config', /^cfg_economia\.json$/, 'cfg_economia'],
+  // v0.1.4: NPCs, diálogos e lojas
+  ['npcs', /^npc_[a-z0-9_]+\.json$/, 'npc'],
+  ['dialogos', /^dlg_[a-z0-9_]+\.json$/, 'dialogo'],
+  ['lojas', /^shop_[a-z0-9_]+\.json$/, 'loja'],
   ['characters', /^hero_[a-z0-9_]+\.json$/, 'personagem'],
   ['enemies', /^enemy_[a-z0-9_]+\.json$/, 'inimigo'],
   ['maps', /^map_[a-z0-9_]+\.json$/, 'mapa'],
@@ -38,7 +43,7 @@ export function lerJson(caminho) {
 // Lista { arquivo (relativo a data/), caminho, esquema } de todos os arquivos de dados; arquivos fora do registro viram esquema null.
 export function listarArquivos(raiz) {
   const dados = join(raiz, 'data'), saida = [];
-  for (const pasta of ['config', 'characters', 'enemies', 'maps', 'texts', 'attacks', 'combate', 'exploracao', 'cenarios']) {
+  for (const pasta of ['config', 'characters', 'enemies', 'maps', 'texts', 'attacks', 'combate', 'exploracao', 'cenarios', 'npcs', 'dialogos', 'lojas']) {
     const dir = join(dados, pasta);
     if (!existsSync(dir)) continue;
     for (const nome of readdirSync(dir).sort()) {
@@ -58,7 +63,7 @@ export function carregarEsquemas(raiz) {
 
 // Pacote único que o jogo carrega: { config:{jogo,perfis,entrada,orcamento}, personagens, inimigos, mapas, textos }.
 export function empacotarDados(raiz) {
-  const pacote = { config: {}, personagens: {}, inimigos: {}, mapas: {}, textos: {}, combate: { herois: {}, inimigos: {}, encontros: {}, itens: {}, acoes: {} }, exploracao: { encontros: {} }, cenarios: {} };
+  const pacote = { config: {}, personagens: {}, inimigos: {}, mapas: {}, textos: {}, combate: { herois: {}, inimigos: {}, encontros: {}, itens: {}, acoes: {} }, exploracao: { encontros: {} }, cenarios: {}, npcs: {}, dialogos: {}, lojas: {} };
   for (const { arquivo, caminho, esquema } of listarArquivos(raiz)) {
     if (!esquema) continue;
     const obj = lerJson(caminho);
@@ -73,8 +78,18 @@ export function empacotarDados(raiz) {
     else if (esquema === 'item_batalha') pacote.combate.itens[obj.id] = obj;
     else if (esquema === 'acao_batalha') pacote.combate.acoes[obj.id] = obj;
     else if (esquema === 'cenario') pacote.cenarios[obj.id] = obj;
+    else if (esquema === 'npc') pacote.npcs[obj.id] = obj;
+    else if (esquema === 'dialogo') pacote.dialogos[obj.id] = obj;
+    else if (esquema === 'loja') pacote.lojas[obj.id] = obj;
     else if (esquema === 'zonas_encontro') pacote.exploracao.encontros[obj.mapa] = obj;
     void arquivo; void basename;
+  }
+  // v0.1.4: formato de execução de NPCs e lojas (o que a exploração/conversa lê); a fonte única continua sendo os arquivos de dados
+  const eco = pacote.config.economia;
+  for (const n of Object.values(pacote.npcs)) { n.cor = n.cor_falante ?? null; n.falas = (pacote.dialogos[n.dialogo]?.falas ?? []).map((f) => f.txt); }
+  for (const l of Object.values(pacote.lojas)) {
+    l.mult_venda = (eco?.venda_pct ?? 50) / 100;
+    l.itens = l.estoque.map((e) => { const p = eco?.precos?.[e.item]; return { item: e.item, preco: p?.compra, venda: p ? p.venda ?? Math.floor(p.compra * l.mult_venda + 0.5) : 0, ...(e.qtd ? { qtd: e.qtd } : {}) }; });
   }
   return pacote;
 }

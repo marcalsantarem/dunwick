@@ -15,6 +15,7 @@
   "toque_min_px_css": 44,
   "t_dica_s": 6,
   "banner_mapa": { "t_total_s": 2.5, "t_entra_s": 0.4, "t_sai_s": 0.6 },
+  "menus_mapa": { "caracteres_por_s": 60, "qtd_max_loja": 99 },
   "marcador_mundo": { "raio_nome_tiles": 2.5, "raio_apontar_tiles": 1.5, "t_aviso_s": 2.5 },
   "minimapa": {
     "px_base": 8,

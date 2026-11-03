@@ -4,10 +4,11 @@
 // Uso: node tools/esboco_vila.mjs [--cromo=caminho/chrome.exe]
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import { NPCS } from './lib/layout_vila.mjs';
 
 const arg = (n, p) => (process.argv.find((a) => a.startsWith(`--${n}=`)) || '').split('=')[1] || p;
 const CROMO = arg('cromo', process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe');
-const SAIDA = 'docs/niveis/esboco_vila_v012_dados.png';
+const SAIDA = arg('saida', 'docs/niveis/esboco_vila_v014_dados.png');
 const json = (c) => JSON.parse(readFileSync(c, 'utf8'));
 
 const mapa = json('data/maps/map_baixo_orvalho.json');
@@ -22,7 +23,7 @@ const W = M + L * T + 24 + LEG, H = M + A * T + 40;
 const CHAO = { grama: '#a9c98a', terra: '#c9a774', calcada: '#cfcac0', musgo: '#7fa36a' };
 const COR = {
   casa: '#8a5a3c', taverna: '#a0662e', forja: '#b5452f', posto: '#4f6fa8', fechada: '#9a8a7a', prop: '#5b3b24', saque: '#3b3530',
-  portal: '#7b4fb0', inativo: '#9b8fb0', arvore: '#2f6b3a', pinheiro: '#1f4f2e', lanterna: '#f2c230', heroi: '#e0303a', seguro: '#2f9e5b',
+  portal: '#7b4fb0', inativo: '#9b8fb0', npc: '#f08a1c', arvore: '#2f6b3a', pinheiro: '#1f4f2e', lanterna: '#f2c230', heroi: '#e0303a', seguro: '#2f9e5b',
 };
 const SAQUE = new Set(['arvore_queimada', 'muro_fuligem', 'pedra_enegrecida']);
 
@@ -30,6 +31,9 @@ const s = []; const add = (x) => s.push(x);
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const texto = (x, y, t, o = {}) => add(`<text x="${x}" y="${y}" font-size="${o.tam || 13}" font-weight="${o.peso || 600}" fill="${o.cor || '#1b1b1b'}" text-anchor="${o.ancora || 'middle'}" ${o.fundo === false ? '' : 'paint-order="stroke" stroke="#fffdf6" stroke-width="3.5" stroke-linejoin="round"'}>${esc(t)}</text>`);
 
+// NPCs planejados (layout) para mapas que ainda não os têm nos dados (a ficha em data/npcs falta): mesmas posições que o gerador grava
+const planejados = (m) => { const onde = m.tipo_mapa === 'interior' ? m.id.replace(/^map_|_interior$/g, '') : 'vila', margem = onde === 'vila' ? (m.tamanho[0] - 48) / 2 : 0;
+  return NPCS.filter((n) => n.onde === onde).map((n) => ({ id: n.npc, x: n.x + margem, z: n.z + margem, dir: n.direcao })); };
 /** Desenha um mapa (chão, objetos, portais) com origem (ox, oy) e t px por tile. */
 function desenharMapa(m, ox, oy, t, rotulos) {
   const px = (x) => ox + x * t, pz = (z) => oy + z * t;
@@ -62,6 +66,13 @@ function desenharMapa(m, ox, oy, t, rotulos) {
     ret(p.x, p.z, p.w, p.d, `fill="${p.ativo ? COR.portal : COR.inativo}55" stroke="${p.ativo ? COR.portal : COR.inativo}" stroke-width="2" stroke-dasharray="${p.ativo ? '0' : '4 3'}"`);
     add(`<circle cx="${px(p.chegada.x)}" cy="${pz(p.chegada.z)}" r="${Math.max(2.5, t * 0.15)}" fill="${COR.portal}"/>`);
   }
+  // NPCs (v0.1.4): losango nos pés + traço para onde olham; rótulo com o nome da ficha (texto txt_npc_<nome>_nome, se existir)
+  const FRENTE = { s: [0, 1], n: [0, -1], l: [1, 0], o: [-1, 0] };
+  for (const n of m.npcs ?? planejados(m)) {
+    const r = Math.max(4, t * 0.32), cx = px(n.x), cz = pz(n.z), [fx, fz] = FRENTE[n.dir ?? 's'];
+    add(`<line x1="${cx}" y1="${cz}" x2="${cx + fx * r * 2}" y2="${cz + fz * r * 2}" stroke="#222" stroke-width="2"/><polygon points="${cx},${cz - r} ${cx + r},${cz} ${cx},${cz + r} ${cx - r},${cz}" fill="${COR.npc}" stroke="#222" stroke-width="1.5"/>`);
+    if (rotulos || t >= 15) texto(cx, cz - r - 4, txt[`txt_${n.id}_nome`] ?? n.id.replace('npc_', ''), { tam: rotulos ? 12 : 10, cor: '#7a3d00' });
+  }
   const [ix, iz] = m.inicio_jogador.tile;
   add(`<circle cx="${px(ix + 0.5)}" cy="${pz(iz + 0.5)}" r="${Math.max(4, t * 0.38)}" fill="${COR.heroi}" stroke="#fff" stroke-width="2"/>`);
 }
@@ -91,7 +102,7 @@ add(`<circle cx="${rx}" cy="${rz}" r="20" fill="#fffdf6cc" stroke="#333"/><polyg
 const lx = M + L * T + 24; let ly = M;
 const linha = (t, o = {}) => { texto(lx + (o.rec || 0), ly, t, { ancora: 'start', tam: o.tam || 13, peso: o.peso || 500, cor: o.cor, fundo: false }); ly += o.passo || 20; };
 const amostra = (estilo, t) => { add(`<rect x="${lx}" y="${ly - 13}" width="22" height="16" ${estilo}/>`); linha(t, { rec: 32 }); };
-linha('Baixo Orvalho — v0.1.2 (dados reais)', { tam: 17, peso: 700, passo: 22 });
+linha('Baixo Orvalho — v0.1.4 (dados reais, com NPCs)', { tam: 17, peso: 700, passo: 22 });
 linha(`map_baixo_orvalho · ${mapa.objetos.length} objetos · ${mapa.edificios.length} edifícios · ${mapa.portais.length} portais`, { tam: 12, cor: '#555', passo: 26 });
 amostra(`fill="${COR.casa}" stroke="#222"`, 'casa com interior');
 amostra(`fill="${COR.taverna}" stroke="#222"`, 'taverna');
@@ -100,7 +111,8 @@ amostra(`fill="${COR.posto}" stroke="#222"`, 'posto do escrivão');
 amostra(`fill="${COR.fechada}" stroke="#222"`, 'casa de morador (fechada, sem interior)');
 amostra(`fill="#f1e7c9" stroke="#222"`, 'porta');
 amostra(`fill="${COR.portal}55" stroke="${COR.portal}" stroke-width="2"`, 'portal ativo (porta ↔ interior) · ponto = chegada');
-amostra(`fill="${COR.inativo}55" stroke="${COR.inativo}" stroke-width="2" stroke-dasharray="4 3"`, 'saída inativa (v0.1.3)');
+amostra(`fill="${COR.inativo}55" stroke="${COR.inativo}" stroke-width="2" stroke-dasharray="4 3"`, 'saída inativa (norte); a sul leva ao mundo (v0.1.3)');
+amostra(`fill="${COR.npc}" stroke="#222"`, 'NPC (v0.1.4) · traço = para onde olha');
 amostra(`fill="${COR.prop}" stroke="#111"`, 'prop do kit (pórtico, quadro, brasa, ervas, armas)');
 amostra(`fill="${COR.saque}" stroke="#111"`, 'marcas do saque');
 amostra(`fill="none" stroke="${COR.seguro}" stroke-width="3" stroke-dasharray="8 4"`, 'zona segura: a vila inteira (sem encontros)');

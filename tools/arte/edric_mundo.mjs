@@ -16,9 +16,9 @@ const ANIMS = { idle: { quadros: 2, fps: 3, loop: true }, andar: { quadros: 4, f
 const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 
 /** Grade de materiais: g[y][x] = [material, tom fixo | null]. */
-function nova() { return Array.from({ length: CEL }, () => Array(CEL).fill(null)); }
-const poe = (g, x, y, m, t = null) => { if (x >= 0 && y >= 0 && x < CEL && y < CEL) g[y][x] = [m, t]; };
-const ret = (g, x0, y0, x1, y1, m, t) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) poe(g, x, y, m, t); };
+export function nova() { return Array.from({ length: CEL }, () => Array(CEL).fill(null)); }
+export const poe = (g, x, y, m, t = null) => { if (x >= 0 && y >= 0 && x < CEL && y < CEL) g[y][x] = [m, t]; };
+export const ret = (g, x0, y0, x1, y1, m, t) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) poe(g, x, y, m, t); };
 
 /** Desenha um quadro. Parâmetros: dir, bob (corpo desce 1 px), passo (−1..1: fase da perna), erg (pé levantado: 0 | 1), corre. */
 function desenhar(dir, { bob = 0, fase = 0, corre = false, parado = false }) {
@@ -67,7 +67,7 @@ function desenhar(dir, { bob = 0, fase = 0, corre = false, parado = false }) {
 }
 
 /** Sombreamento (luz à esquerda), luz de borda e contorno seletivo → RGBA 32×32. */
-function acabar(g) {
+export function acabar(g) {
   const img = novaImagem(CEL, CEL), cel = (x, y) => (x < 0 || y < 0 || x >= CEL || y >= CEL ? null : g[y][x]);
   for (let y = 0; y < CEL; y++) for (let x = 0; x < CEL; x++) {
     const c = g[y][x]; if (!c) continue;
@@ -87,7 +87,7 @@ function acabar(g) {
   return img;
 }
 
-function blit(dst, src, ox, oy) { for (let y = 0; y < CEL; y++) for (let x = 0; x < CEL; x++) { const s = (y * CEL + x) * 4; if (src.px[s + 3]) dst.px.set(src.px.subarray(s, s + 4), ((oy + y) * dst.w + ox + x) * 4); } }
+export function blit(dst, src, ox, oy) { for (let y = 0; y < CEL; y++) for (let x = 0; x < CEL; x++) { const s = (y * CEL + x) * 4; if (src.px[s + 3]) dst.px.set(src.px.subarray(s, s + 4), ((oy + y) * dst.w + ox + x) * 4); } }
 
 export function gerarMundo() {
   const quadros = [], anims = {};

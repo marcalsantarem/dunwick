@@ -5,6 +5,18 @@
 export const arred = (x) => Math.floor(x + 0.5 + 1e-9);
 export const limitar = (v, min, max) => Math.min(max, Math.max(min, v));
 
+/**
+ * Herói efetivo com o equipamento (06 `formulas_turnos.md` §12.1): o item do slot `arma` SUBSTITUI o poder de arma e o do slot `armadura`
+ * SUBSTITUI a armadura; os `bonus_itens` (vida, mana, agilidade) dos dois itens SOMAM ao bônus da ficha. Slot vazio, ou item sem o valor,
+ * vale o da ficha. `equip` = { arma, armadura } (ids de item); `itens` = dados.combate.itens. Não altera `h`.
+ */
+export function heroiEquipado(h, equip, itens) {
+  const sl = equip ?? h.equipamento ?? {}, arma = sl.arma ? itens[sl.arma] : null, arm = sl.armadura ? itens[sl.armadura] : null;
+  const bonus = { vida: 0, mana: 0, agilidade: 0, ...h.bonus_itens };
+  for (const it of [arma, arm]) for (const k of ['vida', 'mana', 'agilidade']) bonus[k] += it?.bonus_itens?.[k] ?? 0;
+  return { ...h, arma: { ...h.arma, poder: arma?.stats?.poder_arma ?? h.arma.poder }, armadura: arm?.stats?.armadura ?? h.armadura, bonus_itens: bonus };
+}
+
 /** vida_max, mana_max, defesa e agilidade de um herói a partir dos atributos (06 §2). */
 export function derivadosHeroi(h, f) {
   const a = h.atributos, b = h.bonus_itens;

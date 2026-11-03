@@ -261,6 +261,21 @@
           "pattern": "^bat_[a-z_]+$"
         }
       }
+    },
+    "equipamento": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "arma": {
+          "type": "string",
+          "pattern": "^item_"
+        },
+        "armadura": {
+          "type": "string",
+          "pattern": "^item_"
+        }
+      },
+      "description": "equipamento inicial (slots); arma.poder e armadura continuam sendo os valores usados pelo motor e devem bater com os itens"
     }
   }
 }

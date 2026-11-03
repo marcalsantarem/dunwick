@@ -15,9 +15,9 @@ const COMANDOS = ['atacar', 'habilidade', 'item', 'defender', 'fugir'];
 
 /**
  * @param dados  pacote de dados (tools/lib/dados.mjs → empacotarDados): config.batalha + combate.{herois,inimigos,encontros,itens,acoes}
- * @param opcoes { encontro, semente, eventos?, grupo?: ids dos heróis, estadoGrupo?: {id:{vida,mana,xp,nivel}}, inventario?: {item: qtd} }
+ * @param opcoes { encontro, semente, eventos?, grupo?: ids dos heróis, estadoGrupo?: {id:{vida,mana,xp,nivel}}, inventario?: {item: qtd}, equipamento?: {heroi: {arma, armadura}} }
  */
-export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEventos(), grupo = ['hero_edric', 'hero_grace'], estadoGrupo = {}, inventario = null }) {
+export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEventos(), grupo = ['hero_edric', 'hero_grace'], estadoGrupo = {}, inventario = null, equipamento = null }) {
   const cfg = dados.config.batalha, C = dados.combate, enc = C.encontros[encontro];
   if (!enc) throw new Error(`encontro "${encontro}" não existe`);
   const prng = criarPrng(semente), log = [], estoque = { ...(inventario ?? cfg.inventario_teste) };
@@ -28,7 +28,7 @@ export function criarBatalha(dados, { encontro, semente = 1, eventos = criarEven
   // ---------- atores ----------
   const atores = [], porUid = new Map();
   grupo.forEach((id) => {
-    const h = C.herois[id], d = F.derivadosHeroi(h, cfg.formulas), est = estadoGrupo[id] ?? {};
+    const h = F.heroiEquipado(C.herois[id], equipamento?.[id], C.itens), d = F.derivadosHeroi(h, cfg.formulas), est = estadoGrupo[id] ?? {};
     atores.push({
       uid: id, id, lado: 'grupo', pos: h.posicao, nome_txt: h.nome_txt, vida_max: d.vida_max, vida: est.vida ?? d.vida_max, mana_max: d.mana_max, mana: est.mana ?? d.mana_max,
       forca: h.atributos.forca, mente: h.atributos.mente, defesa: d.defesa, agilidade: d.agilidade, resist: h.resistencias, imunidades: h.imunidades ?? [],

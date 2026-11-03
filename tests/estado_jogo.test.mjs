@@ -108,7 +108,7 @@ test('iniciar/encerrar: eventos do mundo, XP e inventário aplicados ao grupo; r
   assert.throws(() => j.iniciarBatalha('enc_lobo_1'), /precisa estar em "mapa"/); assert.throws(() => j.encerrarBatalha(), /ainda não terminou/);
   const r = jogar(c, d); assert.equal(j.estado().modo, 'batalha');
   const fim = j.encerrarBatalha(), depois = j.estado();
-  assert.deepEqual([fim.resultado, depois.modo, depois.moedas], ['vitoria', 'mapa', 11]);
+  assert.deepEqual([fim.resultado, depois.modo, depois.moedas], ['vitoria', 'mapa', d.config.economia.coroas_iniciais + 11]); // Coroas iniciais (cfg_economia) + recompensa
   assert.equal(depois.grupo.hero_edric.xp, 32); assert.equal(depois.grupo.hero_grace.xp, 32);
   assert.equal(depois.grupo.hero_edric.vida, r.grupo.find((g) => g.id === 'hero_edric').vida);
   assert.equal(depois.inventario.item_pocao_ervas, r.inventario.item_pocao_ervas);
@@ -131,7 +131,7 @@ test('derrota no M1: game over simples; "tentar de novo" volta ao último ponto 
   assert.throws(() => j.iniciarBatalha('enc_slime_1'), /precisa estar em "mapa"/);
   assert.equal(j.grupo.hero_edric.vida, 0, 'o estado da derrota fica visível no game over');
   j.tentarDeNovo();
-  assert.equal(j.modo, 'mapa'); assert.equal(j.grupo.hero_edric.vida, 40); assert.equal(j.inventario.item_pocao_ervas, 2); assert.equal(j.moedas, 0);
+  assert.equal(j.modo, 'mapa'); assert.equal(j.grupo.hero_edric.vida, 40); assert.equal(j.inventario.item_pocao_ervas, 2); assert.equal(j.moedas, d.config.economia.coroas_iniciais);
   assert.equal(reg.filter(([n]) => n === 'ponto_restaurado').length, 1);
   assert.throws(() => j.tentarDeNovo(), /precisa estar em "game_over"/);
 });

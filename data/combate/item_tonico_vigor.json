@@ -1,0 +1,15 @@
+{
+  "id": "item_tonico_vigor",
+  "versao": 1,
+  "nome_txt": "txt_item_tonico_vigor_nome",
+  "desc_txt": "txt_item_tonico_vigor_desc",
+  "nota": "Tônico de Vigor (taverna): cura 60; o texto do 02 dizia \"fôlego\", que não existe nos turnos.",
+  "categoria": "consumivel",
+  "uso_batalha": true,
+  "alvo_tipo": "aliado_1",
+  "efeito": "cura",
+  "cura_base": 60,
+  "escala": 0,
+  "tempo": "t_item",
+  "pose": "bat_item"
+}

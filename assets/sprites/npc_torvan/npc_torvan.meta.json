@@ -1,0 +1,48 @@
+{
+  "id": "npc_torvan",
+  "tipo": "sprite_humanoide",
+  "celula": [
+    32,
+    32
+  ],
+  "ancora": [
+    16,
+    29
+  ],
+  "arte_escala": 1,
+  "ref_celula": 32,
+  "direcoes": [
+    "s",
+    "se",
+    "l",
+    "ne",
+    "n"
+  ],
+  "espelhar": {
+    "sw": "se",
+    "o": "l",
+    "nw": "ne"
+  },
+  "colunas": 8,
+  "anims": {
+    "parado": {
+      "quadros": 1,
+      "fps": 1,
+      "loop": true,
+      "inicio": 0
+    },
+    "idle_a": {
+      "quadros": 2,
+      "fps": 2,
+      "loop": true,
+      "inicio": 5
+    },
+    "idle_b": {
+      "quadros": 3,
+      "fps": 4,
+      "loop": true,
+      "inicio": 15
+    }
+  },
+  "nota": "Torvan (D-049): veterano grande de ~29 px, casaco cinza da Guarda descosturado, barba e cabelo grisalhos, medalha, bengala de treino e o Regulamento. Quadro = inicio + dir*quadros + q; 5 direções, o motor espelha as demais. Sem normal map."
+}

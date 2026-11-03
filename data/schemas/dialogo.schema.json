@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/dialogo",
+  "title": "Diálogo linear: sequência de falas por ID de texto (nunca texto no dado)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "falas"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^dlg_[a-z0-9]+(_[a-z0-9]+)*$" },
+    "falas": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["txt"],
+        "properties": {
+          "txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+          "falante": { "type": "string", "pattern": "^(npc|hero)_[a-z0-9_]+$", "description": "padrão: o dono do diálogo (o NPC)" }
+        }
+      }
+    }
+  }
+}

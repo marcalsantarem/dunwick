@@ -12,6 +12,7 @@ import { criarMateriais } from './materiais.js';
 import { paredesInterior, ambienteInterior } from './interior.js';
 import { criarTampaBau } from './bau_tesouro.js';
 import { estadoCiclo, lanternaAcesa } from '../jogo/ciclo.js';
+import { dir8DeMundo, spriteDeDir8 } from '../jogo/heroi.js';
 
 const COR_AVISO = 0xd01a8f, COR_AVISO_BORDA = 0xffa0e6; // magenta reservado a perigo
 const RAD = Math.PI / 180;
@@ -73,6 +74,18 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
   const atorHeroi = novoAtor(mundo.heroi, (mundoT && recursos.atlas[heroiDados.sprite_mundo]) || recursos.atlas[heroiDados.sprite], true);
   { const k = mundoT ? heroiDados.escala_mundo ?? 1 : heroiDados.escala_mapa ?? 1; atorHeroi.sprite.malha.scale.setScalar(k); atorHeroi.sprite.silhueta?.scale.setScalar(k); atorHeroi.sombra.scale.setScalar(k); } // escala só na exploração (a batalha usa o atlas próprio); a âncora nos pés é a origem da malha
   for (const e of entidades) novoAtor(e, recursos.atlas[e.dados.sprite], false);
+  // NPCs (v0.1.4): um ator por NPC do mapa; posição e direção vêm de mundo.npcs (estado de cena, da exploração); atlas em recursos.atlas[ficha.sprite]
+  const CICLO_NPC = { parado: 5, idle_a: 1.5, idle_b: 1.5 }; // segundos: parado a maior parte do tempo, depois as duas poses de idle
+  // NPC: sem sombra projetada do sol (só a de contato), para poupar 1 chamada por NPC no mapa de sombras
+  const atoresNpc = []; // as sombras de contato dos NPCs vão num único InstancedMesh (1 chamada de desenho em vez de uma por NPC)
+  for (const n of mapaDados.npcs ?? []) {
+    const ficha = dados.npcs?.[n.id], atlas = ficha && recursos.atlas[ficha.sprite]; if (!atlas) continue;
+    const alvo = { id: n.id, get x() { return (mundo.npcs.find((q) => q.id === n.id) ?? n).x; }, get z() { return (mundo.npcs.find((q) => q.id === n.id) ?? n).z; } };
+    const a = novoAtor(alvo, atlas, false), celHeroi = recursos.atlas[heroiDados.sprite].meta.celula[0], k = ficha.escala_mapa ?? (heroiDados.escala_mapa ?? 1) * (celHeroi / atlas.meta.celula[0]); // padrão: mesma altura que o herói no mapa, qualquer que seja a célula do atlas
+    a.sprite.malha.scale.setScalar(k); cena.remove(a.sombra); a.sprite.malha.castShadow = false; a.escalaSombra = k; a.npc = { id: n.id, fase: [...n.id].reduce((t, c) => t + c.charCodeAt(0), 0) % 7 }; atoresNpc.push(a);
+  }
+  const sombrasNpc = atoresNpc.length ? new THREE.InstancedMesh(geoSombra, matSombra, atoresNpc.length) : null, _m4 = new THREE.Matrix4(), _qn = new THREE.Quaternion(), _sn = new THREE.Vector3();
+  if (sombrasNpc) { sombrasNpc.renderOrder = 1; sombrasNpc.frustumCulled = false; cena.add(sombrasNpc); }
   const mkAnel = (r0, r1, cor, op) => { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: cor, transparent: true, opacity: op, depthWrite: false, depthTest: false })); m.renderOrder = 25; m.visible = false; cena.add(m); return m; };
   const marcadorDestino = mkAnel(0.32, 0.42, 0xfff0d0, 0.9), anelAlvo = mkAnel(0.62, 0.72, 0xd8ecff, 0.9);
   let alvoSobId = null, destinoAnterior = null, destinoT = 0;
@@ -115,7 +128,14 @@ export function criarCena({ dados, mundo, recursos, perfil, opcoes = {} }) {
       colar(_v.set(x, 0, z)); _v.addScaledVector(eixoZ, -cfg.camera.sprite_recuo_tiles); a.sprite.malha.position.copy(_v); if (a.sprite.silhueta) a.sprite.silhueta.position.copy(_v);
       colar(_v.set(x, 0.02, z)); a.sombra.position.copy(_v);
       if (a.ehHeroi) { const sd = heroi.spriteDir(), an = a.sprite.meta.anims, nome = an[heroi.anim.nome] ? heroi.anim.nome : an.andar && Math.hypot(heroi.vx, heroi.vz) > 0.05 ? 'andar' : Object.keys(an)[0]; a.sprite.definir(nome, heroi.anim.quadro, sd.dir, sd.espelhar); } // atlas de mundo: só idle/andar
-      else a.sprite.definir(e.anim.nome, e.anim.quadro, 's', false);
+      else if (a.npc) {
+        const st = mundo.npcs.find((q) => q.id === a.npc.id), an = a.sprite.meta.anims, d = spriteDeDir8(dir8DeMundo(Math.cos(st?.face ?? 0.78), Math.sin(st?.face ?? 0.78)));
+        let nome = 'parado'; const total = CICLO_NPC.parado + CICLO_NPC.idle_a + CICLO_NPC.idle_b, t = (tempoS + a.npc.fase * 1.3) % total;
+        if (st?.falando) nome = 'idle_a'; else if (t >= CICLO_NPC.parado) nome = t < CICLO_NPC.parado + CICLO_NPC.idle_a ? 'idle_a' : 'idle_b';
+        if (!an[nome]) nome = an.parado ? 'parado' : Object.keys(an)[0];
+        a.sprite.definir(nome, Math.floor(tempoS * an[nome].fps), d.dir, d.espelhar); a.sprite.malha.visible = !!st;
+        const i = atoresNpc.indexOf(a); _sn.setScalar(st ? a.escalaSombra : 0); _m4.compose(a.sombra.position, _qn, _sn); sombrasNpc.setMatrixAt(i, _m4); sombrasNpc.instanceMatrix.needsUpdate = true;
+      } else a.sprite.definir(e.anim.nome, e.anim.quadro, 's', false);
       const brilho = !a.ehHeroi && e.estado === 'DANO' ? 1 : 0, realce = a.entidade.id === alvoSobId ? 0.25 : 0; a.sprite.malha.material.emissiveIntensity = 0.3 + brilho * 0.8 + realce;
       if (a.aviso) { const ativo = e.estado === 'AVISO' || e.estado === 'ATIVO', p = e.estado === 'ATIVO' ? 1 : e.aviso; a.aviso.disco.visible = a.aviso.anel.visible = ativo; if (ativo) { a.aviso.disco.scale.set(Math.max(0.01, p), 1, Math.max(0.01, p)); a.aviso.disco.position.set(x, 0.04, z); a.aviso.anel.position.set(x, 0.045, z); } }
     }

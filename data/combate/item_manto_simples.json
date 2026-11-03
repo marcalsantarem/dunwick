@@ -1,0 +1,17 @@
+{
+  "id": "item_manto_simples",
+  "versao": 1,
+  "nome_txt": "txt_item_manto_simples_nome",
+  "desc_txt": "txt_item_manto_simples_desc",
+  "nota": "Equipamento inicial da Grace; não se compra nem se vende.",
+  "categoria": "equipamento",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "slot": "armadura",
+  "para": [
+    "hero_grace"
+  ],
+  "stats": {
+    "armadura": 1
+  }
+}

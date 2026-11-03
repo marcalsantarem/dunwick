@@ -1,0 +1,25 @@
+{
+  "id": "shop_taverneira",
+  "nome_txt": "txt_shop_taverneira_nome",
+  "falas": {
+    "saudacao_txt": "txt_loja_taverneira_saudacao",
+    "comprou_txt": "txt_loja_taverneira_comprou",
+    "vendeu_txt": "txt_loja_taverneira_vendeu",
+    "sem_moedas_txt": "txt_loja_taverneira_sem_moedas",
+    "despedida_txt": "txt_loja_taverneira_despedida"
+  },
+  "estoque": [
+    {
+      "item": "item_sopa_ervas"
+    },
+    {
+      "item": "item_pocao_ervas"
+    },
+    {
+      "item": "item_tonico_vigor"
+    }
+  ],
+  "compra_tipos": [
+    "consumivel"
+  ]
+}

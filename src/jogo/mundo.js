@@ -3,12 +3,13 @@
 // Vários mapas (v0.1.2): exterior e interiores ligados por portais (exploracao/portais.js). mundo.heroi e mundo.camera são sempre os
 // mesmos objetos; mundo.mapa, mundo.mapaId, mundo.entidades e mundo.obstaculos passam a ser os do mapa atual a cada troca.
 import { criarMapa } from './mapa.js';
-import { criarHeroi } from './heroi.js';
+import { criarHeroi, FACE_DE_DIRECAO } from './heroi.js';
 import { criarCameraJogo } from './camera_jogo.js';
 import { criarEstadoJogo } from './estado_jogo.js';
 import { criarGatilhoEncontros } from './exploracao/encontros.js';
 import { criarPortais } from './exploracao/portais.js';
 import { criarObjetos } from './exploracao/objetos.js';
+import { criarConversa } from './exploracao/conversa.js';
 
 export const VERSAO_ESTADO_EXPLORACAO = 2; // 2: + objetos (baús abertos); a 1 ainda é aceita
 const DIRECOES = ['s', 'n', 'l', 'o'];
@@ -37,7 +38,9 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
         estado: 'PARADO', quadroEstado: 0, anim: { nome: 'idle', quadro: 0 }, danoAte: -1, contadores: { acertos: 0 }, aviso: 0,
       });
     }
-    p = { mapa: criarMapa(md, kit, cfg.mundo), entidades, obstaculos: entidades.map((e) => ({ x: e.x, z: e.z, r: e.raioPush })) };
+    const mapa = criarMapa(md, kit, cfg.mundo, dados.npcs); // colisor e direção de cada NPC vêm de criarMapa (08)
+    const npcs = mapa.npcs.map((n) => ({ id: n.id, x: n.x, z: n.z, face: FACE_DE_DIRECAO[n.dir], falando: false })); // estado de cena dos NPCs (render lê)
+    p = { mapa, entidades, npcs, obstaculos: entidades.map((e) => ({ x: e.x, z: e.z, r: e.raioPush })) };
     preparados.set(id, p); return p;
   }
 
@@ -49,7 +52,7 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
   // mapa de mundo (v0.1.3): herói mais lento (cfg_exploracao.mundo); o atlas de mundo é escolhido pela cena (sprite_mundo do hero_edric.json, 08)
   const aplicarTipoMapa = (md) => { const mm = md.tipo_mapa === 'mundo' ? dados.config.exploracao?.mundo : null; heroi.multVel = mm ? mm.mult_velocidade : 1; };
   aplicarTipoMapa(ini.mapa.dados);
-  const mundo = { ticks: 0, dados, mapaId: idInicial, mapa: ini.mapa, heroi, camera, entidades: ini.entidades, obstaculos: ini.obstaculos, eventos, dt: 1 / cfg.passo_logico_hz, hora: ciclo.hora_inicial, cicloLigado: ciclo.ligado };
+  const mundo = { ticks: 0, dados, mapaId: idInicial, mapa: ini.mapa, heroi, camera, entidades: ini.entidades, npcs: ini.npcs, obstaculos: ini.obstaculos, eventos, dt: 1 / cfg.passo_logico_hz, hora: ciclo.hora_inicial, cicloLigado: ciclo.ligado };
 
   // ponte mundo ↔ batalha (BL-008): modo mapa | batalha | cena | game_over. Fora do modo `mapa` a exploração fica congelada (só o relógio de ticks anda).
   mundo.jogo = dados.combate && dados.config.batalha ? criarEstadoJogo(dados, eventos) : null;
@@ -64,11 +67,13 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
   /** Troca o mapa atual e põe o herói em (x, z) virado para `direcao`. Base do portal e do carregar. */
   function trocarMapa(id, x, z, direcao) {
     const p = preparar(id);
-    mundo.mapaId = id; mundo.mapa = p.mapa; mundo.entidades = p.entidades; mundo.obstaculos = p.obstaculos;
+    mundo.mapaId = id; mundo.mapa = p.mapa; mundo.entidades = p.entidades; mundo.npcs = p.npcs; mundo.obstaculos = p.obstaculos;
     heroi.definirMapa(p.mapa, x, z, direcao); aplicarTipoMapa(p.mapa.dados);
     camera.definirLimites(p.mapa.dados.limites_camera); camera.encaixar(heroi);
     if (mundo.encontros) mundo.encontros.definirConfig(cfgEncDe(id));
   }
+  mundo.conversa = criarConversa({ mundo, dados, eventos }); // NPCs: diálogo e loja (v0.1.4); trava o mapa enquanto ativa
+  if (mundo.jogo) mundo.conversa.ligarAoJogo(mundo.jogo); // contrato do 15: jogo.dialogo, jogo.loja, avancarDialogo, comprar…
   mundo.objetos = criarObjetos({ mundo, eventos }); // boneco de treino, baús (depois do gatilho: a volta do treino desfaz a carência)
   mundo.portais = criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, cfg: dados.config.exploracao });
   /** Com `trocaManual`: faz a troca pendente (depois de cobrir a tela) e emite `mapa_trocado`. */
@@ -93,7 +98,7 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
 
   /** Um passo lógico completo. `entrada` = instantâneo de entrada_logica.amostrar(tick); `buffer` = entrada.buffer. */
   mundo.passo = (entrada, buffer) => {
-    if ((mundo.jogo && mundo.jogo.modo !== 'mapa') || mundo.portais.pendente) { mundo.ticks++; return; }
+    if ((mundo.jogo && mundo.jogo.modo !== 'mapa') || mundo.portais.pendente || mundo.conversa.ativa || mundo.menu.aberto) { mundo.ticks++; return; }
     const ent = mundo.portais.antesDoHeroi(entrada); // clique em porta/portal/poi vira destino + intenção
     heroi.passo(ent, { obstaculos: mundo.obstaculos, alvos: mundo.entidades, eventos, buffer, tick: mundo.ticks });
     if (mundo.encontros) mundo.encontros.passo(heroi);
@@ -102,6 +107,13 @@ export function criarMundo(dados, eventos, metasSprite, { sementeEncontros = 1, 
     camera.passo(heroi, heroiDados.movimento.vel_correr, mundo.dt);
     if (mundo.cicloLigado) mundo.hora = (mundo.hora + (mundo.dt * 24) / ciclo.duracao_dia_s) % 24;
     mundo.ticks++;
+  };
+  // menu principal (D-050): abre só explorando (nem batalha, nem diálogo/loja, nem troca de mapa pendente); enquanto aberto o mapa não simula
+  mundo.menu = {
+    aberto: false,
+    podeAbrir: () => !(mundo.jogo && mundo.jogo.modo !== 'mapa') && !mundo.portais.pendente && !mundo.conversa.ativa,
+    abrir() { if (mundo.menu.aberto || !mundo.menu.podeAbrir()) return false; mundo.menu.aberto = true; heroi.vx = heroi.vz = 0; heroi.destino = null; heroi.rota = null; mundo.portais.intencao = null; eventos.emitir('menu_aberto', { mapa: mundo.mapaId }); return true; },
+    fechar() { if (!mundo.menu.aberto) return false; mundo.menu.aberto = false; heroi.ox = heroi.x; heroi.oz = heroi.z; eventos.emitir('menu_fechado', { mapa: mundo.mapaId }); return true; },
   };
   mundo.zerarContadores = () => { for (const e of mundo.entidades) e.contadores.acertos = 0; };
   mundo.avancarHora = (h = 1) => { mundo.hora = (mundo.hora + h) % 24; };

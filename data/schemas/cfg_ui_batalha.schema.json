@@ -21,7 +21,8 @@
     "t_dica_s",
     "minimapa",
     "banner_mapa",
-    "marcador_mundo"
+    "marcador_mundo",
+    "menus_mapa"
   ],
   "properties": {
     "id": {
@@ -173,6 +174,26 @@
           "type": "number",
           "minimum": 0.5,
           "maximum": 10
+        }
+      }
+    },
+    "menus_mapa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caracteres_por_s",
+        "qtd_max_loja"
+      ],
+      "properties": {
+        "caracteres_por_s": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 400
+        },
+        "qtd_max_loja": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
         }
       }
     }

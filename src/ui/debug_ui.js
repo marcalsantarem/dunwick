@@ -41,6 +41,7 @@ export function criarDebugUi({ mundo, entrada, t, cfg, acoesExternas, infoGpu })
       case 'debug_lento': estadoUi.lento = !estadoUi.lento; break; case 'debug_exportar': exportar(true); break;
       case 'debug_contadores': mundo.zerarContadores(); break; case 'debug_perfil': acoesExternas.proximoPerfil(); break;
       case 'debug_hora': mundo.avancarHora(1); break; case 'debug_ciclo': mundo.cicloLigado = !mundo.cicloLigado; break;
+      case 'debug_coroas': mundo.jogo?.alterarMoedas(mundo.dados.config.economia?.debug_coroas ?? 0); break; // + Coroas para testar lojas (cfg_economia.debug_coroas)
     }
   }
 

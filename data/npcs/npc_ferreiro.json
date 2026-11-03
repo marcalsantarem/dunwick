@@ -1,0 +1,9 @@
+{
+  "id": "npc_ferreiro",
+  "nome_txt": "txt_npc_ferreiro_nome",
+  "sprite": "npc_ferreiro",
+  "cor_falante": "#e08a5a",
+  "dir_padrao": "s",
+  "dialogo": "dlg_ferreiro",
+  "loja": "shop_ferreiro"
+}

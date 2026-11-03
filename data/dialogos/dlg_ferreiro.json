@@ -1,0 +1,14 @@
+{
+  "id": "dlg_ferreiro",
+  "falas": [
+    {
+      "txt": "txt_dlg_ferreiro_01"
+    },
+    {
+      "txt": "txt_dlg_ferreiro_02"
+    },
+    {
+      "txt": "txt_dlg_ferreiro_03"
+    }
+  ]
+}

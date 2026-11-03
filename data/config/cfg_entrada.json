@@ -37,6 +37,7 @@
     "debug_contadores": { "teclado": ["F10"] },
     "debug_perfil": { "teclado": ["F12"] },
     "debug_hora": { "teclado": ["Backquote"] },
-    "debug_ciclo": { "teclado": ["Backslash"] }
+    "debug_ciclo": { "teclado": ["Backslash"] },
+    "debug_coroas": { "teclado": ["Digit0"] }
   }
 }

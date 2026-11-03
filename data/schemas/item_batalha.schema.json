@@ -63,9 +63,10 @@
       "enum": [
         "consumivel",
         "lembranca",
-        "chave"
+        "chave",
+        "equipamento"
       ],
-      "description": "consumivel (padrão) · lembranca/chave: sem efeito, não vendem nem se descartam"
+      "description": "consumivel (padrão) · lembranca/chave: sem efeito, não vendem nem se descartam · equipamento: ocupa um slot (arma, armadura)"
     },
     "desc_txt": {
       "type": "string",
@@ -75,6 +76,56 @@
       "type": "integer",
       "minimum": 0,
       "description": "preço de venda em moedas; 0 = não vende"
+    },
+    "slot": {
+      "enum": [
+        "arma",
+        "armadura"
+      ],
+      "description": "só equipamento"
+    },
+    "para": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^hero_[a-z0-9_]+$"
+      },
+      "description": "quem pode equipar"
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "poder_arma": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "armadura": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "valores do slot; SUBSTITUEM o do equipamento anterior (poder_arma no slot arma, armadura no slot armadura)"
+    },
+    "bonus_itens": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vida": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mana": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "agilidade": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "somam ao bonus_itens do herói enquanto equipado"
     }
   },
   "allOf": [
@@ -123,6 +174,30 @@
             "const": false
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "categoria": {
+            "const": "equipamento"
+          }
+        },
+        "required": [
+          "categoria"
+        ]
+      },
+      "then": {
+        "properties": {
+          "slot": true,
+          "para": true,
+          "stats": true
+        },
+        "required": [
+          "slot",
+          "para",
+          "stats"
+        ]
       }
     }
   ]

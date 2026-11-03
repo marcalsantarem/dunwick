@@ -17,6 +17,7 @@ import { criarMovel } from './movel.js';
 import { criarPreferencias } from './preferencias.js';
 import { criarTelaCheia } from './tela_cheia.js';
 import { criarInicio, criarPausa } from './inicio.js';
+import { criarMenu } from './menu.js';
 import { criarBatalhaUi } from '../ui/batalha_ui.js';
 
 async function iniciar() {
@@ -70,10 +71,12 @@ async function iniciar() {
       edificios: (m.edificios ?? []).map((e) => ({ id: e.id, x: e.x, z: e.z, w: e.w, d: e.d, rot: e.rot ?? 0, porta: e.porta ?? null, interior: e.interior })),
       portais: (m.portais ?? []).map((p) => ({ id: p.id, x: p.x, z: p.z, w: p.w, d: p.d, interditado: !p.ativo, nome_txt: p.nome_txt ?? null, destino: p.destino ?? null })),
       pois: (m.pois ?? []).map((p) => ({ id: p.id, tipo: p.tipo, x: p.x, z: p.z, nome_txt: p.nome_txt })),
+      npcs: (m.npcs ?? []).map((n) => ({ id: n.id, x: n.x, z: n.z, dir: n.dir ?? dados.npcs?.[n.id]?.dir_padrao ?? 's', nome_txt: dados.npcs?.[n.id]?.nome_txt ?? null })),
     });
     vistaMapas.set(id, v); return v;
   };
-  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null, mapaAtivo };
+  let cursorChao = { x: 0, z: 0, valido: false }; // último ponto do chão sob o mouse (atualizado a cada movimento do mouse)
+  const plataforma = { preferencias, telaCheia, pausa, audio, movel, inicio: null, mapaAtivo, menu: criarMenu({ mundo, pausa, eventos }), cursorMundo: () => cursorChao };
   // tela de início: em produção sempre; em desenvolvimento só com ?inicio=1 (os testes automáticos já começam jogando)
   if (!__DEV__ || P.get('inicio') === '1') {
     pausa.pausar('inicio'); aviso.remove();
@@ -111,7 +114,7 @@ async function iniciar() {
   function atualizarCursor() {
     const p = ponte.ponteiro, r = canvas.getBoundingClientRect(), e = ren.estado, bx = (p.x - r.left) * (canvas.width / r.width), by = (p.y - r.top) * (canvas.height / r.height);
     const topo = e.altura - e.vy - e.vh, nx = ((bx - e.vx) / e.vw) * 2 - 1, ny = 1 - ((by - topo) / e.vh) * 2, dentro = p.dentro && nx >= -1 && nx <= 1 && ny >= -1 && ny <= 1;
-    const c = cena.pegarCursor(nx, ny, mundo.entidades); entrada.definirCursor(c.x, c.z, dentro ? c.alvo : null, dentro && c.valido);
+    const c = cena.pegarCursor(nx, ny, mundo.entidades); entrada.definirCursor(c.x, c.z, dentro ? c.alvo : null, dentro && c.valido); cursorChao = { x: c.x, z: c.z, valido: dentro && c.valido };
     cena.definirAlvoSob(dentro ? c.alvo : null); canvas.style.cursor = dentro && c.alvo ? 'crosshair' : 'default'; return c;
   }
 

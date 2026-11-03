@@ -1,0 +1,9 @@
+{
+  "id": "npc_taverneira",
+  "nome_txt": "txt_npc_taverneira_nome",
+  "sprite": "npc_taverneira",
+  "cor_falante": "#e0b35a",
+  "dir_padrao": "s",
+  "dialogo": "dlg_taverneira",
+  "loja": "shop_taverneira"
+}

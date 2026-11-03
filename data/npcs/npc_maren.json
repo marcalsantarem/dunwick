@@ -1,0 +1,8 @@
+{
+  "id": "npc_maren",
+  "nome_txt": "txt_npc_maren_nome",
+  "sprite": "npc_maren",
+  "cor_falante": "#d9a65a",
+  "dir_padrao": "s",
+  "dialogo": "dlg_maren"
+}

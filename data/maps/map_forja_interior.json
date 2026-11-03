@@ -92,6 +92,14 @@
       "seed": 9
     }
   ],
+  "npcs": [
+    {
+      "id": "npc_ferreiro",
+      "x": 5.6,
+      "z": 2.6,
+      "dir": "s"
+    }
+  ],
   "portais": [
     {
       "id": "saida",

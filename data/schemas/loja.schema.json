@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/loja",
+  "title": "Loja: estoque e falas; os preços vêm de cfg_economia (fonte única)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "nome_txt", "falas", "estoque"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^shop_[a-z0-9]+(_[a-z0-9]+)*$" },
+    "nome_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+    "falas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["saudacao_txt", "comprou_txt", "vendeu_txt", "sem_moedas_txt", "despedida_txt"],
+      "properties": {
+        "saudacao_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+        "comprou_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+        "vendeu_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+        "sem_moedas_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+        "despedida_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" }
+      }
+    },
+    "estoque": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item"],
+        "properties": {
+          "item": { "type": "string", "pattern": "^item_[a-z0-9_]+$" },
+          "qtd": { "type": "integer", "minimum": 1, "description": "ausente = estoque infinito" }
+        }
+      }
+    },
+    "compra_tipos": { "type": "array", "items": { "type": "string", "pattern": "^[a-z_]+$" }, "description": "tipos de item que a loja compra do herói (ausente = qualquer item com preço de venda)" }
+  }
+}

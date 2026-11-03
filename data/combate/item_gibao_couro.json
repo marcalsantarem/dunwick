@@ -1,0 +1,21 @@
+{
+  "id": "item_gibao_couro",
+  "versao": 1,
+  "nome_txt": "txt_item_gibao_couro_nome",
+  "desc_txt": "txt_item_gibao_couro_desc",
+  "nota": "Gibão de Couro (ferreiro): armadura → 8 e +10 de vida; serve nos dois.",
+  "categoria": "equipamento",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "slot": "armadura",
+  "para": [
+    "hero_edric",
+    "hero_grace"
+  ],
+  "stats": {
+    "armadura": 8
+  },
+  "bonus_itens": {
+    "vida": 10
+  }
+}
