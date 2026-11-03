@@ -1,11 +1,10 @@
-// Diálogo, loja e inventário fora da batalha (15, v0.1.4, D-049). DOM dentro de .tela (#ui); texto só por ID e por textContent.
+// Diálogo e loja fora da batalha (15, v0.1.4, D-049). DOM dentro de .tela (#ui); texto só por ID e por textContent.
 // Contrato com o 13 (simulação, em mundo.jogo): `dialogo` = null | { npc, nome_txt, cor, falas: [txt_…], i, loja }; avancarDialogo(),
 // encerrarDialogo(); `loja` = null | { id, npc, nome_txt }; estoqueLoja(id) → [{ item, preco, estoque|null }]; precoVenda(item) → inteiro|null;
 // comprar(loja, item, qtd) / vender(loja, item, qtd) → { ok, motivo?: sem_moedas|sem_estoque|sem_item }; fecharLoja(); moedas; inventario.
 // Sem estoqueLoja/precoVenda no 13, lê os dados (data/lojas + cfg_economia.precos + categoria do item vs compra_tipos), sem calcular nada.
-// A UI não calcula preço nem mexe em moedas/inventário: só mostra e chama. O inventário pausa o mundo (plataforma.pausa 'inv');
-// diálogo e loja deixam o 13 segurar o herói. Teclado: ver tecla(); gamepad: ver gamepad(borda).
-import { derivadosHeroi } from '../jogo/batalha/formulas.js';
+// A UI não calcula preço nem mexe em moedas/inventário: só mostra e chama;
+// diálogo e loja deixam o 13 segurar o herói (o inventário virou a seção Itens do menu principal, menu_principal.js). Teclado: ver tecla(); gamepad: ver gamepad(borda).
 
 function el(tag, classe, pai, texto) {
   const e = document.createElement(tag);
@@ -21,7 +20,7 @@ const FALA_UI = { sem_estoque: 'ui_loja_sem_estoque', sem_item: 'ui_loja_sem_ite
 const ABAS = ['comprar', 'vender', 'sair'];
 
 export function criarMenusMapa({ mundo, t, cfg, dados = {}, plataforma = {}, raiz, livre = () => true }) {
-  const jogo = () => mundo.jogo, pausa = plataforma.pausa ?? null, C = cfg.menus_mapa;
+  const jogo = () => mundo.jogo, C = cfg.menus_mapa;
   const itemDe = (id) => dados.combate?.itens?.[id] ?? dados.itens?.[id] ?? null;
   const nomeItem = (id) => t(itemDe(id)?.nome_txt ?? id);
   const moeda = (v) => t(v === 1 ? 'ui_moeda_um' : 'ui_moeda_varios', { valor: v }), moedasTxt = () => moeda(jogo()?.moedas ?? 0);
@@ -151,51 +150,9 @@ export function criarMenusMapa({ mundo, t, cfg, dados = {}, plataforma = {}, rai
     else if (c === 'Enter' || c === 'NumpadEnter' || c === 'Space') { if (loja.aba === 'sair') sair(); else if (loja.qtdModo) confirmar(); else escolher(loja.foco); }
   }
 
-  // ---------- inventário mínimo (fora da batalha): Coroas, itens com quantidade e descrição, estado do grupo ----------
-  const fundoInv = el('div', 'tela-pausa inv', raiz); fundoInv.hidden = true;
-  const pInv = el('div', 'tela-painel inv-painel', fundoInv); pInv.setAttribute('role', 'dialog'); pInv.setAttribute('aria-label', t('ui_inventario_titulo'));
-  const cabInv = el('div', 'loja-cab', pInv); el('h2', 'tela-painel-titulo', cabInv, t('ui_inventario_titulo')); const moedasInv = el('span', 'loja-moedas', cabInv);
-  const grupoInv = el('ul', 'inv-grupo', pInv), listaInv = el('ul', 'loja-lista inv-lista', pInv); listaInv.setAttribute('role', 'listbox');
-  const vazioInv = el('p', 'loja-vazio', pInv, t('ui_inventario_vazio')), descInv = el('p', 'loja-desc inv-desc', pInv);
-  const bFecharInv = botao('tela-controle tela-continuar inv-fechar', pInv, t('ui_inv_fechar'));
-  let inv = null; // { foco }
-  bFecharInv.addEventListener('click', () => fecharInv());
-  fundoInv.addEventListener('pointerdown', (e) => { if (e.target === fundoInv) fecharInv(); });
-  fundoInv.addEventListener('contextmenu', (e) => { e.preventDefault(); fecharInv(); });
-  const podeInv = () => livre() && jogo()?.modo === 'mapa' && !jogo()?.dialogo && !jogo()?.loja;
-  function abrirInv() { if (inv || !podeInv()) return false; inv = { foco: 0 }; pausa?.pausar('inv'); fundoInv.hidden = false; desenharInv(); return true; }
-  function fecharInv() { if (!inv) return; inv = null; fundoInv.hidden = true; pausa?.retomar('inv'); }
-  function desenharInv() {
-    const j = jogo(), itens = Object.entries(j.inventario).filter(([, q]) => q > 0), F = dados.config?.batalha?.formulas;
-    moedasInv.textContent = moedasTxt();
-    grupoInv.replaceChildren();
-    for (const [id, g] of Object.entries(j.grupo ?? {})) {
-      const h = dados.combate?.herois?.[id], d = h && F ? derivadosHeroi(h, F) : null, li = el('li', 'inv-heroi', grupoInv);
-      el('span', 'inv-heroi-nome', li, t(h?.nome_txt ?? id)); el('span', 'inv-heroi-nivel', li, t('ui_inv_nivel', { nivel: g.nivel }));
-      el('span', 'inv-heroi-vida', li, t('ui_inv_vida', { atual: g.vida, max: d?.vida_max ?? g.vida })); el('span', 'inv-heroi-mana', li, t('ui_inv_mana', { atual: g.mana, max: d?.mana_max ?? g.mana }));
-    }
-    inv.foco = Math.min(inv.foco, Math.max(0, itens.length - 1));
-    listaInv.replaceChildren();
-    itens.forEach(([id, q], i) => {
-      const li = el('li', 'loja-linha inv-linha', listaInv); li.setAttribute('role', 'option'); li.dataset.item = id; li.classList.toggle('foco', i === inv.foco); li.setAttribute('aria-selected', String(i === inv.foco));
-      el('span', 'loja-nome', li, nomeItem(id)); el('span', 'loja-info', li, t('ui_loja_tem', { qtd: q }));
-      li.addEventListener('click', () => { inv.foco = i; desenharInv(); });
-    });
-    vazioInv.hidden = itens.length > 0;
-    const d = itens[inv.foco] && descDe(itens[inv.foco][0]); descInv.textContent = d ? t(d) : ''; descInv.hidden = !d;
-  }
-  function teclaInv(c) {
-    const n = Object.values(jogo().inventario).filter((q) => q > 0).length;
-    if (['Escape', 'Backspace', 'KeyI', 'Tab'].includes(c)) fecharInv();
-    else if ((c === 'ArrowUp' || c === 'KeyW') && n) { inv.foco = (inv.foco + n - 1) % n; desenharInv(); }
-    else if ((c === 'ArrowDown' || c === 'KeyS') && n) { inv.foco = (inv.foco + 1) % n; desenharInv(); }
-  }
-
   return {
     /** Algum menu do mapa aberto (a UI esconde minimapa, banner e placas; o canto continua). */
-    get ocupado() { return !!(jogo()?.dialogo || jogo()?.loja || inv); },
-    get inventarioAberto() { return !!inv; },
-    abrirInv, fecharInv,
+    get ocupado() { return !!(jogo()?.dialogo || jogo()?.loja); },
     /** Tecla (keydown, sem pausa aberta): true = consumida (o chamador para a propagação). */
     tecla(e) {
       const c = e.code;
@@ -205,8 +162,6 @@ export function criarMenusMapa({ mundo, t, cfg, dados = {}, plataforma = {}, rai
         return true; // durante a fala, nenhuma tecla chega ao mundo
       }
       if (loja && !fundoLoja.hidden) { if (!e.repeat || c.startsWith('Arrow')) teclaLoja(c); return true; }
-      if (inv) { if (!e.repeat || c.startsWith('Arrow')) teclaInv(c); return true; }
-      if ((c === 'KeyI' || c === 'Tab') && !e.repeat) return abrirInv() || c === 'Tab';
       return false;
     },
     /** Gamepad (bordas já calculadas pelo chamador): true = consumido. */
@@ -216,13 +171,10 @@ export function criarMenusMapa({ mundo, t, cfg, dados = {}, plataforma = {}, rai
         const k = b('leste') ? 'Escape' : b('sul') ? 'Enter' : b('cima') ? 'ArrowUp' : b('baixo') ? 'ArrowDown' : b('esq') ? 'ArrowLeft' : b('dir') ? 'ArrowRight' : b('lb') ? 'KeyQ' : b('rb') ? 'KeyE' : null;
         if (k) teclaLoja(k); return true;
       }
-      if (inv) { const k = b('leste') || b('select') ? 'Escape' : b('cima') ? 'ArrowUp' : b('baixo') ? 'ArrowDown' : null; if (k) teclaInv(k); return true; }
-      if (b('select')) return abrirInv();
       return false;
     },
     atualizar(dt, reduzir) {
       cuidarDialogo(dt, reduzir); cuidarLoja();
-      if (inv && !livre()) { fundoInv.hidden = true; } else if (inv) { fundoInv.hidden = false; if (moedasInv.textContent !== moedasTxt()) desenharInv(); }
     },
   };
 }

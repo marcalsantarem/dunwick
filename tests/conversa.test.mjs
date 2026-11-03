@@ -108,3 +108,17 @@ test('estoque limitado (qtd na loja): acaba e recusa com sem_estoque; estoqueLoj
   const equip = Object.values(ctx.dados.combate.itens).find((i) => i.categoria === 'equipamento' && i.para?.includes('hero_edric'));
   if (equip) { jogo.adicionarItem(equip.id, 1); jogo.fecharLoja(); assert.equal(jogo.equipar('hero_edric', equip.id).ok, true); assert.equal(jogo.inventario[equip.id] ?? 0, 0, 'equipado sai da mochila (não vende)'); }
 });
+
+test('clique no corpo do NPC (ponto no chão atrás do pé, como a câmera projeta a cabeça) abre a conversa; ao lado do corpo não', () => {
+  const ctx = novo(), { mundo, dados } = ctx, cam = dados.config.jogo.camera, cfg = dados.config.exploracao;
+  const g = (cam.giro_graus * Math.PI) / 180, k = (cfg.altura_clique_npc_tiles * 0.8) / Math.tan((cam.inclinacao_graus * Math.PI) / 180);
+  const cabeca = { x: NX - Math.sin(g) * k, z: NZ - Math.cos(g) * k }; // 80 % da altura do sprite
+  assert.ok(Math.hypot(cabeca.x - NX, cabeca.z - NZ) > cfg.raio_clique_poi_tiles, 'o ponto está longe do pé (antes não acertava)');
+  colocar(mundo, NX - 4, NZ + 2); rodar(ctx, 1, entrada({ apertou: ['clique_principal'], cursor: cabeca }));
+  let i = 0; while (!mundo.conversa.ativa && i++ < 1200) rodar(ctx, 1, entrada());
+  assert.equal(mundo.conversa.npc, 'npc_falante');
+  mundo.conversa.encerrar(); colocar(mundo, NX - 4, NZ + 2);
+  const lado = { x: NX - Math.cos(g) * 2.6, z: NZ + Math.sin(g) * 2.6 }; // perpendicular ao corpo, longe (do lado oposto ao vendedor)
+  rodar(ctx, 1, entrada({ apertou: ['clique_principal'], cursor: lado })); i = 0; while (i++ < 600) rodar(ctx, 1, entrada());
+  assert.equal(mundo.conversa.ativa, false);
+});

@@ -10,5 +10,7 @@
   "aviso_portal_inativo_txt": "txt_portal_interditado",
   "mundo": {
     "mult_velocidade": 0.5
-  }
+  },
+  "altura_clique_npc_tiles": 1.6,
+  "largura_clique_npc_tiles": 0.55
 }

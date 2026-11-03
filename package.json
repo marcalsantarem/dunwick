@@ -21,7 +21,8 @@
     "test:telas": "node tools/testar_telas.mjs",
     "test:banner-mapa": "node tools/testar_banner_mapa.mjs",
     "test:mundo-ui": "node tools/testar_mundo_ui.mjs",
-    "test:menus-mapa": "node tools/testar_menus_mapa.mjs"
+    "test:menus-mapa": "node tools/testar_menus_mapa.mjs",
+    "test:menu-principal": "node tools/testar_menu_principal.mjs"
   },
   "dependencies": {
     "three": "0.186.1"

@@ -1,10 +1,9 @@
 {
   "id": "npc_ferreiro",
   "nome_txt": "txt_npc_ferreiro_nome",
-  "sprite": "npc_maren",
+  "sprite": "npc_ferreiro",
   "cor_falante": "#e08a5a",
   "dir_padrao": "s",
   "dialogo": "dlg_ferreiro",
-  "loja": "shop_ferreiro",
-  "nota": "sprite PROVISÓRIO (npc_maren) até o 04 entregar o atlas próprio (aguarda aprovação do item-modelo)"
+  "loja": "shop_ferreiro"
 }

@@ -255,8 +255,6 @@
     "ui_loja_tem": "Você tem: {qtd}",
     "ui_inventario_titulo": "Inventário",
     "ui_inventario_vazio": "Nada por aqui. Nem poeira.",
-    "ui_inv_abrir": "Inventário (I)",
-    "ui_inv_fechar": "Fechar",
     "ui_inv_nivel": "Nv. {nivel}",
     "ui_inv_vida": "Vida {atual}/{max}",
     "ui_inv_mana": "Mana {atual}/{max}",

@@ -5,6 +5,7 @@
   "moeda_txt": "txt_moeda_coroa",
   "coroas_iniciais": 80,
   "venda_pct": 50,
+  "debug_coroas": 500,
   "precos": {
     "item_pocao_ervas": {
       "compra": 20,

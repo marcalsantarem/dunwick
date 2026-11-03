@@ -1,9 +1,8 @@
 {
   "id": "npc_escrivao",
   "nome_txt": "txt_npc_escrivao_nome",
-  "sprite": "npc_maren",
+  "sprite": "npc_escrivao",
   "cor_falante": "#c9c28a",
   "dir_padrao": "s",
-  "dialogo": "dlg_escrivao",
-  "nota": "sprite PROVISÓRIO (npc_maren) até o 04 entregar o atlas próprio (aguarda aprovação do item-modelo)"
+  "dialogo": "dlg_escrivao"
 }

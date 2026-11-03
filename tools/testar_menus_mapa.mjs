@@ -1,9 +1,10 @@
-// Diálogo, loja e inventário fora da batalha (15, v0.1.4, D-049) no Chrome real: PC 1280×720 e iPhone paisagem 844×390.
-// Conversa e loja de verdade (conversa.js do 13, loja shop_ferreiro e preços do cfg_economia); enquanto o 14 não põe NPCs nos mapas,
-// o teste registra dois NPCs de teste (textos reais do 02) e começa a conversa pelo mesmo evento da exploração ('interagiu', tipo npc).
+// Diálogo e loja fora da batalha (15, v0.1.4, D-049) no Chrome real: PC 1280×720 e iPhone paisagem 844×390, com os NPCs reais
+// (data/npcs, posicionados pelo 14): Maren na vila e o ferreiro na forja (loja shop_ferreiro, preços do cfg_economia). A conversa começa
+// como na exploração: E perto do NPC (PC) ou toque nele (celular).
 // Cobre: caixa embaixo com nome e cor, texto aparecendo, avançar por clique/toque/Espaço/E/gamepad, mundo parado na fala; loja com
-// comprar (mouse/toque, quantidade, total), sem moedas, vender pelo teclado, gamepad, Esc sai; inventário (I / ☰ / Select), pausa o
-// mundo, some na batalha; Start do gamepad abre a pausa; sem erros no console. Capturas em build/qa/menus_mapa/.
+// comprar (mouse/toque, quantidade, total), sem moedas, vender pelo teclado, gamepad, A em Sair fecha; Start do gamepad abre a pausa;
+// na batalha o ☰ some e C não abre o menu; sem erros no console. O menu principal tem o próprio teste (testar_menu_principal.mjs).
+// Capturas em build/qa/menus_mapa/.
 // Uso: node tools/testar_menus_mapa.mjs [--porta=5196] [--cromo=...]
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -23,10 +24,6 @@ let log = ''; srv.stdout.on('data', (d) => { log += d; }); srv.stderr.on('data',
 for (let i = 0; i < 100 && !log.includes('http://localhost'); i++) await dormir(100);
 const nav = await puppeteer.launch({ executablePath: CROMO, headless: 'new', args: ['--use-angle=d3d11', '--ignore-gpu-blocklist', '--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
 
-const NPCS = {
-  npc_teste_maren: { id: 'npc_teste_maren', nome_txt: 'txt_npc_maren_nome', cor: '#7fbf6a', falas: ['txt_dlg_maren_01', 'txt_dlg_maren_02', 'txt_dlg_maren_03'] },
-  npc_teste_ferreiro: { id: 'npc_teste_ferreiro', nome_txt: 'txt_npc_ferreiro_nome', cor: '#e0a050', falas: ['txt_dlg_ferreiro_01'], loja: 'shop_ferreiro' },
-};
 const estado = (p) => p.evaluate(() => {
   const vis = (s) => { const e = document.querySelector(s); return !!e && !e.hidden && e.getClientRects().length > 0; };
   const caixa = (s) => { const e = document.querySelector(s); if (!e || e.hidden || !e.getClientRects().length) return null; const r = e.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, w: r.width, h: r.height }; };
@@ -35,11 +32,11 @@ const estado = (p) => p.evaluate(() => {
     dlg: vis('.dlg-fundo'), dlgNome: txt('.dlg-nome'), dlgTexto: txt('.dlg-texto'), dlgFala: document.querySelector('.dlg')?.dataset.fala, dlgCor: getComputedStyle(document.querySelector('.dlg-nome')).color, seta: vis('.dlg-seta'),
     loja: vis('.loja'), lojaTitulo: txt('.loja-titulo'), lojaMoedas: txt('.loja .loja-moedas'), linhas: [...document.querySelectorAll('.loja .loja-linha')].map((l) => l.dataset.item), foco: document.querySelector('.loja .loja-linha.foco')?.dataset.item ?? null,
     aba: document.querySelector('.loja-aba.ativa')?.className.match(/loja-aba-(\w+)/)?.[1], qtd: vis('.loja-qtd') ? txt('.loja-qtd-valor') : null, total: txt('.loja-total'), fala: txt('.loja-fala'),
-    inv: vis('.inv'), invMoedas: txt('.inv .loja-moedas'), invItens: [...document.querySelectorAll('.inv-linha')].map((l) => [l.dataset.item, l.querySelector('.loja-info').textContent]), invHerois: document.querySelectorAll('.inv-heroi').length,
-    invCanto: vis('.tela-inv-canto'), dica: vis('.tela-dica'), mini: vis('.minimapa'), pausa: vis('.tela-pausa:not(.loja):not(.inv):not(.tela-achado)'),
-    cx: { dlg: caixa('.dlg'), loja: caixa('.loja-painel'), inv: caixa('.inv-painel'), ui: caixa('#ui'), pausa: caixa('.tela-botao-canto') },
-    transborda: [...document.querySelectorAll('.loja-painel, .inv-painel, .dlg')].some((e) => !e.hidden && e.getClientRects().length && e.scrollWidth > e.clientWidth + 1),
-    menores: [...document.querySelectorAll('.loja-painel button, .loja-linha, .inv-painel button')].filter((b) => b.getClientRects().length && b.getBoundingClientRect().height < 43.5).length,
+    menu: vis('.mp'),
+    invCanto: vis('.tela-inv-canto'), dica: vis('.tela-dica'), mini: vis('.minimapa'), pausa: vis('.tela-pausa:not(.loja):not(.mp):not(.tela-achado)'),
+    cx: { dlg: caixa('.dlg'), loja: caixa('.loja-painel'), ui: caixa('#ui'), pausa: caixa('.tela-botao-canto') },
+    transborda: [...document.querySelectorAll('.loja-painel, .dlg')].some((e) => !e.hidden && e.getClientRects().length && e.scrollWidth > e.clientWidth + 1),
+    menores: [...document.querySelectorAll('.loja-painel button, .loja-linha')].filter((b) => b.getClientRects().length && b.getBoundingClientRect().height < 43.5).length,
     moedas: j.moedas, inventario: { ...j.inventario }, dialogo: !!j.dialogo, lojaJ: !!j.loja, heroi: [__dunwick.mundo.heroi.x, __dunwick.mundo.heroi.z],
   };
 });
@@ -55,23 +52,38 @@ async function rodar(tela, nome) {
   await p.waitForFunction('document.documentElement.dataset.pronto === "1"', { timeout: 30000 });
   await p.evaluate(() => document.getElementById('debug')?.remove());
   await p.waitForFunction(() => document.querySelector('.tela-banner-mapa').hidden, { timeout: 6000 }).catch(() => {});
-  // gamepad falso (navigator.getGamepads) e NPCs de teste
-  await p.evaluate((npcs) => {
+  // gamepad falso (navigator.getGamepads)
+  await p.evaluate(() => {
     window.__gp = { mapping: 'standard', buttons: Array.from({ length: 17 }, () => ({ pressed: false })), axes: [0, 0, 0, 0] };
     navigator.getGamepads = () => [window.__gp];
-    Object.assign(__dunwick.mundo.dados.npcs, npcs);
-  }, NPCS);
+  });
+  if (toque) { await p.touchscreen.tap(tela.width / 2, tela.height / 2); await dormir(300); } // 1º toque: libera o áudio e tira o aviso (08)
   const gp = async (i) => { await p.evaluate((i) => { window.__gp.buttons[i].pressed = true; }, i); await dormir(120); await p.evaluate((i) => { window.__gp.buttons[i].pressed = false; }, i); await dormir(120); };
   const tocar = async (sel) => { const b = await p.$(sel); if (toque) await b.tap(); else await b.click(); await dormir(150); };
   const tocarTela = async () => { const c = await p.evaluate(() => { const r = document.getElementById('ui').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height * 0.4 }; }); if (toque) await p.touchscreen.tap(c.x, c.y); else await p.mouse.click(c.x, c.y); await dormir(150); };
-  const conversar = (id) => p.evaluate((id) => __dunwick.eventos.emitir('interagiu', { mapa: __dunwick.mundo.mapaId, id, tipo: 'npc' }), id);
+  // como o jogador: herói a 1,3 tile do NPC (de frente) e E no PC; toque no NPC no celular
+  const conversar = async (id) => {
+    const n = await p.evaluate((id) => { const n = __dunwick.mundo.npcs.find((q) => q.id === id), h = __dunwick.mundo.heroi; h.x = h.ox = n.x; h.z = h.oz = n.z + 1.3; h.destino = null; return { x: n.x, z: n.z }; }, id);
+    await dormir(200);
+    if (toque) { const c = await p.evaluate((x, z) => __dunwick.mundoParaTela(x, 0, z), n.x, n.z); await p.touchscreen.tap(c.x, c.y); } else await p.keyboard.press('KeyE');
+    return p.waitForFunction(() => !!__dunwick.jogo.dialogo, { timeout: 5000 }).then(() => true, () => false);
+  };
+  // entra num portal de verdade (chegada, depois dentro) e espera a névoa abrir
+  const porPortal = async (destino) => {
+    const pt = await p.evaluate((d) => __dunwick.mundo.mapa.dados.portais.find((x) => x.destino?.mapa === d && x.ativo !== false), destino);
+    await p.evaluate((pt) => { const h = __dunwick.mundo.heroi; h.x = h.ox = pt.chegada?.x ?? pt.x; h.z = h.oz = pt.chegada?.z ?? pt.z + 1.5; }, pt); await dormir(300);
+    await p.evaluate((pt) => { const h = __dunwick.mundo.heroi; h.x = h.ox = pt.x; h.z = h.oz = pt.z; }, pt);
+    return p.waitForFunction((d) => __dunwick.mundo.mapaId === d && !__dunwick.apr?.trans, { timeout: 8000 }, destino).then(() => true, () => false);
+  };
+  const hexRgb = (h) => `rgb(${parseInt(h.slice(1, 3), 16)}, ${parseInt(h.slice(3, 5), 16)}, ${parseInt(h.slice(5, 7), 16)})`;
 
   // 1) conversa simples: caixa embaixo, nome e cor, texto aparece aos poucos, avança por clique/toque e teclado
-  await conversar('npc_teste_maren'); await dormir(60);
+  const abriu = await conversar('npc_maren'); await dormir(60);
   let e = await estado(p);
+  const corMaren = await p.evaluate(() => __dunwick.mundo.dados.npcs.npc_maren.cor ?? __dunwick.mundo.dados.npcs.npc_maren.cor_falante);
   const nomeMaren = await t(p, 'txt_npc_maren_nome'), fala0 = await t(p, 'txt_dlg_maren_01');
-  checar(`${nome}: conversa abre a caixa com o nome "${e.dlgNome}"`, e.dlg && e.dialogo && e.dlgNome === nomeMaren);
-  checar(`${nome}: nome na cor do falante`, e.dlgCor === 'rgb(127, 191, 106)', e.dlgCor);
+  checar(`${nome}: ${toque ? 'toque na' : 'E perto da'} Maren abre a caixa com o nome "${e.dlgNome}"`, abriu && e.dlg && e.dialogo && e.dlgNome === nomeMaren);
+  checar(`${nome}: nome na cor do falante`, e.dlgCor === hexRgb(corMaren), `${e.dlgCor} / ${corMaren}`);
   checar(`${nome}: texto aparecendo (ainda incompleto)`, e.dlgTexto.length < fala0.length, `${e.dlgTexto.length}/${fala0.length}`);
   checar(`${nome}: caixa embaixo, dentro do jogo, sem cobrir ⏸, sem transbordar, dica escondida`, !e.dica && dentro(e.cx.dlg, e.cx.ui) && e.cx.dlg.b > e.cx.ui.t + e.cx.ui.h * 0.7 && !cruza(e.cx.dlg, e.cx.pausa) && !e.transborda);
   checar(`${nome}: minimapa some durante a fala`, !e.mini && !e.invCanto);
@@ -91,8 +103,11 @@ async function rodar(tela, nome) {
 
   // 2) loja: fala do ferreiro → loja; compra pelo mouse/toque com quantidade e total
   await p.evaluate(() => __dunwick.jogo.alterarMoedas(80 - __dunwick.jogo.moedas));
-  await conversar('npc_teste_ferreiro'); await dormir(60);
-  await p.keyboard.press('Space'); await dormir(60); await p.keyboard.press('Space'); await dormir(150);
+  const naForja = await porPortal('map_forja_interior'); await dormir(300);
+  const abriuF = await conversar('npc_ferreiro'); await dormir(60);
+  checar(`${nome}: forja e conversa com o ferreiro`, naForja && abriuF);
+  for (let k = 0; k < 16 && !(await p.evaluate(() => !!__dunwick.jogo.loja)); k++) { await p.keyboard.press('Space'); await dormir(80); }
+  await dormir(150);
   e = await estado(p);
   const saud = await t(p, 'txt_loja_ferreiro_saudacao'), oitenta = await t(p, 'ui_moeda_varios', { valor: 80 });
   checar(`${nome}: última fala abre a loja "${e.lojaTitulo}"`, e.loja && e.lojaJ && !e.dlg && e.lojaTitulo === (await t(p, 'txt_shop_ferreiro_nome')));
@@ -125,26 +140,15 @@ async function rodar(tela, nome) {
   await gp(0); e = await estado(p);
   checar(`${nome}: A em "Sair" fecha a loja e a conversa`, !e.loja && !e.lojaJ && !e.dialogo);
 
-  // 4) inventário: I / ☰ abre (mundo pausado), mostra Coroas, itens e grupo; Esc / Fechar fecha; Select do gamepad abre
+  // 4) Start do gamepad abre e fecha a pausa
   await dormir(150);
-  if (toque) await tocar('.tela-inv-canto'); else { await p.keyboard.press('KeyI'); await dormir(150); }
-  e = await estado(p);
-  checar(`${nome}: inventário abre (${toque ? '☰' : 'I'}) com Coroas, itens e o grupo`, e.inv && e.invMoedas === (await t(p, 'ui_moeda_varios', { valor: 40 })) && e.invItens.some(([id]) => id === 'item_pocao_ervas') && e.invHerois === 2, JSON.stringify(e.invItens));
-  checar(`${nome}: inventário dentro do jogo, sem transbordar, alvos ≥ 44 px`, dentro(e.cx.inv, e.cx.ui) && !e.transborda && e.menores === 0);
-  const pausadoInv = await p.evaluate(() => __dunwick.plataforma.pausa.motivos().join(","));
-  if (!toque) { const hx = e.heroi; await p.keyboard.down('KeyD'); await dormir(300); await p.keyboard.up('KeyD'); const e2 = await estado(p); checar(`${nome}: mundo parado com o inventário aberto`, e2.heroi[0] === hx[0] && e2.inv && pausadoInv.includes("inv"), `pausa ${pausadoInv}`); }
-  await p.screenshot({ path: join(DIR, `${nome}_inventario.png`) });
-  if (toque) await tocar('.inv-fechar'); else { await p.keyboard.press('Escape'); await dormir(150); }
-  e = await estado(p); checar(`${nome}: inventário fecha (${toque ? 'Fechar' : 'Esc'}) sem abrir a pausa`, !e.inv && !e.pausa);
-  await gp(8); e = await estado(p); const abriuGp = e.inv; await gp(1); e = await estado(p);
-  checar(`${nome}: Select abre e B fecha o inventário`, abriuGp && !e.inv);
   await gp(9); e = await estado(p); const pausaGp = e.pausa; await gp(9); e = await estado(p);
   checar(`${nome}: Start do gamepad abre e fecha a pausa`, pausaGp && !e.pausa);
 
-  // 5) batalha: sem ☰ e I não abre nada
+  // 5) batalha: sem ☰ e C não abre o menu
   await p.evaluate(() => __dunwick.jogo.iniciarBatalha('enc_slime_1', { semente: 1 })); await p.waitForFunction(() => __dunwick.apr.visao === 'batalha' && !__dunwick.apr.trans, { timeout: 8000 });
-  if (!toque) { await p.keyboard.press('KeyI'); await dormir(150); }
-  e = await estado(p); checar(`${nome}: na batalha o ☰ some e o inventário não abre`, !e.invCanto && !e.inv);
+  if (!toque) { await p.keyboard.press('KeyC'); await dormir(150); }
+  e = await estado(p); checar(`${nome}: na batalha o ☰ some e o menu não abre`, !e.invCanto && !e.menu);
   await p.evaluate(() => { __dunwick.jogo.batalha.abandonar(); __dunwick.jogo.encerrarBatalha(); }); await dormir(1200);
   checar(`${nome}: console sem erros`, erros.length === 0, erros[0] ?? '');
   await ctx.close();

@@ -26,9 +26,20 @@ export function criarPortais({ mundo, dados, eventos, trocarMapa, trocaManual, c
   const heroi = () => mundo.heroi;
   const portais = () => mundo.mapa.dados.portais ?? [];
   const pois = () => interativosDe(mundo.mapa.dados);
+  // NPC de pé: clicar no corpo (não só nos pés) acerta. Com a câmera ortográfica, um ponto a altura y do sprite cai no chão a
+  // y / tan(inclinação) atrás do pé, na direção oposta à câmera; a área de clique é esse segmento (pé → cabeça) com meia-largura.
+  const cam = dados.config.jogo.camera, giro = (cam.giro_graus * Math.PI) / 180, incl = (cam.inclinacao_graus * Math.PI) / 180;
+  const recuoCabeca = cfg.altura_clique_npc_tiles / Math.tan(incl), ux = -Math.sin(giro) * recuoCabeca, uz = -Math.cos(giro) * recuoCabeca;
+  const distSilhueta = (n, x, z) => { const t = Math.max(0, Math.min(1, ((x - n.x) * ux + (z - n.z) * uz) / (ux * ux + uz * uz))); return Math.hypot(x - (n.x + ux * t), z - (n.z + uz * t)); };
+  function npcSobCursor(x, z) {
+    let melhor = null, dm = cfg.largura_clique_npc_tiles;
+    for (const n of mundo.mapa.dados.npcs ?? []) { const d = distSilhueta(n, x, z); if (d <= dm) { dm = d; melhor = n; } }
+    return melhor;
+  }
 
   function alvoDoClique(x, z) {
     for (const p of portais()) if (dentro(retDe(p), x, z, cfg.folga_clique_portal_tiles)) return { tipo: 'portal', id: p.id, x: p.x, z: p.z };
+    const n = npcSobCursor(x, z); if (n) return { tipo: 'poi', id: n.id, x: n.x, z: n.z }; // o corpo do NPC vale mais que o prédio atrás dele
     for (const e of mundo.mapa.dados.edificios ?? []) {
       if (!e.interior || !dentro(retDe(e), x, z)) continue;
       const p = portais().find((q) => q.destino.mapa === e.interior); // clicar no edifício = ir pela porta dele

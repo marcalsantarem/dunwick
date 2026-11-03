@@ -4,26 +4,65 @@
   "title": "Economia: moeda, Coroas iniciais e tabela de preços (compra/venda)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "versao", "moeda_txt", "coroas_iniciais", "venda_pct", "precos"],
+  "required": [
+    "id",
+    "versao",
+    "moeda_txt",
+    "coroas_iniciais",
+    "venda_pct",
+    "precos"
+  ],
   "properties": {
-    "id": { "const": "cfg_economia" },
-    "versao": { "type": "integer", "minimum": 1 },
-    "nota": { "type": "string" },
-    "moeda_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
-    "coroas_iniciais": { "type": "integer", "minimum": 0 },
-    "venda_pct": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "id": {
+      "const": "cfg_economia"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "moeda_txt": {
+      "type": "string",
+      "pattern": "^txt_[a-z0-9_]+$"
+    },
+    "coroas_iniciais": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "venda_pct": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
     "precos": {
       "type": "object",
-      "propertyNames": { "pattern": "^item_[a-z0-9_]+$" },
+      "propertyNames": {
+        "pattern": "^item_[a-z0-9_]+$"
+      },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["compra"],
+        "required": [
+          "compra"
+        ],
         "properties": {
-          "compra": { "type": "integer", "minimum": 1 },
-          "venda": { "type": "integer", "minimum": 0 }
+          "compra": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "venda": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
+    },
+    "debug_coroas": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Coroas que a tecla de debug (0) soma, só para testes"
     }
   }
 }
