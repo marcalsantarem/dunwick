@@ -18,3 +18,12 @@ Andar pela vila e **falar** com os NPCs (caixa de texto), **comprar e vender** c
 
 ## Critérios de saída
 npm test, validar e build passam; testes de navegador (PC e celular): conversar com cada NPC, comprar e vender no ferreiro e na taverneira, Coroas e inventário atualizados, sem moedas suficientes, menu de inventário, FPS ≥ meta; README/CHANGELOG ao fim.
+
+## Menu principal (D-050) — acrescentado em 2026-11-03
+Menu de tela cheia, simples e original (referência de estrutura: lista de seções à esquerda + cartões de personagem; **não copiar** UI de outro jogo, nada de janela azul em degradê). Seções: **Itens**, **Equipamento** (arma e armadura), **Status**, **Sistema**. Abre com **C/Tab** e botão **☰**; Esc fecha; não abre em batalha.
+- **15 UI/UX:** layout (lista à esquerda, cartões de Edric e Grace com sprite de batalha, nível, XP, PV/PM), subtelas de Itens (usar em personagem), Equipamento (comparar e trocar arma/armadura) e Status; Sistema com preferências e "sair para a tela inicial"; mouse, teclado, gamepad e celular deitado; botão ☰; reaproveita o inventário mínimo da loja.
+- **06:** slots `arma` e `armadura` nas fichas, efeito dos equipamentos nos atributos (fórmulas e testes), uso de consumível fora de batalha (regras de cura com vida cheia: D-040).
+- **08:** estado de equipamento serializável (`estado_jogo`), aplicação dos bônus, esquemas; `plataforma.menu` abrir/fechar com exclusão mútua com pausa/batalha/diálogo.
+- **13:** bloquear o movimento com o menu aberto; evento `menu_aberto/fechado`.
+- **02:** textos do menu e das seções (`ui_menu_*`), nomes de atributos e slots.
+- 10 só revisa o visual do menu (paleta e estilo) quando o 15 mandar a captura.

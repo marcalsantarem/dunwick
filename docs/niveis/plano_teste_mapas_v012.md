@@ -25,3 +25,20 @@ Dono dos dados: 14. As regras rodam em `npm run validar` (`tools/validar_dados.m
 3. Saídas norte e sul (vãos da estacada): pisar no gatilho só avisa (inativas); não dá para sair pela mata.
 5. Andar rente ao muro nos quatro lados e nos cantos: a mata cobre a tela, sem borda vazia.
 4. Minimapa: os 9 edifícios e as portas batem com o mapa.
+
+## NPCs — v0.1.4 (D-049)
+
+| # | Regra | Como é conferida | Onde |
+|---|---|---|---|
+| 14 | `npcs` no formato do esquema (`id` `npc_*`, `x`, `z`, `dir`), com ficha existente em `data/npcs` | esquema + validador (08) | validar |
+| 15 | NPC fora de colisão (móveis, prédios, props) e com 1 tile livre em ≥ 2 lados | checagem do 14 com o `criarMapa` real | gerador |
+| 16 | O herói chega a ≤ 0,75 tile de cada NPC, e a frente dele é alcançável | checagem do 14 (busca em grade de 0,25) | gerador |
+| 17 | Com os NPCs no lugar, todas as chegadas ficam livres e todos os portais ativos alcançáveis | checagem do 14 + validador (regras 5 e 7) | validar |
+
+No navegador (manual, 09):
+
+6. Falar com os 6 NPCs:
+   - Maren (canteiro), Torvan (pátio) e Ysolt (quadro de avisos), na vila;
+   - escrivão (posto), ferreiro (forja) e taverneira (taverna), nos interiores.
+7. O NPC vira para o herói e não bloqueia porta nem saída.
+8. Abrir a loja no ferreiro e na taverneira.

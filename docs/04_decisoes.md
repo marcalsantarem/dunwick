@@ -310,3 +310,9 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Decisão (usuário):** **moeda = Coroa** (abreviação "cor."); **lojas:** **ferreiro** (forja) e **taverneira** (taverna), cada uma com NPC e interior; Maren, Torvan, escrivão e Ysolt só **conversam**; o **ferreiro** vende **consumíveis e 2–3 itens de equipamento básico** (equipamento maior e classe do Edric ficam para a v0.1.5); **diálogo** em **caixa de texto simples** com nome do falante, sem escolhas ramificadas.
 - **Assumido pelo Produtor (declarado):** sem retratos desenhados na demo (só nome e cor por personagem; retrato fica pós-demo); o "Comprar / Vender / Sair" da loja é a única escolha; NPCs ficam parados (sem ronda) perto do posto; textos só por ID com +40 % de espaço; trabalho em `dev-v014`, saindo da `dev` com a v0.1.3 ainda sem merge.
 - Briefing: `docs/briefings/BRF-v014_npcs_dialogo_lojas.md`.
+
+## D-050 — v0.1.4 inclui o menu principal de personagem (2026-11-03)
+- **Decisão (usuário):** a v0.1.4 ganha um **menu principal** estilo RPG japonês, **simplificado e em visual original** (nada de janela azul em degradê nem cópia de UI), **tela cheia**: **lista de seções à esquerda** e **um cartão por personagem** (Edric e Grace: sprite de batalha, nível, XP, barras de PV e PM) no centro.
+- **Seções:** **Itens** (usar consumível em um personagem fora de batalha), **Equipamento** (**arma e armadura**, 2 slots por personagem; sem acessórios), **Status** (atributos nos cartões e detalhe) e **Sistema** (preferências e sair para a tela inicial). Recuperação, missões, grupo e mapa entram nas versões em que o sistema existir (Quests na v0.1.6; Recovery na v0.1.5).
+- **Abrir:** tecla **C** ou **Tab**, mais um botão **☰** ao lado do ⏸ e da tela cheia (inclusive no celular). **M** continua o minimapa e **Esc** a pausa. O menu fecha a pausa/minimapa/placas e não abre em batalha.
+- Detalhes no briefing `docs/briefings/BRF-v014_npcs_dialogo_lojas.md` (seção "Menu principal").
