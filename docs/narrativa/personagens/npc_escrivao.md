@@ -1,6 +1,6 @@
 # O escrivão do tributo — id: npc_escrivao
 
-> Ficha completa (NPC). **[PROPOSTA]** nome provisório **Corvin Ledge** (pergunta j; nome de RPG, D-020). Ele é o escrivão da **Coroa** em Baixo Orvalho (recolhe tributo), não da Guarda.
+> Ficha completa (NPC). Nome **Corvin Ledge** (definitivo, D-051). Ele é o escrivão da **Coroa** em Baixo Orvalho (recolhe tributo), não da Guarda.
 
 - **Tipo e papel no jogo:** NPC de vila, num posto da Coroa junto à praça; carimba formulários; dá `quest_sec_formulario_27b`.
 - **Papel na história:** rosto do absurdo burocrático da Coroa.

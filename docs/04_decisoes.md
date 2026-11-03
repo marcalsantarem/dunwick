@@ -316,3 +316,6 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Seções:** **Itens** (usar consumível em um personagem fora de batalha), **Equipamento** (**arma e armadura**, 2 slots por personagem; sem acessórios), **Status** (atributos nos cartões e detalhe) e **Sistema** (preferências e sair para a tela inicial). Recuperação, missões, grupo e mapa entram nas versões em que o sistema existir (Quests na v0.1.6; Recovery na v0.1.5).
 - **Abrir:** tecla **C** ou **Tab**, mais um botão **☰** ao lado do ⏸ e da tela cheia (inclusive no celular). **M** continua o minimapa e **Esc** a pausa. O menu fecha a pausa/minimapa/placas e não abre em batalha.
 - Detalhes no briefing `docs/briefings/BRF-v014_npcs_dialogo_lojas.md` (seção "Menu principal").
+
+## D-051 — Nomes dos NPCs e aprovação do estilo da Maren (2026-11-03)
+- **Decisão (usuário):** nomes **definitivos**: ferreiro **Hargen Stoll**, taverneira **Elda Pott**, escrivão **Corvin Ledge** (os provisórios ficam). A **Maren** como item-modelo está **aprovada**; as sprites dos 5 NPCs no mesmo molde seguem como estão (ajustes só se o Diretor de Arte pedir).

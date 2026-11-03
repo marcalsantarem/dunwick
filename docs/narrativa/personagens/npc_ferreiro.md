@@ -1,6 +1,6 @@
 # O ferreiro — id: npc_ferreiro
 
-> Ficha completa (NPC). **[PROPOSTA]** nome provisório **Hargen Stoll** (pergunta j; nome de RPG, D-020). Papel e rotina [PROPOSTA]; nada fixado pelo usuário além de "aldeões".
+> Ficha completa (NPC). Nome **Hargen Stoll** (definitivo, D-051). Papel e rotina [PROPOSTA]; nada fixado pelo usuário além de "aldeões".
 
 - **Tipo e papel no jogo:** NPC de vila; vende e conserta equipamento (loja, 06); participa de `quest_sec_formulario_27b` (carimbo de armas).
 - **Papel na história:** representa o povo que depende da Coroa.

@@ -1,6 +1,6 @@
 # A taverneira — id: npc_taverneira
 
-> Ficha completa (NPC). **[PROPOSTA]** nome provisório **Elda Pott** (pergunta j; nome de RPG, D-020).
+> Ficha completa (NPC). Nome **Elda Pott** (definitivo, D-051).
 
 - **Tipo e papel no jogo:** NPC de vila; vende comida (itens de cura leves, 06); dá `quest_sec_receita_sopa`.
 - **Papel na história:** conecta a vila (fofoca, notícias) e Maren (ervas).
