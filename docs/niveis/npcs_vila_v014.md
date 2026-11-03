@@ -6,7 +6,7 @@ Formato do campo, conforme o `mapa.schema` do 08:
 ```json
 "npcs": [{ "id": "npc_maren", "x": 41.5, "z": 36.2, "dir": "s" }]
 ```
-A posição é o ponto dos pés, em tiles. A ficha (`data/npcs/npc_*.json`, do 08 e do 13) traz o nome, o sprite, o diálogo e a loja. O gerador grava cada NPC só quando o esquema aceita `npcs` e a ficha `data/npcs/<id>.json` já existe; é a mesma regra dos props do kit. Em 03/11 ainda não há fichas, então os mapas saem sem NPCs. Quando as fichas existirem, basta rodar o gerador de novo. O esboço desenha as posições planejadas.
+A posição é o ponto dos pés, em tiles. A ficha (`data/npcs/npc_*.json`, do 08 e do 13) traz o nome, o sprite, o diálogo e a loja. O gerador grava cada NPC só quando o esquema aceita `npcs` e a ficha `data/npcs/<id>.json` já existe; é a mesma regra dos props do kit. Em 03/11 o 08 criou as 6 fichas, e os 6 NPCs já estão nos mapas.
 
 | NPC | Mapa | Posição no mapa (x, z) | Olha | Onde / por quê |
 |---|---|---|---|---|

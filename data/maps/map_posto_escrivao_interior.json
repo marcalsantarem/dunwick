@@ -95,6 +95,14 @@
       "seed": 9
     }
   ],
+  "npcs": [
+    {
+      "id": "npc_escrivao",
+      "x": 5,
+      "z": 2,
+      "dir": "s"
+    }
+  ],
   "portais": [
     {
       "id": "saida",

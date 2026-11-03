@@ -1,0 +1,9 @@
+{
+  "id": "npc_ysolt",
+  "nome_txt": "txt_npc_ysolt_nome",
+  "sprite": "npc_maren",
+  "cor_falante": "#b99ad6",
+  "dir_padrao": "s",
+  "dialogo": "dlg_ysolt",
+  "nota": "sprite PROVISÓRIO (npc_maren) até o 04 entregar o atlas próprio (aguarda aprovação do item-modelo)"
+}

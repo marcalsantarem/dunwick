@@ -5,11 +5,11 @@ import { criarBatalha, EVENTOS_BATALHA } from './batalha.js';
 
 const MAPA_RESULTADO = { vitoria: 'vitoria', derrota: 'derrota', fugiu: 'fuga', empate: 'fuga' };
 
-export function criarControladorBatalha(dados, { encontro, semente = 1, grupo, estadoGrupo, inventario, velocidade = 1 } = {}) {
+export function criarControladorBatalha(dados, { encontro, semente = 1, grupo, estadoGrupo, inventario, equipamento, velocidade = 1 } = {}) {
   const cfg = dados.config.batalha, ponte = criarEventos(), fila = [];
   let vel = velocidade;
   if (!cfg.velocidades_batalha.includes(vel)) throw new Error(`velocidade ${vel}× não existe (opções: ${cfg.velocidades_batalha.join(', ')})`);
-  const b = criarBatalha(dados, { encontro, semente, grupo, estadoGrupo, inventario, eventos: ponte });
+  const b = criarBatalha(dados, { encontro, semente, grupo, estadoGrupo, inventario, equipamento, eventos: ponte });
   const encontroDados = dados.combate.encontros[encontro];
   const posCena = (a) => (cfg.posicoes[a.lado === 'grupo' ? 'grupo' : 'inimigos'][a.pos - 1]);
 

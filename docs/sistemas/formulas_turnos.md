@@ -202,6 +202,99 @@ Nível 2 após ~4 batalhas (o misto dá 32 XP; o slime 12; o lobo 20). Ajuste: u
 6. **Campos de ataque:** `atk_*` de inimigo usa `dano_base` (12 slime, 15 lobo; investida 22,5); os de herói usam `mult_dano` sobre `poder_arma` (14 Edric, 8 Grace); todos com `escala` 5.
 7. **Valores de agilidade** dos exemplos O1–O4 podem continuar (são exemplos de ordem), mas os dados reais são os de cima.
 
+## 12. Economia da Coroa e equipamento (v0.1.4, D-049)
+
+Dados: `data/config/cfg_economia.json` (preços, fonte única), `data/lojas/shop_*.json` (estoque e falas), `data/combate/item_*.json` (itens e equipamento). Simulação: `node tools/simulacoes/economia.mjs`. Testes: `tests/economia.test.mjs`.
+
+### 12.1 Regras
+```
+preço de compra = cfg_economia.precos[item].compra          (inteiro ≥ 1; a loja não aplica multiplicador)
+preço de venda  = max(1, arred(compra × venda_pct / 100))    venda_pct = 50; arredondamento meio para cima
+sem lucro em comprar e vender: venda < compra em todo item
+item sem preço (equipamento inicial, lembrança, chave) não se compra nem se vende; item equipado não se vende
+compra: exige moedas ≥ preço × qtd; senão a fala "sem moedas" e nada muda
+equipar: o equipamento novo SUBSTITUI o do slot (arma: poder_arma · armadura: armadura) e SOMA seu bonus_itens (vida, mana, agilidade); o antigo volta à mochila
+```
+Coroas iniciais: **80** (≈ 2 poções + 1 sopa, ou o cajado; **não** a espada). Fontes: Coroas dos inimigos (slime 4, lobo 7, Hollowpaw 60) e vendas; ralos: compras. Sem Coroa por missão ainda.
+
+### 12.2 Tabela de preços (Coroas)
+| Item | Efeito | Compra | Venda | Onde |
+|---|---|---|---|---|
+| `item_sopa_ervas` | cura 25 | **13** | 7 | taverna |
+| `item_pocao_ervas` | cura 40 | **20** | 10 | forja e taverna |
+| `item_tonico_vigor` | cura 60 | **36** | 18 | taverna |
+| `item_cajado_freixo` | Grace: poder de arma 8 → **11**, +6 de mana | **70** | 35 | forja |
+| `item_gibao_couro` | armadura → **8**, +10 de vida (Edric e Grace) | **90** | 45 | forja |
+| `item_espada_ferro` | Edric: poder de arma 14 → **18** | **110** | 55 | forja |
+
+Equipamento inicial (sem preço): `item_espada_treino` (14) e `item_tunica_remendada` (armadura 2) do Edric; `item_cajado_madeira` (8) e `item_manto_simples` (1) da Grace. Cura custa de 0,5 a 0,6 Coroa por ponto de vida. A forja **compra** consumíveis e equipamento; a taverna só consumíveis.
+
+### 12.3 Exemplos resolvidos (viram testes `E1–E10`)
+| # | Entrada | Saída |
+|---|---|---|
+| E1 | venda da poção (compra 20) | **10** |
+| E2 | venda da sopa (13 × 0,5 = 6,5) | **7** (meio para cima) |
+| E3 | venda da espada (110) | **55** |
+| E4 | item de compra 1 | venda **1** (mínimo) |
+| E5 | 80 Coroas − 2 poções − 1 sopa | sobram **27** |
+| E6 | 80 Coroas iniciais ≥ poção + sopa (33) | **sim** |
+| E7 | 80 Coroas iniciais ≥ espada (110) | **não** (faltam 30) |
+| E8 | Coroa por ponto de vida: sopa 0,52 · poção 0,50 · tônico 0,60 | todos entre 0,6× e 1,25× o da poção |
+| E9 | Edric nível 1 no slime (defesa 3): espada de treino · espada de ferro | **19** · 18 × 1,40 × 100/103 = 24,47 → **24** |
+| E10 | defesa do Edric (vigor 7): túnica · gibão | **9** · **15** |
+
+### 12.4 Metas e simulação rápida
+Renda média por batalha do M1: slime 4, lobo 7, misto 11 (**7,3** em média). Uma região de 25 batalhas rende ~**183** + 80 iniciais = **263** Coroas; a lista completa (3 equipamentos + 5 poções) custa **370**: o jogador **cobre ~71 %** e escolhe. A primeira compra grande chega rápido: gibão em 2 batalhas, espada em 5 (a partir das 80 iniciais). Sem grind: nenhum item exige repetir batalha; o boneco de treino não dá Coroa.
+
+Efeito do equipamento (motor real, 2.000 batalhas por linha, heróis do nível 1, política simples do 03):
+| Encontro | Sem compras | + espada | + gibão | + cajado | Tudo |
+|---|---|---|---|---|---|
+| `enc_lobo_1` rodadas · vida no fim | 3,0 · 64 % | 2,0 · 77 % | 3,0 · 70 % | 2,0 · 77 % | 2,0 · 81 % |
+| `enc_misto_1` rodadas · vida no fim | 5,1 · 35 % | 4,0 · 52 % | 5,0 · 45 % | 5,0 · 37 % | 4,0 · 59 % |
+
+Leitura: a **espada** é o ganho de ritmo (menos rodadas), o **gibão** o de sobrevivência (+10 pontos de vida do grupo no misto), o **cajado** o mais discreto (mais mana e dano da Grace). Nenhuma compra torna a batalha trivial (o misto ainda dura 4 rodadas) e nenhuma é obrigatória (vitória ≥ 98 % sem nada).
+
+### 12.5 Pontos para os outros agentes
+- **03/13:** o motor ainda usa `arma.poder` e `armadura` dos heróis; ao equipar, ele deve trocar esses valores pelos do item e somar `bonus_itens` (os testes de dados já garantem que o equipamento inicial bate com eles). Slots: só `arma` e `armadura`.
+- **15:** mostrar na loja o efeito do item pelos dados (`cura_base`, `stats`, `bonus_itens`), nunca por texto; preço em Coroas a partir de `cfg_economia`.
+- **02:** o texto do tônico dizia "fôlego" (não existe nos turnos); troquei por "Cura 60 de vida de um aliado". Nomes e descrições dos equipamentos iniciais são provisórios.
+
+### 12.6 Equipamento nos atributos, comparação e uso de consumível fora de batalha (D-050, D-040)
+
+**Slots:** só `arma` e `armadura` por herói (sem acessórios). Cada herói sempre tem os dois preenchidos (o equipamento inicial); não existe "tirar sem trocar".
+```
+poder_arma = stats.poder_arma do item da arma              (substitui)
+armadura   = stats.armadura do item da armadura             (substitui)
+vida_max   = 30 + 10 × vigor + Σ bonus_itens.vida           (dos dois itens)
+mana_max   = 5 + 3 × mente + Σ bonus_itens.mana
+defesa     = vigor + armadura
+agilidade  = destreza + Σ bonus_itens.agilidade
+```
+Equipamento **não muda os atributos-base** (vigor, força, destreza, mente); muda só os derivados. O Status mostra cada derivado como `total (base + equipamento)`.
+
+**Equipar** (só fora de batalha): o item precisa estar na mochila, ser de `categoria: equipamento` e o herói constar em `para`. O item antigo **volta à mochila**. **Vida e mana atuais nunca sobem** ao equipar (o máximo sobe, a vida não cura sozinha) e são **limitadas ao novo máximo** ao trocar para algo com menos (nunca abaixo de 1 em quem está vivo). Recusas: `nao_e_equipamento`, `nao_serve`, `nao_tem`.
+
+**Comparar (para o menu, 15):** ao escolher um item para um slot, mostrar `novo − atual` (↑ verde com sinal e forma, ↓ com outra forma, = sem mudança) para **poder de arma**, **defesa**, **vida máx**, **mana máx** e **agilidade**. Não mostrar dano esperado.
+
+**Usar consumível fora de batalha (D-040):** qualquer item com `efeito: cura` pode ser usado no menu em Edric ou Grace. Cura pela mesma fórmula da batalha (`cura_base`, `escala`, `mult_cura`), limitada ao que falta de vida. **Com vida cheia executa mesmo assim, gasta 1 item e cura 0** (a tela só avisa "VIDA CHEIA"). Fora de batalha ninguém está caído (vida ≥ 1). Sem item na mochila: nada acontece. Equipamento, lembrança e chave não se "usam".
+
+| # | Entrada | Saída |
+|---|---|---|
+| EQ1 | derivados do Edric · da Grace, equipamento inicial | **100/14/9/6** · **70/29/5/5** (vida/mana/defesa/agilidade) |
+| EQ2 | Edric com gibão de couro | vida **110**, defesa **15** |
+| EQ3 | Grace com cajado de freixo | mana **35**, poder de arma **11** |
+| EQ4 | Grace com gibão de couro | vida **80**, defesa **12** |
+| EQ5 | Edric equipa a espada de ferro | arma 18; **espada de treino** vai à mochila |
+| EQ6 | Edric 100/110 com o gibão; depois com 108/110 volta à túnica | **100** (não curou ao equipar) · **100** (108 limitado ao máximo) |
+| EQ7 | espada de ferro na Grace · item que não tem · poção como equipamento | `nao_serve` · `nao_tem` · `nao_e_equipamento` |
+| EQ8 | lobo (poder 15) morde o Edric: túnica · gibão; Edric no slime: espada de treino · de ferro | **18** · **17**; **19** · **24** |
+| EQ9 | poção em 60/100 | vida **100**, 1 poção a menos |
+| EQ10 | poção em 100/100 | vida **100**, cura **0**, 1 poção a menos |
+| EQ11 | tônico (60) em 70/100 | cura **30**, tônico gasto |
+| EQ12 | sem a poção na mochila · espada "usada" como item | nada acontece |
+
+Testes: `tests/equipamento.test.mjs` (modelo de referência do 06; o 08 implementa em `src/jogo/` e deve bater com ele). O motor de batalha já usa `derivadosHeroi`, então basta alimentá-lo com `arma.poder`, `armadura` e `bonus_itens` já combinados.
+
 ## Histórico de mudanças
 | Data | Mudança | Antes → depois | Motivo |
 |---|---|---|---|
@@ -211,3 +304,4 @@ Nível 2 após ~4 batalhas (o misto dá 32 XP; o slime 12; o lobo 20). Ajuste: u
 | 2026-10-27 | Inimigos do M1 | slime 80/16 e lobo 70/18 (`bestiario_slice.md`) → slime 70 PV poder 12 e lobo 90 PV poder 15 | rodadas, não segundos |
 | 2026-10-27 | Poção de ervas | cura 50 → 40 | escala de PV |
 | 2026-10-27 | Alinhamento com `combate_turnos.md` | Defender +2 PM → sem ganho, prioridade +1; mana só por rodada; IA do 03; `skill_mao_boa` → `skill_cura`; metas de tempo | divergências do 03 |
+| 2026-11-03 | §12 Economia da Coroa, preços, lojas e equipamento (v0.1.4, D-049) | sem economia → Coroas iniciais 80, venda 50 %, 6 itens à venda, 4 equipamentos iniciais | BRF v0.1.4 |

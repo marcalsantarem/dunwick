@@ -10918,6 +10918,26 @@
       "encontro": "enc_boneco_treino"
     }
   ],
+  "npcs": [
+    {
+      "id": "npc_maren",
+      "x": 41.5,
+      "z": 36.2,
+      "dir": "s"
+    },
+    {
+      "id": "npc_torvan",
+      "x": 36.5,
+      "z": 45.8,
+      "dir": "s"
+    },
+    {
+      "id": "npc_ysolt",
+      "x": 54,
+      "z": 44.8,
+      "dir": "s"
+    }
+  ],
   "inicio_jogador": {
     "tile": [47, 51],
     "direcao": "s"

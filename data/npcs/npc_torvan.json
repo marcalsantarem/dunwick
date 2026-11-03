@@ -1,0 +1,9 @@
+{
+  "id": "npc_torvan",
+  "nome_txt": "txt_npc_torvan_nome",
+  "sprite": "npc_maren",
+  "cor_falante": "#9fb5c9",
+  "dir_padrao": "s",
+  "dialogo": "dlg_torvan",
+  "nota": "sprite PROVISÓRIO (npc_maren) até o 04 entregar o atlas próprio (aguarda aprovação do item-modelo)"
+}

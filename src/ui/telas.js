@@ -5,6 +5,7 @@
 // telaCheia.suportada/ativa/alternar/aoMudar, pausa.pausar('ui')/retomar('ui'), movel.ativo. Sem ela (testes), há substitutos locais.
 
 import { criarMinimapa } from './minimapa.js';
+import { criarMenusMapa } from './menus_mapa.js';
 import { fonteDoMapa } from './minimapa_geo.js';
 import { interativosDe } from '../jogo/exploracao/portais.js';
 
@@ -50,6 +51,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   const bPausa = botao('tela-botao-canto', canto, '⏸'); bPausa.setAttribute('aria-label', t('ui_pausa_abrir'));
   const bCheia = botao('tela-botao-canto tela-cheia-canto', canto, '⛶'); bCheia.setAttribute('aria-label', t('ui_pausa_tela_cheia'));
   const bMiniCanto = botao('tela-botao-canto tela-mini-canto', canto, '▦'); bMiniCanto.setAttribute('aria-label', t('ui_pausa_minimapa'));
+  const bInvCanto = botao('tela-botao-canto tela-inv-canto', canto, '☰'); bInvCanto.setAttribute('aria-label', t('ui_inv_abrir'));
   // ---------- pausa ----------
   const fundo = el('div', 'tela-pausa', raiz); fundo.hidden = true;
   const painel = el('div', 'tela-painel', fundo); painel.setAttribute('role', 'dialog'); painel.setAttribute('aria-label', t('ui_pausa_titulo'));
@@ -89,6 +91,9 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
 
   // ---------- dica ----------
   const dicaEl = el('div', 'tela-dica', raiz); dicaEl.hidden = true; dicaEl.setAttribute('role', 'status');
+  // ---------- diálogo, loja e inventário (v0.1.4, D-049): menus_mapa.js ----------
+  const menus = criarMenusMapa({ mundo, t, cfg, dados, plataforma, raiz, livre: () => iniciou() && !pausado && !achado });
+  bInvCanto.addEventListener('click', () => menus.abrirInv());
   // ---------- nome do mapa ao entrar (início do jogo e cada troca por portal: evento 'mapa_trocado' da simulação) ----------
   const bannerEl = el('div', 'tela-banner-mapa', raiz); bannerEl.hidden = true; bannerEl.setAttribute('role', 'status');
   const pedirBanner = (id) => ({ id, nomeTxt: dados.mapas?.[id]?.nome_txt, t: 0 });
@@ -112,7 +117,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
     if (!fontes.has(chave)) { const propria = fonteDoMapa(mundo.mapa.dados, giro, (m) => interativosDe({ ...m, objetos: m.objetos ?? [] })); fontes.clear(); fontes.set(chave, ma ? Object.freeze({ ...ma, muros: ma.muros ?? propria.muros, pois: propria.pois.length >= (ma.pois?.length ?? 0) ? propria.pois : ma.pois }) : propria); }
     return fontes.get(chave);
   };
-  const minimapa = cfg.minimapa ? criarMinimapa({ mundo, t, cfg, fonte: fonteMini, preferencia: PM.obter, visivel: () => iniciou() && !pausado && !achado && !noMundo() && (mundo.jogo?.modo ?? 'mapa') === 'mapa' }) : null;
+  const minimapa = cfg.minimapa ? criarMinimapa({ mundo, t, cfg, fonte: fonteMini, preferencia: PM.obter, visivel: () => iniciou() && !pausado && !achado && !menus.ocupado && !noMundo() && (mundo.jogo?.modo ?? 'mapa') === 'mapa' }) : null;
   const alternarMini = () => { PM.definir('minimapa', !PM.obter('minimapa')); desenhar(); };
   const alternarMiniC = () => { PM.definir('minimapa_contraste', !PM.obter('minimapa_contraste')); desenhar(); };
 
@@ -158,6 +163,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   addEventListener('keydown', (e) => {
     if (!iniciou()) return; // a tela de início (08) cuida da tecla
     if (achado) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && ['Enter', 'NumpadEnter', 'Space', 'Escape', 'KeyE', 'Backspace'].includes(e.code)) fecharAchado(); return; }
+    if (!pausado && mundo.jogo?.modo !== 'batalha' && menus.tecla(e)) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     const pausa = e.code === 'Escape' || e.code === 'KeyP';
     if (!pausado) {
       if (e.code === 'KeyM' && !e.repeat && minimapa && !noMundo() && mundo.jogo?.modo !== 'batalha') { e.preventDefault(); alternarMini(); return; }
@@ -176,12 +182,12 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   function lerGamepad() {
     const gp = [...(navigator.getGamepads?.() ?? [])].find((g) => g && g.mapping === 'standard'); if (!gp) return;
     const b = (i) => !!gp.buttons[i]?.pressed, ay = gp.axes[1] ?? 0, ax = gp.axes[0] ?? 0;
-    const agora = { start: b(9), sul: b(0), leste: b(1), cima: b(12) || ay < -0.5, baixo: b(13) || ay > 0.5, esq: b(14) || ax < -0.5, dir: b(15) || ax > 0.5 };
-    const borda = (k) => agora[k] && !antes[k]; antes = agora;
+    const agora = { start: b(9), sul: b(0), leste: b(1), cima: b(12) || ay < -0.5, baixo: b(13) || ay > 0.5, esq: b(14) || ax < -0.5, dir: b(15) || ax > 0.5, select: b(8), lb: b(4), rb: b(5) };
+    const ant = antes, borda = (k) => agora[k] && !ant[k]; antes = agora;
     if (!iniciou()) return;
     if (achado) { if (borda('sul') || borda('leste') || borda('start')) fecharAchado(); return; }
     if (borda('start')) { if (pausado) fecharPausa(); else abrirPausa(); return; }
-    if (!pausado) return;
+    if (!pausado) { if (mundo.jogo?.modo !== 'batalha') menus.gamepad(borda); return; }
     if (borda('cima')) mover(-1); if (borda('baixo')) mover(1); if (borda('esq')) ajustar[foco]?.(-1); if (borda('dir')) ajustar[foco]?.(1);
     if (borda('sul')) ativar[foco](); if (borda('leste')) fecharPausa();
   }
@@ -190,6 +196,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   function esconderDica(marcar = true) { if (!dica) return; dica = null; dicaEl.hidden = true; if (marcar) gravar({ dica_vista: true }); }
   function cuidarDica(dt) {
     if (!iniciou() || pausado || achado) return;
+    dicaEl.hidden = !dica || menus.ocupado; if (menus.ocupado) return; // a fala, a loja e o inventário cobrem a dica (ela espera)
     const h = mundo.heroi;
     if (!dica) {
       if (prefs().dica_vista || mundo.jogo?.modo !== 'mapa' || !h) return;
@@ -203,7 +210,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   function cuidarBanner(dt) {
     if (!banner.id || !iniciou()) return;
     if (mundo.jogo && mundo.jogo.modo !== 'mapa') { banner.id = null; bannerEl.hidden = true; return; }
-    if (pausado || achado) { bannerEl.hidden = true; return; }
+    if (pausado || achado || menus.ocupado) { bannerEl.hidden = true; return; }
     const B = cfg.banner_mapa, nomeTxt = banner.nomeTxt;
     if (!nomeTxt || banner.t >= B.t_total_s) { banner.id = null; bannerEl.hidden = true; return; }
     if (bannerEl.hidden || bannerEl.dataset.mapa !== banner.id) { bannerEl.textContent = t(nomeTxt); bannerEl.dataset.mapa = banner.id; bannerEl.hidden = false; }
@@ -239,7 +246,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   function cuidarMarcador(dt) {
     const M = cfg.marcador_mundo; if (!M) return;
     if (aviso) { aviso.t += dt; if (aviso.t >= M.t_aviso_s) aviso = null; }
-    const livre = iniciou() && !pausado && !achado && (mundo.jogo?.modo ?? 'mapa') === 'mapa';
+    const livre = iniciou() && !pausado && !achado && !menus.ocupado && (mundo.jogo?.modo ?? 'mapa') === 'mapa';
     const m = livre && noMundo() && bannerEl.hidden ? escolherMarca() : null, comAviso = livre && !!aviso;
     if (!m && !comAviso) { if (!marcaEl.hidden) { marcaEl.hidden = true; marca = null; } return; }
     const chave = `${m?.id ?? ''}|${comAviso ? aviso.txt : ''}`;
@@ -256,7 +263,8 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   return {
     minimapa,
     get pausado() { return pausado || !!achado; }, get achadoAberto() { return !!achado; }, preferencias: prefs,
-    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); cuidarBanner(dt); cuidarMarcador(dt); minimapa?.atualizar(); },
+    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); cuidarBanner(dt); cuidarMarcador(dt); minimapa?.atualizar(); menus.atualizar(dt, prefs().reduzir_movimento || !!globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches); bInvCanto.hidden = (mundo.jogo?.modo ?? 'mapa') !== 'mapa' || menus.ocupado; },
+    menus,
     abrirPausa, fecharPausa, gravar,
   };
 }

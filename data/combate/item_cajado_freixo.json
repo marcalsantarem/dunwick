@@ -1,0 +1,20 @@
+{
+  "id": "item_cajado_freixo",
+  "versao": 1,
+  "nome_txt": "txt_item_cajado_freixo_nome",
+  "desc_txt": "txt_item_cajado_freixo_desc",
+  "nota": "Cajado de Freixo (ferreiro): poder de arma 8 → 11 e +6 de mana.",
+  "categoria": "equipamento",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "slot": "arma",
+  "para": [
+    "hero_grace"
+  ],
+  "stats": {
+    "poder_arma": 11
+  },
+  "bonus_itens": {
+    "mana": 6
+  }
+}

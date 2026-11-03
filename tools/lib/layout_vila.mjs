@@ -39,6 +39,16 @@ export const PROPS_VILA = [
   // pátio do Torvan: 1 boneco interativo (o mais distante do poço); substitui os 2 bonecos `inimigo` do M1 quando enc_boneco_treino existir (06)
   { id: 'boneco_treino', tipo: 'boneco_treino', x: 11.5, z: 24, encontro: 'enc_boneco_treino', substitui: ['enemy_boneco_alvo', 'enemy_boneco_golpe'] },
 ];
+// NPCs (v0.1.4, D-049; docs/niveis/npcs_vila_v014.md): `onde` = 'vila' (coordenadas locais) ou o id do edifício (coordenadas da sala).
+// Ficam parados (sem vagar) com 1 tile livre em ≥ 2 lados. `alcance` (tiles): pedido ao 13 para quem atende atrás do balcão (o mapa ainda não leva esse campo).
+export const NPCS = [
+  { npc: 'npc_maren', onde: 'vila', x: 18.5, z: 13.2, direcao: 's' }, // ao lado do canteiro de ervas, a leste da porta dela
+  { npc: 'npc_torvan', onde: 'vila', x: 13.5, z: 22.8, direcao: 's' }, // pátio de treino, junto ao boneco
+  { npc: 'npc_ysolt', onde: 'vila', x: 31, z: 21.8, direcao: 's' }, // provisório: de passagem, ao lado do quadro de avisos (a feira vem depois do slice da vila)
+  { npc: 'npc_escrivao', onde: 'posto_escrivao', x: 5, z: 2, direcao: 's', alcance: 1.8 }, // atrás do balcão do posto
+  { npc: 'npc_ferreiro', onde: 'forja', x: 5.6, z: 2.6, direcao: 's' }, // ao lado da bigorna, de frente para a porta (loja)
+  { npc: 'npc_taverneira', onde: 'taverna', x: 5, z: 1, direcao: 's', alcance: 1.8 }, // atrás do balcão (loja)
+];
 // item do baú de tesouro da casa do Edric: ID definido pelo 06 (o baú só entra no mapa quando o item existir em data/combate)
 // quintal do Edric sem árvores (retângulo local) e caminho de terra até a trilha da Maren
 export const QUINTAL_EDRIC = [ex(-2.5), ez(-1.5), ex(7), ez(7.5)];

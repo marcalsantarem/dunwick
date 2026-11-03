@@ -509,6 +509,39 @@
         }
       }
     },
+    "npcs": {
+      "type": "array",
+      "description": "NPCs do mapa (ficha em data/npcs); a posição é o ponto dos pés, em tiles",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "x",
+          "z"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^npc_[a-z0-9]+(_[a-z0-9]+)*$"
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "dir": {
+            "enum": [
+              "s",
+              "l",
+              "n",
+              "o"
+            ]
+          }
+        }
+      }
+    },
     "pois": {
       "type": "array",
       "items": {

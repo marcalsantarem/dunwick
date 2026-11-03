@@ -19,9 +19,15 @@ export function colisorDe(o, kit) {
   return null;
 }
 
-export function criarMapa(dados, kit, cfgMundo) {
+export const RAIO_NPC_PADRAO = 0.35;
+
+/** `fichasNpc` (opcional) = dados.npcs: o raio de colisão de cada NPC vem da ficha (padrão RAIO_NPC_PADRAO). */
+export function criarMapa(dados, kit, cfgMundo, fichasNpc = {}) {
   const [L, A] = dados.tamanho;
   const colisores = dados.objetos.flatMap((o) => { const c = colisorDe(o, kit); return Array.isArray(c) ? c : c ? [c] : []; });
+  // NPCs (v0.1.4): um círculo pequeno nos pés de cada um; `npc` marca o colisor para a exploração (virar/interagir)
+  const npcs = (dados.npcs ?? []).map((n) => ({ id: n.id, x: n.x, z: n.z, dir: n.dir ?? fichasNpc[n.id]?.dir_padrao ?? 's', raio: fichasNpc[n.id]?.raio ?? RAIO_NPC_PADRAO }));
+  for (const n of npcs) colisores.push({ forma: 'circ', x: n.x, z: n.z, r: n.raio, id: n.id, npc: true });
   // portais inativos bloqueiam a passagem (o mundo dá o aviso ao encostar)
   const ret = (r, id, extra) => ({ forma: 'ret', x0: r[0], z0: r[1], x1: r[2], z1: r[3], id, ...extra });
   // contrato v0.1.2 (08): retângulo por centro+tamanho {x,z,w,d} (ou `ret` [x0,z0,x1,z1])
@@ -135,5 +141,5 @@ export function criarMapa(dados, kit, cfgMundo) {
     return pontos;
   }
   const materialEm = (x, z) => dados.legenda[dados.planta[Math.min(A - 1, Math.max(0, Math.floor(z)))][Math.min(L - 1, Math.max(0, Math.floor(x)))]];
-  return { largura: L, altura: A, dados, colisores, resolverCirculo, livre, segmentoLivre, rota, materialEm };
+  return { largura: L, altura: A, dados, colisores, npcs, resolverCirculo, livre, segmentoLivre, rota, materialEm };
 }

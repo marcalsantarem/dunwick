@@ -219,3 +219,39 @@ html.movel #aviso { bottom: auto; top: calc(env(safe-area-inset-top) + 6px); fon
 .tela-achado-texto { margin: 0; font-size: max(13px, calc(18 * var(--u))); color: var(--ui-4); }
 .tela-ok { min-width: 8ch; min-height: 44px; flex: none; }
 .bat-res-treino { margin: 0 0 calc(10 * var(--u)); color: var(--ui-3); }
+
+/* ---------- diálogo, loja e inventário fora da batalha (15, v0.1.4, D-049) ---------- */
+/* diálogo: caixa embaixo (sem retrato), nome do falante na cor dele; o fundo transparente pega clique/toque em qualquer lugar para avançar */
+.dlg-fundo { position: absolute; inset: 0; z-index: 4; display: flex; align-items: flex-end; justify-content: center; padding: 0 calc(12 * var(--u)) calc(12 * var(--u)); box-sizing: border-box; pointer-events: auto; cursor: pointer; }
+.dlg { position: relative; width: min(100%, 70ch); min-height: calc(3 * 1.35em + 20 * var(--u)); box-sizing: border-box; padding: calc(16 * var(--u)) calc(18 * var(--u)) calc(14 * var(--u)); background: rgba(33, 18, 9, 0.94); border: max(1px, calc(2 * var(--u))) solid var(--madeira-3); box-shadow: inset 0 0 0 max(1px, calc(2 * var(--u))) var(--madeira-2), 4px 4px 0 rgba(0, 0, 0, 0.5); font-size: max(14px, calc(18 * var(--u))); line-height: 1.35; }
+.dlg-nome { position: absolute; left: calc(12 * var(--u)); top: 0; transform: translateY(-60%); max-width: 80%; padding: max(1px, calc(2 * var(--u))) calc(10 * var(--u)); background: var(--ui-1); border: max(1px, calc(2 * var(--u))) solid var(--cor-falante, var(--latao)); color: var(--cor-falante, var(--brilho-2)); font-size: max(13px, calc(15 * var(--u))); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 0 #000; }
+.dlg-texto { margin: 0; min-height: 2.7em; }
+.dlg-seta { position: absolute; right: calc(12 * var(--u)); bottom: calc(6 * var(--u)); color: var(--brilho-1); animation: bat-cursor 0.8s steps(2) infinite; }
+.dlg-dica { position: absolute; right: calc(32 * var(--u)); bottom: calc(6 * var(--u)); color: var(--ui-3); font-size: max(11px, calc(12 * var(--u))); }
+/* loja e inventário: reaproveitam o fundo e o painel da pausa */
+.loja-painel, .inv-painel { width: min(94%, 64ch); display: flex; flex-direction: column; gap: calc(6 * var(--u)); }
+.loja-cab { display: flex; align-items: baseline; justify-content: space-between; gap: calc(12 * var(--u)); }
+.loja-cab .tela-painel-titulo { margin: 0; text-align: left; }
+.loja-moedas { color: var(--brilho-1); white-space: nowrap; }
+.loja-abas { display: flex; gap: calc(6 * var(--u)); }
+.loja-aba { flex: 1; min-height: 44px; }
+.loja-aba.ativa { border-color: var(--brilho-1); color: var(--brilho-2); background: var(--madeira-3); }
+.loja-lista { margin: 0; padding: 0; list-style: none; max-height: calc(5 * 46px); overflow: auto; }
+.loja-linha { display: grid; grid-template-columns: 1fr auto auto; gap: max(14px, calc(18 * var(--u))); align-items: center; min-height: 44px; padding: 0 calc(8 * var(--u)); border: max(1px, calc(2 * var(--u))) solid transparent; cursor: pointer; pointer-events: auto; }
+.loja-linha.foco { border-color: var(--brilho-1); background: rgba(135, 90, 59, 0.35); }
+.loja-linha.caro .loja-preco, .loja-linha.caro .loja-nome { color: var(--ui-2); }
+.loja-info { color: var(--ui-3); font-size: max(12px, calc(13 * var(--u))); }
+.loja-preco { min-width: 9ch; text-align: right; color: var(--brilho-2); }
+.loja-vazio, .loja-desc { margin: 0; color: var(--ui-3); font-size: max(12px, calc(14 * var(--u))); }
+.loja-qtd { display: flex; align-items: center; gap: calc(8 * var(--u)); flex-wrap: wrap; }
+.loja-qtd-valor { min-width: 5ch; text-align: center; }
+.loja-total { flex: 1; text-align: right; color: var(--brilho-2); }
+.loja-confirmar { min-width: 10ch; min-height: 44px; border-color: var(--brilho-1); }
+.loja-fala { margin: 0; min-height: 2.6em; padding: calc(6 * var(--u)) calc(10 * var(--u)); background: rgba(0, 0, 0, 0.3); border-left: max(2px, calc(3 * var(--u))) solid var(--latao); font-size: max(13px, calc(15 * var(--u))); }
+.inv-grupo { display: grid; grid-template-columns: repeat(auto-fit, minmax(22ch, 1fr)); gap: calc(6 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.inv-heroi { display: grid; grid-template-columns: 1fr auto; gap: 0 calc(8 * var(--u)); padding: calc(4 * var(--u)) calc(8 * var(--u)); border: max(1px, calc(2 * var(--u))) solid var(--madeira-2); font-size: max(12px, calc(14 * var(--u))); }
+.inv-heroi-nome { color: var(--brilho-2); }
+.inv-fechar { min-height: 44px; }
+/* celular deitado (pouca altura): lista mais curta, painel rola */
+@media (max-height: 460px) { .loja-lista { max-height: calc(3 * 46px); } .loja-painel, .inv-painel { gap: 4px; } }
+.tela-canto { z-index: 5; } /* ⏸ acima da caixa de diálogo (z 4); a pausa, a loja e o inventário (z 5, depois no DOM) cobrem o canto */

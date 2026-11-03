@@ -1,0 +1,17 @@
+{
+  "id": "item_espada_treino",
+  "versao": 1,
+  "nome_txt": "txt_item_espada_treino_nome",
+  "desc_txt": "txt_item_espada_treino_desc",
+  "nota": "Equipamento inicial do Edric; não se compra nem se vende.",
+  "categoria": "equipamento",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "slot": "arma",
+  "para": [
+    "hero_edric"
+  ],
+  "stats": {
+    "poder_arma": 14
+  }
+}

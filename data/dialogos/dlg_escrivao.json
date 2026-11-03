@@ -1,0 +1,14 @@
+{
+  "id": "dlg_escrivao",
+  "falas": [
+    {
+      "txt": "txt_dlg_escrivao_01"
+    },
+    {
+      "txt": "txt_dlg_escrivao_02"
+    },
+    {
+      "txt": "txt_dlg_escrivao_03"
+    }
+  ]
+}

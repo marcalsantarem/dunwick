@@ -154,6 +154,14 @@
       "seed": 15
     }
   ],
+  "npcs": [
+    {
+      "id": "npc_taverneira",
+      "x": 5,
+      "z": 1,
+      "dir": "s"
+    }
+  ],
   "portais": [
     {
       "id": "saida",

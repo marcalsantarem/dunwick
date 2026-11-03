@@ -8,7 +8,7 @@ import { listarArquivos, carregarEsquemas, lerJson } from './lib/dados.mjs';
 import { validarMapasLigados } from './lib/validar_mapas_ligados.mjs';
 
 const RAIZ_PADRAO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc', 'z', 'cen'];
+const PREFIXOS_ID = ['hero', 'npc', 'enemy', 'boss', 'item', 'skill', 'quest', 'map', 'fx', 'sfx', 'mus', 'txt', 'ui', 'amb', 'atk', 'cfg', 'perfil', 'env', 'prop', 'enc', 'z', 'cen', 'dlg', 'shop'];
 
 function mensagemAjv(e) {
   const extra = e.params?.additionalProperty ? ` (campo "${e.params.additionalProperty}")` : e.params?.allowedValues ? ` (${e.params.allowedValues.join(' | ')})` : e.params?.missingProperty ? ` ("${e.params.missingProperty}")` : '';
@@ -114,7 +114,24 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
     if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
   }
-  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto, { encontros: new Set(por('encontro').map(([, e]) => e.id)), itens: new Set(por('item_batalha').map(([, x]) => x.id)), paleta: new Set(Object.keys(um('cfg_mundo')?.terreno.materiais ?? {})) });
+  // ---- NPCs, diálogos, lojas e economia (v0.1.4) ----
+  const fichasNpc = Object.fromEntries(por('npc').map(([, n]) => [n.id, n])), dialogosId = new Set(por('dialogo').map(([, d]) => d.id)), lojasId = new Set(por('loja').map(([, l]) => l.id)), itensId = new Set(por('item_batalha').map(([, x]) => x.id)), eco = um('cfg_economia');
+  for (const [arq, n] of por('npc')) {
+    exigeTexto(arq, '/nome_txt', n.nome_txt); temSprite(arq, '/sprite', n.sprite);
+    if (!dialogosId.has(n.dialogo)) erro(arq, '/dialogo', `diálogo "${n.dialogo}" não existe em data/dialogos`);
+    if (n.loja && !lojasId.has(n.loja)) erro(arq, '/loja', `loja "${n.loja}" não existe em data/lojas`);
+  }
+  for (const [arq, d] of por('dialogo')) d.falas.forEach((f, i) => { exigeTexto(arq, `/falas/${i}/txt`, f.txt); if (f.falante?.startsWith('npc_') && !fichasNpc[f.falante]) erro(arq, `/falas/${i}/falante`, `NPC "${f.falante}" não existe em data/npcs`); });
+  if (eco) {
+    exigeTexto('config/cfg_economia.json', '/moeda_txt', eco.moeda_txt);
+    for (const [item, pr] of Object.entries(eco.precos)) { if (!itensId.has(item)) erro('config/cfg_economia.json', `/precos/${item}`, `item "${item}" não existe em data/combate`); if (pr.venda !== undefined && pr.venda > pr.compra) erro('config/cfg_economia.json', `/precos/${item}/venda`, 'o preço de venda não pode superar o de compra (arbitragem)'); }
+  }
+  for (const [arq, l] of por('loja')) {
+    exigeTexto(arq, '/nome_txt', l.nome_txt); for (const [k, id] of Object.entries(l.falas)) exigeTexto(arq, `/falas/${k}`, id);
+    if (!eco) erro(arq, '/', 'há loja mas falta data/config/cfg_economia.json (ou ele é inválido)');
+    const vistos = new Set(); l.estoque.forEach((e, i) => { if (!itensId.has(e.item)) erro(arq, `/estoque/${i}/item`, `item "${e.item}" não existe em data/combate`); else if (eco && !eco.precos[e.item]) erro(arq, `/estoque/${i}/item`, `item "${e.item}" não tem preço em cfg_economia`); if (vistos.has(e.item)) erro(arq, `/estoque/${i}/item`, `item "${e.item}" repetido no estoque`); vistos.add(e.item); });
+  }
+  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto, { fichasNpc, encontros: new Set(por('encontro').map(([, e]) => e.id)), itens: new Set(por('item_batalha').map(([, x]) => x.id)), paleta: new Set(Object.keys(um('cfg_mundo')?.terreno.materiais ?? {})) });
   if (por('mapa').some(([, m]) => m.tipo_mapa === 'mundo') && !um('cfg_mundo')) erros.push('data/: há mapa de mundo mas falta data/config/cfg_mundo.json (ou ele é inválido)'); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
   // ---- combate por turnos (regras cruzadas; esquemas em data/schemas/*_batalha, encontro, cfg_batalha) ----
   const cb = um('cfg_batalha');

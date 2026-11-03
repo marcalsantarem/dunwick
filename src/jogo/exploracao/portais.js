@@ -14,6 +14,7 @@ export function interativosDe(md) {
   const porId = new Map();
   for (const o of md.objetos) if (TIPOS_INTERATIVOS.includes(o.tipo)) porId.set(o.id, o);
   for (const p of md.pois ?? []) porId.set(p.id, porId.has(p.id) ? { ...porId.get(p.id), ...p } : p);
+  for (const n of md.npcs ?? []) porId.set(n.id, { ...n, tipo: 'npc' }); // NPCs (v0.1.4): falar = interagir
   return [...porId.values()];
 }
 const distRet = (r, x, z) => Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));

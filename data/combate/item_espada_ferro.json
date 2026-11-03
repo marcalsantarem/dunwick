@@ -1,0 +1,17 @@
+{
+  "id": "item_espada_ferro",
+  "versao": 1,
+  "nome_txt": "txt_item_espada_ferro_nome",
+  "desc_txt": "txt_item_espada_ferro_desc",
+  "nota": "Espada Curta de Ferro (ferreiro): poder de arma 14 → 18.",
+  "categoria": "equipamento",
+  "uso_batalha": false,
+  "efeito": "nenhum",
+  "slot": "arma",
+  "para": [
+    "hero_edric"
+  ],
+  "stats": {
+    "poder_arma": 18
+  }
+}

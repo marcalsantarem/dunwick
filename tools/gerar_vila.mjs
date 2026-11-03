@@ -9,7 +9,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { jsonCompacto } from './lib/json_compacto.mjs';
-import { EDIFICIOS, PROPS_VILA, SALAS, QUINTAL_EDRIC, CAMINHO_EDRIC } from './lib/layout_vila.mjs';
+import { EDIFICIOS, PROPS_VILA, SALAS, QUINTAL_EDRIC, CAMINHO_EDRIC, NPCS } from './lib/layout_vila.mjs';
 
 // Tudo é calculado em coordenadas LOCAIS da vila (núcleo 0–48, como em layout_vila.mjs) e deslocado por MARGEM no fim.
 // MURO = estacada do perímetro (local); fora dela, MATA tiles de mata densa até a borda do mapa. A câmera fica presa a FOLGA_CAM tiles
@@ -21,6 +21,9 @@ const ORIGEM = 'tools/gerar_vila.mjs (14, vila v0.1.2 — esboço aprovado em D-
 let s = 20241; const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 const ruido = (x, z) => { const f = (a, b) => { const h = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return h - Math.floor(h); }; const xi = Math.floor(x), zi = Math.floor(z), fx = x - xi, fz = z - zi, u = fx * fx * (3 - 2 * fx), v = fz * fz * (3 - 2 * fz); return f(xi, zi) * (1 - u) * (1 - v) + f(xi + 1, zi) * u * (1 - v) + f(xi, zi + 1) * (1 - u) * v + f(xi + 1, zi + 1) * u * v; };
 const distSeg = (px, pz, ax, az, bx, bz) => { const dx = bx - ax, dz = bz - az, t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / (dx * dx + dz * dz))); return Math.hypot(px - ax - t * dx, pz - az - t * dz); };
+// NPCs (v0.1.4): só entram nos mapas quando o mapa.schema (08) aceitar `npcs` e a ficha data/npcs/<id>.json existir (mesma regra dos props do kit)
+const ACEITA_NPCS = !!JSON.parse(readFileSync(join(RAIZ, 'data/schemas/mapa.schema.json'), 'utf8')).properties.npcs;
+const npcsDe = (onde) => NPCS.filter((n) => n.onde === onde && existsSync(join(RAIZ, `data/npcs/${n.npc}.json`))).map((n) => ({ id: n.npc, x: n.x, z: n.z, dir: n.direcao })); // formato do 08: { id, x, z, dir }
 const salvar = (rel, obj) => writeFileSync(join(RAIZ, rel), jsonCompacto(obj));
 
 const centro = ([x0, z0, x1, z1]) => ({ x: (x0 + x1 + 1) / 2, z: (z0 + z1 + 1) / 2, w: x1 - x0 + 1, d: z1 - z0 + 1 });
@@ -140,7 +143,7 @@ const pois = [
 
 const vila = {
   id: 'map_baixo_orvalho', versao: 2, nome_txt: 'txt_map_baixo_orvalho_nome', origem: ORIGEM, tipo_mapa: 'exterior', estado: 'dia',
-  tamanho: [N, N], legenda: { g: 'grama', t: 'terra', c: 'calcada', m: 'musgo' }, planta, objetos, edificios, portais, pois,
+  tamanho: [N, N], legenda: { g: 'grama', t: 'terra', c: 'calcada', m: 'musgo' }, planta, objetos, edificios, portais, pois, ...(ACEITA_NPCS && npcsDe('vila').length ? { npcs: npcsDe('vila') } : {}),
   inicio_jogador: { tile: [24, 28], direcao: 's' }, limites_camera: [MURO[0] + FOLGA_CAM, MURO[1] + FOLGA_CAM, MURO[2] - MURO[0] - 2 * FOLGA_CAM, MURO[3] - MURO[1] - 2 * FOLGA_CAM],
 };
 // local → mapa: desloca tudo por MARGEM (o mapa começa em 0)
@@ -149,6 +152,7 @@ for (const o of objetos) d(o, 'x', 'z', 'x0', 'z0', 'x1', 'z1');
 for (const e of edificios) { d(e, 'x', 'z'); d(e.porta, 'x', 'z'); }
 for (const p of portais) { d(p, 'x', 'z'); d(p.chegada, 'x', 'z'); }
 for (const p of pois) d(p, 'x', 'z');
+for (const n of vila.npcs ?? []) d(n, 'x', 'z');
 vila.inicio_jogador.tile = vila.inicio_jogador.tile.map((v) => v + MARGEM); vila.limites_camera[0] += MARGEM; vila.limites_camera[1] += MARGEM;
 salvar('data/maps/map_baixo_orvalho.json', vila);
 
@@ -161,6 +165,7 @@ for (const e of EDIFICIOS.filter((x) => x.interior)) {
     tamanho: [L, A], legenda: { [ch]: sala.piso }, planta: Array.from({ length: A }, () => ch.repeat(L)),
     objetos: objsSala,
     ...(objsSala.some((o) => o.tipo === 'bau_tesouro') ? { pois: objsSala.filter((o) => o.tipo === 'bau_tesouro').map((o) => ({ ...poiDe(o.id, o.tipo, o.x, o.z), item: o.item })) } : {}),
+    ...(ACEITA_NPCS && npcsDe(e.id).length ? { npcs: npcsDe(e.id) } : {}),
     portais: [{ id: 'saida', x: L / 2, z: A - 0.5, w: 2, d: 1, destino: { mapa: 'map_baixo_orvalho', portal: vilaPortal }, chegada: { x: L / 2, z: A - 2.5, direcao: 'n' }, ativo: true }],
     sala: { altura_parede: 3, parede: sala.parede, piso: sala.piso }, ambiente: { cor_luz: sala.luz[0], intensidade: sala.luz[1], fundo: sala.luz[2] },
     inicio_jogador: { tile: [L / 2, Math.floor(A / 2)], direcao: 'n' }, limites_camera: [0, 0, L, A],

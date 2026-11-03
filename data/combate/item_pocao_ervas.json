@@ -9,5 +9,7 @@
   "cura_base": 40,
   "escala": 0,
   "tempo": "t_item",
-  "pose": "bat_item"
+  "pose": "bat_item",
+  "categoria": "consumivel",
+  "desc_txt": "txt_item_pocao_ervas_desc"
 }
