@@ -1,11 +1,14 @@
 {
   "id": "cfg_exploracao",
-  "versao": 1,
-  "nota": "Exploração (13): portas, portais e interação com objetos (pois). Distâncias em tiles.",
+  "versao": 2,
+  "nota": "Exploração (13): portas, portais/marcadores e interação com objetos (pois). Distâncias em tiles. mundo: mapa de mundo (tipo_mapa \"mundo\", v0.1.3): multiplicador da velocidade do herói (o atlas de mundo vem do hero_edric.json, 08).",
   "alcance_interagir_tiles": 2.2,
   "folga_clique_portal_tiles": 0.4,
   "raio_clique_poi_tiles": 1.8,
   "contato_portal_tiles": 0.12,
   "soltar_contato_portal_tiles": 0.5,
-  "aviso_portal_inativo_txt": "txt_portal_interditado"
+  "aviso_portal_inativo_txt": "txt_portal_interditado",
+  "mundo": {
+    "mult_velocidade": 0.5
+  }
 }

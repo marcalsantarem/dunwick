@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dunwick/cfg_mundo",
+  "title": "Mapa de mundo: câmera, resolução, pós, ambiente e terreno em shader (atlas por código, transições, água, nuvens)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "versao",
+    "camera",
+    "terreno",
+    "ambiente_padrao"
+  ],
+  "$defs": {
+    "cor": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "material": {
+      "enum": [
+        "grama",
+        "terra",
+        "calcada",
+        "musgo",
+        "mata_rala",
+        "agua",
+        "estrada",
+        "montanha",
+        "areia"
+      ]
+    }
+  },
+  "properties": {
+    "id": {
+      "const": "cfg_mundo"
+    },
+    "versao": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nota": {
+      "type": "string"
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pixels_por_unidade",
+        "giro_graus",
+        "inclinacao_graus"
+      ],
+      "properties": {
+        "pixels_por_unidade": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 64
+        },
+        "giro_graus": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 360
+        },
+        "inclinacao_graus": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 90,
+          "description": "90 = de cima (top-down)"
+        },
+        "arte": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 160,
+              "maximum": 1920
+            },
+            {
+              "type": "integer",
+              "minimum": 90,
+              "maximum": 1080
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "description": "resolução do buffer de arte do mundo (padrão: a do jogo)"
+        }
+      }
+    },
+    "pos": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dof": {
+          "type": "boolean"
+        },
+        "vinheta_extra": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "saturacao": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "contraste": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2
+        }
+      }
+    },
+    "ambiente_padrao": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cor_luz",
+        "intensidade",
+        "fundo"
+      ],
+      "properties": {
+        "cor_luz": {
+          "$ref": "#/$defs/cor"
+        },
+        "intensidade": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fundo": {
+          "$ref": "#/$defs/cor"
+        },
+        "sol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cor",
+            "intensidade",
+            "elevacao_graus"
+          ],
+          "properties": {
+            "cor": {
+              "$ref": "#/$defs/cor"
+            },
+            "intensidade": {
+              "type": "number",
+              "minimum": 0
+            },
+            "elevacao_graus": {
+              "type": "number",
+              "minimum": 5,
+              "maximum": 90
+            }
+          }
+        }
+      }
+    },
+    "terreno": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "px_por_tile",
+        "variantes",
+        "brilho",
+        "borda_tiles",
+        "borda_material",
+        "transicao",
+        "agua",
+        "nuvens",
+        "materiais",
+        "variacao_zona"
+      ],
+      "properties": {
+        "px_por_tile": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 32
+        },
+        "variantes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "brilho": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 2
+        },
+        "borda_tiles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 400
+        },
+        "borda_material": {
+          "$ref": "#/$defs/material"
+        },
+        "transicao": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "vies",
+            "ruido",
+            "contorno"
+          ],
+          "properties": {
+            "vies": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.2
+            },
+            "ruido": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "contorno": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "agua": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "material",
+            "cor_rasa",
+            "cor_funda",
+            "cor_onda",
+            "espuma",
+            "brilhos"
+          ],
+          "properties": {
+            "material": {
+              "$ref": "#/$defs/material"
+            },
+            "cor_rasa": {
+              "$ref": "#/$defs/cor"
+            },
+            "cor_funda": {
+              "$ref": "#/$defs/cor"
+            },
+            "cor_onda": {
+              "$ref": "#/$defs/cor"
+            },
+            "espuma": {
+              "$ref": "#/$defs/cor"
+            },
+            "brilhos": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.05
+            }
+          }
+        },
+        "nuvens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ligado",
+            "intensidade",
+            "escala",
+            "limiar",
+            "vento"
+          ],
+          "properties": {
+            "ligado": {
+              "type": "boolean"
+            },
+            "intensidade": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.6
+            },
+            "escala": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.5
+            },
+            "limiar": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "vento": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "items": false,
+              "minItems": 2
+            }
+          }
+        },
+        "materiais": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 12,
+          "propertyNames": {
+            "$ref": "#/$defs/material"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cor",
+              "padrao",
+              "prioridade"
+            ],
+            "properties": {
+              "cor": {
+                "$ref": "#/$defs/cor"
+              },
+              "cor_b": {
+                "$ref": "#/$defs/cor"
+              },
+              "cor_c": {
+                "$ref": "#/$defs/cor"
+              },
+              "flor": {
+                "$ref": "#/$defs/cor"
+              },
+              "padrao": {
+                "enum": [
+                  "relva",
+                  "folhas",
+                  "trilha",
+                  "rocha",
+                  "areia",
+                  "agua",
+                  "liso"
+                ]
+              },
+              "prioridade": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 20
+              }
+            }
+          }
+        },
+        "variacao_zona": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.6
+        }
+      }
+    },
+    "relevo": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "relevo do 07: montanhas em 3D e floresta em massa por cima do terreno em shader",
+      "properties": {
+        "ligado": {
+          "type": "boolean"
+        },
+        "px_relevo": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 48
+        },
+        "altura_montanha": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 2
+        },
+        "neve": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 1
+        },
+        "celulas_por_tile": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "densidade": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "sombra_nuvem": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.6
+        },
+        "floresta": {
+          "type": "boolean"
+        },
+        "moldura": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

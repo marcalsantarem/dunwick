@@ -285,3 +285,23 @@ Respostas do usuário às perguntas t, u, v do 02:
 - **Efeito no roteiro:** **v0.1.3** (entorno) passa a ser o **mapa aberto simplificado** com a vila como ponto de entrada; **v0.1.7** (bosque e caverna) são **locais ricos acessados por portal**, com corredores e salas estreitas (mais baratos que céu aberto). Escopo e versões não mudam; só o custo por mapa cai.
 - **Registro de desejo (usuário):** depois do slice, **gerar campos e masmorras por regras** (densidade de vegetação, caminhos, salas, sementes) para expandir o jogo com facilidade. **Fora do slice e da demo**; entra no backlog como BL-033.
 - **Processo:** pedir uma coisa por vez, a menos agentes, e juntar os ajustes de playtest num briefing só.
+
+## D-045 — v0.1.3: mapa de mundo estilizado (estilo Final Fantasy) e baús só em locais (2026-11-02)
+- **Decisão (usuário):** o mapa aberto é um **mapa de mundo estilizado**, não a câmera da vila: visão **mais distante**, terreno em tiles simples, **herói minúsculo (sprite própria, mais simples) e mais lento**. A vila (e depois bosque e caverna) aparece como **marcador** no mapa de mundo; **entra-se tocando o marcador** (D-044).
+- **Baús de tesouro:** **saem do mapa de mundo**; existem só em **mapas de locais** (vilas, cidades, bosques, florestas, cavernas, masmorras…). A vila já tem o baú da casa do Edric; a v0.1.3 não coloca baús no mundo.
+- **Nome provisório (usuário):** **Campos de Baixo Orvalho**.
+- **Assumido pelo Produtor (declarado):** v0.1.3 = modo de mapa de mundo (render e câmera próprios), 1 mapa `map_mundo_orvalho` com terreno, a vila como marcador ativo e marcadores futuros (bosque, caverna) visíveis porém interditados, **transição mundo ↔ local por portal** com a mesma névoa escura, saída da vila pelo vão sul volta ao marcador, minimapa desligado no mundo (o mapa já é o resumo), encontros aleatórios só na v0.1.5. Trabalho em branch `dev-v013` (a v0.1.2 aguarda o teste do usuário em `dev`).
+- Briefing: `docs/briefings/BRF-v013_mapa_de_mundo.md`.
+
+## D-046 — Visual do mapa de mundo: refazer do zero, sem se prender ao estipulado (2026-11-02)
+- **Decisão (usuário):** o primeiro visual do mapa de mundo (terreno chapado, montanhas de cones, herói minúsculo) foi reprovado: "feio, pobre; os Final Fantasy de 35 anos atrás eram mais bonitos". **Repensar e reconstruir** o visual para ficar bonito, **mesmo que saia do que estava estipulado** (câmera, resolução de tile, estilo 3D×2D, escala). A parte funcional (portais, marcadores, colisão, banner, placa) é mantida.
+- **Responsável pela direção:** Diretor de Arte (10), com 07 (execução), 08 (render) e 14 (dados do mapa). Briefing: `docs/briefings/BRF-v013b_visual_mundo.md`.
+
+## D-047 — Mapa de mundo em câmera 2D de cima, pixel art 32 px/tile (2026-11-02)
+- **Decisão (Diretor de Arte, 10, dentro da liberdade dada pelo usuário em D-046):** só o **modo mundo** muda para **câmera de cima 2D, norte para cima**, pixel art de **32 px/tile**; a vila e os locais continuam **isométricos**. O terreno é gerado **por pixel** com bordas orgânicas, 3 profundidades de água, espuma, relevo por luz, florestas e montanhas em massa e objetos em 3/4; vida: água de 4 quadros, nuvens, vento, fumaça. Motivo: o chão isométrico girado a 45° serrilha e perde o pixel.
+- **Consequências:** escala do mundo 14→32 px/unidade e terreno 8→32 px/tile; **herói de mundo com 1 tile de altura**; **mapa maior** (recomendado 64×64, 48×48 se o custo apertar); **moldura** de mar estendido, paredão de montanhas e névoa (nunca aparece o "fim do mundo"); **paleta nova** (`docs/arte/paleta_mundo.json`). Direção completa em `docs/arte/mapa_de_mundo.md`.
+- **Condição:** o usuário vê o **item-modelo (12×12 tiles)** antes da produção em massa; se preferir manter a isométrica (opção B), o risco do pixel serrilhado volta. Meta de 60 fps (pior 1 % ≥ 45) e download ≤ ~10 MB mantidas.
+
+## D-048 — Mundo segue isométrico 3D denso; D-047 (câmera de cima 2D) não é adotada (2026-11-02)
+- **Decisão (usuário):** ao ver o item-modelo v1 do 07 (floresta em massa, montanhas em 3D com relevo, água animada com espuma, rio sinuoso), o usuário aprovou: "já melhorou bastante; pode seguir assim, depois refinamos mais". **Mantém-se a câmera isométrica** e o 3D estilizado denso do 07/08; **D-047 (câmera de cima 2D, 32 px/tile) fica arquivada** como alternativa (`docs/arte/mapa_de_mundo.md` continua valendo para paleta e vida do mundo).
+- **Próximos refinamentos já apontados (07/08/10/14):** remover do mapa os objetos `arvore_mundo`/`montanha_mundo` antigos (borrões pretos), bordas orgânicas também na mata, grama menos saturada e mais variada, marcadores maiores e bonitos (vila com casas e fumaça, bosque, caverna), herói mais legível, rochas e campos; depois FPS nos 3 perfis e celular.

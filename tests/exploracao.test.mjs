@@ -157,3 +157,63 @@ test('contrato do 14: poi e objeto com o mesmo id viram um interativo só (encon
   assert.deepEqual(l.map((o) => o.id).sort(), ['boneco_treino', 'poco']);
   assert.deepEqual(l.find((o) => o.id === 'boneco_treino'), { id: 'boneco_treino', tipo: 'boneco_treino', x: 11.5, z: 24, encontro: 'enc_x', nome_txt: 'txt_y' });
 });
+
+// ---- v0.1.3: mapa de mundo (o map_mundo_orvalho do 14 ainda a caminho: mapa de teste em memória) ----
+const MUNDO = 'map_mundo_teste';
+function comMundo(d) {
+  const planta = []; for (let j = 0; j < 16; j++) planta.push(j === 8 ? 'aaaaaaaaaaaaaaaa'.replace(/^(.{6})../, '$1gg') : 'gggggggggggggggg'); // rio na linha 8 com um vau em x 6–7
+  d.mapas[MUNDO] = {
+    id: MUNDO, versao: 1, nome_txt: 'txt_map_baixo_orvalho_nome', tipo_mapa: 'mundo', tamanho: [16, 16], legenda: { g: 'grama', a: 'agua' }, solidos: ['a'], planta, objetos: [],
+    portais: [
+      { id: 'marcador_vila', x: 4, z: 4, w: 1, d: 1, ativo: true, nome_txt: 'txt_map_baixo_orvalho_nome', destino: { mapa: VILA, portal: 'saida_sul' }, chegada: { x: 4, z: 5.5, direcao: 's' } },
+      { id: 'marcador_bosque', x: 12, z: 12, w: 1, d: 1, ativo: false, aviso_txt: 'txt_portal_interditado', destino: { mapa: 'map_bosque', portal: 'entrada' }, chegada: { x: 12, z: 13.5, direcao: 's' } },
+    ],
+    pois: [], edificios: [], inicio_jogador: { tile: [4, 6], direcao: 's' }, limites_camera: [0, 0, 16, 16],
+  };
+  const sul = d.mapas[VILA].portais.find((p) => p.id === 'saida_sul'); Object.assign(sul, { ativo: true, destino: { mapa: MUNDO, portal: 'marcador_vila' } });
+}
+
+test('mundo: água bloqueia pelo tile (solidos), o vau passa; nada de encontros', () => {
+  const ctx = novoMundo(comMundo, { encontros: true }), { mundo } = ctx; mundo.restaurarExploracao({ versao: 2, mapa: MUNDO, x: 2.5, z: 6.5, direcao: 's', portal_retorno: null, encontros: null, objetos: { baus_abertos: [] } });
+  const h = mundo.heroi; assert.equal(mundo.mapa.livre(2.5, 8.5, h.raioPush), false); assert.equal(mundo.mapa.livre(7, 8.5, h.raioPush), true);
+  rodar(ctx, 300, entrada({ x: 1, z: 1 })); assert.ok(h.z <= 8 - h.raioPush + 0.01, `atravessou o rio: z=${h.z}`); // +z no mundo
+  colocar(mundo, 2.5, 6.5); rodar(ctx, 1, clique(2.5, 10.5)); assert.ok(ate(ctx, () => !h.destino && h.velocidade() < 0.01, 3000));
+  assert.ok(Math.hypot(h.x - 2.5, h.z - 10.5) < 0.3, `a rota usa o vau: ${h.x},${h.z}`); assert.equal(mundo.encontros.estado().passos, 0);
+});
+
+test('mundo: herói mais lento (cfg_exploracao.mundo); de volta à vila, normal', () => {
+  const ctx = novoMundo(comMundo), { mundo } = ctx, h = mundo.heroi, cfgM = ctx.dados.config.exploracao.mundo, vel = (n) => { rodar(ctx, n, entrada({ x: 1 })); return h.velocidade(); };
+  colocar(mundo, 24, 30); const vVila = vel(60);
+  mundo.restaurarExploracao({ versao: 2, mapa: MUNDO, x: 4, z: 12, direcao: 's', portal_retorno: null, encontros: null, objetos: { baus_abertos: [] } });
+  const vMundo = vel(60); assert.equal(h.multVel, cfgM.mult_velocidade);
+  assert.ok(Math.abs(vMundo / vVila - cfgM.mult_velocidade) < 0.02, `razão ${vMundo / vVila}`);
+});
+
+test('mundo ↔ vila: o vão sul leva ao marcador, o marcador (andar ou E) leva ao vão sul; mapa_trocado traz tipo_mapa', () => {
+  const ctx = novoMundo(comMundo), { mundo } = ctx, ev = registrar(ctx), sul = mundo.mapa.dados.portais.find((p) => p.id === 'saida_sul');
+  colocar(mundo, sul.x, sul.z - 2); assert.ok(ate(ctx, () => mundo.mapaId === MUNDO, 600, entrada({ x: -1, z: 1 }))); // +z no mundo
+  const t1 = ev.find((e) => e.n === 'mapa_trocado'); assert.deepEqual([t1.mapa, t1.tipo_mapa, t1.portal], [MUNDO, 'mundo', 'marcador_vila']);
+  assert.deepEqual([mundo.heroi.x, mundo.heroi.z], [4, 5.5]);
+  rodar(ctx, 1, entrada({ apertou: ['interagir'] })); assert.equal(mundo.mapaId, VILA, 'E perto do marcador entra');
+  assert.deepEqual([mundo.heroi.x, mundo.heroi.z], [sul.chegada.x, sul.chegada.z]);
+  assert.equal(ev.filter((e) => e.n === 'mapa_trocado').pop().tipo_mapa, 'exterior');
+});
+
+test('mundo: marcador interditado bloqueia e avisa com o texto do próprio portal (encostar, clicar ou E)', () => {
+  const ctx = novoMundo(comMundo), { mundo } = ctx, ev = registrar(ctx);
+  mundo.restaurarExploracao({ versao: 2, mapa: MUNDO, x: 12, z: 14, direcao: 'n', portal_retorno: null, encontros: null, objetos: { baus_abertos: [] } });
+  rodar(ctx, 1, entrada({ apertou: ['interagir'] }));
+  const b = ev.filter((e) => e.n === 'portal_bloqueado'); assert.equal(b.length, 1); assert.deepEqual([b[0].portal, b[0].aviso_txt], ['marcador_bosque', 'txt_portal_interditado']);
+  assert.equal(mundo.mapaId, MUNDO); assert.equal(mundo.mapa.livre(12, 12, mundo.heroi.raioPush), false);
+});
+
+test('dados reais do mundo: vão sul → Campos de Baixo Orvalho (herói mais lento), E no bosque avisa, E no marcador da vila volta', () => {
+  const ctx = novoMundo(), { mundo } = ctx, ev = registrar(ctx), sul = mundo.mapa.dados.portais.find((p) => p.id === 'saida_sul');
+  colocar(mundo, sul.chegada.x, sul.chegada.z); assert.ok(ate(ctx, () => mundo.mapaId === 'map_mundo_orvalho', 600, entrada({ x: -1, z: 1 })));
+  assert.equal(mundo.heroi.multVel, ctx.dados.config.exploracao.mundo.mult_velocidade); assert.equal(ctx.dados.exploracao.encontros.map_mundo_orvalho, undefined);
+  const p = (id) => mundo.mapa.dados.portais.find((q) => q.id === id), bosque = p('marcador_bosque'), vila = p('marcador_vila');
+  colocar(mundo, bosque.chegada.x, bosque.chegada.z); rodar(ctx, 1, entrada({ apertou: ['interagir'] }));
+  const b = ev.filter((e) => e.n === 'portal_bloqueado'); assert.equal(b.length, 1); assert.equal(b[0].aviso_txt, bosque.aviso_txt ?? ctx.dados.config.exploracao.aviso_portal_inativo_txt);
+  colocar(mundo, vila.chegada.x, vila.chegada.z); rodar(ctx, 1, entrada({ apertou: ['interagir'] }));
+  assert.equal(mundo.mapaId, VILA); assert.deepEqual([mundo.heroi.x, mundo.heroi.z], [sul.chegada.x, sul.chegada.z]); assert.equal(mundo.heroi.multVel, 1);
+});

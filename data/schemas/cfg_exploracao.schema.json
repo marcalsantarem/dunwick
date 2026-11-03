@@ -14,6 +14,10 @@
     "raio_clique_poi_tiles": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 },
     "contato_portal_tiles": { "type": "number", "minimum": 0, "maximum": 1 },
     "soltar_contato_portal_tiles": { "type": "number", "minimum": 0, "maximum": 3 },
-    "aviso_portal_inativo_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" }
+    "aviso_portal_inativo_txt": { "type": "string", "pattern": "^txt_[a-z0-9_]+$" },
+    "mundo": {
+      "type": "object", "additionalProperties": false, "required": ["mult_velocidade"],
+      "properties": { "mult_velocidade": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 } }
+    }
   }
 }

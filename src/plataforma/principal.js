@@ -51,9 +51,9 @@ async function iniciar() {
   // batalha (BL-008): arena separada, câmera e resolução de arte próprias; a plataforma troca de vista por névoa (apresentacao.js)
   const temBatalha = !!(mundo.jogo && dados.cenarios && dados.config.sprites_batalha);
   const cenaBat = temBatalha ? criarCenaBatalha({ dados, recursos, perfil: perfis[iPerfil], opcoes: { texelsPorTile: Number(P.get('texel') ?? 64) } }) : null;
-  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { aoTrocarMapa: () => { cena = cenas.get(idMapa()); }, reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
+  const apr = temBatalha ? criarApresentacao({ mundo, dados, cenaBatalha: cenaBat, ren, container: document.getElementById('ui'), opcoes: { aoTrocarMapa: () => { cena = cenas.get(idMapa()); ren.definirArte(...cena.arte); }, reduzirMovimento: () => P.get('reduzir') === '1' || preferencias.obter('reduzir_movimento') || matchMedia('(prefers-reduced-motion: reduce)').matches } }) : null;
   const aplicarPerfil = () => { ren.definirPerfil(perfis[iPerfil]); for (const c of cenas.values()) c.aplicarPerfil(perfis[iPerfil]); cenaBat?.aplicarPerfil(perfis[iPerfil]); };
-  aplicarPerfil(); for (const c of cenas.values()) c.atualizar(1, 0, 0), ren.compilar(c); marcas.cena = performance.now(); // aquece: posiciona luzes e compila os shaders de cada mapa antes de jogar
+  aplicarPerfil(); for (const c of cenas.values()) c.atualizar(1, 0, 0), ren.compilar(c), ren.desenhar(c.cena, c.camera, c.visual); marcas.cena = performance.now(); // aquece: posiciona luzes e compila os shaders de cada mapa antes de jogar
 
   // ---------- áudio desbloqueado por clique/tecla ----------
   const audio = criarAudio(recursos.sfxPing);

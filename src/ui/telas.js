@@ -1,5 +1,6 @@
 // Telas fora da batalha (15, pacote v0.1.1): menu de pausa (botão ⏸, Esc/P, Start do gamepad), botão de tela cheia e dica de controles
-// da 1ª vez; v0.1.2: janela de achado, nome do mapa ao entrar e minimapa (tecla M, botão ▦ no canto, linhas no painel de pausa). DOM dentro de #ui (retângulo do jogo, escala com --k); texto só por ID e por textContent. A tela de início é do 08
+// da 1ª vez; v0.1.2: janela de achado, nome do mapa ao entrar e minimapa (tecla M, botão ▦ no canto, linhas no painel de pausa); v0.1.3 (D-045):
+// no mapa de mundo o minimapa fica inativo (▦ some, M não faz nada) e aparece o nome do marcador apontado/perto; aviso de portal interditado. DOM dentro de #ui (retângulo do jogo, escala com --k); texto só por ID e por textContent. A tela de início é do 08
 // (plataforma.inicio, #inicio); aqui só se espera ela acabar. API da plataforma (08, principal.js): preferencias.obter/definir/todas,
 // telaCheia.suportada/ativa/alternar/aoMudar, pausa.pausar('ui')/retomar('ui'), movel.ativo. Sem ela (testes), há substitutos locais.
 
@@ -92,7 +93,14 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   const bannerEl = el('div', 'tela-banner-mapa', raiz); bannerEl.hidden = true; bannerEl.setAttribute('role', 'status');
   const pedirBanner = (id) => ({ id, nomeTxt: dados.mapas?.[id]?.nome_txt, t: 0 });
   let banner = pedirBanner(mundo.mapaId ?? null); // pendente desde o começo: aparece quando o jogo começa de fato
-  mundo.eventos?.em('mapa_trocado', (ev) => { banner = pedirBanner(ev.mapa); });
+  mundo.eventos?.em('mapa_trocado', (ev) => { banner = pedirBanner(ev.mapa); marca = null; desenhar(); });
+
+  // ---------- mapa de mundo (D-045): nome do marcador (apontado, alvo do clique ou o mais perto) e aviso de portal interditado ----------
+  const noMundo = () => mundo.mapa?.dados?.tipo_mapa === 'mundo';
+  const marcaEl = el('div', 'tela-marcador', raiz); marcaEl.hidden = true; marcaEl.setAttribute('role', 'status');
+  const marcaNome = el('span', 'tela-marcador-nome', marcaEl), marcaNota = el('span', 'tela-marcador-nota', marcaEl);
+  let marca = null, aviso = null; // aviso = { txt, t }: o texto do 13 (portal_bloqueado) por alguns segundos, em qualquer mapa
+  mundo.eventos?.em('portal_bloqueado', (ev) => { if (ev.aviso_txt) aviso = { txt: ev.aviso_txt, t: 0 }; });
 
   // ---------- minimapa (D-041) ----------
   const PM = preferenciasMinimapa(P), giro = dados.config?.jogo?.camera?.giro_graus ?? 45, fontes = new Map();
@@ -101,10 +109,10 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
   const fonteMini = () => {
     if (!mundo.mapa?.dados) return null;
     const ma = plataforma.mapaAtivo?.() ?? null, chave = ma ?? mundo.mapaId;
-    if (!fontes.has(chave)) { const propria = fonteDoMapa(mundo.mapa.dados, giro, interativosDe); fontes.clear(); fontes.set(chave, ma ? Object.freeze({ ...ma, muros: ma.muros ?? propria.muros, pois: propria.pois.length >= (ma.pois?.length ?? 0) ? propria.pois : ma.pois }) : propria); }
+    if (!fontes.has(chave)) { const propria = fonteDoMapa(mundo.mapa.dados, giro, (m) => interativosDe({ ...m, objetos: m.objetos ?? [] })); fontes.clear(); fontes.set(chave, ma ? Object.freeze({ ...ma, muros: ma.muros ?? propria.muros, pois: propria.pois.length >= (ma.pois?.length ?? 0) ? propria.pois : ma.pois }) : propria); }
     return fontes.get(chave);
   };
-  const minimapa = cfg.minimapa ? criarMinimapa({ mundo, t, cfg, fonte: fonteMini, preferencia: PM.obter, visivel: () => iniciou() && !pausado && !achado && (mundo.jogo?.modo ?? 'mapa') === 'mapa' }) : null;
+  const minimapa = cfg.minimapa ? criarMinimapa({ mundo, t, cfg, fonte: fonteMini, preferencia: PM.obter, visivel: () => iniciou() && !pausado && !achado && !noMundo() && (mundo.jogo?.modo ?? 'mapa') === 'mapa' }) : null;
   const alternarMini = () => { PM.definir('minimapa', !PM.obter('minimapa')); desenhar(); };
   const alternarMiniC = () => { PM.definir('minimapa_contraste', !PM.obter('minimapa_contraste')); desenhar(); };
 
@@ -119,7 +127,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
     bCheiaPainel.textContent = t(tela.ativa() ? 'ui_ligado' : 'ui_desligado'); lCheia.hidden = !cheia;
     const mini = PM.obter('minimapa'), miniC = PM.obter('minimapa_contraste');
     bMini.textContent = t(mini ? 'ui_ligado' : 'ui_desligado'); bMini.setAttribute('aria-pressed', String(mini)); bMiniCanto.setAttribute('aria-pressed', String(mini)); bMiniCanto.classList.toggle('ligado', mini);
-    bMiniC.textContent = t(miniC ? 'ui_ligado' : 'ui_desligado'); bMiniC.setAttribute('aria-pressed', String(miniC)); lMini.hidden = lMiniC.hidden = !minimapa; bMiniCanto.hidden = !minimapa;
+    bMiniC.textContent = t(miniC ? 'ui_ligado' : 'ui_desligado'); bMiniC.setAttribute('aria-pressed', String(miniC)); lMini.hidden = lMiniC.hidden = !minimapa; bMiniCanto.hidden = !minimapa || noMundo(); // no mundo o ▦ some; a escolha na pausa vale para os locais
     fundo.hidden = !pausado;
     linhas.forEach((l, i) => l.classList.toggle('foco', pausado && i === foco));
     for (const e of [raiz, document.getElementById('batalha'), ...document.querySelectorAll('.bat-camada')]) e?.classList.toggle('reduzir', p.reduzir_movimento);
@@ -152,7 +160,7 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
     if (achado) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && ['Enter', 'NumpadEnter', 'Space', 'Escape', 'KeyE', 'Backspace'].includes(e.code)) fecharAchado(); return; }
     const pausa = e.code === 'Escape' || e.code === 'KeyP';
     if (!pausado) {
-      if (e.code === 'KeyM' && !e.repeat && minimapa && mundo.jogo?.modo !== 'batalha') { e.preventDefault(); alternarMini(); return; }
+      if (e.code === 'KeyM' && !e.repeat && minimapa && !noMundo() && mundo.jogo?.modo !== 'batalha') { e.preventDefault(); alternarMini(); return; }
       if (!pausa || (e.code === 'Escape' && mundo.jogo?.modo === 'batalha' && podeCancelarBatalha())) return;
       e.preventDefault(); e.stopImmediatePropagation(); abrirPausa(); return;
     }
@@ -204,11 +212,51 @@ export function criarTelas({ mundo, t, cfg, dados = {}, plataforma = {}, podeCan
     banner.t += dt;
   }
 
+  // marcadores = portais e pois com nome, da mesma fonte do minimapa; calculados uma vez por mapa. Poi dentro do retângulo de um portal
+  // (o marcador do 14 no mesmo ponto do portal) é o mesmo marcador: id e "interditado" do portal, nome do poi (senão o do portal ou o do destino)
+  const listasMarca = new WeakMap();
+  const marcadores = () => {
+    const f = fonteMini(); if (!f) return [];
+    if (!listasMarca.has(f)) {
+      const sobre = (o, p) => Math.abs(o.x - p.x) <= p.w / 2 && Math.abs(o.z - p.z) <= p.d / 2;
+      const soltos = f.pois.filter((o) => !f.portais.some((p) => sobre(o, p)));
+      listasMarca.set(f, [
+        ...f.portais.map((p) => ({ id: p.id, x: p.x, z: p.z, nomeTxt: f.pois.find((o) => sobre(o, p))?.nome_txt ?? p.nome_txt ?? dados.mapas?.[p.destino?.mapa]?.nome_txt, interditado: !!p.interditado })),
+        ...soltos.map((o) => ({ id: o.id, x: o.x, z: o.z, nomeTxt: o.nome_txt, interditado: false })),
+      ].filter((m) => m.nomeTxt));
+    }
+    return listasMarca.get(f);
+  };
+  function escolherMarca() {
+    const M = cfg.marcador_mundo, lista = marcadores(), h = mundo.heroi; if (!lista.length || !h) return null;
+    const perto = (x, z, raio) => { let m = null, dm = raio; for (const q of lista) { const d = Math.hypot(q.x - x, q.z - z); if (d <= dm) { dm = d; m = q; } } return m; };
+    const c = plataforma.cursorMundo?.(); // apontar com o mouse (quando a plataforma informa o cursor no chão)
+    const apontado = c?.valido ? perto(c.x, c.z, M.raio_apontar_tiles) : null; if (apontado) return apontado;
+    const alvo = mundo.portais?.intencao; if (alvo) { const q = lista.find((m) => m.id === alvo.id); if (q) return q; } // clicou/tocou: o nome fica até chegar
+    return perto(h.x, h.z, M.raio_nome_tiles);
+  }
+  // não bloqueia (sem clique); some na batalha, na pausa e no achado; o nome do mapa tem a vez (o aviso aparece mesmo assim, logo abaixo)
+  function cuidarMarcador(dt) {
+    const M = cfg.marcador_mundo; if (!M) return;
+    if (aviso) { aviso.t += dt; if (aviso.t >= M.t_aviso_s) aviso = null; }
+    const livre = iniciou() && !pausado && !achado && (mundo.jogo?.modo ?? 'mapa') === 'mapa';
+    const m = livre && noMundo() && bannerEl.hidden ? escolherMarca() : null, comAviso = livre && !!aviso;
+    if (!m && !comAviso) { if (!marcaEl.hidden) { marcaEl.hidden = true; marca = null; } return; }
+    const chave = `${m?.id ?? ''}|${comAviso ? aviso.txt : ''}`;
+    if (chave !== marca) {
+      marca = chave; marcaEl.dataset.marcador = m?.id ?? '';
+      marcaNome.textContent = m ? t(m.nomeTxt) : ''; marcaNome.hidden = !m;
+      marcaNota.textContent = comAviso ? t(aviso.txt) : m?.interditado ? t('ui_marcador_inacessivel') : ''; marcaNota.hidden = !marcaNota.textContent;
+      marcaEl.classList.toggle('interditado', !!m?.interditado || comAviso);
+    }
+    marcaEl.hidden = false;
+  }
+
   desenhar();
   return {
     minimapa,
     get pausado() { return pausado || !!achado; }, get achadoAberto() { return !!achado; }, preferencias: prefs,
-    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); cuidarBanner(dt); minimapa?.atualizar(); },
+    atualizar(dt) { if (canto.hidden === iniciou()) desenhar(); lerGamepad(); cuidarDica(dt); cuidarBanner(dt); cuidarMarcador(dt); minimapa?.atualizar(); },
     abrirPausa, fecharPausa, gravar,
   };
 }

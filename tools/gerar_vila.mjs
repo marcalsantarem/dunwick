@@ -79,7 +79,7 @@ for (const [id, z] of [['norte', n0], ['sul', n1]]) {
 }
 // saídas interditadas (v0.1.3 abre): dois troncos caídos atravessados na estrada, logo fora do vão. Além do visual, deixam o lado de
 // fora sem chão livre colado ao portal, e o clique no portal leva o herói ao lado de DENTRO (célula livre mais próxima)
-if (kit.pegadas.tronco_caido) for (const [id, z] of [['norte', n0 - 1.2], ['sul', n1 + 1.2]]) for (const [i, x] of [[1, C.x - 1.1], [2, C.x + 1.1]].values()) add({ id: `tronco_saida_${id}_${i}`, tipo: 'tronco_caido', x, z, rot: 0, seed: i + 8 });
+if (kit.pegadas.tronco_caido) for (const [id, z] of [['norte', n0 - 1.2]]) /* a saída sul é aberta (v0.1.3: leva ao mapa de mundo) */ for (const [i, x] of [[1, C.x - 1.1], [2, C.x + 1.1]].values()) add({ id: `tronco_saida_${id}_${i}`, tipo: 'tronco_caido', x, z, rot: 0, seed: i + 8 });
 add({ id: 'estacada_oeste', tipo: 'estacada', x0: m0, z0: n0, x1: m0, z1: n1, rot: 0, seed: 6 });
 add({ id: 'estacada_leste', tipo: 'estacada', x0: m1, z0: n0, x1: m1, z1: n1, rot: 0, seed: 7 });
 
@@ -126,7 +126,8 @@ for (const e of EDIFICIOS) {
 }
 // saídas no vão do muro (portal 4×1 sobre a linha da estacada, fecha o vão enquanto inativo)
 portais.push({ id: 'saida_norte', x: C.x, z: MURO[1], w: 4, d: 1, destino: { mapa: 'map_campos_norte', portal: 'saida_vila' }, chegada: { x: C.x, z: MURO[1] + 2, direcao: 's' }, ativo: false });
-portais.push({ id: 'saida_sul', x: C.x, z: MURO[3], w: 4, d: 1, destino: { mapa: 'map_campos_sul', portal: 'saida_vila' }, chegada: { x: C.x, z: MURO[3] - 2, direcao: 'n' }, ativo: false });
+// saída sul aberta (v0.1.3, D-045): leva ao marcador da vila no mapa de mundo (tools/gerar_mundo.mjs)
+portais.push({ id: 'saida_sul', x: C.x, z: MURO[3], w: 4, d: 1, destino: { mapa: 'map_mundo_orvalho', portal: 'marcador_vila' }, chegada: { x: C.x, z: MURO[3] - 2, direcao: 'n' }, ativo: true });
 
 const poiDe = (id, tipo, x, z) => ({ id, tipo, x, z, nome_txt: `txt_poi_${id}` });
 const portaDe = (id) => edificios.find((e) => e.id === id).porta;

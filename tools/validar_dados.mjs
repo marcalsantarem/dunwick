@@ -114,7 +114,8 @@ export function validarDados(raiz = RAIZ_PADRAO) {
     const [lx, lz, lw, lh] = m.limites_camera; if (lx < 0 || lz < 0 || lx + lw > L || lz + lh > A) erro(arq, '/limites_camera', 'limites saem do mapa');
     if (m.inicio_jogador.tile[0] >= L || m.inicio_jogador.tile[1] >= A) erro(arq, '/inicio_jogador/tile', 'início fora do mapa');
   }
-  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto, { encontros: new Set(por('encontro').map(([, e]) => e.id)), itens: new Set(por('item_batalha').map(([, x]) => x.id)) }); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
+  if (kit && jogo) validarMapasLigados(por('mapa'), kit, jogo.mundo, erro, exigeTexto, { encontros: new Set(por('encontro').map(([, e]) => e.id)), itens: new Set(por('item_batalha').map(([, x]) => x.id)), paleta: new Set(Object.keys(um('cfg_mundo')?.terreno.materiais ?? {})) });
+  if (por('mapa').some(([, m]) => m.tipo_mapa === 'mundo') && !um('cfg_mundo')) erros.push('data/: há mapa de mundo mas falta data/config/cfg_mundo.json (ou ele é inválido)'); // edifícios, portais ida e volta, início/chegadas livres, POIs alcançáveis (v0.1.2)
   // ---- combate por turnos (regras cruzadas; esquemas em data/schemas/*_batalha, encontro, cfg_batalha) ----
   const cb = um('cfg_batalha');
   if (por('cfg_batalha').length === 0 && por('encontro').length) erros.push('data/combate: falta cfg_batalha.json (ou ele é inválido)');
