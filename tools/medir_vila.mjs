@@ -11,7 +11,7 @@ const arg = (n, p) => { const a = process.argv.find((x) => x.startsWith(`--${n}=
 const PORTA = Number(arg('porta', 5195)), SEG = Number(arg('seg', 60)), CROMO = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const PERFIS = arg('perfis', 'perfil_alto,perfil_medio,perfil_baixo').split(','), JANELAS = arg('janelas', '1280x720,1920x1080').split(',').map((s) => s.split('x').map(Number));
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
-const TRECHOS = [['praça', 47, 51], ['mata', 15, 60], ['canto sudeste', 82, 82], ['fora da casa do Edric', 23.5, 22], ['dentro da casa do Edric', null, null]];
+const TRECHOS = [['mundo', 'M', 0], ['praça', 47, 51], ['mata', 15, 60], ['canto sudeste', 82, 82], ['fora da casa do Edric', 23.5, 22], ['dentro da casa do Edric', null, null]];
 
 const srv = spawn(process.execPath, [join(RAIZ, 'tools/servir.mjs'), 'dev', `--porta=${PORTA}`], { cwd: RAIZ, stdio: ['ignore', 'pipe', 'pipe'] });
 let log = ''; srv.stdout.on('data', (d) => { log += d; }); srv.stderr.on('data', (d) => { log += d; });
@@ -27,7 +27,10 @@ try {
     let quadros = [], gl = { chamadas: 0, triangulos: 0, texturas: 0, geometrias: 0 }, heap = 0;
     const porTrecho = [];
     for (const [nome, x, z] of TRECHOS) {
-      if (x === null) { // entra na casa pelo portal da porta
+      if (x === 'M') { // mapa de mundo: entra pelo vão sul da vila e, ao fim do trecho, volta pelo marcador da vila
+        await p.evaluate(() => { const h = __dunwick.mundo.heroi; h.x = h.ox = 47; h.z = h.oz = 77.5; h.vx = h.vz = 0; }); await dormir(300);
+        await p.evaluate(() => { const h = __dunwick.mundo.heroi; h.x = h.ox = 47; h.z = h.oz = 79; }); await p.waitForFunction("__dunwick.mundo.mapaId === 'map_mundo_orvalho' && !__dunwick.apr.trans", { timeout: 10000 }).catch(() => {}); await dormir(300); await livre(27, 24); // longe dos marcadores: o trecho mede o mundo, não volta à vila
+      } else if (x === null) { // entra na casa pelo portal da porta
         await p.evaluate(() => { const h = __dunwick.mundo.heroi; h.x = h.ox = 23.5; h.z = h.oz = 20.6; h.vx = h.vz = 0; }); await dormir(300);
         await p.evaluate(() => { const h = __dunwick.mundo.heroi; h.x = h.ox = 23.5; h.z = h.oz = 19.5; }); await p.waitForFunction("__dunwick.mundo.mapaId === 'map_casa_edric_interior' && !__dunwick.apr.trans", { timeout: 10000 }).catch(() => {}); await dormir(300);
       } else await livre(x, z);
@@ -36,8 +39,8 @@ try {
       await p.keyboard.down('ShiftLeft');
       while (Date.now() - ini < (SEG / TRECHOS.length) * 1000) for (const [k, ms] of rota) { if (Date.now() - ini >= (SEG / TRECHOS.length) * 1000) break; await p.keyboard.down(k); await dormir(ms); await p.keyboard.up(k); }
       await p.keyboard.up('ShiftLeft');
-      const e = await p.evaluate('__dunwick.estatisticasGl()'); const t = await p.evaluate('__dunwick.exportarTempos()');
-      const v = t.quadros_ms.slice(10).sort((a, b) => a - b); porTrecho.push({ nome, fps: +(1000 / (v.reduce((s, q) => s + q, 0) / v.length)).toFixed(1), pior1: +(1000 / (v.slice(Math.floor(v.length * 0.99)).reduce((s, q) => s + q, 0) / v.slice(Math.floor(v.length * 0.99)).length)).toFixed(1), maior_ms: +v[v.length - 1].toFixed(0), lentos: v.filter((q) => q > 25).length, chamadas: e.chamadas, triangulos: e.triangulos });
+      const e = await p.evaluate('__dunwick.estatisticasGl()'), mapaFim = await p.evaluate('__dunwick.mundo.mapaId');  const t = await p.evaluate('__dunwick.exportarTempos()'); if (x === 'M') { await p.evaluate(() => { const h = __dunwick.mundo.heroi; h.x = h.ox = 20; h.z = h.oz = 30; }); await p.waitForFunction("__dunwick.mundo.mapaId === 'map_baixo_orvalho' && !__dunwick.apr.trans", { timeout: 10000 }).catch(() => {}); await dormir(300); } // a volta à vila só depois de medir (a troca por portal não entra na medição)
+      const v = t.quadros_ms.slice(10).sort((a, b) => a - b); porTrecho.push({ nome, mapa: mapaFim, fps: +(1000 / (v.reduce((s, q) => s + q, 0) / v.length)).toFixed(1), pior1: +(1000 / (v.slice(Math.floor(v.length * 0.99)).reduce((s, q) => s + q, 0) / v.slice(Math.floor(v.length * 0.99)).length)).toFixed(1), maior_ms: +v[v.length - 1].toFixed(0), lentos: v.filter((q) => q > 25).length, chamadas: e.chamadas, triangulos: e.triangulos });
       quadros = quadros.concat(t.quadros_ms.slice(10)); gl = { chamadas: Math.max(gl.chamadas, e.chamadas), triangulos: Math.max(gl.triangulos, e.triangulos), texturas: Math.max(gl.texturas, e.texturas), geometrias: Math.max(gl.geometrias, e.geometrias) };
       heap = Math.max(heap, await p.evaluate('performance.memory.usedJSHeapSize / 1048576'));
     }

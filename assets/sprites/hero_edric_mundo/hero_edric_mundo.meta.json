@@ -1,0 +1,68 @@
+{
+  "id": "hero_edric_mundo",
+  "tipo": "sprite_humanoide",
+  "celula": [
+    32,
+    32
+  ],
+  "ancora": [
+    16,
+    29
+  ],
+  "arte_escala": 1,
+  "ref_celula": 32,
+  "direcoes": [
+    "s",
+    "se",
+    "l",
+    "ne",
+    "n"
+  ],
+  "espelhar": {
+    "sw": "se",
+    "o": "l",
+    "nw": "ne"
+  },
+  "colunas": 8,
+  "anims": {
+    "idle": {
+      "quadros": 2,
+      "fps": 3,
+      "loop": true,
+      "inicio": 0
+    },
+    "andar": {
+      "quadros": 4,
+      "fps": 8,
+      "loop": true,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 2,
+          "tipo": "passo"
+        }
+      ],
+      "inicio": 10
+    },
+    "correr": {
+      "quadros": 4,
+      "fps": 12,
+      "loop": true,
+      "eventos": [
+        {
+          "quadro": 0,
+          "tipo": "passo"
+        },
+        {
+          "quadro": 2,
+          "tipo": "passo"
+        }
+      ],
+      "inicio": 30
+    }
+  },
+  "nota": "Edric de mundo (D-045): minúsculo (~20 px de altura numa célula 32×32), sem poses de batalha. Mesmo esquema do hero_edric: quadro = inicio + dir*quadros + q; 5 direções, o motor espelha as demais. Sem normal map."
+}

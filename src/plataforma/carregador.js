@@ -26,9 +26,9 @@ export function criarCarregador(manifesto) {
 
 /** Carrega tudo que a cena precisa, em paralelo, a partir dos dados já lidos. */
 export async function carregarRecursos(carregador, dados) {
-  const ids = [...new Set([...Object.values(dados.personagens), ...Object.values(dados.inimigos)].map((d) => d.sprite))];
+  const idsBase = [...new Set([...Object.values(dados.personagens), ...Object.values(dados.inimigos)].map((d) => d.sprite))], idsMundo = [...new Set(Object.values(dados.personagens).map((d) => d.sprite_mundo).filter(Boolean))]; const ids = [...idsBase, ...idsMundo.filter((i) => !idsBase.includes(i))]; // sprite_mundo: atlas do herói no mapa de mundo (pasta própria = id, ex.: assets/sprites/hero_edric_mundo/)
   // atlas de batalha (cfg_sprites_batalha): o próprio ou a base do provisório
   const sb = dados.config.sprites_batalha?.atores ?? {}, idsBatalha = [...new Set(Object.values(sb).map((a) => a.atlas ?? a.provisorio.base))];
-  const [atlas, texs, ping, atlasBat] = await Promise.all([Promise.all(ids.map((id) => carregador.atlas(id))), Promise.all(NOMES_TEXTURAS.map((n) => carregador.textura(n))), carregador.bytes('audio/sfx_teste_ping.wav'), Promise.all(idsBatalha.map((id) => carregador.atlas(id, id.replace(/_batalha$/, ''))))]);
+  const [atlas, texs, ping, atlasBat] = await Promise.all([Promise.all(ids.map((id) => carregador.atlas(id, id))), Promise.all(NOMES_TEXTURAS.map((n) => carregador.textura(n))), carregador.bytes('audio/sfx_teste_ping.wav'), Promise.all(idsBatalha.map((id) => carregador.atlas(id, id.replace(/_batalha$/, ''))))]);
   return { atlas: Object.fromEntries(ids.map((id, i) => [id, atlas[i]])), metas: Object.fromEntries(ids.map((id, i) => [id, atlas[i].meta])), texturas: Object.fromEntries(NOMES_TEXTURAS.map((n, i) => [n, texs[i]])), sfxPing: ping, atlasBatalha: Object.fromEntries(idsBatalha.map((id, i) => [id, atlasBat[i]])) };
 }

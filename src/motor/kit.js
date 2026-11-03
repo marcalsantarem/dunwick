@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PECAS_VILA, materiaisCasa, decorarCasa } from './kit_vila.js';
 import { PECAS_INTERIOR } from './kit_interior.js';
+import { PECAS_MUNDO } from './kit_mundo.js';
 
 export const rng = (s) => { let x = (s >>> 0) || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); };
 const M4 = new THREE.Matrix4(), V3 = new THREE.Vector3(), Q = new THREE.Quaternion(), E = new THREE.Euler();
@@ -155,7 +156,7 @@ export function construirKit(mapaDados, kit, texelsPorTile = 64) {
       case 'casa': { const j0 = saida.janelas.length; casa(col, o, kit, saida); decorarCasa(col, o, kit, saida, saida.janelas.slice(j0)); break; } case 'arvore': arvore(col, o, kit); break; case 'pinheiro': pinheiro(col, o, kit); break; case 'arbusto': arbusto(col, o); break;
       case 'pedra': pedra(col, o); break; case 'poco': poco(col, o); break; case 'torre_sino': torreSino(col, o, kit, saida); break; case 'lanterna': lanterna(col, o, kit, saida); break;
       case 'barril': barril(col, o); break; case 'caixote': caixote(col, o); break; case 'cerca': cerca(col, o); break;
-      default: (PECAS_VILA[o.tipo] ?? PECAS_INTERIOR[o.tipo])?.(col, o, kit, saida);
+      default: (PECAS_VILA[o.tipo] ?? PECAS_INTERIOR[o.tipo] ?? PECAS_MUNDO[o.tipo])?.(col, o, kit, saida);
     }
   }
   // interior: a marcação de SAÍDA (capacho, luz de fora e fonte de luz) é desenhada no ponto do portal `saida` (borda sul)

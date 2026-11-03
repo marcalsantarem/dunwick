@@ -153,6 +153,27 @@ try {
     }
     await p.close();
   }
+  // mapa de mundo (v0.1.3): da vila ao mundo pelo vão sul, banner com o nome, cena de mundo ativa, câmera mais distante, e de volta à vila
+  for (const [rotulo, op] of [['PC', { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0', w: 1280, h: 720, dpr: 1, touch: false }], ['iPhone deitado', { ua: UA_IOS, w: 844, h: 390, dpr: 3, movel: true }]]) {
+    const p = await abrir(op);
+    const info = await p.evaluate(() => { const d = __dunwick.mundo.dados.mapas, vila = __dunwick.mundo.mapaId, mu = Object.values(d).find((m) => m.tipo_mapa === 'mundo'); if (!mu) return null; const pv = d[vila].portais.find((q) => q.ativo && q.destino.mapa === mu.id), pm = mu.portais.find((q) => q.ativo && q.destino.mapa === vila); return { vila, mundo: mu.id, pv, pm, texto: __dunwick.mundo.dados.textos?.['pt-BR']?.[mu.nome_txt] ?? null, ppu: __dunwick.cenas.get(mu.id).meioW, ppuVila: __dunwick.cenas.get(vila).meioW }; });
+    checar(rotulo + ': há mapa de mundo ligado à vila por portal ativo', !!(info && info.pv && info.pm), JSON.stringify(info));
+    if (!info?.pv) { await p.close(); continue; }
+    const ir = (x, z) => p.evaluate((x, z) => { const h = __dunwick.mundo.heroi; h.x = h.ox = x; h.z = h.oz = z; h.vx = h.vz = 0; }, x, z);
+    const esperar = (cond) => p.waitForFunction(cond, { timeout: 8000 }).then(() => true, () => false);
+    await ir(info.pv.x, info.pv.z - info.pv.d - 0.8); await dormir(300); await ir(info.pv.x, info.pv.z);
+    const noMundo = await esperar(`__dunwick.mundo.mapaId === '${info.mundo}' && !__dunwick.apr.trans`), ativa = await p.evaluate((id) => __dunwick.cena === __dunwick.cenas.get(id), info.mundo);
+    checar(rotulo + ': o vão sul da vila leva ao mundo (cena de mundo ativa)', noMundo && ativa);
+    checar(rotulo + ': a câmera do mundo mostra mais área que a da vila (zoom out)', info.ppu > info.ppuVila * 1.5, `meia largura ${info.ppu.toFixed(1)} vs ${info.ppuVila.toFixed(1)} tiles`);
+    await dormir(500); await p.screenshot({ path: join(DIR, 'mundo_' + rotulo.replace(' ', '_') + '.png') });
+    const texto = info.texto ?? 'Campos de Baixo Orvalho', vis = () => p.evaluate((tx) => [...document.querySelectorAll('#ui *')].some((n) => n.children.length === 0 && n.textContent.trim() === tx && n.getClientRects().length > 0 && +getComputedStyle(n).opacity > 0.05), texto);
+    checar(rotulo + ': banner "' + texto + '" ao entrar no mundo', await vis(), 'banner não encontrado');
+    let sumiu = false; for (let i = 0; i < 16 && !sumiu; i++) { await dormir(500); sumiu = !(await vis()); } checar(rotulo + ': o banner do mundo some sozinho', sumiu);
+    await ir(info.pm.x, info.pm.z);
+    const volta = await esperar(`__dunwick.mundo.mapaId === '${info.vila}' && !__dunwick.apr.trans`);
+    checar(rotulo + ': tocar o marcador da vila volta à vila', volta);
+    await p.close();
+  }
   checar('console limpo (0 erros)', erros.length === 0, erros.slice(0, 4).join(' | '));
 } finally { await nav.close(); srv.kill(); }
 const f = resultados.filter((x) => !x.ok); console.log(`\n${f.length ? '✗' : '✓'} ${resultados.length - f.length}/${resultados.length} verificações do modo celular passaram`); process.exit(f.length ? 1 : 0);

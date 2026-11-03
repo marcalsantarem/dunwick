@@ -76,7 +76,12 @@
           "grama",
           "terra",
           "calcada",
-          "musgo"
+          "musgo",
+          "mata_rala",
+          "agua",
+          "estrada",
+          "montanha",
+          "areia"
         ]
       }
     },
@@ -223,6 +228,10 @@
           "aberto": {
             "type": "boolean",
             "description": "bau_tesouro: já aberto (tampa levantada)"
+          },
+          "interditado": {
+            "type": "boolean",
+            "description": "marcador de local ainda inacessível (visual apagado)"
           }
         }
       }
@@ -274,6 +283,31 @@
           "minimum": 0,
           "maximum": 60,
           "description": "partículas de poeira do cômodo (0 = nenhuma; padrão dos interiores)"
+        },
+        "sol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cor",
+            "intensidade",
+            "elevacao_graus"
+          ],
+          "properties": {
+            "cor": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "intensidade": {
+              "type": "number",
+              "minimum": 0
+            },
+            "elevacao_graus": {
+              "type": "number",
+              "minimum": 5,
+              "maximum": 90
+            }
+          },
+          "description": "mundo: luz direcional sem sombra (opcional)"
         }
       }
     },
@@ -299,7 +333,8 @@
     "tipo_mapa": {
       "enum": [
         "exterior",
-        "interior"
+        "interior",
+        "mundo"
       ]
     },
     "estado": {
@@ -465,6 +500,11 @@
                 ]
               }
             }
+          },
+          "aviso_txt": {
+            "type": "string",
+            "pattern": "^txt_[a-z0-9_]+$",
+            "description": "aviso ao tocar no portal interditado"
           }
         }
       }
@@ -541,6 +581,16 @@
           ]
         }
       }
+    },
+    "solidos": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "uniqueItems": true,
+      "description": "mapa de mundo: caracteres da legenda que bloqueiam o herói (colisores gerados da planta)"
     }
   }
 }

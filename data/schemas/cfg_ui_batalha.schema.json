@@ -20,7 +20,8 @@
     "toque_min_px_css",
     "t_dica_s",
     "minimapa",
-    "banner_mapa"
+    "banner_mapa",
+    "marcador_mundo"
   ],
   "properties": {
     "id": {
@@ -145,6 +146,32 @@
         "t_sai_s": {
           "type": "number",
           "minimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "marcador_mundo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raio_nome_tiles",
+        "raio_apontar_tiles",
+        "t_aviso_s"
+      ],
+      "properties": {
+        "raio_nome_tiles": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "raio_apontar_tiles": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "t_aviso_s": {
+          "type": "number",
+          "minimum": 0.5,
           "maximum": 10
         }
       }

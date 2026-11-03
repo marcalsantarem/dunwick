@@ -1,0 +1,499 @@
+{
+  "id": "map_mundo_orvalho",
+  "versao": 2,
+  "nome_txt": "txt_map_mundo_orvalho_nome",
+  "origem": "tools/gerar_mundo.mjs (14, mapa de mundo v0.1.3b — D-045/D-048)",
+  "tipo_mapa": "mundo",
+  "estado": "dia",
+  "tamanho": [48, 48],
+  "legenda": {
+    "g": "grama",
+    "r": "mata_rala",
+    "e": "estrada",
+    "a": "agua",
+    "n": "montanha",
+    "p": "areia"
+  },
+  "solidos": [
+    "a",
+    "n"
+  ],
+  "planta": [
+    "nnnnnnnnnnnnnnnnnnnnnnnnannnnnnnnnnnnnnnnnnaaaaa",
+    "nnnnnnnnnnnnnnnnnnnnnnnnannnnnnnnnnnnnnnnnnaaaaa",
+    "nnnnnnnnnnnnnnnnnnnnnnnnannnnnnnnnnnnnnnnnnnaaaa",
+    "nnnnnnnnnnnnnnnnnnnnnnnnaannnnnnnnnnnnnnnnnaaaaa",
+    "nnnnnnnnnnnnnnnnnnnnnnnnaannnnnnnnnnnnnnnnnaaaaa",
+    "nnnnnnnnnnnnnnnnnnnnngggaannggnnngnnnnnnnaaaaaaa",
+    "nnnnggggrrrgggrrgrrrrgggaagggggggggggrpppaaaaaaa",
+    "nnnnrggrrrgrgggrrrrrggggaggggggggggggppaaaaaaaaa",
+    "nnnnrrrrrgrrrrrrrrrrrgggaggggrggggggppaaaaaappaa",
+    "nnnnrrrrrgrrrrrrrrrrggggaagggrrgeegrrpaaaaaappaa",
+    "nnnnrrrgggrrrrgrrrgggggggagggrrrgeerrpaaaaaaaaaa",
+    "nnnnrrrrggrrrrrrrrrggggaaaaaarrggrerrpaaaaaaaaaa",
+    "nnnngrrrrgrrgrrrrrrggggaaaaaaargrreerrpaaaaaaaaa",
+    "nnnngrrrggggrrrrrrgggggaaaaaaargrrrerrrpaaaaaaaa",
+    "nnnggrrrgggggrrrgrggggggaaaaaaagrrrerrrrppaaaaaa",
+    "nnnrrrrgggggrrrrrrrggggggggggaaarrreerrrrrpaaaaa",
+    "nnnrrrrrggegrrrrrrggrgggggggggaagrreerrrrrpaaaaa",
+    "nnnrrrrrrreerrrrrrrgggggggggggaaggreerrrrrpaaaaa",
+    "nnnrrrrrrrreerrrrgggggggggggggaagrgeerggggpaaaaa",
+    "nnnrrrrrrrrreerrggggggggggggggaaggeeggggggpaaaaa",
+    "nnnrrrrrrrrreergggggggggggeeeeeeeeegggggppappaaa",
+    "nnnrrrrrrrrrreeeggggggggeeeeeeeeeeeggggpaaaapaaa",
+    "nnnggrrrrrrrrreeeeggggeeeggrrraagggggppaaaaaaaaa",
+    "nnngggggrrrrrrgggeeggeeggrrgggaaagggppaaaaaaaaaa",
+    "nnngggrrrrrrrrggggeeeegrrrgggggaaggppaaaaaaaaaaa",
+    "nnnrggggggggrggrgggeeggggggggrrgaagppaaaaaaaaaaa",
+    "nnnngggggggggggrgggeeggggggggggggaaaapaaaaaaaaaa",
+    "nnnngggggggggggggggeegggggggggggggaaaaaaaaaaaaaa",
+    "nnnnrgggrggggggggggeeggggggggggggggggaaapaaaaaaa",
+    "nnnnrgrrrrrggggggggeegggggggggggggggggaaapaaaaaa",
+    "nnnnrrrrrrrrgggggggeeggggggggggggggggggaaaaaaaaa",
+    "nnnnrrrrrrrrrggggggeegggggrrgggrrrrggrrgggaaaaaa",
+    "nnnnrrrrrrrrrrrgggggeggggrrrrrrrrrgggrrggggpaaaa",
+    "nnnnrrrrrrrrrrrrggggeggggggggrrrggggggggggppaaaa",
+    "nnnrrgrrrrrrrrgrrggggegggggrrrrrggggggggppaaaaaa",
+    "nnnrrgrrrrrrrrrggggggeegggrrrrrrrrggggpppaaaaaaa",
+    "nnnrrgrrrrrrrrrgggggggeeggrgrrrrrrrggpppaaaaaaaa",
+    "nnngrrrrgrrrrrgggggggggeggrrrrrrgrrggpaaaaaaaaaa",
+    "nnnnrrrrgrrrrrgggggggggrggrprrrrgrgppaaaaaaaaaaa",
+    "nnnrrpprrggggggggggggggrrppppprrrgpaaaaaaaaaaaaa",
+    "nnngppppppppggggggggggggpaaappprggpaaaaaaaaaaaaa",
+    "nnnnpaaaaaaapgggggggggggpaaaaapprgpaaaaaaaaaaaaa",
+    "nnnnaaaaaaaappggpppgggppaaaaaaapppppaaaaaaaaaaaa",
+    "nnaaaaaaaaaaaapppppppppaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaappaaaaaaaaaaaaa",
+    "aaaaaaaaappaaaaaaaaaaaaaaaaaaaaaappaaaaaaaaaaaaa",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ],
+  "objetos": [
+    {
+      "id": "marcador_vila",
+      "tipo": "marcador_vila",
+      "x": 20,
+      "z": 30,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "marcador_bosque",
+      "tipo": "marcador_bosque",
+      "x": 10,
+      "z": 15,
+      "rot": 0,
+      "seed": 1,
+      "interditado": true
+    },
+    {
+      "id": "marcador_caverna",
+      "tipo": "marcador_caverna",
+      "x": 33,
+      "z": 8,
+      "rot": 0,
+      "seed": 1,
+      "interditado": true
+    },
+    {
+      "id": "ponte_rio",
+      "tipo": "ponte_mundo",
+      "x": 31,
+      "z": 21,
+      "w": 2.5,
+      "rot": 0,
+      "seed": 1
+    },
+    {
+      "id": "rocha_mundo_0",
+      "tipo": "rocha_mundo",
+      "x": 42.54,
+      "z": 18.21,
+      "rot": 99,
+      "escala": 0.72,
+      "seed": 96
+    },
+    {
+      "id": "rocha_mundo_1",
+      "tipo": "rocha_mundo",
+      "x": 14.7,
+      "z": 43.6,
+      "rot": 176,
+      "escala": 1.04,
+      "seed": 532
+    },
+    {
+      "id": "rocha_mundo_2",
+      "tipo": "rocha_mundo",
+      "x": 11.99,
+      "z": 39.49,
+      "rot": 49,
+      "escala": 0.88,
+      "seed": 806
+    },
+    {
+      "id": "rocha_mundo_3",
+      "tipo": "rocha_mundo",
+      "x": 40.37,
+      "z": 35.91,
+      "rot": 175,
+      "escala": 0.71,
+      "seed": 632
+    },
+    {
+      "id": "rocha_mundo_4",
+      "tipo": "rocha_mundo",
+      "x": 18.13,
+      "z": 43.96,
+      "rot": 337,
+      "escala": 1.16,
+      "seed": 464
+    },
+    {
+      "id": "rocha_mundo_5",
+      "tipo": "rocha_mundo",
+      "x": 40.18,
+      "z": 28.79,
+      "rot": 219,
+      "escala": 0.99,
+      "seed": 226
+    },
+    {
+      "id": "rocha_mundo_6",
+      "tipo": "rocha_mundo",
+      "x": 3.17,
+      "z": 35.15,
+      "rot": 314,
+      "escala": 1.18,
+      "seed": 887
+    },
+    {
+      "id": "rocha_mundo_7",
+      "tipo": "rocha_mundo",
+      "x": 37.24,
+      "z": 10.55,
+      "rot": 240,
+      "escala": 0.99,
+      "seed": 839
+    },
+    {
+      "id": "rocha_mundo_8",
+      "tipo": "rocha_mundo",
+      "x": 5.09,
+      "z": 6.91,
+      "rot": 358,
+      "escala": 0.83,
+      "seed": 265
+    },
+    {
+      "id": "rocha_mundo_9",
+      "tipo": "rocha_mundo",
+      "x": 34.78,
+      "z": 40.79,
+      "rot": 224,
+      "escala": 0.71,
+      "seed": 170
+    },
+    {
+      "id": "rocha_mundo_10",
+      "tipo": "rocha_mundo",
+      "x": 35.41,
+      "z": 6.83,
+      "rot": 118,
+      "escala": 1.02,
+      "seed": 632
+    },
+    {
+      "id": "rocha_mundo_11",
+      "tipo": "rocha_mundo",
+      "x": 17.3,
+      "z": 6.88,
+      "rot": 103,
+      "escala": 1.04,
+      "seed": 0
+    },
+    {
+      "id": "rocha_mundo_12",
+      "tipo": "rocha_mundo",
+      "x": 10.05,
+      "z": 6.57,
+      "rot": 344,
+      "escala": 1.28,
+      "seed": 853
+    },
+    {
+      "id": "rocha_mundo_13",
+      "tipo": "rocha_mundo",
+      "x": 20.77,
+      "z": 6.22,
+      "rot": 72,
+      "escala": 0.85,
+      "seed": 612
+    },
+    {
+      "id": "rocha_mundo_14",
+      "tipo": "rocha_mundo",
+      "x": 43.3,
+      "z": 20.94,
+      "rot": 326,
+      "escala": 1.01,
+      "seed": 79
+    },
+    {
+      "id": "rocha_mundo_15",
+      "tipo": "rocha_mundo",
+      "x": 10.67,
+      "z": 46.49,
+      "rot": 35,
+      "escala": 0.91,
+      "seed": 271
+    },
+    {
+      "id": "rocha_mundo_16",
+      "tipo": "rocha_mundo",
+      "x": 3.42,
+      "z": 37.16,
+      "rot": 6,
+      "escala": 1.24,
+      "seed": 58
+    },
+    {
+      "id": "rocha_mundo_17",
+      "tipo": "rocha_mundo",
+      "x": 6.76,
+      "z": 7.99,
+      "rot": 225,
+      "escala": 0.87,
+      "seed": 232
+    },
+    {
+      "id": "rocha_mundo_18",
+      "tipo": "rocha_mundo",
+      "x": 18.25,
+      "z": 16.72,
+      "rot": 275,
+      "escala": 1.05,
+      "seed": 123
+    },
+    {
+      "id": "rocha_mundo_19",
+      "tipo": "rocha_mundo",
+      "x": 3.66,
+      "z": 24,
+      "rot": 27,
+      "escala": 0.77,
+      "seed": 785
+    },
+    {
+      "id": "rocha_mundo_20",
+      "tipo": "rocha_mundo",
+      "x": 7.91,
+      "z": 6.67,
+      "rot": 149,
+      "escala": 1.22,
+      "seed": 994
+    },
+    {
+      "id": "rocha_mundo_21",
+      "tipo": "rocha_mundo",
+      "x": 3.65,
+      "z": 20.44,
+      "rot": 292,
+      "escala": 1.08,
+      "seed": 497
+    },
+    {
+      "id": "rocha_mundo_22",
+      "tipo": "rocha_mundo",
+      "x": 22.22,
+      "z": 17.02,
+      "rot": 53,
+      "escala": 0.86,
+      "seed": 475
+    },
+    {
+      "id": "rocha_mundo_23",
+      "tipo": "rocha_mundo",
+      "x": 18.56,
+      "z": 18.82,
+      "rot": 31,
+      "escala": 1.02,
+      "seed": 919
+    },
+    {
+      "id": "rocha_mundo_24",
+      "tipo": "rocha_mundo",
+      "x": 27.14,
+      "z": 9.67,
+      "rot": 62,
+      "escala": 0.72,
+      "seed": 463
+    },
+    {
+      "id": "rocha_mundo_25",
+      "tipo": "rocha_mundo",
+      "x": 3.07,
+      "z": 14.28,
+      "rot": 149,
+      "escala": 1.06,
+      "seed": 980
+    },
+    {
+      "id": "rocha_mundo_26",
+      "tipo": "rocha_mundo",
+      "x": 23.33,
+      "z": 25.7,
+      "rot": 44,
+      "escala": 1.27,
+      "seed": 626
+    },
+    {
+      "id": "rocha_mundo_27",
+      "tipo": "rocha_mundo",
+      "x": 23.44,
+      "z": 19.36,
+      "rot": 158,
+      "escala": 1.07,
+      "seed": 902
+    },
+    {
+      "id": "rocha_mundo_28",
+      "tipo": "rocha_mundo",
+      "x": 30.22,
+      "z": 27.25,
+      "rot": 34,
+      "escala": 1.27,
+      "seed": 740
+    },
+    {
+      "id": "rocha_mundo_29",
+      "tipo": "rocha_mundo",
+      "x": 41.13,
+      "z": 34.34,
+      "rot": 198,
+      "escala": 1.03,
+      "seed": 563
+    },
+    {
+      "id": "rocha_mundo_30",
+      "tipo": "rocha_mundo",
+      "x": 18.95,
+      "z": 6.63,
+      "rot": 306,
+      "escala": 0.93,
+      "seed": 104
+    },
+    {
+      "id": "rocha_mundo_31",
+      "tipo": "rocha_mundo",
+      "x": 4.22,
+      "z": 31.04,
+      "rot": 185,
+      "escala": 0.78,
+      "seed": 625
+    },
+    {
+      "id": "rocha_mundo_32",
+      "tipo": "rocha_mundo",
+      "x": 23.75,
+      "z": 40.53,
+      "rot": 252,
+      "escala": 0.82,
+      "seed": 184
+    },
+    {
+      "id": "rocha_mundo_33",
+      "tipo": "rocha_mundo",
+      "x": 21.11,
+      "z": 20.78,
+      "rot": 300,
+      "escala": 0.82,
+      "seed": 890
+    }
+  ],
+  "portais": [
+    {
+      "id": "marcador_vila",
+      "x": 20,
+      "z": 30,
+      "w": 2,
+      "d": 2,
+      "destino": {
+        "mapa": "map_baixo_orvalho",
+        "portal": "saida_sul"
+      },
+      "chegada": {
+        "x": 20,
+        "z": 32,
+        "direcao": "s"
+      },
+      "ativo": true
+    },
+    {
+      "id": "marcador_bosque",
+      "x": 10,
+      "z": 15,
+      "w": 2,
+      "d": 2,
+      "destino": {
+        "mapa": "map_bosque_orvalho",
+        "portal": "entrada"
+      },
+      "chegada": {
+        "x": 10,
+        "z": 17,
+        "direcao": "s"
+      },
+      "nome_txt": "txt_mundo_marcador_bosque_nome",
+      "aviso_txt": "txt_mundo_marcador_bosque_aviso",
+      "ativo": false
+    },
+    {
+      "id": "marcador_caverna",
+      "x": 33,
+      "z": 8,
+      "w": 2,
+      "d": 2,
+      "destino": {
+        "mapa": "map_caverna_hollowpaw",
+        "portal": "entrada"
+      },
+      "chegada": {
+        "x": 33,
+        "z": 10,
+        "direcao": "s"
+      },
+      "nome_txt": "txt_mundo_marcador_caverna_nome",
+      "aviso_txt": "txt_mundo_marcador_caverna_aviso",
+      "ativo": false
+    }
+  ],
+  "pois": [
+    {
+      "id": "marcador_vila",
+      "tipo": "marcador",
+      "x": 20,
+      "z": 30,
+      "nome_txt": "txt_mundo_marcador_vila_nome"
+    },
+    {
+      "id": "marcador_bosque",
+      "tipo": "marcador",
+      "x": 10,
+      "z": 15,
+      "nome_txt": "txt_mundo_marcador_bosque_nome"
+    },
+    {
+      "id": "marcador_caverna",
+      "tipo": "marcador",
+      "x": 33,
+      "z": 8,
+      "nome_txt": "txt_mundo_marcador_caverna_nome"
+    }
+  ],
+  "inicio_jogador": {
+    "tile": [20, 32],
+    "direcao": "s"
+  },
+  "limites_camera": [4, 4, 40, 40]
+}

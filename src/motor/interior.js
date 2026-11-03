@@ -17,7 +17,7 @@ export function paredesInterior(m, materiais, texelsPorTile = 64) {
 }
 
 /** Estado de luz do interior no mesmo formato de `estadoCiclo` (cena.js lê os mesmos campos). */
-export function ambienteInterior(amb) {
-  const cor = hex(amb.cor_luz), k = amb.intensidade, fundo = hex(amb.fundo).map((c) => c ** 2.2); // fundo sRGB → linear (escuro de verdade)
-  return { tom: [1, 0.98, 0.94], luzArtificial: 1, solCor: [0, 0, 0], solInt: 0, solElev: 60, hemiCeu: cor.map((c) => c * k), hemiChao: cor.map((c) => c * k * 0.55), hemiInt: 1, fundo, nevoa: fundo };
+export function ambienteInterior(amb, mundo = false) {
+  const cor = hex(amb.cor_luz), k = amb.intensidade, fundo = hex(amb.fundo).map((c) => c ** 2.2), sol = amb.sol; // fundo sRGB → linear (escuro de verdade); `sol` (mundo): luz direcional sem sombra
+  return { tom: [1, 0.98, 0.94], luzArtificial: mundo ? 0 : 1, solCor: sol ? hex(sol.cor) : [0, 0, 0], solInt: sol ? sol.intensidade : 0, solElev: sol ? sol.elevacao_graus : 60, hemiCeu: cor.map((c) => c * k), hemiChao: cor.map((c) => c * k * 0.55), hemiInt: 1, fundo, nevoa: fundo };
 }
