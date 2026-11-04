@@ -8,7 +8,7 @@ Fantasia medieval original, humor ácido e um sino que nunca devia ter voltado p
 [**▶ Jogar a versão estável**](https://dunwick.netlify.app) · [**🧪 Versão em desenvolvimento**](https://dev--dunwick.netlify.app)
 
 ![status](https://img.shields.io/badge/status-em%20desenvolvimento-orange)
-![versão](https://img.shields.io/badge/versão-v0.1.3-blue)
+![versão](https://img.shields.io/badge/versão-v0.1.4-blue)
 ![classificação](https://img.shields.io/badge/classificação-16%2B-red)
 ![plataforma](https://img.shields.io/badge/plataforma-navegador-brightgreen)
 
@@ -125,7 +125,7 @@ Tudo é decidido pelo usuário e registrado em [`docs/04_decisoes.md`](docs/04_d
 | v0.1.1 | batalha por turnos básica validada |
 | v0.1.2 | vila completa com interiores, casa do Edric, boneco de treino, entorno com mata e muralha, nome do mapa e minimapa ✅ |
 | v0.1.3 | mapa de mundo estilizado (Campos de Baixo Orvalho), vila como marcador, baús só em locais ✅ |
-| v0.1.4 | NPCs, diálogos, lojas e moeda |
+| v0.1.4 | NPCs, diálogos, lojas, moeda Coroa e menu principal ✅ |
 | v0.1.5 | encontros aleatórios, classe, nível por XP, save e recompensas |
 | v0.1.6 | missões da vila e sistema de missões |
 | v0.1.7 | bosque e caverna como locais ricos acessados por portal |
